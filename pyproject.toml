@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "werp-toolkit-demo"
+version = "0.1.0"
+description = ""
+authors = ["Galen Holt <53928785+galenholt@users.noreply.github.com>"]
+readme = "README.md"
+packages = [{include = "werp_toolkit_demo"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+py-ewr = "1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
