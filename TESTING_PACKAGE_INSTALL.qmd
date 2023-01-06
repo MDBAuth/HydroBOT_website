@@ -1,0 +1,91 @@
+---
+title: "pytest"
+format: html
+editor: visual
+---
+
+```{r setup}
+#| warning: false
+#| message: false
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+```
+
+Without the `force = TRUE` this almost never rebuilds even with changes.
+
+```{r}
+# credentials::set_github_pat()
+# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr')
+devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+```
+
+```{r}
+library(werptoolkitr)
+```
+
+```{r}
+Sys.setenv(RETICULATE_PYTHON = 'C:/Users/galen/Documents/WERP_toolkit/werptoolkitpy/.venv/Scripts/python.exe')
+```
+
+Just trying to check the vignette that breaks `devtools::check`
+
+The scenario controller is primarily an interface that allows us to point to the input data, run the EWR tool, and save outputs and metadata in a standard format.
+
+## Input hydrographs
+
+The first task is to point at the hydrographs for the scenarios. I expect the format of those scenarios to change, and so the default methods for handling them will as well. Likewise, they should come in with metadata describing them, but we don't know what that looks like yet.
+
+*At present*, the controller expects hydrographs in csvs with a particular folder structure, and saves the EWR output to the same directory. But that is specific to keeping the package together, and should change in use.
+
+For testing purposes, we use `testsmall`, which is 5 years and 6 gauges (3 in each of two catchments). For a more extended demo, see `WERP_toolkit_demo`.
+
+```{r}
+# 'testsmall' is 5 years and 6 gauges, fast for testing the ewr tool
+
+scenario_dir <- file.path('TRASHDATA', 'testsmall')
+
+output_dir <- file.path('TRASHDATA', 'testsmall')
+```
+
+Format of the hydrographs- the test data is modified hydrographs which match IQQM format.
+
+```{r}
+# Options
+# 'Bigmod - MDBA'
+# 'IQQM - NSW 10,000 years'
+# 'Source - NSW (res.csv)'
+
+model_format <- 'IQQM - NSW 10,000 years'
+```
+
+## Set some climate info
+
+Not sure why this isn't either baked-in or from somewhere.
+
+```{r}
+MINT = (100 - 0)/100
+MAXT = (100 + 0 )/100
+DUR = (100 - 0 )/100
+DRAW = (100 -0 )/100
+
+climate = 'Standard - 1911 to 2018 climate categorisation'
+```
+
+## Control output and return
+
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`, with more I need to add to reflect new EWR functionality. These have to be lists to work right.
+
+```{r}
+outputType <- list('none')
+returnType <- list('summary')
+```
+
+## Run and save
+
+The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See `data_creation/controller_R_demo.qmd` for an expanded version used to run test data and step through each step to make testing/changes more transparent.
+
+We can ask `prep_run_save_ewrs` to return any of the outputs to the current session (e.g. `returnType = list('summary', 'all')` in R or `returnType = ['summary', 'all]` in python) in addition to saving, if we want to play with things interactively.
+
+```{r}
+ewr_summary <- prep_run_save_ewrs_R(scenario_dir, output_dir, model_format, climate, outputType, returnType)
+```
