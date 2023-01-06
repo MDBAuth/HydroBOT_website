@@ -1,0 +1,359 @@
+---
+title: Test Gauge Data Mostly R
+author: Galen Holt
+format:
+  html:
+    df-print: paged
+editor: visual
+params:
+  REBUILD_DATA: FALSE
+---
+
+```{r setup}
+#| warning: false
+#| message: false
+# knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+```
+
+```{r}
+# credentials::set_github_pat()
+# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+# reticulate::use_virtualenv(file.path('.venv'))
+# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+```
+
+```{r}
+#| warning: false
+#| message: false
+library(werptoolkitr)
+library(ggplot2)
+library(sf)
+library(reticulate) # Not strictly necessary but allows easier referencing of objects
+```
+
+## TO REBUILD
+
+Rebuilding data is done with params. To rebuild, at the terminal in WERP_toolkit run `quarto render data_creation/scenario_creation/scenario_creation_R_demo.qmd -P REBUILD_DATA:TRUE`. or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+
+**TODO** use {targets} to manage this workflow.
+
+Set with params. But that doesn't work with interactive running, so deal with that.
+
+```{r}
+if ("params" %in% ls()) {
+  REBUILD_DATA <- params$REBUILD_DATA
+} else {
+  REBUILD_DATA <- FALSE
+}
+```
+
+## Dev note
+
+I originally built this in Python ([scenario_creation.qmd](data_creation/scenario_creation.qmd)), but the only bit that *needs* to be in python is the gauge puller code. I'm adding this version as an example of how to mix R and python code chunks in similar situations where we only need a bit of code from the other language.
+
+As long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`. *Now that we have nested directories, I set the RETICULATE_PYTHON env variable in* `.Rprofile` .
+
+I'm leaving the `=` alone rather than changing to `<-`.
+
+We could save shapefiles and other output as .rda or other, but it's safer and more consistent to just keep them as .shp, .csv, etc. Once we have a format for the scenarios, we'll switch to that.
+
+# Creation of demonstration scenarios
+
+We need to create demo data for several scenarios for several gauges. This finds the gauges to pull based on location, gets the data, and modifies it into scenarios. We need multiple catchments (or other aggregation units) so the spatial aggregation demonstrations are more interesting.
+
+The shapefiles used to see what we're doing and do the selecting were produced with `data_creation/spatial_data_creation.qmd` within the WERP_toolkit package to keep consistency. It's possible we'll add more shapefile creation and move all the canonical versions and their creation to their own data package or repo.
+
+Set the data dir to make that easy to change. Now we're not working in the package, but in an analysis repo. These should point to external shared directories. For now though, let's point them inside the repo at untracked dirs.
+
+This needs an outdir and a location for the canonical shapefiles
+
+```{r}
+scenariodir <- 'scenario_data'
+dataextdir <- system.file("extdata", package = 'werptoolkitr')
+```
+
+## Read in gauges
+
+Use the bom gauges, since this is what were contained in the EWR tool.
+
+```{r}
+gaugegeo = read_sf(file.path(dataextdir, 'bom_gauges.shp'))
+```
+
+## Read in polygons
+
+I'll read in a few options, and then choose- basin, resource plan areas, sdl areas (which is where David got the Macquarie polygon), and catchments. I have cut out the testing of David's single polygon- it is the Macquarie-Castlereagh in the sdls.
+
+```{r}
+basin = read_sf(file.path(dataextdir, 'basin.shp'))
+rps = read_sf(file.path(dataextdir, 'resource_plan.shp'))
+sdl = read_sf(file.path(dataextdir, 'sdl_units.shp'))
+ltv = read_sf(file.path(dataextdir, 'cewo_valleys.shp'))
+```
+
+crs all match from the creation.
+
+### Plot the polygons and data checks
+
+Basin
+
+```{r}
+ggplot(basin) + geom_sf(fill = 'powderblue')
+```
+
+Resource plan areas
+
+```{r}
+ggplot(rps) + geom_sf(aes(fill = SWWRPANAME), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
+These have 'SW' codes
+
+```{r}
+rps
+```
+
+SDL plan areas
+
+```{r}
+ggplot(sdl) + geom_sf(aes(fill = SWSDLName), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWSDLName), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
+These have 'SS' codes.
+
+```{r}
+sdl
+```
+
+Catchments
+
+```{r}
+ggplot(ltv) + geom_sf(aes(fill = ValleyName), show.legend = FALSE) +
+  geom_sf_label(aes(label = ValleyName), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
+```{r}
+ltv
+```
+
+## Cut to demo polygons
+
+The Macquarie shapefile from David is the Macquarie-Castlereagh from `rps`. I want a few catchments to play with for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan. That might be a LOT of gauges, though.
+
+```{r}
+catch_demo = rps %>% 
+  dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh', 'Lachlan', 'Namoi'))
+```
+
+```{r}
+(ggplot(catch_demo) + geom_sf(aes(fill = SWWRPANAME)) +
+scale_fill_brewer(type = 'qual', palette = 8))
+```
+
+## Get relevant gauges
+
+### Cut to the polygons
+
+Cut the gaugegeo from the whole country to just those four catchments
+
+```{r}
+demo_gauges = st_intersection(gaugegeo, catch_demo)
+```
+
+How many are we talking?
+
+```{r}
+demo_gauges %>% nrow()
+```
+
+295 rows is a lot, but unlikely they'll all be in the EWR.
+
+### Extract their names
+
+To feed to the gauge extractor, we need their gauge numbers.
+
+```{r}
+gaugenums = demo_gauges$gauge
+```
+
+## Get the values
+
+We can feed lists to `gg.gauge_pull`, so can feed it that way. We might *want* to loop for parallelising extraction or modifications, but the real scenarios won't be made this way anyway, so not worth it here.
+
+What time span do we want? 10 years to start
+
+```{r}
+starttime = lubridate::ymd(20100101)
+endtime = lubridate::ymd(20191231)
+```
+
+How many are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. *This is where we have to use python to access the EWR table*.
+
+\*Access the python objects with `py$objname`.
+
+**TODO** THIS FAILS AS OF 1.0.4. Get the table some other way, I guess. I have rolled back to 1.0.1, since the necessary file just doesn't exist in 1.0.4 (and in about half the branches on github). Is it being phased out? Does that mean they're all 'good' now, and I can use all of them and not filter good/bad?
+
+Error messages:
+
+    FileNotFoundError: [Errno 2] No such file or directory: 'py_ewr/parameter_metadata/NSWEWR.csv'
+
+    Error in py_get_attr_impl(x, name, silent) : 
+      AttributeError: module '__main__' has no attribute 'ewrs'
+
+```{python}
+from py_ewr.data_inputs import get_EWR_table
+ewrs, badewrs = get_EWR_table()
+```
+
+What are those gauges, and which are in both the ewr and the desired catchments?
+
+```{r}
+ewrgauges = py$ewrs$Gauge
+ewr_demo_gauges = gaugenums[gaugenums %in% ewrgauges]
+length(ewr_demo_gauges)
+```
+
+47 seems ok. Let's go with that.
+
+### Get all the gauge data
+
+Now we have a list of gauges, go actually get their hydrographs. Takes a while, be patient.
+
+*Again, need python here.* *Pass R objects to python as* `r.`
+
+*It takes -forever- to do a type translation on the* `DATETIME` *column*. So change it to something simple while still in python, and change it back in R next.
+
+```{python gaugepulling}
+#| message: false
+import mdba_gauge_getter as gg
+demo_levs = gg.gauge_pull(r.ewr_demo_gauges, start_time_user = r.starttime, end_time_user = r.endtime)
+demo_ids = demo_levs.SITEID.unique()
+len(demo_ids)
+
+# I think this will work, the above is running
+demo_levs['Date'] = demo_levs['DATETIME'].astype(str)
+```
+
+I guess that's not terrible. 168k rows is fine in general, but likely overkill for testing. I could cut it to fewer gauges and less time, probably, but it will be good to have reasonable time periods for testing time windowing if this doesn't eat too much time elsewhere.
+
+For some reason `demo_levs['VALUE']` is an object and not numeric. And `'DATETIME'` needs to be named `Date` for the EWR tool to read it.
+
+*I'm copying the py obj to R for further manipulation.* A bit dumb from a memory point of view, but it's not big.
+
+Transforming the python dates to R dates is horribly slow. MUCH faster to change to string and back again.
+
+```{r datatransfer}
+demo_levs <- py$demo_levs
+
+demo_levs$VALUE = as.numeric(demo_levs$VALUE)
+
+# # In python, we just need to change the name of the date column. Here, we need to change the python datetime.date objects to R dates
+# 
+# # Really slow. furrr is actually slower.
+# # MUCH faster to just make the dates characters in python, and back to dates here.
+# rdates <- purrr::map(demodates, py_to_r) %>% 
+#   tibble(.name_repair = ~'Date') %>%  
+#   unnest(cols = Date)
+# 
+# demo_levs <- bind_cols(rdates, demo_levs)
+demo_levs <- dplyr::select(demo_levs, -DATETIME) %>% 
+  dplyr::mutate(Date = lubridate::ymd(Date))
+```
+
+### Map the gauges
+
+```{r}
+# gaugegeo <- gaugegeo %>% 
+#   dplyr::rename(gauge = `gauge number`)
+demo_geo = gaugegeo %>% dplyr::filter(gauge %in% py$demo_ids)
+```
+
+Looks reasonable. Probably overkill for testing, but can do a cut down version too.
+
+```{r}
+(ggplot() + 
+geom_sf(data = basin, fill = 'lightsteelblue') +
+geom_sf(data = catch_demo, mapping = aes(fill = SWWRPANAME)) +
+geom_sf(data = demo_geo, color = 'black') +
+scale_fill_brewer(type = 'qual', palette = 8))
+```
+
+## Make test scenarios
+
+### Demo scenarios
+
+For now, the test scenarios are just multiplying by 4 or 0.25 to give something to work with. This section could easily be modified for other simple scenarios.
+
+```{r}
+down4 = demo_levs
+up4 = demo_levs
+
+down4$VALUE = down4$VALUE * 0.25
+up4$VALUE = up4$VALUE * 4
+```
+
+### Make the data look like IQQM
+
+I read this in with the EWR tool's code, but need to be able to read into the EWR tool through the `scenario_handling`. That's sort of convoluted, and could be fixed by splitting up `process_scenarios` into a read-in bit and a bit that calls `evaluate_EWRs.calc_sorter`. The end of `process_scenarios` starting with `gauge_results = {}` is the same as `process_gauges` and so could be shared.
+
+For now though, just tell EWR it's IQQM so I can use `scenario_handling`. As long as I have a date column `Date` and other columns with gauge numbers for names, I can get the EWR tool to work by telling it it's IQQM. It can have multiple gauges, with each having its own column. I had originally set up for single files per scenario-gauge combination, but let's use multi-cols for now. The read-in should work either way.
+
+### Save the output
+
+Not being too fussed about structure, since the structure is going to change once we have actual scenarios.
+
+I will still do the dir/file structure even with one file as it allows easier changes and more flexibility.
+
+*I had saved the full suite, but I think since this is now turning into a package, we want to keep things minimal. Move the full set of gauges to the demo project*
+
+```{r}
+scenenames = c('base', 'up4', 'down4')
+
+# the full scenarios
+for (x in scenenames) {
+      scenedir = file.path(scenariodir, 'testscenarios', x)
+    if (!dir.exists(scenedir)) {
+      dir.create(scenedir, recursive = TRUE)
+    }
+
+}
+
+```
+
+Create clean dataframes to save.
+
+```{r}
+base <- demo_levs %>% 
+  dplyr::select(Date, VALUE, SITEID) %>% 
+  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
+
+up4 <- up4 %>% 
+  dplyr::select(Date, VALUE, SITEID) %>% 
+  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
+
+down4 <- down4 %>% 
+  dplyr::select(Date, VALUE, SITEID) %>% 
+  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE) 
+```
+
+Save. could do this above easily enough, but getting lots of dots and hard to read.
+
+```{r}
+if (REBUILD_DATA) {
+      readr::write_csv(base, file.path(scenariodir,
+                                       'testscenarios', 'base', 'base.csv'))
+  
+      readr::write_csv(up4, file.path(scenariodir,
+                                      'testscenarios', 'up4', 'up4.csv'))
+      readr::write_csv(down4, file.path(scenariodir,
+                                        'testscenarios', 'down4', 'down4.csv'))
+}
+
+```
+
