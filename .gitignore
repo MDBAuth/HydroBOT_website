@@ -8,4 +8,4 @@
 # Likely will need to do something different here once we want to see the HTML
 _output
 
-scenario_data/
+scenario_example/

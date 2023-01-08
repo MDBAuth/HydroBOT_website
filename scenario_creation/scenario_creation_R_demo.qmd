@@ -72,10 +72,11 @@ The shapefiles used to see what we're doing and do the selecting were produced w
 
 Set the data dir to make that easy to change. Now we're not working in the package, but in an analysis repo. These should point to external shared directories. For now though, let's point them inside the repo at untracked dirs.
 
-This needs an outdir and a location for the canonical shapefiles
+This needs an outdir and a location for the canonical shapefiles.
 
 ```{r}
-scenariodir <- 'scenario_data'
+scenariodir <- 'scenario_example'
+hydrodir <- file.path(scenariodir, 'hydrographs')
 dataextdir <- system.file("extdata", package = 'werptoolkitr')
 ```
 
@@ -323,7 +324,7 @@ scenenames = c('base', 'up4', 'down4')
 
 # the full scenarios
 for (x in scenenames) {
-      scenedir = file.path(scenariodir, 'testscenarios', x)
+      scenedir = file.path(hydrodir, x)
     if (!dir.exists(scenedir)) {
       dir.create(scenedir, recursive = TRUE)
     }
@@ -352,13 +353,10 @@ Save. could do this above easily enough, but getting lots of dots and hard to re
 
 ```{r}
 if (REBUILD_DATA) {
-      readr::write_csv(base, file.path(scenariodir,
-                                       'testscenarios', 'base', 'base.csv'))
+      readr::write_csv(base, file.path(hydrodir, 'base', 'base.csv'))
   
-      readr::write_csv(up4, file.path(scenariodir,
-                                      'testscenarios', 'up4', 'up4.csv'))
-      readr::write_csv(down4, file.path(scenariodir,
-                                        'testscenarios', 'down4', 'down4.csv'))
+      readr::write_csv(up4, file.path(hydrodir, 'up4', 'up4.csv'))
+      readr::write_csv(down4, file.path(hydrodir, 'down4', 'down4.csv'))
 }
 
 ```
