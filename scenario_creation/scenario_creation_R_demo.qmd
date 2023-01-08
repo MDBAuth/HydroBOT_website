@@ -9,6 +9,8 @@ params:
   REBUILD_DATA: FALSE
 ---
 
+Should be unnecessary, but leaving for the minute.
+
 ```{r setup}
 #| warning: false
 #| message: false
@@ -16,10 +18,14 @@ params:
 
 ```
 
+To reinstall the package if it's changed, either remotely or locally.
+
 ```{r}
+## GITHUB INSTALL
 # credentials::set_github_pat()
 # devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
-# reticulate::use_virtualenv(file.path('.venv'))
+
+## LOCAL INSTALL- easier for quick iterations, but need a path.
 # devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
 ```
 
@@ -34,7 +40,7 @@ library(reticulate) # Not strictly necessary but allows easier referencing of ob
 
 ## TO REBUILD
 
-Rebuilding data is done with params. To rebuild, at the terminal in WERP_toolkit run `quarto render data_creation/scenario_creation/scenario_creation_R_demo.qmd -P REBUILD_DATA:TRUE`. or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+Rebuilding data is done with params. To rebuild, at the terminal in WERP_toolkit run `quarto render scenario_creation/scenario_creation_R_demo.qmd -P REBUILD_DATA:TRUE`. or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
 
 **TODO** use {targets} to manage this workflow.
 
@@ -356,4 +362,3 @@ if (REBUILD_DATA) {
 }
 
 ```
-
