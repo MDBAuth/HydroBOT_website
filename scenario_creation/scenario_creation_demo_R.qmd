@@ -75,9 +75,9 @@ Set the data dir to make that easy to change. Now we're not working in the packa
 This needs an outdir and a location for the canonical shapefiles.
 
 ```{r}
-scenariodir <- 'scenario_example'
-hydrodir <- file.path(scenariodir, 'hydrographs')
-dataextdir <- system.file("extdata", package = 'werptoolkitr')
+scenario_dir <- 'scenario_example'
+hydro_dir <- file.path(scenario_dir, 'hydrographs')
+geo_data_dir <- system.file("extdata", package = 'werptoolkitr')
 ```
 
 ## Read in gauges
@@ -85,7 +85,7 @@ dataextdir <- system.file("extdata", package = 'werptoolkitr')
 Use the bom gauges, since this is what were contained in the EWR tool.
 
 ```{r}
-gaugegeo = read_sf(file.path(dataextdir, 'bom_gauges.shp'))
+gaugegeo = read_sf(file.path(geo_data_dir, 'bom_gauges.shp'))
 ```
 
 ## Read in polygons
@@ -93,10 +93,10 @@ gaugegeo = read_sf(file.path(dataextdir, 'bom_gauges.shp'))
 I'll read in a few options, and then choose- basin, resource plan areas, sdl areas (which is where David got the Macquarie polygon), and catchments. I have cut out the testing of David's single polygon- it is the Macquarie-Castlereagh in the sdls.
 
 ```{r}
-basin = read_sf(file.path(dataextdir, 'basin.shp'))
-rps = read_sf(file.path(dataextdir, 'resource_plan.shp'))
-sdl = read_sf(file.path(dataextdir, 'sdl_units.shp'))
-ltv = read_sf(file.path(dataextdir, 'cewo_valleys.shp'))
+basin = read_sf(file.path(geo_data_dir, 'basin.shp'))
+rps = read_sf(file.path(geo_data_dir, 'resource_plan.shp'))
+sdl = read_sf(file.path(geo_data_dir, 'sdl_units.shp'))
+ltv = read_sf(file.path(geo_data_dir, 'cewo_valleys.shp'))
 ```
 
 crs all match from the creation.
@@ -324,7 +324,7 @@ scenenames = c('base', 'up4', 'down4')
 
 # the full scenarios
 for (x in scenenames) {
-      scenedir = file.path(hydrodir, x)
+      scenedir = file.path(hydro_dir, x)
     if (!dir.exists(scenedir)) {
       dir.create(scenedir, recursive = TRUE)
     }
@@ -353,10 +353,10 @@ Save. could do this above easily enough, but getting lots of dots and hard to re
 
 ```{r}
 if (REBUILD_DATA) {
-      readr::write_csv(base, file.path(hydrodir, 'base', 'base.csv'))
+      readr::write_csv(base, file.path(hydro_dir, 'base', 'base.csv'))
   
-      readr::write_csv(up4, file.path(hydrodir, 'up4', 'up4.csv'))
-      readr::write_csv(down4, file.path(hydrodir, 'down4', 'down4.csv'))
+      readr::write_csv(up4, file.path(hydro_dir, 'up4', 'up4.csv'))
+      readr::write_csv(down4, file.path(hydro_dir, 'down4', 'down4.csv'))
 }
 
 ```
