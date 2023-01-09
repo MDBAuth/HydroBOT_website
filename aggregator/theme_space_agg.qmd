@@ -1,0 +1,470 @@
+---
+title: "Aggregate Theme Space"
+author: "Galen Holt"
+format:
+  html:
+    df-print: paged
+editor: visual
+---
+
+```{r}
+#| warning: false
+#| message: false
+
+## GITHUB INSTALL
+# credentials::set_github_pat()
+# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+
+## LOCAL INSTALL- easier for quick iterations, but need a path.
+# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+
+# And for very fast iteration (no building, but exposes too much, often)
+# devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
+
+```
+
+```{r}
+library(werptoolkitr)
+library(ggplot2)
+```
+
+```{r}
+#| warning: false
+#| message: false
+
+## GITHUB INSTALL
+# credentials::set_github_pat()
+# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+
+## LOCAL INSTALL- easier for quick iterations, but need a path.
+# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+
+# And for very fast iteration (no building, but exposes too much, often)
+# devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
+
+```
+
+```{r}
+library(werptoolkitr)
+library(ggplot2)
+```
+
+```{r}
+scenario_dir <- file.path('scenario_example')
+ewr_results <- file.path(scenario_dir, 'module_output', 'EWR')
+geo_data_dir <- system.file("extdata", package = 'werptoolkitr')
+```
+
+### Scenario information
+
+This needs to come from somewhere. For now, I'm just using it for diagnostic plots, so make it here.
+
+```{r}
+scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+```
+
+## Overview
+
+We have theme aggregation and spatial aggregation, now can we interleave the two?
+
+There is quite a bit of demoing and testing options and argument formats in the walkthrough of each of those. This document focuses more specifically on interleaving them.
+
+Both operate on the same core function, and both use similar principles- take a list of aggregation sequences, and aggregate on them. Here, we interleave them, including auto-detecting which dimension we're operating on (though that might be fragile).
+
+Typically, aggregating (and some other operations) on dataframes with geometry is MUCH slower than without. So I've put a heavy focus on stripping and re-adding geometry so we are usually using dataframes that reference geometry without the geometry attached and only take the geometry hit when the geometry is needed.
+
+Fundamentally, `multi_aggregate` wraps `theme_aggregate` and `spatial_aggregate` with some data organisation and tracking of what the previous level of aggregation was to maintain proper grouping as they alternate.
+
+For inputs, `multi_aggregate` expects the incoming data to be in memory and geographic, and the edges defining theme relationships to be already calculated. However, I have also developed a wrapper `read_and_agg` that takes paths and does the read-in of the data, finds the edges, and then runs `multi_aggregate` for when and if we want to use it that way (far easier to use paths in a config file of arguments than read in and create data, and needed for parallelization and too-large-for memory data).
+
+## Data prep
+
+### EWRs
+
+To make the actual multi-aggregate loop general, I'vr moved dataprep to its own functions (e.g. not auto-load the ewr from a path, since we might not be giving it ewrs, but econ relationships.
+
+That said, we can also wrap this (`read_and_agg`), and then we just feed it paths and the aggregation lists, either with an interface or a config file and parameterized notebook.
+
+```{r}
+#| message: false
+
+ewrdata <- prep_ewr_agg(ewr_results, type = 'summary', geopath = bom_basin_gauges)
+```
+
+### Spatial
+
+This at least points to pre-prepared shapefiles that we can easily hit. Will need a small wrapper from paths to make `read_and_agg` depend only on paths.
+
+```{r}
+
+basin <- sf::read_sf(file.path(geo_data_dir, 
+                           'basin.shp'))
+
+rps <- sf::read_sf(file.path(geo_data_dir, 'resource_plan.shp')) %>%
+  sf::st_make_valid()
+
+ltv <-sf::read_sf(file.path(geo_data_dir, 'cewo_valleys.shp')) %>%
+  sf::st_make_valid()
+```
+
+## Setup
+
+First, let's specify an interleaved aggregation sequence with simple set of functions (i.e. no doubles yet).
+
+**TODO** the weighted means need to be made into a named function, but for now this allows testing whether passing in functions this way works.
+
+**TODO** refer to the shapefiles by name so we dont have a huge list
+
+If we name the list by target instead of just have values things are a bit easier to track. need to deal with auto-naming.
+
+```{r}
+
+aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               env_obj =  c('ewr_code', "env_obj"),
+               rps = rps,
+               Specific_goal = c('env_obj', "Specific_goal"),
+               catchment = ltv,
+               Objective = c('Specific_goal', 'Objective'),
+               mdb = basin,
+               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+
+funseq <- list(c('CompensatingFactor'),
+               c('ArithmeticMean'),
+               c('ArithmeticMean'),
+               c('ArithmeticMean'),
+               list(wm = ~weighted.mean(., w = area, 
+                                        na.rm = TRUE)),
+               c('ArithmeticMean'),
+               
+               list(wm = ~weighted.mean(., w = area, 
+                                    na.rm = TRUE)),
+               c('ArithmeticMean'))
+
+```
+
+Need to create the edges from just the theme
+
+```{r}
+themeseq <- aggseq[purrr::map_lgl(aggseq, is.character)]
+ewr_edges <- make_edges(dflist = causal_ewr, 
+                         fromtos = themeseq)
+```
+
+The spatial aggs are inherently slow because of the `st_intersection`, but I've optimized the amount of intersecting we're doing, and I think I've unpicked space where possible so nothing else is slowed down by being spatial (including the actual aggregation of the spatial data). So we're doing the absolute minimum spatially-aware processing, and doing some in some parts doesn't mean it slows down later parts.
+
+```{r}
+#| message: false
+#| warning: false
+tsagg <- multi_aggregate(dat = ewrdata,
+                         causal_edges = ewr_edges,
+                         groupers = 'scenario',
+                         aggCols = 'ewr_achieved',
+                         aggsequence = aggseq,
+                         funsequence = funseq)
+```
+
+Now let's try the intermediate saving and assorted other tests (really need to write consistent tests to hit all these things- passing tidyselect, function formats, mutliple functions, etc). See the `theme_agg.qmd` and `spatial_agg.qmd` for more thorough tests of these argument formats.
+
+-   saveintermediate
+
+-   multiple functions per level
+
+-   keepAllPolys
+
+-   namehistory
+
+```{r}
+#| message: false
+#| warning: false
+allagg <- multi_aggregate(dat = ewrdata,
+                         causal_edges = ewr_edges,
+                         groupers = 'scenario',
+                         aggCols = 'ewr_achieved',
+                         aggsequence = aggseq,
+                         funsequence = funseq,
+                         saveintermediate = TRUE,
+                         namehistory = FALSE,
+                         keepAllPolys = TRUE)
+```
+
+Let's quickly plot/inspect each of those to make sure they make sense.
+
+Very crude plots to sense-check, NOT good plots, though this is what we need for that.
+
+Starting to be some clear copy-paste here though that shows what these could be as functions pretty easily
+
+### Sheet 1- raw data from ewr
+
+This is just the input data, don't bother plotting
+
+```{r}
+allagg$ewr_code_timing
+```
+
+### Sheet 2- ewr_code
+
+Still a lot, plot one at random more or less
+
+```{r}
+allagg$ewr_code
+```
+
+Using forcats::fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
+
+```{r}
+#| message: false
+allagg$ewr_code %>% 
+  dplyr::filter(ewr_code == 'LF1') %>%
+  dplyr::left_join(scenarios) %>% 
+  ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(data = ltv, aes(fill = ValleyName), alpha = 0.25, show.legend = F) + 
+  geom_sf(aes(color = ewr_achieved)) +
+  facet_grid(.~forcats::fct_reorder(scenario, delta))
+```
+
+### Sheet 3- env_obj
+
+Still a lot, plot one at random more or less
+
+```{r}
+allagg$env_obj
+```
+
+Using fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
+
+```{r}
+#| message: false
+allagg$env_obj %>% 
+  dplyr::filter(env_obj == 'NF1') %>%
+  dplyr::left_join(scenarios) %>% 
+  ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(aes(color = ewr_achieved)) +
+  facet_grid(.~forcats::fct_reorder(scenario, delta))
+```
+
+### Sheet 4- env_obj
+
+Still env_obj, now in rps polys
+
+```{r}
+allagg$rps
+```
+
+Using fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
+
+```{r}
+#| message: false
+allagg$rps %>% 
+  dplyr::filter(env_obj == 'NF1') %>%
+  dplyr::left_join(scenarios) %>% 
+  ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(aes(fill = ewr_achieved)) +
+  facet_grid(.~forcats::fct_reorder(scenario, delta))
+```
+
+### Sheet 5- Specific goal
+
+Still in rps polys
+
+```{r}
+allagg$Specific_goal
+```
+
+Using fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
+
+```{r}
+#| message: false
+allagg$Specific_goal %>% 
+  dplyr::filter(Specific_goal == 'All recorded fish species') %>%
+  dplyr::left_join(scenarios) %>% 
+  ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(aes(fill = ewr_achieved)) +
+  facet_grid(.~forcats::fct_reorder(scenario, delta))
+```
+
+### Sheet 6- Catchment
+
+Crossing rps specific goals into catchments (using wm). Contrived, but good test.
+
+```{r}
+allagg$catchment
+```
+
+Using fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
+
+```{r}
+#| message: false
+allagg$catchment %>% 
+  dplyr::filter(Specific_goal == 'All recorded fish species') %>%
+  dplyr::left_join(scenarios) %>% 
+  ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(aes(fill = ewr_achieved)) +
+  facet_grid(.~forcats::fct_reorder(scenario, delta))
+```
+
+### Sheet 7- Objective
+
+Still in catchments
+
+```{r}
+allagg$Objective
+```
+
+Using fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
+
+```{r}
+#| message: false
+allagg$Objective %>% 
+  dplyr::filter(Objective == 'No loss of native fish species') %>%
+  dplyr::left_join(scenarios) %>% 
+  ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(aes(fill = ewr_achieved)) +
+  facet_grid(.~forcats::fct_reorder(scenario, delta))
+```
+
+### Sheet 8- Objective
+
+Still at objective level, now scaling to basin with area-weighted
+
+```{r}
+allagg$mdb
+```
+
+Using forcats::fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
+
+```{r}
+#| message: false
+allagg$mdb %>% 
+  dplyr::filter(Objective == 'No loss of native fish species') %>%
+  dplyr::left_join(scenarios) %>% 
+  ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(aes(fill = ewr_achieved)) +
+  facet_grid(.~forcats::fct_reorder(scenario, delta))
+```
+
+### Sheet 9- 5-year targets
+
+Still in basin, now 5-year targets
+
+```{r}
+allagg$target_5_year_2024
+```
+
+Using forcats::fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
+
+```{r}
+#| message: false
+allagg$target_5_year_2024 %>% 
+  dplyr::filter(target_5_year_2024 == 'All known species detected annually') %>%
+  dplyr::left_join(scenarios) %>% 
+  ggplot() +
+  geom_sf(data = basin) +
+  geom_sf(aes(fill = ewr_achieved)) +
+  facet_grid(.~forcats::fct_reorder(scenario, delta))
+```
+
+Can we plot that on a network like I did before for just the theme agg? probably, but will need to sort it out. Likely need to indicate spatial level somehow. Mabye with edge color? Further dev there will happen when I build the comparer.
+
+## Parallelization
+
+In `theme_agg.qmd` I demonstrated parallelisation over gauges and scenarios from read-in onwards, which will likely be very useful once we're dealing with real scenarios. Once spatial aggregation enters the mix, parallelisation over gauges doesn't work once we get to higher spatial levels. We could try to get clever with the futures and parallel within poly 1, then parallel those within polys 2, etc. But for now, let's just demo parallelisation over scenarios.
+
+Note that if we want to `saveintermediate = TRUE`, which we often do, we can't `.combine = bind_rows`, but would need to save a list of lists and then `bind_rows` at each list-level post-hoc. Will need to include that in the parallel function wrapper.
+
+```{r}
+#| message: false
+#| warning: false
+
+library(foreach)
+library(doFuture)
+
+registerDoFuture()
+plan(multisession)
+# plan(sequential) # debug
+
+# get these from elsewhere, the whole point is to not read everything in. Should be able to extract from the paths (or the scenario metadata - better)
+allscenes <- list.files(ewr_results, recursive = TRUE) %>% 
+  dirname() %>% 
+  dirname() %>% 
+  unique()
+
+# I think no longer needed now we have a package
+# passfuns <- unique(unlist(funseq))
+# passfuns <- unlist(passfuns[purrr::map_lgl(passfuns, is.character)])
+
+parAgg <- foreach(s = allscenes,
+                       .combine = dplyr::bind_rows) %dopar% {
+    
+    read_and_agg(datpath = ewr_results, type = 'summary',
+                 geopath = bom_basin_gauges,
+                 causalpath = causal_ewr,
+                 groupers = c('scenario'),
+                 aggCols = 'ewr_achieved',
+                 aggsequence = aggseq,
+                 funsequence = funseq,
+                 namehistory = TRUE,
+                 saveintermediate = FALSE,
+                 scenariofilter = s)
+  }
+
+parAgg
+```
+
+That output is the same as `tsagg`, but now it's been read-in and processed in parallel over scenarios.
+
+# TODO
+
+-   document
+
+-   test
+
+-   cleaner data locations
+
+-   make package
+
+-   parameter config file
+
+-   test more general `tidyselect` and function passing. It's good, but could be even more flexible.
+
+-   Develop plot functions (in comparer)
+
+    -   including testing/modifying `extract_vals_causal` for the situation with interleaved spatial and temporal- there will be multiple list items with the same theme level
+
+    -   similarly, including spatial agg info in a causal network plot
+
+-   Parallelisation function (likely once we know what the directory/file structure actually looks like)
+
+-   Less fragile (and less conditional) way of detecting theme vs spatial dimension
+
+-   wrapper for spatial read-in so `read_and_agg` can take paths to spatial files in the `aggsequence` argument instead of `sf` objects.
+
+-   Cleaner, more demo-y version of this doc.
+
+-   Simple flow all the way through
+
+-   A way to aggregate different rows differently- e.g. Fish with GeometricMean, Birds with ArithmeticMean. I think I sorted out how to do the grouping and column-selecting in causal networks, but getting that to line up with the functions will require some work.
+
+    -   and the agg history will *need* to be saved in cols, since it wont be consistent for a column.
+
+-   Better way of doing the aggregation history? Is there one?
+
+    -   The way I've done it keeps it attached to the data, and allows us to do multiple aggregation functions at multiple steps. But having some sort of metadata table would be cleaner in some ways (and more error prone, more of a hassle in others). Could package as a list? Would still be easy to lost track of multiple agg functions.
+    -   at least, make `agg_names_to_cols` more robust to unnamed lists. Or just save into columns in the first place
+    -   Will need to save into columns if we develop a way to agg different rows differently
+
+-   another round of refactoring `theme_aggregate` and `spatial_aggregate`-
+
+    -   they both do some data prep including spatial matching and stripping, run `general_aggregate`, and then re-glue space. Should be able to make them more similar (identical?), and pull into a different format- something like `data <- dataprep()` , then `agged <- general_aggregate(data)`, then `outdata <- respatial_data(agged)`, rather than wrapping those fundamental operations up in (two) function(s).
+    -   remove the `prefix` argument from `spatial_aggregate` to match `theme_aggregate`- it should be auto-created. But that will involve using names instead of objects, and that'd be part of the bigger refactor
+
+#### Develop capacity for time?
+
+I started doing it internal to space because I did them simultaneously previously, but I think the time version needs to be separated out just like theme and spatial. Wanted to get these sorted first and then do time. I've done it before, it'll mostly be an issue of getting grouping and intervals right and then using the same sort of `general_aggregate` function.
