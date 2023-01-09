@@ -10,14 +10,17 @@ editor: visual
 ```{r setup}
 #| warning: false
 #| message: false
-#| echo: false
 
-# SUPER TEMPORARY
-# devtools::install_local(path = 'C:/Users/galen/Documents/WERP_toolkit/werptoolkitr')
-devtools::load_all(path = 'C:/Users/galen/Documents/WERP_toolkit/werptoolkitr')
+## GITHUB INSTALL
+# credentials::set_github_pat()
+# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+
+## LOCAL INSTALL- easier for quick iterations, but need a path.
+# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
 ```
 
 ```{r}
+library(werptoolkitr)
 library(dplyr)
 ```
 
@@ -294,3 +297,4 @@ I've set `make_causal_plot` up to be fairly general so we can do quite a lot wit
         -   Dynamic would be better, especially for comms (e.g. Shiny, or Quarto plays well with Observable) or ???
 
 -   Allow other colour palettes besides those in `paletteer`
+
