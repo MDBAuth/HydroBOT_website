@@ -1,0 +1,160 @@
+---
+title: "Scenario controller"
+author: "Galen Holt"
+format:
+  html:
+    df-print: paged
+editor: visual
+params:
+  REBUILD_DATA: FALSE
+---
+
+The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata.
+
+```{r setup}
+#| warning: false
+#| message: false
+# knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+```
+
+We want to have this run with `library(werptoolkitr)`. If that's changed, reinstall it from github (more robust, slower) or local (faster, needs a path).
+
+```{r}
+#| warning: false
+#| message: false
+
+## GITHUB INSTALL
+# credentials::set_github_pat()
+# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+
+## LOCAL INSTALL- easier for quick iterations, but need a path.
+# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+```
+
+Load the package
+
+```{r}
+library(werptoolkitr)
+```
+
+## TO REBUILD
+
+Rebuilding data is done with params. To rebuild, at the terminal in WERP_toolkit run `quarto render controller/controller_ewr_wrapped_R.qmd -P REBUILD_DATA:TRUE`. or, to rebuild *everything*, run `quarto render -P REBUILD_DATA:TRUE` (or without the parameters if we want to re-render but not rebuild.)
+
+**TODO** use {targets} to manage this workflow.
+
+Set with params. But that doesn't work with interactive running, so deal with that.
+
+```{r}
+if ("params" %in% ls()) {
+  REBUILD_DATA <- params$REBUILD_DATA
+} else {
+  REBUILD_DATA <- FALSE
+}
+```
+
+## Input and output directories
+
+Use the `testsmall/` directory for development. 6 gauges in 2 catchments.
+
+*Normally* `scenario_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.
+
+### Set directories
+
+```{r}
+# 'testsmall' is 5 years and two gauges, fast for testing the ewr tool
+# 'testscenarios' is 10 years and 40+ gauges, slower but better for testing whole toolkit, especially aggregation
+# hydro_dir = os.path.join(repo, 'demo_data', 'testsmall')
+
+scenario_dir = file.path('scenario_example')
+
+hydro_dir = file.path(scenario_dir, 'hydrographs')
+```
+
+### Format
+
+Tell it the format- typically will be IQQM, at least for a while
+
+```{r}
+# Options
+# 'Bigmod - MDBA'
+# 'IQQM - NSW 10,000 years'
+# 'Source - NSW (res.csv)'
+
+model_format = 'IQQM - NSW 10,000 years'
+```
+
+### Climate info
+
+To have an R object that works as a `dict` in python, use a named list. The names can be quoted or unquoted; keep quoted to be most like python specs.
+
+```{r}
+MINT = (100 - 0)/100
+MAXT = (100 + 0 )/100
+DUR = (100 - 0 )/100
+DRAW = (100 -0 )/100
+
+climate = 'Standard - 1911 to 2018 climate categorisation'
+```
+
+## Control output and return
+
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`, with more I need to add to reflect new EWR functionality. These have to be lists to work right- To make a `list` in python, need to have unnamed lists in R. Named lists become dicts.
+
+*there's an issue with* `outputType = 'annual'` *in py-ewr- I'm getting an error inside the EWR tool. Until the bug is found, skip that*
+
+```{r}
+outputType <- list('none')
+returnType <- list('summary', 'all')
+```
+
+### Rebuild saved data
+
+This is a bit temporary- need to shift to {targets} or use a different script, but for the moment, let the REBUILD_DATA param override the `outputType` we just set above.
+
+```{r}
+if (params$REBUILD_DATA) {
+  outputType = list('summary', 'all')
+}
+```
+
+## Run and save
+
+The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller/controller_ewr_stepthrough_R.qmd) for an expanded version used to run test data and step through each step to make testing/changes more transparent.
+
+We can ask `prep_run_save_ewrs` to return any of the outputs to the current session (e.g. `returnType = list('summary', 'all')` in R or `returnType = ['summary', 'all]` in python) in addition to saving, if we want to play with things interactively.
+
+```{r}
+#| message: false
+ewr_out <- prep_run_save_ewrs_R(hydro_dir, scenario_dir, model_format, climate,
+outputType, returnType)
+```
+
+Now we have a `summary` and `all`.
+
+```{r}
+#| rows.print = 20
+ewr_out$summary
+```
+
+```{r}
+#| rows.print = 20
+ewr_out$all
+```
+
+# Still do to
+
+-   config file
+
+-   metadata
+
+-   climate categorisation
+
+-   allowances
+
+-   document
+
+-   new ewr output formats
+
+-   parallelise? here or in EWR or both?
