@@ -56,7 +56,7 @@ if ("params" %in% ls()) {
 
 ## Input and output directories
 
-Use the `testsmall/` directory for development. 6 gauges in 2 catchments.
+Use the `scenario_example/` directory [created](scenario_creation_demo_R.qmd) to capture a very simple demonstration case of 46 gauges in three catchments.
 
 *Normally* `scenario_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.
 
