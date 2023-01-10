@@ -96,15 +96,15 @@ ewrdata <- prep_ewr_agg(ewr_results, type = 'summary', geopath = bom_basin_gauge
 This at least points to pre-prepared shapefiles that we can easily hit. Will need a small wrapper from paths to make `read_and_agg` depend only on paths.
 
 ```{r}
-
-basin <- sf::read_sf(file.path(geo_data_dir, 
-                           'basin.shp'))
-
-rps <- sf::read_sf(file.path(geo_data_dir, 'resource_plan.shp')) %>%
-  sf::st_make_valid()
-
-ltv <-sf::read_sf(file.path(geo_data_dir, 'cewo_valleys.shp')) %>%
-  sf::st_make_valid()
+# 
+# basin <- sf::read_sf(file.path(geo_data_dir, 
+#                            'basin.shp'))
+# 
+# rps <- sf::read_sf(file.path(geo_data_dir, 'resource_plan.shp')) %>%
+#   sf::st_make_valid()
+# 
+# ltv <-sf::read_sf(file.path(geo_data_dir, 'cewo_valleys.shp')) %>%
+#   sf::st_make_valid()
 ```
 
 ## Setup
@@ -121,9 +121,9 @@ If we name the list by target instead of just have values things are a bit easie
 
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                env_obj =  c('ewr_code', "env_obj"),
-               rps = rps,
+               resource_plan = resource_plan_areas,
                Specific_goal = c('env_obj', "Specific_goal"),
-               catchment = ltv,
+               catchment = cewo_valleys,
                Objective = c('Specific_goal', 'Objective'),
                mdb = basin,
                target_5_year_2024 = c('Objective', 'target_5_year_2024'))
