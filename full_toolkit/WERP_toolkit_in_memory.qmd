@@ -3,39 +3,13 @@ title: "WERP_toolkit_demo"
 editor: visual
 ---
 
-This document provides a template for running through the toolkit in a single document. Within this repo there are also documents providing templates for each step and exploring more of the options for calling, particularly for aggregation.
+This document provides a template for running through the toolkit in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_save_steps.qmd). See the [repo readme](WERP_toolkit_demo.qmd) for overall structure of the repo and package installation.
 
-Toolkit flow
+Load the package
 
--   [Controller](controller_ewr_wrapped_R.qmd)
-
-    -   [in additional detail](controller_ewr_stepthrough.qmd)
-
-    -   [in python *NOT UPDATED*](controller_ewr_testrun_py.qmd)
-
--   Aggregator
-
-    -   [Theme and Space](theme_space_agg.qmd)
-
-    -   [Theme alone with more options and plot examples](theme_agg.qmd)
-
-    -   [Space alone with more options](spatial_agg.qmd)- includes multilevel spatial agg into different polygons and complex aggregation functions
-
-Necessary pieces but not part of the data flow in the toolkit
-
--   [Causal networks](causal_plots.qmd)
-
-    -   Causal networks are needed for aggregation and some plotting, but are not part of the flow per-se. Much of this will be integrated into the *Comparer* module
-
--   [Scenario creation](scenario_creation_demo_R.qmd)
-
-    -   Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit
-
-    -   These are simple demo scenarios, but useful for seeing expected formats, and to let the rest of the kit work.
-
-    -   [python version *NOT UPDATED*](scenario_creation_demo_py.qmd)
-
-This document will provide a simple template for the *toolkit flow*, **expecting that scenario hydrographs will be available and the causal networks are defined.**
+```{r}
+library(werptoolkitr)
+```
 
 ## Structure
 
@@ -44,37 +18,6 @@ To run the toolkit, we need to provide paths to directories for input data and o
 One option is to do that in a parameters file, and then treat this as a parameterised notebook.
 
 The other option is to have this *be* the parameterising file, so we can have a bit more text around the parameterisations. Not sure which makes more sense, but they're not mutually exclusive, and the answer likely depends on whether we're working interactively or want to fire off 1,000 runs.
-
-## Dependencies
-
-The {werptoolkitr} package needs to be installed to provide all functions used here. It also provides some necessary data for the causal network relationships, and (at least for now) canonical shapefiles that have been prepped.
-
-Typically install it from github, which requires a github PAT because it's private (acquired with `set_github_pat`), and a `subdir` argument because the R package is nested. It may also need a `ref` argument to load a branch or commit other than main.
-
-```{r}
-#| warning: false
-#| message: false
-
-## GITHUB INSTALL
-# credentials::set_github_pat()
-# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
-```
-
-For rapid development, it can be much easier to install from local (or even just to `load_all`), but these rely on paths that aren't portable.
-
-```{r}
-## LOCAL INSTALL- easier for quick iterations, but need a path.
-# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
-
-# And for very fast iteration (no building, but exposes too much, often)
-# devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
-```
-
-Load the package
-
-```{r}
-library(werptoolkitr)
-```
 
 # Parameters
 

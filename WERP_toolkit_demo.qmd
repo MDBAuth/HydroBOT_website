@@ -1,0 +1,73 @@
+---
+title: "WERP_toolkit_demo"
+editor: visual
+---
+
+This repo provides a templates and documentation for using the toolkit in various ways. The `full_toolkit` directory provides notebooks for running the full toolkit in single files, either [in memory](WERP_toolkit_in_memory) or [saving each step and reading back in](WERP_toolkit_save_steps.qmd). Within this repo there are also documents providing templates for each step separately (in `controller` and `aggregation` directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (`scenario_creation` and `causal_networks`).
+
+Toolkit flow
+
+-   [Controller](controller_ewr_wrapped_R.qmd)
+
+    -   [in additional detail](controller_ewr_stepthrough.qmd)
+
+    -   [in python *NOT UPDATED*](controller_ewr_testrun_py.qmd)
+
+-   Aggregator
+
+    -   [Theme and Space](theme_space_agg.qmd)
+
+    -   [Theme alone with more options and plot examples](theme_agg.qmd)
+
+    -   [Space alone with more options](spatial_agg.qmd)- includes multilevel spatial agg into different polygons and complex aggregation functions
+
+Necessary pieces but not part of the data flow in the toolkit
+
+-   [Causal networks](causal_plots.qmd)
+
+    -   Causal networks are needed for aggregation and some plotting, but are not part of the flow per-se. Much of this will be integrated into the *Comparer* module
+
+-   [Scenario creation](scenario_creation_demo_R.qmd)
+
+    -   Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit
+
+    -   These are simple demo scenarios, but useful for seeing expected formats, and to let the rest of the kit work.
+
+    -   [python version *NOT UPDATED*](scenario_creation_demo_py.qmd)
+
+**In use, the toolkit expects that scenario hydrographs will be available and the causal networks are defined.**
+
+## Dependencies
+
+The {werptoolkitr} package needs to be installed to provide all functions used here. It also provides some necessary data for the causal network relationships, and (at least for now) canonical shapefiles that have been prepped.
+
+Typically install it from github, which requires a github PAT because it's private (acquired with `set_github_pat`), and a `subdir` argument because the R package is nested. It may also need a `ref` argument to load a branch or commit other than main.
+
+```{r}
+#| warning: false
+#| message: false
+
+## GITHUB INSTALL
+# credentials::set_github_pat()
+# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+```
+
+For rapid development, it can be much easier to install from local (or even just to `load_all`), but these rely on paths that aren't portable.
+
+```{r}
+## LOCAL INSTALL- easier for quick iterations, but need a path.
+# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+
+# And for very fast iteration (no building, but exposes too much, often)
+# devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
+```
+
+Load the package
+
+```{r}
+# library(werptoolkitr)
+```
+
+# Additional info
+
+More info will go here.
