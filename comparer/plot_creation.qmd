@@ -1,0 +1,166 @@
+---
+title: "Plot demonstrations"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Notebook to develop plots
+
+Then send them to the werptoolkitr package. They're just easier to develop here where there's data to plot.
+
+What's the best way to do this though? just `devtools::load_all(path/to/toolkit)` for quick dev, anyway, I think.
+
+Largely the same header junk as the other qmds here to allow me to load the toolkit different ways.
+
+```{r}
+#| warning: false
+#| message: false
+
+## GITHUB INSTALL
+# credentials::set_github_pat()
+# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+
+## LOCAL INSTALL- easier for quick iterations, but need a path.
+# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+
+# And for very fast iteration (no building, but exposes too much, often)
+devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
+
+```
+
+```{r}
+# library(werptoolkitr)
+library(ggplot2)
+```
+
+```{r}
+scenario_dir <- file.path('scenario_example')
+ewr_results <- file.path(scenario_dir, 'module_output', 'EWR')
+geo_data_dir <- system.file("extdata", package = 'werptoolkitr')
+```
+
+### Scenario information
+
+This needs to come from somewhere. For now, I'm just using it for diagnostic plots, so make it here.
+
+```{r}
+scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+```
+
+# Standard appearance
+
+## Theme
+
+Let's try to develop a werp toolkit theme that we can use to get a consistent look. We'll also want to do colours, but that will come later.
+
+Just want to start something here that I can build on.
+
+```{r}
+# theme_werp_toolkit <- function(base_size = 10, ...) {
+#   
+#   ggplot2::theme_bw(base_size = base_size) +
+#     ggplot2::theme(strip.background = ggplot2::element_blank(),
+#           panel.grid = ggplot2::element_blank(),
+#           ...)
+#     
+# }
+```
+
+## Colour
+
+I don't think I want to necessarily enforce a standard set of colours (yet)- they'll change between scenarios/projects. But I *could* enforce palettes.
+
+At the least, I want to establish the infrastructure to set consistent colors. Let's do that by setting a scenario
+
+# Descriptive
+
+## Hydrographs
+
+Settings
+
+```{r}
+hydropath <- file.path('scenario_example', 'hydrographs')
+```
+
+There is code to unpack that, but it's in python and sends them to the EWR, but here we just want to read them in. Here, make something that we can also change. With a wrapper that lets me read different hydrograph formats.
+
+`mdba_gauge_getter` seems to default to flow, and gets them with `141`, ML/day. Check that all makes sense- what does EWR use? It is ML/day for most gauges (which is `varto = 141`), though some are stage gauges and use 100.
+
+```{r}
+# read_hydro <- function(hydropath, long = TRUE, format = 'csv') {
+#   if (format == 'csv') {
+#     return(read_hydro_csv(hydropath, long))
+#   }  
+# }
+# 
+# read_hydro_csv <- function(hydropath, long) {
+#   all_hydros <- list.files(hydropath, recursive = TRUE)
+#   # read-in and extract the names
+#   hydros <- readr::read_csv(file.path(hydropath, all_hydros), id = 'scenario') |> 
+#     dplyr::mutate(scenario = stringr::str_extract(scenario, "(\\w|\\d)+\\.csv$"),
+#            scenario = stringr::str_extract(scenario, '^[\\w|\\d]+'))
+#   
+#   if (long) {
+#     hydros <- tidyr::pivot_longer(hydros, cols = -c(scenario, Date), names_to = "gauge", values_to = "flow")
+#   }
+#   
+#   return(hydros)
+# }
+```
+
+Now, make a plot. How do we want to organise it? There are lots of options. Particularly subsetting gauges.
+
+```{r}
+scenehydros <- read_hydro(hydropath, long = TRUE, format = 'csv')
+
+
+```
+
+```{r}
+gauges_to_plot <- c('412002', '419001', '422028', '421001')
+```
+
+```{r}
+scenehydros |>
+  dplyr::filter(gauge %in% gauges_to_plot) |>
+ggplot2::ggplot(ggplot2::aes(x = Date, y = flow, color = scenario)) + 
+  ggplot2::geom_line() +
+  ggplot2::facet_wrap(~gauge) +
+  theme_werp_toolkit()
+```
+
+### Make that a function
+
+Moved it to the package
+
+A typical plot
+
+First, let's establish a standard set of colours with base as a reference
+
+```{r}
+scene_pal <- make_pal(unique(scenehydros$scenario), palette = 'calecopal::superbloom3', refvals = 'base', refcols = 'black')
+```
+
+```{r}
+plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, colors = scene_pal)
+
+```
+
+A test with scenariofilter, scales, and trans. Kinda silly, but shows it works
+
+```{r}
+plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, scenariofilter = c('up4', 'down4'), scales = 'free_y', transy = 'log10')
+```
+
+### What else might we want to do?
+
+-   select scenarios
+
+-   color/fill the backgrounds by catchment? that's getting fairly fancy.
+
+-   average over something? Not sure that really makes sense? I think this might be good for now.
+
+-   Theming: a set theme. and standard set of scenario colours that is consistent across figs, even when scenarios are filtered.
+
+-   I think make the theme set, and the colors we allow an argument, and make the user specify those relationships if they want to.

@@ -1,0 +1,144 @@
+---
+title: "Scenario controller"
+author: "Galen Holt"
+format:
+  html:
+    df-print: paged
+---
+
+
+Import the external packages we need
+```{python}
+import os
+import git
+import time
+```
+
+Import our functions from the py package. 
+Will need to tweak this depending on how things play out.
+```{python}
+from werptoolkitpy import controller_functions
+```
+
+similar to the `rprojroot`, for python to know about the git dir, we need to find it. This requirement has gone away in R quatro with the use of a project directory, but persisting here for some reason.
+
+```{python}
+repo = git.Repo('.', search_parent_directories=True).working_tree_dir
+repo
+```
+
+# Goal
+
+**Use this file or the R version of this file, not the vignette, to build new test EWR output data. It provides more fine-grained access to the functions if we need to change things and test.** 
+
+We want a notebook that points at a directory of scenario hydrographs, runs the EWR tool (and in future any others), processes outputs into standard format(s), puts them in standard places, and writes any metadata. Will likely point to a config file with all arguments for the run, once I sort that out.
+
+## Point at directory
+
+Use the `testsmall/` directory for development. 6 gauges in 2 catchments.
+
+*Normally* `output_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.
+
+*For this case only- building test data*- do we actually want to rebuild the data? Or just use this as a demo script?
+
+```{python}
+REBUILD_DATA = False
+```
+
+```{python}
+# 'testsmall' is 5 years and two gauges, fast for testing the ewr tool
+# 'testscenarios' is 10 years and 40+ gauges, slower but better for testing whole toolkit, especially aggregation
+# scenario_dir = os.path.join(repo, 'demo_data', 'testsmall')
+
+scenario_dir = os.path.join(repo, 'werptoolkitr', 'inst', 'extdata', 'testsmall')
+
+output_dir = os.path.join(repo, 'werptoolkitr', 'inst', 'extdata', 'testsmall')
+```
+
+Tell it the format- typically will be IQQM, at least for a while
+
+```{python}
+# Options
+# 'Bigmod - MDBA'
+# 'IQQM - NSW 10,000 years'
+# 'Source - NSW (res.csv)'
+
+model_format = 'IQQM - NSW 10,000 years'
+```
+
+## Set some climate info
+
+Not sure why this isn't either baked-in or from somewhere.
+
+```{python}
+MINT = (100 - 0)/100
+MAXT = (100 + 0 )/100
+DUR = (100 - 0 )/100
+DRAW = (100 -0 )/100
+
+allowance ={'minThreshold': MINT, 'maxThreshold': MAXT, 'duration': DUR, 'drawdown': DRAW}
+
+climate = 'Standard - 1911 to 2018 climate categorisation'
+```
+
+## Wrapper internals
+
+Typically, the stuff below is wrapped. Here, I'm exposing it so we can see what's happening and where we need to tweak as formats change.
+
+Once we have the directory and set any other needed params (e.g. point at a config), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I'm stepping through that here though and then will wrap it up.
+
+## Set up output directories
+
+This will typically be hidden in `prep_run_save_ewrs`, but I'm exposing the steps here for easier viewing and testing, especially as the formats change. see the Vignette for the wrapped version.
+
+This was assuming there would be gauge-files, and now there's not. Still seems to basically work, and not really worth spending too much time until we know the actual structure we want to use. We get the information about the directory structure and files as a dict with `make_scenario_info`- if there are multiple gauges within each, they enter the dict as a 'gauge' value. If not, the 'gauge' value is confusingly just the filename, but otherwise this works. The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so `paths_gauges` just unfolds the dict to give that.
+
+I expect all of this to change once we have a set data format.
+
+```{python}
+# Gives file locations as a dict- 
+sceneinfodict = controller_functions.make_scenario_info(scenario_dir)
+# make the output directory structure
+outpath = controller_functions.make_output_dir(output_dir, sceneinfodict)
+# unfold the sceneinfodict to make it easy to get the lists of paths and gauges
+everyhydro = controller_functions.paths_gauges(sceneinfodict)[0]
+```
+
+## Run the ewr tool
+
+Now we run the ewr tool. Currently I have the test data in IQQM format, but if that changes for a particular run, we'll need to pass it in.
+
+**TODO** - How are we going to do the climate cats moving forward? - Which results do we want? - Currently summary, annual, all_events - but also all_interEvents, all_successful_events, all_successful_interEvents
+
+Will need to ask Martin what those do.
+
+### Loop and save
+
+This works, but there's an issue with `outputType = 'annual'` - I'm getting an error there inside the EWR tool. Until the bug is found, skip that.
+
+```{python}
+if not REBUILD_DATA:
+  outputType = ['none']
+if REBUILD_DATA:
+  outputType = ['summary', 'all']
+
+ewr_out = controller_functions.run_save_ewrs(everyhydro, outpath, model_format = model_format, allowance = allowance, climate = climate, outputType = outputType, datesuffix = False, returnType = ['summary', 'all'])
+```
+
+# Still do to
+
+-   config file
+
+-   metadata
+
+-   climate categorisation
+
+-   allowances
+
+-   wrap
+
+-   document
+
+-   new ewr output formats
+
+-   parallelise? here or in EWR or both?
