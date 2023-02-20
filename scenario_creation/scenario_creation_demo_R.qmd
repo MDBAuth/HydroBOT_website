@@ -90,7 +90,7 @@ gaugegeo = read_sf(file.path(geo_data_dir, 'bom_gauges.shp'))
 
 ## Read in polygons
 
-I'll read in a few options, and then choose- basin, resource plan areas, sdl areas (which is where David got the Macquarie polygon), and catchments. I have cut out the testing of David's single polygon- it is the Macquarie-Castlereagh in the sdls.
+I'll read in a few options, and then choose- basin, sdl units, resource plan areas (which is where David got the Macquarie polygon - it is SW11 for SWWRPACODE), and catchments. I have cut out the testing of David's single polygon- it is the Macquarie-Castlereagh in the sdls.
 
 ```{r}
 basin = read_sf(file.path(geo_data_dir, 'basin.shp'))
@@ -151,7 +151,7 @@ ltv
 
 ## Cut to demo polygons
 
-The Macquarie shapefile from David is the Macquarie-Castlereagh from `rps`. I want a few catchments to play with for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan. That might be a LOT of gauges, though.
+The Macquarie shapefile from David is the Macquarie-Castlereagh from `rps` - `SWWRPACODE == 'SW11'`. I want a few catchments to play with for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan. That might be a LOT of gauges, though.
 
 ```{r}
 catch_demo = rps %>% 
@@ -227,6 +227,21 @@ length(ewr_demo_gauges)
 ```
 
 47 seems ok. Let's go with that.
+
+### Get the ewr gauges in a dataframe
+
+Let's filter the `demo_gauges` df to the ones in EWR. We don't go on to use it, but it's useful
+
+```{r}
+ewr_demo <- demo_gauges %>% 
+  dplyr::filter(gauge %in% ewr_demo_gauges)
+```
+
+And just for Macquarie-Castlereagh
+
+```{r}
+ewr_mc <- ewr_demo %>% dplyr::filter(SWWRPACODE == 'SW11')
+```
 
 ### Get all the gauge data
 

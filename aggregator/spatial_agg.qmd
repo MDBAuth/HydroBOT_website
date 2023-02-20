@@ -94,6 +94,8 @@ We will aggregate into polygons, and we want to be able to do that several times
 
 For now, let's use resource plan areas, catchments (from cewo), and the basin. I'm also going to bring in the gauge locations to make them easy to look at, even though those are linked to the EWR results in `simpleThemeagg`.
 
+*NOTE*- these are just in the package now. `sdl_units`, etc...
+
 ```{r}
 basin <- read_sf(file.path(geo_data_dir, 
                            'basin.shp'))

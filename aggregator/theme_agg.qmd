@@ -159,7 +159,7 @@ In the example above, we can feed the output data to `agg_names_to_cols`,
 agg_names_to_cols(simpleThemeAgg, aggsequence = aggseq, funsequence = funseq, aggCols = 'ewr_achieved')
 ```
 
-In practice, what makes most sense is to use a switch inside `theme_agg_multi` to return this format.
+In practice, what makes most sense is to use a switch inside `multi_aggregate` to return this format.
 
 ```{r}
 #| message: false
