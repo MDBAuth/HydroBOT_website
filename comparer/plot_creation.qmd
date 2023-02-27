@@ -32,6 +32,7 @@ devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
 ```{r}
 # library(werptoolkitr)
 library(ggplot2)
+library(dplyr) # make my life easier
 ```
 
 ```{r}
@@ -46,6 +47,12 @@ This needs to come from somewhere. For now, I'm just using it for diagnostic plo
 
 ```{r}
 scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+```
+
+I think I probably want to make a standard ordering of the scenarios. Can I push something through to plots
+
+```{r}
+sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
 ```
 
 # Standard appearance
@@ -121,11 +128,14 @@ scenehydros <- read_hydro(hydropath, long = TRUE, format = 'csv')
 gauges_to_plot <- c('412002', '419001', '422028', '421001')
 ```
 
+forcats::fct_reorder(scenario, flow, .fun=median)
+
 ```{r}
 scenehydros |>
   dplyr::filter(gauge %in% gauges_to_plot) |>
-ggplot2::ggplot(ggplot2::aes(x = Date, y = flow, color = scenario)) + 
-  ggplot2::geom_line() +
+ggplot2::ggplot(ggplot2::aes(x = Date, y = flow, 
+                             color = forcats::fct_relevel(scenario, levels(sceneorder)))) + 
+  ggplot2::geom_line() + 
   ggplot2::facet_wrap(~gauge) +
   theme_werp_toolkit()
 ```
@@ -164,3 +174,320 @@ plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, scenariofilter = c('
 -   Theming: a set theme. and standard set of scenario colours that is consistent across figs, even when scenarios are filtered.
 
 -   I think make the theme set, and the colors we allow an argument, and make the user specify those relationships if they want to.
+
+## Setting baseline
+
+We want to set a baseline and the relationship to it. The baseline should be able to be either a scenario name or a scalar. Potentially something else (e.g. historical daily means), but deal with that later- relatively straightforward to add a method to pass a dataframe with date and flow cols, for example.
+
+Do we want to build it into the plot functions, or pre-run it? Definitely make it available for the latter, but does it just make the plot functions too messy? Would be nice for auto-labelling though.
+
+```{r}
+dif_flow <- baseline_compare(scenehydros, group_col = 'scenario', base_lev = 'base', values_col = 'flow', comp_fun = difference)
+```
+
+```{r}
+plot_hydrographs(dif_flow, gaugefilter = gauges_to_plot, y_col = 'difference_flow', colors = scene_pal)
+```
+
+Relative
+
+```{r}
+rel_flow <- baseline_compare(scenehydros, group_col = 'scenario', 
+                             base_lev = 'base', 
+                             values_col = 'flow', comp_fun = relative, add_eps = min(scenehydros$flow[scenehydros$flow > 0])/10)
+```
+
+```{r}
+plot_hydrographs(rel_flow, gaugefilter = gauges_to_plot, y_col = 'relative_flow', colors = scene_pal)
+```
+
+Well, I guess that makes sense. The scenarios are 4x and 0.24x, and so they always are flat lines at those levels (plus the `add_eps`) unless everything is 0. It will be more relevant for other things, I think.
+
+Mutliplicative will usually make more sense with a logged y
+
+```{r}
+plot_hydrographs(rel_flow, gaugefilter = gauges_to_plot, y_col = "relative_flow", colors = scene_pal, transy = 'log10')
+```
+
+`transy = 'log'` works too, but `scales::trans` chooses ugly axis labels. Not that these are great, but they're not as horrible.
+
+I now have incorporated the ability to pass the comparison bit directly into the plot function. It's likely the y-labels will need to be changed post-hoc, but that's easy with `+ ylab('new label')`. It just ended up making more sense to label with exactly what they are, rather than all permutations of how i might want to label differences vs relatives vs. whatever down the track.
+
+To re-do the above in one go, start with `scenehydros` directly
+
+```{r}
+plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, y_col = 'flow', colors = scene_pal, base_lev = 'base', comp_fun = difference)
+```
+
+For the relative, I'm not adding an eps, but letting the zeros drop out here.
+
+```{r}
+plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, y_col = 'flow', colors = scene_pal, base_lev = 'base', comp_fun = relative)
+```
+
+## Describing the aggregation
+
+These are Georgia's tile plots and maps. Need to automate how they're done. Will need the list-saved aggregations, as well as the aggseq and funseqs.
+
+Though with the names and aggseqs as columns, I should be able to say what *happened* to the final outcome, just won't be able to build up the plots. That's fine, I think. Then can loop over the list if I want to show the build-up.
+
+# Analysis
+
+## David's heatmap
+
+We can't do this yet- all we have is flow scaling, which is one-d. That's fine, I can make a 1-d version (e.g an x with flow scaling, y with outcome, and fit a curve/kernel/line. But even then, we don't have anywhere like enough data. So for now, I think we just geom_line() it, but put in the ability to use a kernel density or a spline or something.
+
+The 1-d version will end up looking at lot like some of the figures we had in the demo doc, and for good reason- that's what they are.
+
+So, develop the 1-d version
+
+## Scenario vs outcome 1d
+
+This should take tibbles of some sort, arguments for the outcome and any groupings and return a ggplot. Possibly facetted.
+
+Test first with just the EWR output summary
+
+Assume we always have a 'scenario' column
+
+Filtering is going to be trickier here- we can't really use gaugefilter since we can't assume gauges will exist.
+
+At some level, should I just enforce the look with `make_pal` and `theme_werp_toolkit` at let us build plots ad-hoc? Yes, but let's still provide some standard ones.
+
+### Bar
+
+This really is a bit of a mess. We need to only plot a single value per x/color/fill/facet factorial. (and color and fill are unlikely to differ)
+
+```{r}
+ggplot2::ggplot(summary_ewr_output, 
+                ggplot2::aes(x = scenario, y = ewr_achieved, fill = scenario)) +
+  ggplot2::geom_col() # I think same as geom_bar(stat = 'identity')- plots the value
+```
+
+That's quite clearly NOT plotting a single value. We could aggregate (e.g. over gauges), or we can split. Here, what varies within scenario? `gauge`, `ewr_code` , `ewr_code_timing`, anything else?
+
+```{r}
+summary_ewr_output %>% 
+  # just grab the first code_timing
+  dplyr::group_by(ewr_code, gauge, scenario) %>% 
+  dplyr::slice(1) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::filter(ewr_code %in% c('BF1', 'LF1', "OB5") & 
+                  gauge %in% c("412002", "412005", "412038")) %>% 
+ggplot2::ggplot(ggplot2::aes(x = scenario, y = ewr_achieved, fill = scenario)) +
+  ggplot2::geom_col() + # Same as geom_bar(stat = 'identity')- plots the value
+  # use `reformulate` to end run the rlang issues of characters
+  ggplot2::facet_grid(reformulate('gauge','ewr_code'))
+```
+
+So, how much handholding do we want to do? I think if we want to keep data general, as little as possible. By the time we get the data arrangement sorted out, we'll kind of end up just wrapping the ggplot call in the arguments. I guess though we still want to do the `plot_prep` for baselining and colors? I have a feeling the workflow in practice will be more like
+
+dataprep --\> plot_prep -\> ggplot code -\> scale_color_manual + theme_werp_toolkit
+
+but we can build a function, I guess.
+
+If we get to the point of making *default* plots, then the dataprep can be rolled up into a default_bar function or whatever.
+
+Anyway, let's assume the data has been arranged in a reasonable way by the user. Then, we can pass in a fill, facet_row, facet_col, and call it a day with a little check that fill \* row \* col isn't longer than nrows.
+
+OR, is it better to settle on what the default plots should be, and then just make them in a notebook with exposed ggplot code, since that's more readable anyway? quite possibly. We just need to be really targetted and not fill notebooks up with 100 different copy-paste variations- at that point it SHOULD be a function. But maybe don't write those until we bash through what we want for a given case study/report whatever. IE have an 'experiment' notebook that manages the run and its outputs, and use the plot infrastructure functions but not all the way to full plotting functions?
+
+That would still let me enforce color palettes across scenarios, for example.
+
+Kind of what I'm wondering is if the answer is more aggressive editing and re-writing, rather than functions all over the place. It will depend how things progress, I think.
+
+I'll get through this plot, and then make more demos just in ggplot (e.g. the next couple, maps, etc). Then we can decide exactly what the functions need to do. We already have causal plot funs too.
+
+One **MAJOR** advantage of functions is that any data changes that clean it for a given plot aren't preserved, and so it's way easier to keep the data clean and know what we're working with. and if we consistently do the *same* changes, that can be its own function, e.g. `plot_prep`
+
+The above can now be created with a function
+
+First, it's the user's responsibility to know what the data looks like. Make some
+
+```{r}
+ewr_to_bar_data <- summary_ewr_output %>% 
+  # just grab the first code_timing
+  dplyr::group_by(ewr_code, gauge, scenario) %>% 
+  dplyr::slice(1) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::filter(ewr_code %in% c('BF1', 'LF1', "OB5") & 
+                  gauge %in% c("412002", "412005", "412038"))
+```
+
+Then plot, and feed it the scenario palette `scene_pal` . otherwise it auto-generates with `scico::oslo`.
+
+```{r}
+plot_outcomes_bar(ewr_to_bar_data, 
+                 y_col = 'ewr_achieved', 
+                 facet_row = 'gauge', 
+                 facet_col = 'ewr_code',
+                 colors = scene_pal,
+                 sceneorder = levels(sceneorder))
+```
+
+Maybe not the prettiest color choices, but everything is working.
+
+Do I want a file in `/R` that just establishes all the default orders and palettes? Probably. Could be a function that gets called, e.g. `set_plot_defaults_werp()` at the head of notebooks/scripts.
+
+### Same thing, but better data
+
+at the other end of the spectrum, let's look at the basin-scaled data
+
+Set up the data we want to plot. There are 27 objectives. Should we just use them all? Try it.
+
+```{r}
+basin_to_plot <- agg_theme_space$mdb %>% 
+  rename(allArith = 4, oneLimiting = 5) %>% # for readability
+  filter(!is.na(Objective))
+```
+
+There's really only one thing to facet, so should drop to `facet_wrap` instead of `facet_grid`.
+
+```{r}
+plot_outcomes_bar(basin_to_plot, 
+                 y_col = 'allArith',
+                 facet_wrapper = 'Objective',
+                 colors = scene_pal,
+                 sceneorder = levels(sceneorder))
+```
+
+### Stacked bar, multiple outcomes
+
+What's x and what's the stack? could be ewr_code or scenario in either place. Does it matter? Maybe not?
+
+```{r}
+ggplot(basin_to_plot, aes(x = scenario, y = allArith, fill = Objective)) + 
+  geom_col() + theme(legend.position = 'none')
+```
+
+THat's basically it, once i sort out the color-grouping-
+
+Can I group these in some way? I have some code in causal network plots that allows specifying colors by group within a col that might work really well, e/.g. make the different Fish outcomes shades of blue, veg green, etc...
+
+I now have a function.
+
+I can use a single color palette
+
+```{r}
+basin_to_plot <- agg_theme_space$mdb %>%
+    dplyr::rename(allArith = 4, oneLimiting = 5) %>% # for readability
+    dplyr::filter(!is.na(Objective))
+
+  basin_plot <- plot_outcomes_stacked(basin_to_plot,
+                                      y_col = 'allArith',
+                                      colorset = 'Objective',
+                                      pal_list = list("scico::oslo"),
+                                      sceneorder = c('down4', 'base', 'up4'))
+  basin_plot
+```
+
+I can specify groups and use different palettes for each
+
+```{r}
+obj_sdl_to_plot <- agg_theme_space$sdl_units %>%
+    dplyr::rename(allArith = 4) # for readability
+
+  # Create a grouping variable
+  obj_sdl_to_plot <- obj_sdl_to_plot |>
+    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(colcol)) |>
+    dplyr::arrange(colcol, env_obj)
+
+  # Create a palette list
+  grouplist = list(EF = 'grDevices::Purp',
+                   NF = 'grDevices::Mint',
+                   NV = 'grDevices::Burg',
+                   OS = 'grDevices::Blues',
+                   WB = 'grDevices::Peach')
+
+  # need to facet by space sdl unit and create a group col to take multiple palettes
+sdl_stack <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = grouplist,
+                          facet_wrapper = 'SWSDLName',
+                          sceneorder = c('down4', 'base', 'up4'))
+sdl_stack
+```
+
+And I can specify that differently with `facet_wrap` and `facet_rows`
+
+```{r}
+ sdl_plot_facrow <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = grouplist,
+                          facet_col = 'SWSDLName',
+                          facet_row = '.',
+                          sceneorder = c('down4', 'base', 'up4'))
+ sdl_plot_facrow
+```
+
+And it might actually look best to facet on the groups
+
+```{r}
+sdl_plot_factgroup <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = grouplist,
+                          facet_row = 'SWSDLName',
+                          facet_col = 'colcol',
+                          sceneorder = c('down4', 'base', 'up4'))
+sdl_plot_factgroup
+```
+
+#### Flipped axes
+
+Does that actually work better with the objectives on x and scenarios as colors? Maybe coord_flipped?
+
+I haven't done a plot_prep here, so the scenarios aren't ordered properly, but that basically works. Maybe we should fct_reorder? Not sure what the natural ordering is.
+
+```{r}
+ggplot(basin_to_plot, aes(x = forcats::fct_reorder(Objective, allArith,
+                                                   .fun = sum, 
+                                                   .desc = TRUE),
+                          y = allArith, fill = scenario)) + 
+  geom_col() + scale_fill_manual(values = scene_pal)
+```
+
+So, that's one option. It might be nice to put them in groups somehow (or have that ability). ie lump by fish, veg, whatever. For some outcomes we don't know what that looks like.
+
+One option is to fct_reorder2 with a group col, another is to use the group color thing I want to do above to set color (i.e. the outline).
+
+And we need to make those names readable, but that's going to be a job. Just flipping coords doesn't work. stringr::str_wrap helps, but those names just need to be shortened, and that's a manual job.
+
+```{r}
+
+ggplot(basin_to_plot, aes(x = forcats::fct_reorder(
+  stringr::str_wrap(Objective, 20),
+  allArith,
+  .fun = sum, 
+  .desc = TRUE),
+  y = allArith, 
+  fill = scenario)) + 
+  geom_col() + 
+  scale_fill_manual(values = scene_pal) + 
+  coord_flip()
+```
+
+Now that I have a function for the other way, hopefully I can just modify it to make this stack. Will need to swap x and fill, and pass in scene_pal instead of of the big palette list (in addition to, if I want to color the bar outlines?).
+
+### Lines with quant x
+
+# Aggsequencing
+
+For most plots (except hydrographs), we need a way to choose which aggsequences to plot. It needs to work for the column-format and the name-format (though I guess we could foce one).
+
+And we need to be able to facet on it- ie facet by aggreation in step 3.
+
+How? There's an easy bypass of just asking for the column if namehistory, and facetting by columns. (is that true that we can facet by multiple?)
+
+Otherwise, I think we should be able to feed it a funsequence that may be a subset of the original one, and it'll grab that. Then if any item in the funsequence is longer than 1, facet on it.
+
+# Maps
+
+# Tiles
+
+# Causal networks
