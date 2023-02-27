@@ -117,6 +117,8 @@ First, let's specify an interleaved aggregation sequence with simple set of func
 
 If we name the list by target instead of just have values things are a bit easier to track. need to deal with auto-naming.
 
+**NOTE** the *first* aggregation into a spatial unit doesn't need to be area-weighted, because the thing being aggregated doesn't have area. After that, it does. It shouldn't *hurt* to use weighted.mean though, since it defaults to even weights. But there won't be an area column.
+
 ```{r}
 
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),

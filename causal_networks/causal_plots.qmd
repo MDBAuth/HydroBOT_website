@@ -224,7 +224,7 @@ make_causal_plot(nodes, edges,
 
 ### Groupings within node groups
 
-It's possible but gets rapidly bespoke to break those up into more discrete chunks. I've had a crude go at establishing a default though, where I grouped EWRs and environmental objectives by their main group, and lumped all the targets by year (though only including 5-year in this example). That default can be accessed by passing `'werp'` to as the `node_colorset`.
+It's possible but gets rapidly bespoke to break those up into more discrete chunks. I've had a crude go at establishing a default though, where I grouped EWRs and environmental objectives by their main group, and lumped all the targets by year (though only including 5-year in this example). That default can be accessed by passing `'werp'` to as the `node_colorset`. This is an end-run that builds a new column to use as `colorset`, defined according to some defaults. The same thing could be done externally by creating a new column to define the `colorset` outside the function and then making that column `colorset`.
 
 In that case, we might want to use a different set of palettes,
 
@@ -236,10 +236,12 @@ node_list_g <- list(ewr_code = 'viridis::mako',
                     target_5_year_2024 = 'calecopal::eschscholzia')
 ```
 
+why does this need node_pal at all? Because it lets us set the within-node_colorgroups palettes. The `node_colorset = 'werp'` just creates a new column in the data that gives rows values we want (e.g. the first two letters of the ewr_codes), which are then used to choose colors from that particular palette. It's a way to have fewer colors (and more meaningful colors) *within* the colorgroups.
+
 ```{r}
 make_causal_plot(nodes, edges, 
                  edge_pal = 'black',
-                 node_pal = node_list_c,
+                 node_pal = node_list_g,
                  node_colorgroups = 'NodeType',
                  node_colorset = 'werp', render = FALSE) %>% 
   DiagrammeR::render_graph()

@@ -243,6 +243,19 @@ And just for Macquarie-Castlereagh
 ewr_mc <- ewr_demo %>% dplyr::filter(SWWRPACODE == 'SW11')
 ```
 
+Save all the macquarie gauges for the case study and note which are in EWR
+
+```{r}
+demo_gauges %>% 
+  dplyr::filter(SWWRPACODE == 'SW11') %>%
+  dplyr::select(gauge, site, SWWRPANAME) %>% 
+  dplyr::mutate(in_ewr = ifelse(gauge %in% ewr_mc$gauge, TRUE, FALSE)) %>% 
+  cbind(st_coordinates(.)) %>% 
+  dplyr::rename(lon = X, lat = Y) %>% 
+  st_drop_geometry() %>% 
+  readr::write_csv(file.path(scenario_dir, 'Macquarie_gauges.csv'))
+```
+
 ### Get all the gauge data
 
 Now we have a list of gauges, go actually get their hydrographs. Takes a while, be patient.
