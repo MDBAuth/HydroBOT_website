@@ -474,6 +474,39 @@ ggplot(basin_to_plot, aes(x = forcats::fct_reorder(
 
 Now that I have a function for the other way, hopefully I can just modify it to make this stack. Will need to swap x and fill, and pass in scene_pal instead of of the big palette list (in addition to, if I want to color the bar outlines?).
 
+For the same set as the function-ed stacks above,
+
+```{r}
+obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          colorgroups = NULL,
+                          colorset = 'env_obj',
+                          pal_list = list('scico::berlin'),
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_x = FALSE,
+                          scene_pal = scene_pal,
+                          sceneorder = levels(sceneorder))
+```
+
+I'm really close to having a grouping aesthetic, (I can assign color), but using color on bar plots is ugly. Some sort of faint background would be better, or coloring the x-labels by group. Not worth the time now, but it's set up to do if I can figure out how to do those things.
+
+what does that look like facetted on the groups of outcomes as well? It works OK, but not as well as when the individual objectives are stacked, since each one gets its own x-tick. I hoped `scales = 'free_x'` would work to just give each one a subset, but it only does when the groupings are in facet-columns. That's probably OK?
+
+```{r}
+obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          colorgroups = NULL,
+                          colorset = 'env_obj',
+                          pal_list = list('scico::berlin'),
+                          facet_row = 'SWSDLName',
+                          facet_col = 'colcol',
+                          scales = 'free_x',
+                          scene_x = FALSE,
+                          scene_pal = scene_pal,
+                          sceneorder = levels(sceneorder))
+```
+
 ### Lines with quant x
 
 # Aggsequencing
