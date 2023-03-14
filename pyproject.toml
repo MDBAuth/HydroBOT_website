@@ -9,6 +9,9 @@ packages = [{include = "werp_toolkit_demo"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 py-ewr = "1.0.1"
+geopandas = "^0.12.2"
+gitpython = "^3.1.31"
+plotnine = "^0.10.1"
 
 
 [build-system]
