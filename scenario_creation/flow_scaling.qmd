@@ -87,11 +87,9 @@ if ("params" %in% ls()) {
 
 ## Language
 
-I originally built this in Python ([scenario_creation_demo_py.qmd](data_creation/scenario_creation_demo_py.qmd)), but the only bit that *needs* to be in python is the gauge puller code. I'm adding this version as an example of how to mix R and python code chunks in similar situations where we only need a bit of code from the other language.
+This depends on a little bit of python from the `py_ewr` package.
 
 To call the python from R, as long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`. *Now that we have nested directories, I set the RETICULATE_PYTHON env variable in* `.Rprofile` .
-
-I'm leaving the `=` alone rather than changing to `<-` to make cross-translation easier.
 
 # Set up paths
 
@@ -146,7 +144,7 @@ gauge_cats <- py$catgauges %>%
   setNames(c('flow', 'level', 'stage'))
 ```
 
-I could leave that as a list (might make it easier to `furrr` or loop over in the gauge getting), but I kind of want them in a dataframe for mapping. Could do both, I guess
+I could leave that as a list, but a dataframe ends up helping later on with other arguments (e.g. state and variable) and is easier to map.
 
 ```{r}
 cat_gauges <- gauge_cats %>% 
@@ -159,9 +157,9 @@ cat_gauges <- gauge_cats %>%
   ))
 ```
 
-149 gauges doesn't seem too bad. Hopefully, the full period of record won't be too big. We still might want to parallelize in a couple places, if only to develop the methods.
+149 gauges doesn't seem too bad.
 
-## Map gauges to SDL units
+## Map gauges
 
 The gauges with their locations as `sf` object are in `bom_basin_gauges`.
 
@@ -173,7 +171,7 @@ nrow(geo_gauges  %>%
   filter(!st_is_empty(geometry)))
 ```
 
-The `st_is_empty` filter is because some of the gauges are things like 'Bills Pipe' and 'Pump direct from river', and so don't actually have locations. Are they pullable from NSW? I guess I can leave them in the main df and try?
+The `st_is_empty` filter is because some of the gauges are things like 'Bills Pipe' and 'Pump direct from river', and so don't actually have locations. Are they pullable from NSW? No, but we can leave them in for now.
 
 The commented out code labels the SDL units, but it's too busy.
 
@@ -205,29 +203,27 @@ We get the gauge data with `{vicwater}` (now), so we feed `geo_gauges$gauge` to 
 
 What time span do we want? Full period of record. David's scenarios go 1 Jan 1890 to 31 Jan 2019. Most (all?) gauges start after 1890, and go past 2019. But we should be able to scale the full period of record- they don't have to match the scenarios.
 
+::: {#Aside- gauge puller}
 I was using `mdba_gauge_getter` to pull gauges in [scenario_creation_demo_R.qmd](scenario_creation_demo_R.qmd), but there are a couple issues with it- if I pull data from both before and after the gauge start date, it fills the first section with zeros. This is an issue with the API itself. I've switched to my [{vicwater}](https://github.com/galenholt/vicwater) package in R, because it's able to find the period of record and only pull available data for a site (and despite the name, works for Vic, NSW, and QLD).
+:::
 
 We can do this two ways- using `get_variable_list`, extracting the start and end, and then passing those to `get_ts_traces`. Or we can use `get_ts_traces2`, which can do the timeperiod extraction internally. Some speed testing shows they're equivalent, so I'll use the automated and cleaner `get_ts_traces2`.
 
 ## Set up for the pull
 
-I'm being explicit about daily means and `varto` arguments matching those used by `mdba_gauge_getter` in the EWR tool. I'm using `returnformat = sitelist` to return a list of gauges instead of a long dataframe because that makes it easier to find site failures.
+I'm being explicit about daily means and `var_to` arguments matching those used by `mdba_gauge_getter` in the EWR tool. I'm using `returnformat = sitelist` to return a list of gauges instead of a long dataframe because that makes it easier to find site failures.
 
-I *think* I could ask for all three `vart_to` and it'd handle things internally, but I'm going to do three separate sets of requests for clarity for the flow, stage, and level gauges.
-
-I had thought that I'd just feed the `gauge_cats` list in as `site_list`, with a length-3 vector of the `var_to` values, since that list is already set up. But we also need the state argument, and that's on a gauge-by-gauge basis. So I'm going to need to do a bit of cleanup, and call `get_ts_traces` three times, since there are gauges in Vic, Qld, and NSW.
+I had thought that I'd just feed the `gauge_cats` list in as `site_list`, with a length-3 vector of the `var_to` values, since that list is already set up. But we also need the state argument, and that's on a gauge-by-gauge basis. So I'm going to need to do a bit of cleanup, and call `get_ts_traces2` for each combination of gauge type and state, since there are gauges in Vic, Qld, and NSW.
 
 ```{r}
-table(geo_gauges$owner)
+table(geo_gauges$owner, geo_gauges$type)
 ```
 
-It would be almost as fast to just future-loop over rows, since that's all `get_ts_traces2` does for the traces, but that would require more API calls to the function that gets the period (`get_ts_traces2` only needs to call it once), and I think that'd add up. The basic `get_ts_traces` would let me hit all the sites in one API call, but we have to call them separately anyway, since start and end dates will differ for each one.
+After lots of testing, I've decided to use `datasource = A` because `CP` gives unstable 504 Gateway timeouts. It's tempting to just `furrr::pmap` over the rows of `geo_gauges`, but that takes about 20x as long. We shouldn't need to do this much, but still, it's likely we'll need to more than once.
 
-After lots of testing, I've decided to use `datasource = A` because `CP` gives unstable 504 Gateway timeouts, and to manually split the data into states and gauge types so I can call `get_ts_traces2` with a site_list vector. Calling it rowwise with `furrr::pmap` takes about 20x as long. We shouldn't need to do this much, but still, it's likely we'll need to more than once.
+I seem to have it working to `pmap` over the states and variables, anyway, but the catch is errors tend to cause whole chunks of sites to fail. It's working now, but the manual way is commented out if it starts failing again.
 
-I suppose I could still map2 or pmap over lists to not have to actually manually split the data and copy-paste the calls. The catch there is if we pmap over the df here (`gauges_to_pull`), the whole row fails if any gauge fails. So one failing flow gauge kills 133 others. So I think I'll *not* `pmap` or `map` so single failures don't kill the whole thing.
-
-If we *do* go back to `pmap`, the `gauge` column is a list of tibbles, and for each one we need to unlist it to make it a character vector- `get_ts_traces` doesn't accept tibbles of gauge numbers.
+The `gauge` column is a list of tibbles, and for each one we need to unlist it to make it a character vector- `get_ts_traces` doesn't accept tibbles of gauge numbers.
 
 ```{r}
 gauges_to_pull <- geo_gauges %>% 
@@ -255,7 +251,7 @@ wrap_traces <- function(owner,var_to,gauge) {
 }
 ```
 
-So tired of gateway timeouts killing everything. The purrr works most of the time, but occasionally hits one. This might just have to be ad-hoc, depending on what fails to serve when it runs. The catch is that when this purr fails it fails on a whole row of the table, so we often lose all the NSW flow, which sucks. I think what I really need to do is make vicwater robust to http errors like 504. The `safely` lets it finish, but still annoying to have to re-do.
+So tired of gateway timeouts killing everything. The purrr works most of the time, but occasionally hits one. This might just have to be ad-hoc, depending on what fails to serve when it runs. The catch is that when this purr fails it fails on a whole row of the table, so we often lose all the NSW flow. I think I've now made {vicwater} robust to http errors like 504, so that should help. The `safely` lets it finish, but still annoying to have to re-do.
 
 ```{r}
 system.time(all_gauges <- purrr::pmap(gauges_to_pull, purrr::safely(wrap_traces)))
@@ -329,19 +325,17 @@ just_values <- all_results %>%
   purrr::map(\(x) dplyr::select(x, time, site, value))
 ```
 
-That produces a list with 141 gauges that's 494.3 MB (on 13 Mar 2023) in 103 seconds. Surprisingly fast, really. I'm going to save it though, just in case.
+That produces a list with 141 gauges that's 494.3 MB (on 13 Mar 2023) in 125 seconds. Surprisingly fast, really. I'm going to save it though, just in case.
 
 ```{r}
-saveRDS(just_values, file = file.path(hydro_dir, 'extracted_flows.rds'))
+if (REBUILD_DATA) {
+  saveRDS(just_values, file = file.path(hydro_dir, 'extracted_flows.rds'))
+}
 ```
 
-I still need to do some cleanup-
+## TODO
 
--   check for anything with an `error_num` column other than 0, since they should come through with `'pass'`. Done
-
--   Drop all the unneeded columns, so we only have what we need for the EWR tool
-
-    -   Done. But plus maybe quality code and variable?
+-   scale
 
 -   save in an EWR-friendly csv format (can EWR handle csvs with missing values, e.g. when sites differ?)
 
@@ -350,693 +344,3 @@ I still need to do some cleanup-
     -   This happens after the scaling anyway.
 
 -   save in whatever the standard netcdf format is, once we know what it is
-
-## OLD
-
-I can `purrr::map2` though to make this cleaner, if I set up a wrapper so x and y are easy. Using datasource = 'CP' to match `mdba_gauge_getter`, (and 'A' fails for the level gauge).
-
-```{r}
-wrap_traces <- function(x,y) {
-  traces <- get_ts_traces2(state = 'NSW', 
-                            site_list = x, 
-                            var_list = y,
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'CP',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass')
-  
-}
-```
-
-I'm having some issues with 'CP' taking forever and 504 timeout. Try switching back to 'A' for the flow gauges, anyway.
-
-```{r}
-wrap_traces_a <- function(x,y) {
-  traces <- get_ts_traces2(state = 'NSW', 
-                            site_list = x, 
-                            var_list = y,
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'A',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass')
-  
-}
-```
-
-### Minor cleanup
-
-I've persisted gauges with weird names until now, but they cause the API to error. MDBA_gauge_getter checks gauges are available to call, so I will just do the same, though I should make {vicwater} more robust.
-
-```{r}
-gauges_exist_nsw <- geo_gauges %>% 
-  dplyr::filter(grepl('NSW', owner) &
-                  gauge %in% bom_basin_gauges$gauge) 
-
- 
-```
-
-## Test- faster to loop rows or one call
-
-Looping rows is actually cleaner (we can autofill state and var_list), one call has fewer API calls. Test the worst case- NSW flow
-
-The manually-separated way. i'm just getting hammered by 504 Gateway timeouts. Is it always the same gauge(s)?
-
-```{r}
-
-flow_nsw <- gauges_exist_nsw %>% 
-  dplyr::filter(type == 'flow')
-  
-system.time(siteout_f <- get_ts_traces2(state = 'NSW', 
-                            site_list = flow_nsw$gauge, 
-                            var_list = "141",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'CP',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass'))
-```
-
-The loop (well, purrr pmap way), done on the same data- this is a bit contrived since the whole point is we *wouldn't* split up the data. Kind of a pain to get the df set up for `pmap.`
-
-Oof. 1090 seconds. WHy is this so much slower than before? Is 'CP' super slow? Is the `safely` wrapper?
-
-```{r}
-# need the names to match
-flow_nsw_namematch <- flow_nsw %>% 
-  st_drop_geometry() %>% 
-  rename(x = gauge, y = var_to) %>% 
-  select(x,y)
-system.time(siteout_fp <- purrr::pmap(flow_nsw_namematch, 
-                                      purrr::safely(wrap_traces)))
-```
-
-Errors
-
-```{r}
-which(purrr::map_lgl(siteout_fp, \(x) !is.null(x$error)))
-```
-
-Does index 16 *always* throw an error? Seems to. what's the deal?
-
-```{r}
-i16 <- wrap_traces(x = flow_nsw_namematch$x[16], y = flow_nsw_namematch$y[16])
-```
-
-Gauge
-
-```{r}
-flow_nsw[which(flow_nsw$gauge == flow_nsw_namematch$x[16]), ]
-```
-
-Why is that one consistently timing out? Is it too big? Check both A and CP datasources
-
-```{r}
-ds16 <- get_variable_list(state = 'nsw', site_list = '412038', datasource = c('A', 'CP'))
-ds16
-```
-
-It goes back to 1893. That *is* a long way. Is the answer just a shorter time period? What's the longest one otherwise? But 59 goes back to 1886 and works.
-
-```{r}
-datarows <- purrr::map_int(siteout_fp, \(x) if (is.null(x$result)) {0} else {nrow(x$result[[1]])})
-```
-
-What if I hit it wtih the manual function? Does it time out there too? If it doesn't, I think the timeouts might just be idiosyncratic, because this is what the purrr would have called too. Yeah, still a gateway.
-
-```{r}
-man16 <- get_ts_traces2(state = 'NSW', 
-                            site_list = '412038', 
-                            var_list = "141",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'CP',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass')
-```
-
-Does 'A' work?
-
-```{r}
-man16 <- get_ts_traces2(state = 'NSW', 
-                            site_list = '412038', 
-                            var_list = "141",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'A',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass')
-```
-
-Do the longer ones timeout too, and we just got lucky?
-
-```{r}
-# 59 is even bigger
-biggauge <- flow_nsw_namematch$x[59]
-man59 <- get_ts_traces2(state = 'NSW', 
-                            site_list = biggauge, 
-                            var_list = "141",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'CP',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass')
-```
-
-That works just fine. So, what's up with 16? can we ask for smaller subsets? Or does it just always fail? Get 10 years in the middle
-
-```{r}
-man16_10 <- get_ts_traces2(state = 'NSW', 
-                            site_list = '412038', 
-                            var_list = "141",
-                            start_time = "20000101",
-                            end_time = "20100101",
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'CP',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass')
-```
-
-That works. So what's the deal? Can I get approximately halves? Just go to 1960.
-
-```{r}
-man16_start <- get_ts_traces2(state = 'NSW', 
-                            site_list = '412038', 
-                            var_list = "141",
-                            start_time = ds16$period_start[ds16$variable == "100.00" & ds16$datasource == 'CP'],
-                            end_time = "19600101",
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'CP',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass')
-```
-
-That works. But I can get the whole thing with 'A' quickly.
-
-Does 'A' work?
-
-```{r}
-man16 <- get_ts_traces2(state = 'NSW', 
-                            site_list = '412038', 
-                            var_list = "141",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'A',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass')
-```
-
-Should I just use that? 742 seconds.
-
-```{r}
-system.time(siteout_fp_A <- purrr::pmap(flow_nsw_namematch, 
-                                      purrr::safely(wrap_traces_a)))
-```
-
-main q is whether it throws errors - nope
-
-```{r}
-which(purrr::map_lgl(siteout_fp_A, \(x) !is.null(x$error)))
-```
-
-is the data the same? No. Consistently less data (typically low tens of days, but sometimes \~200. Why? Looks like A doesn't have the newest stuff. Is CP the NSW version of AT (composite of Archive and Telemetry)? I think probably. Guage getter uses 'PUBLISH' for VIC an 'AT' for QLD. So, yet another thing to do differently per state. So I guess I'm going to have to add that. PUBLISH is not docuemtned wiht VIC, and does not show up on the get_datasources_by_site. Just like CP in NSW. I htink. Have I get_datasource_by_site for most/all/some of these?
-
-```{r}
-datarows_A <- purrr::map_int(siteout_fp_A, \(x) if (is.null(x$result)) {0} else {nrow(x$result[[1]])})
-
-datarows_A - datarows
-```
-
-I still want to know if the other wahy with fewer API hits is faster. If not, furring makes a lot of sense. 99 seconds. That's WAY better. So, what to do about the 'CP' issue?
-
-```{r}
-system.time(siteout_f_A <- get_ts_traces2(state = 'NSW', 
-                            site_list = flow_nsw$gauge, 
-                            var_list = "141",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'A',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass'))
-```
-
-How fast is that for CP without the bad gauge? Getting another gateway timeout. I'm going to bail on the CP for this- it's WAY too buggy, and we dont really need the last couple months of data for what we're trying to do.
-
-```{r}
-412038
-system.time(siteout_f_CP_good <- get_ts_traces2(state = 'NSW', 
-                            site_list = flow_nsw$gauge[flow_nsw$gauge != '412038'], 
-                            var_list = "141",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'CP',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass'))
-```
-
-## OLD
-
-```{r}
-# gauges_exist <- purrr::map(gauge_cats,
-#                            \(x) x[x %in% bom_basin_gauges$gauge])
-```
-
-```{r}
-# make a list of the var_to matching the length of gauge_cats
-varlist <- list(flow = 141, level = 130, stage = 100)
-
-# catch any ordering errors
-all(names(gauges_exist) == names(varlist))
-```
-
-There's a `dopar` in `get_ts_traces2`, so set up to use that.
-
-```{r}
-registerDoFuture()
-plan(multisession)
-```
-
-## Get the traces
-
-This purrrs over the gauges and variables to extract the flows. Some
-
-```{r}
-system.time(siteout <- purrr::map2(gauges_exist, varlist, wrap_traces))
-```
-
-This is going to return a length 3 list of lists containing each gauge. that's kind of annoying, I'd like them to all be in the same list. Oh well.
-
-# Stopped here on the train
-
-### Flow (141)
-
-```{r}
-system.time(siteout_f <- get_ts_traces2(state = 'NSW', 
-                            site_list = gauges_exist$flow, 
-                            var_list = "141",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                           datasource = 'CP',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass'))
-```
-
-### Level (130)
-
-```{r}
-system.time(siteout_l <- get_ts_traces2(state = 'NSW', 
-                            site_list = gauges_exist$level, 
-                            var_list = "130",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass'))
-```
-
-### Stage (100)
-
-THIS ONE IS ACTUALLY IN VIC- ARE OTHERS?- mdba_gauge_getter matches. can we get that matching file? YES- it's the BOM gauge data csv, gauge_owner col
-
-```{r}
-system.time(siteout_s <- get_ts_traces2(state = 'NSW', 
-                            site_list = gauges_exist$stage, 
-                            var_list = "100",
-                            start_time = 'all',
-                            end_time = 'all',
-                            interval = 'day',
-                            data_type = 'mean',
-                            returnformat = 'sitelist',
-                            .errorhandling = 'pass'))
-```
-
-## OLD, but not *as* old
-
-That produces a list with 133 gauges that's 501.3 MB (on 8 Mar 2023) in 103 seconds. Surprisingly fast, really. I'm going to save it though, just in case.
-
-```{r}
-saveRDS(siteout_a, file = file.path(hydro_dir, 'extracted_flows.rds'))
-```
-
-I still need to do some cleanup-
-
--   check for anything with an `error_num` column other than 0, since they should come through with `'pass'`.
-
--   Drop all the unneeded columns, so we only have what we need for the EWR tool
-
--   save in an EWR-friendly format
-
--   save in whatever the standard netcdf format is, once we know what it is
-
-### Check for errors
-
-We get a value in the `error_num` column if there was an error in retrieving the data.
-
-```{r}
-ernums <- purrr::map(siteout_a, \(x) unique(x$error_num)) %>% 
-  # remove if zero
-  purrr::discard(\(x) (all(x == 0)))
-```
-
-I'm not going to automate this, since in theory the errors won't always be the same. What's going on there?
-
-There's only one this time, but be explicit
-
-```{r}
-siteout_a[[names(ernums)[1]]]$error_msg
-```
-
-Can I get it manually? First, get start and end dates
-
-```{r}
-failvar <- get_variable_list(state = 'NSW', site_list = names(ernums), datasource = 'A')
-
-flowindex <- which(failvar$variable == '100.00')
-
-```
-
-try a few things
-
-```{r}
-# # Same error. 
-# failman <- get_ts_traces(state = 'NSW', 
-#                          site_list = names(ernums),
-#                          var_list = '141',
-#                          start_time = failvar$period_start[flowindex],
-#                          end_time = failvar$period_end[flowindex])
-
-# # What about with 'CP'? Same error
-# failman <- get_ts_traces(state = 'NSW', 
-#                          site_list = names(ernums),
-#                          var_list = '141',
-#                          start_time = failvar$period_start[flowindex],
-#                          end_time = failvar$period_end[flowindex],
-#                          datasource = 'CP')
-
-# Can we get 100? the base that 140 and 141 are built on? Yes
-fail100 <- get_ts_traces(state = 'NSW', 
-                         site_list = names(ernums),
-                         var_list = '100',
-                         start_time = failvar$period_start[flowindex],
-                         end_time = failvar$period_end[flowindex])
-
-# How about 140- no. 
-fail140 <- get_ts_traces(state = 'NSW', 
-                         site_list = names(ernums),
-                         var_list = '140',
-                         start_time = failvar$period_start[flowindex],
-                         end_time = failvar$period_end[flowindex])
-```
-
-# OLD BELOW- chopping up
-
-Use the bom gauges, since this is what were contained in the EWR tool.
-
-```{r}
-gaugegeo = read_sf(file.path(geo_data_dir, 'bom_gauges.shp'))
-  
-```
-
-## Read in polygons
-
-In [scenario_creation_demo_R.qmd](scenario_creation_demo_R.qmd), I read these in from shapefiles to make things more portable between R and python, and to compare the different spatial units. Here, I'll just use the `sf`objects provided by `werptoolkitr` and we're really only interested in the sdl units, with maybe the basin for reference.
-
-### Plot the polygons and data checks
-
-SDL plan areas
-
-```{r}
-ggplot(sdl) + geom_sf(aes(fill = SWSDLName), show.legend = FALSE) +
-  geom_sf_label(aes(label = SWSDLName), size = 3, label.padding = unit(0.1, 'lines')) + 
-  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
-```
-
-These have 'SS' codes.
-
-```{r}
-sdl
-```
-
-## Cut to demo polygons
-
-The Macquarie shapefile from David is the Macquarie-Castlereagh from `rps` - `SWWRPACODE == 'SW11'`. I want a few catchments to play with for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan. That might be a LOT of gauges, though.
-
-```{r}
-catch_demo = rps %>% 
-  dplyr::filter(SWWRPANAME %in% c('Macquarie-Castlereagh', 'Lachlan', 'Namoi'))
-```
-
-```{r}
-(ggplot(catch_demo) + geom_sf(aes(fill = SWWRPANAME)) +
-scale_fill_brewer(type = 'qual', palette = 8))
-```
-
-## Get relevant gauges
-
-### Cut to the polygons
-
-Cut the gaugegeo from the whole country to just those four catchments
-
-```{r}
-demo_gauges = st_intersection(gaugegeo, catch_demo)
-```
-
-How many are we talking?
-
-```{r}
-demo_gauges %>% nrow()
-```
-
-295 rows is a lot, but unlikely they'll all be in the EWR.
-
-### Extract their names
-
-To feed to the gauge extractor, we need their gauge numbers.
-
-```{r}
-gaugenums = demo_gauges$gauge
-```
-
-## Get the values
-
-We can feed lists to `gg.gauge_pull`, so can feed it that way. We might *want* to loop for parallelising extraction or modifications, but the real scenarios won't be made this way anyway, so not worth it here.
-
-What time span do we want? 10 years to start
-
-```{r}
-starttime = lubridate::ymd(20100101)
-endtime = lubridate::ymd(20191231)
-```
-
-How many are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. *This is where we have to use python to access the EWR table*.
-
-\*Access the python objects with `py$objname`.
-
-**TODO** THIS FAILS AS OF 1.0.4. Get the table some other way, I guess. I have rolled back to 1.0.1, since the necessary file just doesn't exist in 1.0.4 (and in about half the branches on github). Is it being phased out? Does that mean they're all 'good' now, and I can use all of them and not filter good/bad?
-
-Error messages:
-
-    FileNotFoundError: [Errno 2] No such file or directory: 'py_ewr/parameter_metadata/NSWEWR.csv'
-
-    Error in py_get_attr_impl(x, name, silent) : 
-      AttributeError: module '__main__' has no attribute 'ewrs'
-
-```{python}
-from py_ewr.data_inputs import get_EWR_table
-ewrs, badewrs = get_EWR_table()
-```
-
-What are those gauges, and which are in both the ewr and the desired catchments?
-
-```{r}
-ewrgauges = py$ewrs$Gauge
-ewr_demo_gauges = gaugenums[gaugenums %in% ewrgauges]
-length(ewr_demo_gauges)
-```
-
-47 seems ok. Let's go with that.
-
-### Get the ewr gauges in a dataframe
-
-Let's filter the `demo_gauges` df to the ones in EWR. We don't go on to use it, but it's useful
-
-```{r}
-ewr_demo <- demo_gauges %>% 
-  dplyr::filter(gauge %in% ewr_demo_gauges)
-```
-
-And just for Macquarie-Castlereagh
-
-```{r}
-ewr_mc <- ewr_demo %>% dplyr::filter(SWWRPACODE == 'SW11')
-```
-
-Save all the macquarie gauges for the case study and note which are in EWR
-
-```{r}
-demo_gauges %>% 
-  dplyr::filter(SWWRPACODE == 'SW11') %>%
-  dplyr::select(gauge, site, SWWRPANAME) %>% 
-  dplyr::mutate(in_ewr = ifelse(gauge %in% ewr_mc$gauge, TRUE, FALSE)) %>% 
-  cbind(st_coordinates(.)) %>% 
-  dplyr::rename(lon = X, lat = Y) %>% 
-  st_drop_geometry() %>% 
-  readr::write_csv(file.path(scenario_dir, 'Macquarie_gauges.csv'))
-```
-
-### Get all the gauge data
-
-Now we have a list of gauges, go actually get their hydrographs. Takes a while, be patient.
-
-*Again, need python here.* *Pass R objects to python as* `r.`
-
-*It takes -forever- to do a type translation on the* `DATETIME` *column*. So change it to something simple while still in python, and change it back in R next.
-
-```{python gaugepulling}
-#| message: false
-import mdba_gauge_getter as gg
-demo_levs = gg.gauge_pull(r.ewr_demo_gauges, start_time_user = r.starttime, end_time_user = r.endtime)
-demo_ids = demo_levs.SITEID.unique()
-len(demo_ids)
-
-# I think this will work, the above is running
-demo_levs['Date'] = demo_levs['DATETIME'].astype(str)
-```
-
-I guess that's not terrible. 168k rows is fine in general, but likely overkill for testing. I could cut it to fewer gauges and less time, probably, but it will be good to have reasonable time periods for testing time windowing if this doesn't eat too much time elsewhere.
-
-For some reason `demo_levs['VALUE']` is an object and not numeric. And `'DATETIME'` needs to be named `Date` for the EWR tool to read it.
-
-*I'm copying the py obj to R for further manipulation.* A bit dumb from a memory point of view, but it's not big.
-
-Transforming the python dates to R dates is horribly slow. MUCH faster to change to string and back again.
-
-```{r datatransfer}
-demo_levs <- py$demo_levs
-
-demo_levs$VALUE = as.numeric(demo_levs$VALUE)
-
-# # In python, we just need to change the name of the date column. Here, we need to change the python datetime.date objects to R dates
-# 
-# # Really slow. furrr is actually slower.
-# # MUCH faster to just make the dates characters in python, and back to dates here.
-# rdates <- purrr::map(demodates, py_to_r) %>% 
-#   tibble(.name_repair = ~'Date') %>%  
-#   unnest(cols = Date)
-# 
-# demo_levs <- bind_cols(rdates, demo_levs)
-demo_levs <- dplyr::select(demo_levs, -DATETIME) %>% 
-  dplyr::mutate(Date = lubridate::ymd(Date))
-```
-
-### Map the gauges
-
-```{r}
-# gaugegeo <- gaugegeo %>% 
-#   dplyr::rename(gauge = `gauge number`)
-demo_geo = gaugegeo %>% dplyr::filter(gauge %in% py$demo_ids)
-```
-
-Looks reasonable. Probably overkill for testing, but can do a cut down version too.
-
-```{r}
-(ggplot() + 
-geom_sf(data = basin, fill = 'lightsteelblue') +
-geom_sf(data = catch_demo, mapping = aes(fill = SWWRPANAME)) +
-geom_sf(data = demo_geo, color = 'black') +
-scale_fill_brewer(type = 'qual', palette = 8))
-```
-
-## Make test scenarios
-
-### Demo scenarios
-
-For now, the test scenarios are just multiplying by 4 or 0.25 to give something to work with. This section could easily be modified for other simple scenarios.
-
-```{r}
-down4 = demo_levs
-up4 = demo_levs
-
-down4$VALUE = down4$VALUE * 0.25
-up4$VALUE = up4$VALUE * 4
-```
-
-### Make the data look like IQQM
-
-I read this in with the EWR tool's code, but need to be able to read into the EWR tool through the `scenario_handling`. That's sort of convoluted, and could be fixed by splitting up `process_scenarios` into a read-in bit and a bit that calls `evaluate_EWRs.calc_sorter`. The end of `process_scenarios` starting with `gauge_results = {}` is the same as `process_gauges` and so could be shared.
-
-For now though, just tell EWR it's IQQM so I can use `scenario_handling`. As long as I have a date column `Date` and other columns with gauge numbers for names, I can get the EWR tool to work by telling it it's IQQM. It can have multiple gauges, with each having its own column. I had originally set up for single files per scenario-gauge combination, but let's use multi-cols for now. The read-in should work either way.
-
-### Save the output
-
-Not being too fussed about structure, since the structure is going to change once we have actual scenarios.
-
-I will still do the dir/file structure even with one file as it allows easier changes and more flexibility.
-
-*I had saved the full suite, but I think since this is now turning into a package, we want to keep things minimal. Move the full set of gauges to the demo project*
-
-```{r}
-scenenames = c('base', 'up4', 'down4')
-
-# the full scenarios
-for (x in scenenames) {
-      scenedir = file.path(hydro_dir, x)
-    if (!dir.exists(scenedir)) {
-      dir.create(scenedir, recursive = TRUE)
-    }
-
-}
-
-```
-
-Create clean dataframes to save.
-
-```{r}
-base <- demo_levs %>% 
-  dplyr::select(Date, VALUE, SITEID) %>% 
-  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
-
-up4 <- up4 %>% 
-  dplyr::select(Date, VALUE, SITEID) %>% 
-  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE)
-
-down4 <- down4 %>% 
-  dplyr::select(Date, VALUE, SITEID) %>% 
-  tidyr::pivot_wider(id_cols = Date, names_from = SITEID, values_from = VALUE) 
-```
-
-Save. could do this above easily enough, but getting lots of dots and hard to read.
-
-```{r}
-if (REBUILD_DATA) {
-      readr::write_csv(base, file.path(hydro_dir, 'base', 'base.csv'))
-  
-      readr::write_csv(up4, file.path(hydro_dir, 'up4', 'up4.csv'))
-      readr::write_csv(down4, file.path(hydro_dir, 'down4', 'down4.csv'))
-}
-
-```
