@@ -240,6 +240,8 @@ Though with the names and aggseqs as columns, I should be able to say what *happ
 
 We can't do this yet- all we have is flow scaling, which is one-d. That's fine, I can make a 1-d version (e.g an x with flow scaling, y with outcome, and fit a curve/kernel/line. But even then, we don't have anywhere like enough data. So for now, I think we just geom_line() it, but put in the ability to use a kernel density or a spline or something.
 
+The maps are actually really close to it too- they have y_col mapped to fill.
+
 The 1-d version will end up looking at lot like some of the figures we had in the demo doc, and for good reason- that's what they are.
 
 So, develop the 1-d version
@@ -319,11 +321,12 @@ ewr_to_bar_data <- summary_ewr_output %>%
 Then plot, and feed it the scenario palette `scene_pal` . otherwise it auto-generates with `scico::oslo`.
 
 ```{r}
-plot_outcomes_bar(ewr_to_bar_data, 
+plot_outcomes(ewr_to_bar_data, 
                  y_col = 'ewr_achieved', 
                  facet_row = 'gauge', 
                  facet_col = 'ewr_code',
-                 colors = scene_pal,
+                 colorset = 'scenario',
+                 pal_list = scene_pal,
                  sceneorder = levels(sceneorder))
 ```
 
@@ -346,10 +349,11 @@ basin_to_plot <- agg_theme_space$mdb %>%
 There's really only one thing to facet, so should drop to `facet_wrap` instead of `facet_grid`.
 
 ```{r}
-plot_outcomes_bar(basin_to_plot, 
+plot_outcomes(basin_to_plot, 
                  y_col = 'allArith',
                  facet_wrapper = 'Objective',
-                 colors = scene_pal,
+                 colorset = 'scenario',
+                 pal_list = scene_pal,
                  sceneorder = levels(sceneorder))
 ```
 
@@ -375,7 +379,7 @@ basin_to_plot <- agg_theme_space$mdb %>%
     dplyr::rename(allArith = 4, oneLimiting = 5) %>% # for readability
     dplyr::filter(!is.na(Objective))
 
-  basin_plot <- plot_outcomes_stacked(basin_to_plot,
+  basin_plot <- plot_outcomes(basin_to_plot,
                                       y_col = 'allArith',
                                       colorset = 'Objective',
                                       pal_list = list("scico::oslo"),
@@ -407,7 +411,7 @@ obj_sdl_to_plot <- agg_theme_space$sdl_units %>%
 
   # need to facet by space sdl unit and create a group col to take multiple palettes
 sdl_stack <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           colorgroups = 'colcol',
                           colorset = 'env_obj',
                           pal_list = grouplist,
@@ -420,7 +424,7 @@ And I can specify that differently with `facet_wrap` and `facet_rows`
 
 ```{r}
  sdl_plot_facrow <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           colorgroups = 'colcol',
                           colorset = 'env_obj',
                           pal_list = grouplist,
@@ -434,7 +438,7 @@ And it might actually look best to facet on the groups
 
 ```{r}
 sdl_plot_factgroup <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           colorgroups = 'colcol',
                           colorset = 'env_obj',
                           pal_list = grouplist,
@@ -451,7 +455,7 @@ This is kind of a cool plot too
                       palette = 'scico::berlin')
   
 sdl_plot_groupblock <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'scenario',
                           colorgroups = 'colcol',
                           colorset = 'env_obj',
@@ -505,7 +509,7 @@ For the same set as the function-ed stacks above (and the same as the colcol sta
 
 ```{r}
 obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           colorgroups = NULL,
                           colorset = 'env_obj',
                           pal_list = list('scico::berlin'),
@@ -522,7 +526,7 @@ what does that look like facetted on the groups of outcomes as well? It works OK
 
 ```{r}
 stackfacet <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           colorgroups = NULL,
                           colorset = 'env_obj',
                           pal_list = list('scico::berlin'),
@@ -540,7 +544,7 @@ We can (I think) dodge the bars. These are ggplot objects, so we can tweak them 
 
 ```{r}
 dodgefacet <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           y_lab = 'Proportion Success',
                           colorgroups = NULL,
                           colorset = 'env_obj',
@@ -562,7 +566,7 @@ Those last two also work well (better) with scenario as colors and env_obj as x
 
 ```{r}
 stackfacet <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'env_obj',
                           colorgroups = NULL,
                           colorset = 'env_obj',
@@ -581,7 +585,7 @@ We can (I think) dodge the bars. These are ggplot objects, so we can tweak them 
 
 ```{r}
 dodgefacet <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'env_obj',
                           colorgroups = NULL,
                           colorset = 'env_obj',
@@ -610,7 +614,7 @@ obj_sdl_to_plot <- obj_sdl_to_plot |>
 
 ```{r}
  sdl_line <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'delta',
                           colorgroups = NULL,
                           colorset = 'env_obj',
@@ -627,7 +631,7 @@ And we can do the same sorts of things here as elsewhere- make values relative, 
 
 ```{r}
   sdl_line_options <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'delta',
                           y_lab = 'Proportion met',
                           x_lab = 'Change in flow',
@@ -651,7 +655,7 @@ In the demo doc, Georgia had the lines as states. This should be flexible enough
 
 ```{r}
   sdl_line_catchment <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'delta',
                           y_lab = 'Proportion met',
                           x_lab = 'Change in flow',
@@ -677,7 +681,7 @@ And we can smooth- if we do it for unique groupings (e.g. same as above), we jus
 
 ```{r}
 sdl_line_catchment_smooth <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'delta',
                           y_lab = 'Proportion met',
                           x_lab = 'Change in flow',
@@ -703,7 +707,7 @@ We can also use smoothing with multiple points, e.g. if we want to group data in
 
 ```{r}
   sdl_smooth_groups <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'delta',
                           y_lab = 'Proportion met',
                           x_lab = 'Change in flow',
@@ -728,7 +732,7 @@ And if we use `method = 'lm'`, we're just taking a mean aggregation and plotting
 
 ```{r}
   sdl_smooth_mean <- obj_sdl_to_plot |>
-    plot_outcomes_stacked(y_col = 'allArith',
+    plot_outcomes(y_col = 'allArith',
                           x_col = 'delta',
                           y_lab = 'Proportion met',
                           x_lab = 'Change in flow',
