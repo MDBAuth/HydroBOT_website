@@ -9,3 +9,4 @@
 _output
 
 scenario_example/
+/.luarc.json

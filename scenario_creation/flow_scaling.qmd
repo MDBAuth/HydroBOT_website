@@ -203,9 +203,7 @@ We get the gauge data with `{vicwater}` (now), so we feed `geo_gauges$gauge` to 
 
 What time span do we want? Full period of record. David's scenarios go 1 Jan 1890 to 31 Jan 2019. Most (all?) gauges start after 1890, and go past 2019. But we should be able to scale the full period of record- they don't have to match the scenarios.
 
-::: {#Aside- gauge puller}
-I was using `mdba_gauge_getter` to pull gauges in [scenario_creation_demo_R.qmd](scenario_creation_demo_R.qmd), but there are a couple issues with it- if I pull data from both before and after the gauge start date, it fills the first section with zeros. This is an issue with the API itself. I've switched to my [{vicwater}](https://github.com/galenholt/vicwater) package in R, because it's able to find the period of record and only pull available data for a site (and despite the name, works for Vic, NSW, and QLD).
-:::
+::: {#Aside- gauge puller} I was using `mdba_gauge_getter` to pull gauges in [scenario_creation_demo_R.qmd](scenario_creation_demo_R.qmd), but there are a couple issues with it- if I pull data from both before and after the gauge start date, it fills the first section with zeros. This is an issue with the API itself. I've switched to my [{vicwater}](https://github.com/galenholt/vicwater) package in R, because it's able to find the period of record and only pull available data for a site (and despite the name, works for Vic, NSW, and QLD). :::
 
 We can do this two ways- using `get_variable_list`, extracting the start and end, and then passing those to `get_ts_traces`. Or we can use `get_ts_traces2`, which can do the timeperiod extraction internally. Some speed testing shows they're equivalent, so I'll use the automated and cleaner `get_ts_traces2`.
 

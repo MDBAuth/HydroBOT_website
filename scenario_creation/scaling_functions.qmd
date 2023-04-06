@@ -95,7 +95,7 @@ We follow the basic method for q-q scaling from [climate change australia](https
 
 # Testing
 
-I'm going to figure out how to do this with a single df- I think I'm going to do it almost orthogonal to George's approach- we don't need hydrographs at all- we just want to develop the transforms here. Macquarie is SS20, use that.
+I'm going to figure out how to do this with a single df- I think I'm going to do it almost orthogonal to George's approach- we don't need hydrographs at all- we just want to develop the transforms here. Macquarie is SS20, use that to test.
 
 ```{r}
 testdf <- scenario_list$SS20
@@ -211,7 +211,7 @@ relfun <- function(x,y) {(x-y)/y}
 # Use `werptoolkitr::baseline_compare` so we don't have to manually extract
 test_q_s <- test_q_s %>% 
   group_by(scenario, Month) %>% 
-  baseline_compare(group_col = 'scenario', base_lev = 'SimR0', 
+  baseline_compare(compare_col = 'scenario', base_lev = 'SimR0', 
                    values_col = 'mean', 
                    comp_fun = relfun) %>% 
   ungroup() %>% 
