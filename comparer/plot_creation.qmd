@@ -149,7 +149,10 @@ A typical plot
 First, let's establish a standard set of colours with base as a reference
 
 ```{r}
-scene_pal <- make_pal(unique(scenehydros$scenario), palette = 'calecopal::superbloom3', refvals = 'base', refcols = 'black')
+# rcartocolor::Antique
+# RColorBrewer::Set2
+scene_pal <- make_pal(unique(scenehydros$scenario), palette = 'ggsci::nrc_npg', refvals = 'base', refcols = 'black')
+scene_pal
 ```
 
 ```{r}
@@ -182,7 +185,7 @@ We want to set a baseline and the relationship to it. The baseline should be abl
 Do we want to build it into the plot functions, or pre-run it? Definitely make it available for the latter, but does it just make the plot functions too messy? Would be nice for auto-labelling though.
 
 ```{r}
-dif_flow <- baseline_compare(scenehydros, group_col = 'scenario', base_lev = 'base', values_col = 'flow', comp_fun = difference)
+dif_flow <- baseline_compare(scenehydros, compare_col = 'scenario', base_lev = 'base', values_col = 'flow', comp_fun = difference)
 ```
 
 ```{r}
@@ -192,7 +195,7 @@ plot_hydrographs(dif_flow, gaugefilter = gauges_to_plot, y_col = 'difference_flo
 Relative
 
 ```{r}
-rel_flow <- baseline_compare(scenehydros, group_col = 'scenario', 
+rel_flow <- baseline_compare(scenehydros, compare_col = 'scenario', 
                              base_lev = 'base', 
                              values_col = 'flow', comp_fun = relative, add_eps = min(scenehydros$flow[scenehydros$flow > 0])/10)
 ```
@@ -378,6 +381,9 @@ basin_to_plot <- agg_theme_space$mdb %>%
                                       pal_list = list("scico::oslo"),
                                       sceneorder = c('down4', 'base', 'up4'))
   basin_plot
+  
+  # labels are terribly long
+  basin_plot + theme(legend.position = 'none')
 ```
 
 I can specify groups and use different palettes for each
@@ -438,6 +444,27 @@ sdl_plot_factgroup <- obj_sdl_to_plot |>
 sdl_plot_factgroup
 ```
 
+This is kind of a cool plot too
+
+```{r}
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+                      palette = 'scico::berlin')
+  
+sdl_plot_groupblock <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'scenario',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          color_lab = 'Environmental\ngroup',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+
+sdl_plot_groupblock + theme(legend.position = 'left')
+```
+
 #### Flipped axes
 
 Does that actually work better with the objectives on x and scenarios as colors? Maybe coord_flipped?
@@ -449,7 +476,7 @@ ggplot(basin_to_plot, aes(x = forcats::fct_reorder(Objective, allArith,
                                                    .fun = sum, 
                                                    .desc = TRUE),
                           y = allArith, fill = scenario)) + 
-  geom_col() + scale_fill_manual(values = scene_pal)
+  geom_col() + scale_fill_manual(values = scene_pal) 
 ```
 
 So, that's one option. It might be nice to put them in groups somehow (or have that ability). ie lump by fish, veg, whatever. For some outcomes we don't know what that looks like.
@@ -474,7 +501,7 @@ ggplot(basin_to_plot, aes(x = forcats::fct_reorder(
 
 Now that I have a function for the other way, hopefully I can just modify it to make this stack. Will need to swap x and fill, and pass in scene_pal instead of of the big palette list (in addition to, if I want to color the bar outlines?).
 
-For the same set as the function-ed stacks above,
+For the same set as the function-ed stacks above (and the same as the colcol stack above, but without the grouping. this is similar to above, but now we don't give different palettes to the groups.
 
 ```{r}
 obj_sdl_to_plot |>
@@ -494,7 +521,7 @@ I'm really close to having a grouping aesthetic, (I can assign color), but using
 what does that look like facetted on the groups of outcomes as well? It works OK, but not as well as when the individual objectives are stacked, since each one gets its own x-tick. I hoped `scales = 'free_x'` would work to just give each one a subset, but it only does when the groupings are in facet-columns. That's probably OK?
 
 ```{r}
-obj_sdl_to_plot |>
+stackfacet <- obj_sdl_to_plot |>
     plot_outcomes_stacked(y_col = 'allArith',
                           colorgroups = NULL,
                           colorset = 'env_obj',
@@ -504,20 +531,237 @@ obj_sdl_to_plot |>
                           scales = 'free_x',
                           scene_x = FALSE,
                           scene_pal = scene_pal,
-                          sceneorder = levels(sceneorder))
+                          sceneorder = levels(sceneorder)) 
+
+stackfacet
 ```
+
+We can (I think) dodge the bars. These are ggplot objects, so we can tweak them a bit after they come out of the main function.
+
+```{r}
+dodgefacet <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          y_lab = 'Proportion Success',
+                          colorgroups = NULL,
+                          colorset = 'env_obj',
+                          pal_list = list('scico::berlin'),
+                          facet_row = 'SWSDLName',
+                          facet_col = 'colcol',
+                          scales = 'free_x',
+                          scene_x = FALSE,
+                          scene_pal = scene_pal,
+                          sceneorder = levels(sceneorder),
+                          position = 'dodge') 
+
+dodgefacet + theme(legend.position = 'bottom') + labs(x = 'Environmental Objective')
+```
+
+### scenario colors
+
+Those last two also work well (better) with scenario as colors and env_obj as x
+
+```{r}
+stackfacet <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'env_obj',
+                          colorgroups = NULL,
+                          colorset = 'env_obj',
+                          pal_list = list('scico::berlin'),
+                          facet_row = 'SWSDLName',
+                          facet_col = 'colcol',
+                          scales = 'free_x',
+                          scene_x = FALSE,
+                          scene_pal = scene_pal,
+                          sceneorder = levels(sceneorder)) 
+
+stackfacet
+```
+
+We can (I think) dodge the bars. These are ggplot objects, so we can tweak them a bit after they come out of the main function.
+
+```{r}
+dodgefacet <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'env_obj',
+                          colorgroups = NULL,
+                          colorset = 'env_obj',
+                          pal_list = list('scico::berlin'),
+                          facet_row = 'SWSDLName',
+                          facet_col = 'colcol',
+                          scales = 'free_x',
+                          scene_x = FALSE,
+                          scene_pal = scene_pal,
+                          sceneorder = levels(sceneorder),
+                          position = 'dodge')
+
+dodgefacet + theme(legend.position = 'bottom') + labs(x = 'Environmental Objective')
+```
+
+### 
 
 ### Lines with quant x
 
+This is the sort of plot we might want to make for plotting the actual values that change between scenarios. In this case, we have scenarios with flow multipliers; we add those to the data with a `left_join` here, but they should be attached.
+
+```{r}
+obj_sdl_to_plot <- obj_sdl_to_plot |>
+   left_join(scenarios)
+```
+
+```{r}
+ sdl_line <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          colorgroups = NULL,
+                          colorset = 'env_obj',
+                          pal_list = list('scico::berlin'),
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'))
+ 
+ sdl_line # + theme(legend.position = 'bottom')
+```
+
+And we can do the same sorts of things here as elsewhere- make values relative, group the colors, etc
+
+```{r}
+  sdl_line_options <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Environmental\ngroup',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'relative',
+                          group_cols = c('env_obj', 'polyID'))
+  
+  sdl_line_options
+```
+
+In the demo doc, Georgia had the lines as states. This should be flexible enough to do that (well, not states, necessarily, but arbitrary groups).
+
+```{r}
+  sdl_line_catchment <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Catchment',
+                          colorgroups = NULL,
+                          colorset = 'SWSDLName',
+                          point_group = 'env_obj',
+                          pal_list = list('RColorBrewer::Dark2'),
+                          facet_row = 'colcol',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('env_obj', 'polyID'),
+                          smooth = FALSE)
+  
+  sdl_line_catchment
+```
+
+And we can smooth- if we do it for unique groupings (e.g. same as above), we just get smooth curves, though the loess *really* hates the sample size.
+
+```{r}
+sdl_line_catchment_smooth <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Catchment',
+                          colorgroups = NULL,
+                          colorset = 'SWSDLName',
+                          point_group = 'env_obj',
+                          pal_list = list('RColorBrewer::Dark2'),
+                          facet_row = 'colcol',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('env_obj', 'polyID'),
+                          smooth = TRUE)
+  
+  suppressWarnings(print(sdl_line_catchment_smooth))
+```
+
+We can also use smoothing with multiple points, e.g. if we want to group data in some way- maybe use it to put a line through the color groups and ignore individual levels. **This is dangerous**- it's an aggregation. So it's usually better to do the aggregation explicitly, but if you're OK with a mean aggregation within the implied groups here, it works, and shows the data points, which is nice.
+
+```{r}
+  sdl_smooth_groups <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Environmental\ngroup',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('polyID'),
+                          smooth = TRUE)
+  
+  suppressWarnings(print(sdl_smooth_groups))
+```
+
+And if we use `method = 'lm'`, we're just taking a mean aggregation and plotting it with the data points. Jittering should help too.
+
+```{r}
+  sdl_smooth_mean <- obj_sdl_to_plot |>
+    plot_outcomes_stacked(y_col = 'allArith',
+                          x_col = 'delta',
+                          y_lab = 'Proportion met',
+                          x_lab = 'Change in flow',
+                          transx = 'log10',
+                          color_lab = 'Environmental\ngroup',
+                          colorgroups = 'colcol',
+                          colorset = 'env_obj',
+                          pal_list = obj_pal,
+                          facet_row = 'SWSDLName',
+                          facet_col = '.',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('polyID'),
+                          smooth = TRUE,
+                          smooth_method = 'lm',
+                          position = position_jitter(width = 0.01, height = 0))
+  
+  suppressWarnings(print(sdl_smooth_mean))
+```
+
 # Aggsequencing
 
-For most plots (except hydrographs), we need a way to choose which aggsequences to plot. It needs to work for the column-format and the name-format (though I guess we could foce one).
+For most plots (except hydrographs), we need a way to choose which aggsequences to plot. It needs to work for the column-format and the name-format (though I guess we could force one).
 
 And we need to be able to facet on it- ie facet by aggreation in step 3.
 
 How? There's an easy bypass of just asking for the column if namehistory, and facetting by columns. (is that true that we can facet by multiple?)
 
 Otherwise, I think we should be able to feed it a funsequence that may be a subset of the original one, and it'll grab that. Then if any item in the funsequence is longer than 1, facet on it.
+
+We're going to want this all the time to choose what to plot/process. But it will be essential for the tile explanatory plots.
 
 # Maps
 
