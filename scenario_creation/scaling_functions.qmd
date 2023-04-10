@@ -7,7 +7,7 @@ editor: visual
 
 ## Setting up the scaling functions
 
-I'm using [flow_scaling.qmd](flow_scaling.qmd) to pull the gauges and scale them, but actually getting the scaling relationships is a bit sideways, and doesn't need to happen in the same script, so I'll do that here.
+I'm using [flow_scaling.qmd](flow_scaling.qmd) to pull the gauges and scale them, but actually getting the scaling relationships is independent, and so doesn't need to happen in the same script. I'll do that here.
 
 ```{r}
 library(werptoolkitr)
@@ -91,7 +91,9 @@ scenario_list <- purrr::map(CCSc_FileList,
 
 We follow the basic method for q-q scaling from [climate change australia](https://www.climatechangeinaustralia.gov.au/en/obtain-data/application-ready-data/scaling-methods/), with the following modifications
 
--   
+-   Use 2% bins (e.g. 50 bins) instead of 10 + 10 in final
+
+-   Month-matching quantiles (e.g. 90th %ile for June separate from September). The method given might do that too, it's unclear.
 
 # Testing
 
@@ -101,7 +103,7 @@ I'm going to figure out how to do this with a single df- I think I'm going to do
 testdf <- scenario_list$SS20
 ```
 
-I'm going to follow climate change australia with the monthly binning, but we might do yearly or daily or windowed. Yearly is what David and I talked about, but that seems weird, since day of year is likely more important than year. Doesn't really matter- the main thing here is to have a grouper, and we can change what it is (though rolling windows will need to be fancier with the timeseries). On reading that site, I don't think they're actually month-matching, I think they're just using it to smooth and treating all months as interchangeable- e.g. for each month they get the quantiles, but then they average those? I think? It's poorly explained.
+I'm going to follow climate change australia with the monthly binning, but we might do yearly or daily or windowed. Yearly seems weird, since day of year is likely more important than year. Doesn't really matter- the main thing here is to have a grouper, and we can change what it is (though rolling windows will need to be fancier with the timeseries). Months will introduce artificial discontinuities, but we aren't trying to be perfect. On reading that site, I don't think they're actually month-matching, I think they're just using it to smooth and treating all months as interchangeable- e.g. for each month they get the quantiles, but then they average those? I think? It's poorly explained. Month-matching makes more sense to create statistics that are at least partially reflective of the major changes through the water year- e.g. it is useful to know the 90th percentile for the low points of the year too, and we'd never see that if we just pooled the data.
 
 ### Break into groups, rank and bin
 
@@ -381,7 +383,7 @@ Then I just need to write it out.
 
 -   Run it over the full list of SDL units
 
--   settle on the grouping
+-   settle on the grouping- use months
 
 -   a version with long data- would it make more sense? Done, and I think yes
 
