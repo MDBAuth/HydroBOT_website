@@ -1,0 +1,620 @@
+---
+title: "Scaling functions"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Setting up the scaling functions
+
+I'm using [flow_scaling.qmd](flow_scaling.qmd) to pull the gauges and scale them, but actually getting the scaling relationships is independent, and so doesn't need to happen in the same script. I'll do that here.
+
+```{r}
+library(werptoolkitr)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+```
+
+Set up some directories. Once we move to MDBA, these will be easier to point at in a shared way.
+
+```{r}
+scenario_dir <- '../flow_scaling_data'
+hydro_dir <- file.path(scenario_dir, 'hydrographs')
+scaling_dir <- file.path(scenario_dir, 'CC_Scenarios_WRPs')
+```
+
+## Background and definitions
+
+Bring in David's climate scenarios NOTE: Only go to 31-Jan-2019.
+
+Prec and ETp (PE) are historical (not needed here)
+
+SimR0 is simulated historical runnoff using actual historical Prec and ETp (PE)
+
+SimR1 - SimR7 are simulated with +7% PE but different Rainfall:
+
+1.  -20%
+
+2.  -15% ("High change scenario")
+
+3.  -10%
+
+4.  -5% ("Moderate change scenario")
+
+5.  +0%
+
+6.  +5% ("Low change scenario")
+
+7.  +10%
+
+### Make numeric metadata
+
+The format of this may change, but we're going to want something. Lists are going to be easier to yaml than dataframes (though a dataframe is easier to construct).
+
+Though it sounds like the scenario yamls are likely to *not* be lists, but single values, ie each one gets their own value to create it, and that's it (which makes sense).
+
+```{r}
+
+rain_multiplier <- seq(from = 0.8, to = 1.1, by = 0.05) %>% 
+  setNames(paste0('R', 1:7))
+
+scenario_meta <- list(
+  PE_multiplier = 1.07,
+  rain_multiplier = rain_multiplier,
+  scenario_name = names(rain_multiplier)
+)
+
+# Don't run yet, since I don't know the format we'll be using, but this works to create yaml metadata
+# yaml::write_yaml(scenario_meta, file = 'path/to/file.yml')
+```
+
+Suggestion is to compare each scenario to simulated historic baseline, work out the ratio and apply the difference to the gauge records... Would be good to get 'cease to flow' events for the scenarios.
+
+## Bring in the scenario data
+
+Get the list of files and read them in (to a list of dfs)
+
+```{r}
+#| message: false
+CCSc_FileList <- list.files(scaling_dir, pattern = '.csv', 
+                            full.names = TRUE)
+
+scenario_list <- purrr::map(CCSc_FileList,
+                            \(x) read_csv(file = x, id = 'path')) %>% 
+  setNames(stringr::str_extract(CCSc_FileList, "SS[0-9]+"))
+```
+
+## Scale
+
+We follow the basic method for q-q scaling from [climate change australia](https://www.climatechangeinaustralia.gov.au/en/obtain-data/application-ready-data/scaling-methods/), with the following modifications
+
+-   Use 2% bins (e.g. 50 bins) instead of 10 + 10 in final
+
+-   Month-matching quantiles (e.g. 90th %ile for June separate from September). The method given might do that too, it's unclear.
+
+-   'Change ratio', $\frac{F-H}{H}$ replaced with 'relative change', $\frac{F}{H}$, and adjustment changed from $Obs(CR) + Obs$ to $Obs(RC)$.
+
+    -   These are algebraically equivalent, and the change ratio seems unnecessarily convoluted
+
+$$
+Obs(\frac{F-H}{H}) + Obs = 
+Obs(\frac{F}{H}-1}) + Obs = 
+Obs(\frac{F}{H}) - Obs + Obs = 
+Obs(\frac{F}{H})
+$$
+
+### Break into groups, rank and bin
+
+Use 2% bins (e.g. 50 bins) instead of 10 + 10 in final.
+
+Write functions we can apply to each set of data, as well as historical.
+
+```{r}
+get_q <- function(vals, q_perc) {
+  qs <- quantile(vals, probs = seq(0,1, q_perc), type = 5)
+  # cut fails with lots of zeros (well, any duplicate bins)
+  # binvec <- cut(vals, qs, include.lowest = TRUE, labels = FALSE)
+  # findInterval is OK with duplicate bins, but combines them, eg. if there are 10 bins that are all 0, it will call them all q10. 
+  binvec <- findInterval(vals, qs, rightmost.closed = TRUE)
+  return(binvec)
+}
+```
+
+```{r}
+get_qmean <- function(vals, q_perc = 0.02) {
+  binvec <- get_q(vals, q_perc)
+  qmean <- aggregate(x = vals, by = list(binvec), FUN = mean) %>% 
+    setNames(c('quantile', 'mean')) #%>% 
+    # tidyr::nest(q_m = everything())
+}
+```
+
+## Function to purrr
+
+We have `scenario_list`, and we want to find the quantile means and relative changes for each dataframe in it. So write that function and use `purrr::map`
+
+```{r}
+get_scalings <- function(unitdf) {
+  # Stack
+  stackdf <- unitdf %>% 
+  mutate(sdl = stringr::str_extract(path, "SS[0-9]+")) %>% 
+  select(sdl, Year, Month, Day, starts_with('Sim')) %>% 
+  pivot_longer(cols = starts_with('Sim'), 
+               names_to = 'scenario', values_to = 'runoff')
+  
+  # Quantile means
+  q_s <- stackdf %>% 
+  group_by(scenario, Month) %>%
+  reframe(qmean = get_qmean(runoff)) %>%
+  tidyr::unnest(cols = qmean)
+  
+  # Get the relative change
+  q_s <- q_s %>% 
+  group_by(scenario, Month) %>% 
+  baseline_compare(group_col = 'scenario', base_lev = 'SimR0', 
+                   values_col = 'mean', 
+                   comp_fun = `/`) %>% 
+  ungroup() %>% 
+  select(scenario = scenario.x, everything(), 
+         relative_change = `/_mean`, 
+         -scenario.y)
+}
+
+
+```
+
+## Get relative changes for all scenarios and units
+
+Now, we need to apply `get_scalings` to every SDL unit in `scenario_list`
+
+```{r}
+#| message: false
+scaled_units <- purrr::map(scenario_list, get_scalings)
+```
+
+This `scaled_units` list now contains lookup tables to give the relative change for each scenario and month that need to be mapped to the observed gauge data. First, let's do a quick plot check.
+
+## Plots
+
+A few plots to check nothing is going wrong. SS20 is Macquarie-Castlereagh.
+
+### Quantiles
+
+First, check the quantiles themselves
+
+```{r}
+# just look at a couple quantiles
+scaled_units$SS20 %>% 
+  filter(quantile %in% c(1,25,50)) %>% 
+ggplot(mapping = aes(x = scenario, y = mean, fill = as.factor(quantile))) + geom_col(position = position_dodge())
+```
+
+Do the quantiles look smooth?
+
+```{r}
+scaled_units$SS20 %>% 
+ggplot(mapping = aes(x = as.factor(quantile), y = mean, fill = scenario)) + geom_col(position = position_dodge()) + facet_grid(Month ~ scenario)
+```
+
+```{r}
+scaled_units$SS20 %>% 
+  ggplot(mapping = aes(x = quantile, 
+                       y = mean, color = scenario)) + 
+  geom_line() + 
+  facet_wrap('Month')
+```
+
+### Relative change
+
+For reduced precip, the drops at the highest quantiles are larger than the drops at the lower end. For increased precip, the higher quantiles go up more than the lower. That sort of nonlinearity does make sense, I think.
+
+```{r}
+scaled_units$SS20 %>% 
+  filter(quantile %in% c(1,25,50)) %>% 
+ggplot(mapping = aes(x = scenario, 
+                     y = relative_change, 
+                     fill = as.factor(quantile))) + 
+  geom_col(position = position_dodge())
+```
+
+Perhaps the best way to look at this is the relative change in each quantile for the different scenarios.
+
+```{r}
+scaled_units$SS20 %>% 
+  ggplot(mapping = aes(x = quantile, 
+                       y = relative_change, color = scenario)) + 
+  geom_line() + 
+  facet_wrap('Month')
+```
+
+Nothing there jumps out as horribly misaligned or major step changes between months, so let's move on.
+
+# Adjust the flows
+
+We now want to adjust the gauges with those relative changes to represent the different scenarios.
+
+We could do this in `flow_scaling.qmd`, where we would read in the `scaled_units` list we just created. That's tempting, because we have the gauges mapped to SDL units over there already. However, that script takes a while to run and is susceptible to intermittent API errors from the gauge service, and so everything will be more stable if we do the transform here. The main issue is going to be knowing which of the `scaled_units` dataframes to use for each gauge in `orig_hydro`.
+
+```{r}
+orig_hydro <- readRDS(file.path(hydro_dir, 'extracted_flows.rds'))
+```
+
+## What's the process here?
+
+1.  find the quantile of each value in the orig_hydro data for each group-unit (e.g. Month)
+2.  multiply by relative_change for each quantile, group-unit, and scenario
+3.  do that over all the sdl units
+
+## Quantiles for historical data
+
+We don't want `get_qmean`, but instead just want to ID the quantile of each value, so use `get_q`.
+
+And we need to group and know the sdl unit for the transforms
+
+### Function to use with map
+
+We want to process each of the gauges with each of the scenarios, so write a map function `scale_gauges` to map over the gauges. It needs a little helper saving function `savefun` because each df is a nested df of scenarios with times and hydrographs that needs to be unpacked, named, and saved.
+
+**Question** do I want to do this differently to save all gauges within scenarios as a single csv? or just do them one at a time? I think the way the data works (e.g. coming in as single gauges and scenarios all together), it gets convoluted either way, really. Separate csvs per gauge might be better anyway given the different date ranges.
+
+Make sure directories exist for writing out results
+
+```{r}
+#| output: false
+purrr::map(unique(thqs$scenario), 
+           \(x) if (!dir.exists(file.path(hydro_dir, x))) {
+             dir.create(file.path(hydro_dir, x), 
+                        recursive = TRUE)
+             })
+```
+
+```{r}
+savefun <- function(scenario, data) {
+  write_csv(data, file = file.path(hydro_dir, scenario, paste0(names(data)[2], '.csv')))
+}
+
+```
+
+```{r}
+scale_gauges <- function(gaugedata, gaugename) {
+  
+    # if they are level gauges, bail- the scaling doesn't make sense
+  if (geo_gauges$type[geo_gauges$gauge == gaugename] == 'level') {
+    return(NULL)
+  }
+  
+  # Get the sdl name
+  sdl_name <- geo_gauges$SWSDLID[geo_gauges$gauge == gaugename]
+
+  # If the sdl unit for the gauge isn't in the scaling scenarios, return NULL.
+    # THis only happens for one gauge (422027) in the Barwon-Darling Watercourse (SS19)
+  if (!(sdl_name %in% names(scaled_units))) {
+    return(NULL)
+  }
+  
+  # There is one gauge (currently- 412036) that returns duplicated dates from 1990-2004. I've had a long look, and the values differ on each day, with no apparent pattern. They do tend to track together, but the difference can be large. It's not obvious which to keep (if any). I'll just keep the first of each pair, but this should be revisited.
+  gaugedata <- gaugedata[!duplicated(gaugedata$time), ]
+  
+  # do the transforms
+  
+  gaugedata <- gaugedata %>% 
+    # get the time units right
+    mutate(Month = lubridate::month(time)) %>% 
+  rename(Date = time) %>%  # To match other inputs
+    group_by(Month) %>% 
+    # get quantiles
+  mutate(quantile = get_q(value, q_perc = 0.02)) %>% 
+  ungroup() %>% 
+    # join to correct sdl unit for the scalings
+  left_join(scaled_units[[sdl_name]], 
+            by = c('Month', 'quantile'), 
+            multiple = 'all') %>% # Says it's OK to duplicate rows x scenarios
+    # get the adjusted levels
+  mutate(adj_val = value*relative_change) %>% 
+  # Just the needed cols
+  dplyr::select(scenario, site, Date, adj_val) %>% 
+  # pivot so the gauge name is col name
+  tidyr::pivot_wider(names_from = site, values_from = adj_val) %>% 
+  # collapse to a list-tibble with one row per scenario
+  tidyr::nest(.by = scenario)
+  
+  # Save the csvs
+  purrr::pmap(gaugedata, savefun)
+  
+  # Not sure this is a good idea- might want to return NULL
+  return(gaugedata)
+}
+```
+
+### Do the transforms
+
+```{r}
+system.time(scaled_hydro <- purrr::map2(orig_hydro, names(orig_hydro), 
+                                        scale_gauges))
+```
+
+Where is that warning?
+
+```{r}
+hunt_warn <- scaled_hydro %>% 
+  purrr::map(\(x) if (!is.null(x)) unnest(x, cols = data) %>% 
+               purrr::map(is.list)) %>% 
+  purrr::list_c() %>% 
+  unlist() %>% 
+  which()
+```
+
+What is going on here? there are duplicate times
+
+```{r}
+nrow(orig_hydro[['412036']])
+orig_hydro[['412036']] %>% distinct(time) %>% nrow()
+```
+
+Is that the only one? it is. Going to have to sort this out in the gauge pulling.
+
+```{r}
+dupdates <- purrr::map_lgl(orig_hydro, \(x) nrow(x) != x %>% distinct(time) %>% nrow())
+which(dupdates)
+```
+
+Re-pull- is it comign from the API?
+
+```{r}
+re_dup <- get_ts_traces2(state = 'NSW', 
+                            site_list = '412036', 
+                            var_list = 141,
+                            start_time = 'all',
+                            end_time = 'all',
+                            interval = 'day',
+                            data_type = 'mean',
+                           datasource = 'A',
+                            returnformat = 'df',
+                            .errorhandling = 'pass')
+```
+
+```{r}
+nrow(re_dup)
+
+re_dup %>% distinct(time) %>% nrow()
+```
+
+Yes. Why?
+
+is there an obvious pattern? Yes, every day starting in 1990 to 2004-04-01.
+
+```{r}
+duptimes <- re_dup$time[duplicated(re_dup$time)]
+min(duptimes)
+max(duptimes)
+plot(duptimes)
+```
+
+Are the values the same? e.g. can we just dump the dups?
+
+```{r}
+dups <- re_dup %>%
+  dplyr::group_by(time) %>%
+  dplyr::filter(n() > 1) %>%
+  mutate(dupnum = row_number()) %>% 
+  dplyr::arrange(time) # makes the comparisons easier
+```
+
+Quite clearly not the same.
+
+```{r}
+dups <- dups %>% 
+  select(site, value, time, site_short_name, variable, dupnum, qualit_codes, quality_codes_id)
+dups
+```
+
+It's not just that they have different codes
+
+```{r}
+table(dups$quality_codes)
+
+```
+
+```{r}
+ggplot(dups, aes(x = time, y = value, color = factor(dupnum))) + geom_point()
+```
+
+Is there a consistent difference between them
+
+```{r}
+dupwide <- dups %>% pivot_wider(names_from = dupnum, names_prefix = 'dup_', id_cols = c(site, time, site_short_name, variable)) %>% 
+  mutate(dupdif = dup_2-dup_1)
+```
+
+```{r}
+ggplot(dupwide, aes(x = dup_1, y = dupdif)) + geom_point()
+```
+
+No obvious pattern to their relative difference.
+
+```{r}
+ggplot(dupwide, aes(x = dup_1, y = dup_2)) + geom_point()
+```
+
+At least they both go up together?
+
+If we re-pull only in that range, do we still get the issue?
+
+```{r}
+re_dup_short <- get_ts_traces2(state = 'NSW', 
+                            site_list = '412036', 
+                            var_list = 141,
+                            start_time = '19950101',
+                            end_time = '19960101',
+                            interval = 'day',
+                            data_type = 'mean',
+                           datasource = 'A',
+                            returnformat = 'df',
+                            .errorhandling = 'pass')
+```
+
+```{r}
+dupshort <- re_dup_short %>%
+  dplyr::group_by(time) %>%
+  dplyr::filter(n() > 1) %>%
+  mutate(dupnum = row_number()) %>% 
+  dplyr::arrange(time) # makes the comparisons easier
+```
+
+Does a different datasource fix it?
+
+```{r}
+re_dup_short_cp <- get_ts_traces2(state = 'NSW', 
+                            site_list = '412036', 
+                            var_list = 141,
+                            start_time = '19950101',
+                            end_time = '19960101',
+                            interval = 'day',
+                            data_type = 'mean',
+                           datasource = 'CP',
+                            returnformat = 'df',
+                            .errorhandling = 'pass')
+```
+
+```{r}
+sum(duplicated(re_dup_short_cp$time))
+
+```
+
+No, still there. So, what to do? I think either throw out the gauge, or throw out one set of values. No idea which.
+
+### For reference, is furrr faster?
+
+```{r}
+library(furrr)
+plan(multisession)
+system.time(scaled_hydro <- furrr::map2(orig_hydro, names(orig_hydro), 
+                                        scale_gauges))
+```
+
+Just grab one for testing that's flow, reasonably long, but not too long.
+
+```{r}
+test_hydro <- orig_hydro[[5]]
+gaugename <- names(orig_hydro)[5]
+sdl_name <- geo_gauges$SWSDLID[geo_gauges$gauge == gaugename]
+```
+
+We need a grouping variable, been using Month, so stick with that for testing. means we need to create it. Obviously this could get more complicated
+
+```{r}
+test_hydro <- test_hydro %>% 
+  mutate(Month = lubridate::month(time)) %>% 
+  rename(Date = time) # To match other inputs
+```
+
+Now let's find the quantile of each value
+
+```{r}
+test_hydro_q <- test_hydro %>% 
+  group_by(Month) %>% 
+  mutate(quantile = get_q(value, q_perc = 0.02)) %>% 
+  ungroup()
+```
+
+Plot check
+
+```{r}
+ggplot(test_hydro_q, aes(x = Date, y = value, color = quantile)) + 
+  geom_point() + geom_line() + 
+  scale_color_viridis_c()
+```
+
+Looks right, but we can also check within months
+
+```{r}
+ggplot(test_hydro_q, aes(x = lubridate::mday(Date), 
+                         y = value, color = quantile,
+                         group = lubridate::year(Date))) +
+  geom_point() + geom_line() +
+  facet_wrap('Month') + 
+  scale_color_viridis_c()
+```
+
+### Do the shift
+
+The `multiple = all` here is because otherwise it throws a warning that it duplicates rows x scenarios. That's fine. But it might make more sense to do the scenarios as a list anyway, since they'll get saved different places. Doesn't matter right this instant.
+
+```{r}
+test_hydro_q <- test_hydro_q %>% 
+  left_join(scaled_units[[sdl_name]], by = c('Month', 'quantile'), multiple = 'all')
+```
+
+Do the transform
+
+**All of this change ratio stuff is unnecessarily convoluted**- just multiple F/H, don't do this weird multiply then add thing. It's *exactly the same* algebraically.
+
+```{r}
+test_hydro_q <- test_hydro_q %>% 
+  mutate(adj_val = value*relative_change)
+
+```
+
+Plot check. too hard to see overplotted.
+
+```{r}
+test_hydro_q %>% 
+  filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
+ggplot(mapping = aes(x = time, y = adj_val, color = scenario)) + 
+  geom_point() + geom_line() + 
+  scale_color_brewer(palette = 'Dark2') + 
+  facet_wrap('scenario') + theme(legend.position = 'bottom')
+```
+
+## Format cleanup
+
+I want to then separate the scenarios and save a version that's just time, site, and adj_val, but with 'site' as the name. This makes a nested tibble, which we could then loop over to save.
+
+```{r}
+thqs <- test_hydro_q %>% 
+  # Just the needed cols
+  dplyr::select(scenario, site, time, adj_val) %>% 
+  # pivot so the gauge name is col name
+  tidyr::pivot_wider(names_from = site, values_from = adj_val) %>% 
+  # collapse to a list-tibble with one row per scenario
+  tidyr::nest(.by = scenario)
+```
+
+Then I just need to write it out. First, make sure the directories exist
+
+```{r}
+purrr::map(unique(thqs$scenario), 
+           \(x) if (!dir.exists(file.path(hydro_dir, x))) {
+             dir.create(file.path(hydro_dir, x), recursive = TRUE)
+             })
+
+```
+
+```{r}
+savefun <- function(scenario, data) {
+  write_csv(data, file = file.path(hydro_dir, scenario, paste0(names(data)[2], '.csv')))
+}
+purrr::pmap(thqs, savefun)
+```
+
+```{}
+```
+
+# TODO
+
+-   Plot check- Done
+
+-   make that easy to use for adjusting the hyrdographs. Done, I think.
+
+-   Run it over the full list of SDL units
+
+-   settle on the grouping- use months
+
+-   a version with long data- would it make more sense? Done, and I think yes
+
+-   I'm curently doing the gauge pull, and then this. But does it make more sense to create the scaling dfs/lists here and save them, and then read them in and do the scaling over there? I think probably.
+
+    -   Then, for example, we wouldn't need to re-match to sdl units, we'd have the mapping there already in `geo_gauge`, and could pull sdl from the gauge name.
