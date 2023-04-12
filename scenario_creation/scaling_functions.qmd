@@ -390,3 +390,132 @@ Then I just need to write it out.
 -   I'm curently doing the gauge pull, and then this. But does it make more sense to create the scaling dfs/lists here and save them, and then read them in and do the scaling over there? I think probably.
 
     -   Then, for example, we wouldn't need to re-match to sdl units, we'd have the mapping there already in `geo_gauge`, and could pull sdl from the gauge name.
+
+# Testing
+
+In the clean version, I'm getting a warning about list-columns and not-distinctly defined variables. It comes from duplicated data coming in from the API. I've cut out most of the hunting around to find the issue, but it'sworth keeping the issue itself here.
+
+Re-pull- is it comign from the API?
+
+```{r}
+re_dup <- get_ts_traces2(state = 'NSW', 
+                            site_list = '412036', 
+                            var_list = 141,
+                            start_time = 'all',
+                            end_time = 'all',
+                            interval = 'day',
+                            data_type = 'mean',
+                           datasource = 'A',
+                            returnformat = 'df',
+                            .errorhandling = 'pass')
+```
+
+```{r}
+nrow(re_dup)
+
+re_dup %>% distinct(time) %>% nrow()
+```
+
+Yes. Why?
+
+is there an obvious pattern? Yes, every day starting in 1990 to 2004-04-01.
+
+```{r}
+duptimes <- re_dup$time[duplicated(re_dup$time)]
+min(duptimes)
+max(duptimes)
+plot(duptimes)
+```
+
+Are the values the same? e.g. can we just dump the dups?
+
+```{r}
+dups <- re_dup %>%
+  dplyr::group_by(time) %>%
+  dplyr::filter(n() > 1) %>%
+  mutate(dupnum = row_number()) %>% 
+  dplyr::arrange(time) # makes the comparisons easier
+```
+
+Quite clearly not the same.
+
+```{r}
+dups <- dups %>% 
+  select(site, value, time, site_short_name, variable, dupnum, qualit_codes, quality_codes_id)
+dups
+```
+
+It's not just that they have different codes
+
+```{r}
+table(dups$quality_codes)
+
+```
+
+```{r}
+ggplot(dups, aes(x = time, y = value, color = factor(dupnum))) + geom_point()
+```
+
+Is there a consistent difference between them
+
+```{r}
+dupwide <- dups %>% pivot_wider(names_from = dupnum, names_prefix = 'dup_', id_cols = c(site, time, site_short_name, variable)) %>% 
+  mutate(dupdif = dup_2-dup_1)
+```
+
+```{r}
+ggplot(dupwide, aes(x = dup_1, y = dupdif)) + geom_point()
+```
+
+No obvious pattern to their relative difference.
+
+```{r}
+ggplot(dupwide, aes(x = dup_1, y = dup_2)) + geom_point()
+```
+
+At least they both go up together?
+
+If we re-pull only in that range, do we still get the issue?
+
+```{r}
+re_dup_short <- get_ts_traces2(state = 'NSW', 
+                            site_list = '412036', 
+                            var_list = 141,
+                            start_time = '19950101',
+                            end_time = '19960101',
+                            interval = 'day',
+                            data_type = 'mean',
+                           datasource = 'A',
+                            returnformat = 'df',
+                            .errorhandling = 'pass')
+```
+
+```{r}
+dupshort <- re_dup_short %>%
+  dplyr::group_by(time) %>%
+  dplyr::filter(n() > 1) %>%
+  mutate(dupnum = row_number()) %>% 
+  dplyr::arrange(time) # makes the comparisons easier
+```
+
+Does a different datasource fix it?
+
+```{r}
+re_dup_short_cp <- get_ts_traces2(state = 'NSW', 
+                            site_list = '412036', 
+                            var_list = 141,
+                            start_time = '19950101',
+                            end_time = '19960101',
+                            interval = 'day',
+                            data_type = 'mean',
+                           datasource = 'CP',
+                            returnformat = 'df',
+                            .errorhandling = 'pass')
+```
+
+```{r}
+sum(duplicated(re_dup_short_cp$time))
+
+```
+
+No, still there. So, what to do? I think either throw out the gauge, or throw out one set of values.
