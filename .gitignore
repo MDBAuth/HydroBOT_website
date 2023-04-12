@@ -10,3 +10,8 @@ _output
 
 scenario_example/
 /.luarc.json
+
+/_*.local
+*_cache
+*_files
+
