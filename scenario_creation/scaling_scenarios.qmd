@@ -1,7 +1,9 @@
 ---
-title: "Scaling functions"
+title: "Finding and applying flow scaling"
 author: "Galen Holt"
-format: html
+format:
+  html:
+    df-print: paged
 editor: visual
 ---
 
