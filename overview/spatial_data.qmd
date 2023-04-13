@@ -1,0 +1,79 @@
+---
+title: "Spatial data"
+author: "Galen Holt"
+format:
+  html:
+    df-print: paged
+editor: visual
+---
+
+```{r}
+library(werptoolkitr)
+```
+
+## Visualizing spatial data from werptoolkitr
+
+The [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit){style="font-size: 11pt;"} package provides a standard set of spatial data, generated in `data_creation/spatial_data_creation.qmd`. Here, we make quick plots of the data so we know what it looks like.
+
+The datasets are `bom_basin_gauges` (points), and `basin` (the MDB as a single polygon), `sdl_units`, `resource_plan_areas`, and `cewo_valleys`. Relevant to the case study- the original polygon used was the Macquarie-Castlereagh in the sdls. The crs all match from the creation.
+
+### Basin
+
+```{r}
+ggplot(basin) + geom_sf(fill = 'powderblue')
+```
+
+### Resource plan areas
+
+```{r}
+ggplot(resource_plan_areas) + geom_sf(aes(fill = SWWRPANAME), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
+These have 'SW' codes
+
+```{r}
+resource_plan_areas
+```
+
+### SDL plan areas
+
+```{r}
+ggplot(sdl_units) + geom_sf(aes(fill = SWSDLName), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWSDLName), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
+These have 'SS' codes.
+
+```{r}
+sdl_units
+```
+
+### Catchments
+
+```{r}
+ggplot(cewo_valleys) + geom_sf(aes(fill = ValleyName), show.legend = FALSE) +
+  geom_sf_label(aes(label = ValleyName), size = 3, label.padding = unit(0.1, 'lines')) + 
+  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+```
+
+These have names, ID, and ValleyCodes
+
+```{r}
+cewo_valleys
+```
+
+### Gauges
+
+```{r}
+ggplot() + 
+  geom_sf(data = basin, fill = 'powderblue') +
+  geom_sf(data = bom_basin_gauges)
+```
+
+```{r}
+bom_basin_gauges
+```
+
