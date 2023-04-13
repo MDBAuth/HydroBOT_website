@@ -3,16 +3,15 @@
 .RData
 .Ruserdata
 
+# Quarto controls and outputs
 /.quarto/
-
 /.luarc.json
-
-# Likely will need to do something different here once we want to see the HTML
-_output
-
-scenario_example/
-
 /_*.local
 *_cache
 *_files
 
+# quarto output- will need to make visible to produce docs
+_output
+
+# Demonstration data outputs
+scenario_example/

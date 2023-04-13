@@ -1,0 +1,305 @@
+---
+title: Flow scaling demonstration
+author: Galen Holt
+format:
+  html:
+    df-print: paged
+editor: visual
+params:
+  REBUILD_DATA: FALSE
+---
+
+```{r}
+#| echo: false
+#| warning: false
+#| message: false
+library(werptoolkitr)
+library(vicwater)
+library(dplyr)
+library(ggplot2)
+library(sf)
+
+# Not strictly necessary but allows easier referencing of objects
+library(reticulate) 
+
+# to hopefully speed up the API calls
+library(doFuture) 
+registerDoFuture()
+plan(multisession)
+```
+
+```{r}
+#| echo: false
+
+# params don't get seen in interactive running, so handle that.
+if ("params" %in% ls()) {
+  REBUILD_DATA <- params$REBUILD_DATA
+} else {
+  REBUILD_DATA <- FALSE
+}
+```
+
+# Creating scaled hydrographs
+
+Here, we want to grab historical gauge data from across the basin, match it to its catchment so we can use catchment-specific scaling factors, and then create scaled scenarios. These will then be run through the toolkit to
+
+1.  Demonstrate how the toolkit works and its capabilities
+
+2.  Identify needed improvements
+
+3.  Identify our ability to detect changes in outcomes (sensitivity analysis of the available response model-- EWR module).
+
+What this *isn't* is the best model of climate change. Instead, it uses simple scaling to come up with a reasonable range of changes, and uses them to assess the tools available.
+
+## Process
+
+To create the scenario hydrographs, we need to
+
+1.  Identify gauges in the EWR tool, since that's the module that currently exists
+
+2.  Pull their historical data
+
+3.  Map them to SDL units, because the scaling simulations are done at that scale
+
+    1.  This document stops at this point, along with some visualisations
+
+4.  Scale them. This is done in [scaling_scenarios.qmd](scaling_scenarios.qmd).
+
+At that point, the scenario hydrographs will be created, and we can then run them through the toolkit.
+
+# Set up paths
+
+For the [smaller demo](scenario_creation_demo_R.qmd) the data inside the repo so users can see what's being produced. For this, we'll follow a more typical use-case where both the input and output data are external, and so we need their path. This will likely end up on MDBA blob, but for now, I'll just send it up a level locally. We'll create an internal directory for the hydrographs, since the other output goes in the `scenario_dir` as well.
+
+```{r}
+scenario_dir <- '../flow_scaling_data'
+hydro_dir <- file.path(scenario_dir, 'hydrographs')
+scaling_dir <- file.path(scenario_dir, 'CC_Scenarios_WRPs')
+```
+
+```{r}
+if (!dir.exists(hydro_dir)) {dir.create(hydro_dir, recursive = TRUE)}
+
+```
+
+# Identify relevant gauges
+
+We want *all* the gauges in the EWR tool (i.e. all the gauges we can assess).
+
+## Gauges in EWR
+
+Which gauges are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. *Use python to access the EWR table*. *Access the python objects with* `py$objname`.
+
+::: {#ewr_update}
+**TODO** THIS FAILS AS OF 1.0.4. I have rolled back to ewr version 1.0.1, since the necessary file just doesn't exist in 1.0.4 (and in about half the branches on github). This needs to be updated and tested.
+
+Error messages:
+
+    FileNotFoundError: [Errno 2] No such file or directory: 'py_ewr/parameter_metadata/NSWEWR.csv'
+
+    Error in py_get_attr_impl(x, name, silent) : 
+      AttributeError: module '__main__' has no attribute 'ewrs'
+:::
+
+```{python}
+from py_ewr.data_inputs import get_EWR_table
+from py_ewr.observed_handling import categorise_gauges
+ewrs, badewrs = get_EWR_table()
+distinctgauges = ewrs['Gauge'].unique()
+# Separate into flow gauges, level gauges, and stage gauges
+catgauges = categorise_gauges(distinctgauges)
+```
+
+Get those gauge numbers into an R object, and ask how many. `py$ewrs`is the full EWR table. So we have made them unique, and then used `py_ewe.observed_handling.categorise_gauges` to separate them into flow, level, and stage gauges (as documented in that function).
+
+Pull the full list into R to use for things like mapping, and then categorized list too.
+
+```{r}
+ewrgauges = unique(py$ewrs$Gauge)
+length(ewrgauges)
+
+gauge_cats <- py$catgauges %>% 
+  setNames(c('flow', 'level', 'stage'))
+```
+
+I could leave that as a list, but a dataframe ends up helping later on with other arguments (e.g. state and variable) and is easier to map.
+
+```{r}
+cat_gauges <- gauge_cats %>% 
+  stack() %>% 
+  rename(gauge = values, type = ind) %>% 
+  mutate(var_to = case_when(
+    type == 'flow' ~ 141,
+    type == 'level' ~ 130,
+    type == 'stage' ~ 100
+  ))
+```
+
+149 gauges doesn't seem too bad.
+
+## Map gauges
+
+The gauges with their locations as an `sf` object are in `werptoolkitr::bom_basin_gauges`.
+
+Join to the categorized table. `right_join` maintains the `sf` object but only has rows for cat_gauges.
+
+```{r}
+geo_gauges <- right_join(bom_basin_gauges, cat_gauges)
+nrow(geo_gauges  %>% 
+  filter(!st_is_empty(geometry)))
+```
+
+The `st_is_empty` filter is because some of the gauges are things like 'Bills Pipe' and 'Pump direct from river', and so don't actually have locations. They aren't pullable from NSW, but we can leave them in for now.
+
+Note that this contains level gauges (and stage). I include the stage gauges in the flow scaling, but not the level. All three types are likely to respond to runoff, with flow being the most directly related, and stage more nonlinear. Level changes will be much more difficult to translate, and so we drop them, at least for the moment.
+
+```{r}
+# The commented out code labels the SDL units, but it's too busy.
+ggplot() +
+  geom_sf(data = sdl_units, 
+          mapping = aes(fill = SWSDLName), 
+          show.legend = FALSE) +
+  # geom_sf_label(data = sdl_units, 
+  #               mapping = aes(label = SWSDLName), 
+  #               size = 3, 
+  #               label.padding = unit(0.1, 'lines')) +
+  geom_sf(data = geo_gauges, mapping = aes(color= type)) +
+  colorspace::scale_fill_discrete_qualitative(palette = 'Harmonic') +
+  colorspace::scale_color_discrete_diverging(palette = 'Lisbon')
+```
+
+## Mapping gauges to SDL unit
+
+To do the flow-scaling, we'll need to know the SDL unit. While we're here working with both, let's add that on to `geo_gauges` (though we end up doing it a bit differently in the [scaling notebook](scaling_scenarios.qmd).
+
+```{r}
+geo_gauges <- st_intersection(geo_gauges, sdl_units)
+```
+
+# Pull the gauges
+
+We get the gauge data with [{vicwater}](https://github.com/galenholt/vicwater) (now), so we feed `geo_gauges$gauge` to that, broken into groups by `type`, e.g. level, flow, stage, because these affect the `var_from` and `var_to` we have to ask for. And, despite the EWRs all being in NSW at present, some of the *gauges* are run by Victoria, so we also need to get the `state` argument.
+
+We want to pull the full period of record. David's scenarios go 1 Jan 1890 to 31 Jan 2019. Most gauges start after 1890, and go past 2019. We can still scale the full period of record though because we use q-q scaling, which does not depend on date-matching.
+
+::: {#Aside- gauge puller} I use `mdba_gauge_getter` to pull gauges in [scenario_creation_demo_R.qmd](scenario_creation_demo_R.qmd), but there are a couple issues with it- if I pull data from both before and after the gauge start date, it fills the first section with zeros. This is an issue with the API itself. I've switched to my [{vicwater}](https://github.com/galenholt/vicwater) package in R, because it's able to automatically find the period of record and only pull available data for a site (and despite the name, works for Vic, NSW, and QLD).
+
+We can do this two ways- using `get_variable_list`, extracting the start and end, and then passing those to `get_ts_traces`. Or we can use `get_ts_traces2`, which can do the timeperiod extraction internally. Some speed testing shows they're equivalent, so I'll use the automated and cleaner `get_ts_traces2`. :::
+
+## Set up for the pull
+
+I'm being explicit about daily means and `var_to` arguments to match those used internally by `mdba_gauge_getter` in the EWR tool, since that's what the EWR expects. I'm using `returnformat = sitelist` to return a list of gauges instead of a long dataframe because that makes it easier to find (and bypass) site failures.
+
+If we didn't need a state argument, we could use the `gauge_cats` list as `site_list`, with a length-3 vector of the `var_to` values, since that list is already set up. But we also need the state argument, and that's on a gauge-by-gauge basis. So instead I call `get_ts_traces2` for each combination of gauge type and state, since there are gauges in Vic, Qld, and NSW.
+
+```{r}
+table(geo_gauges$owner, geo_gauges$type)
+```
+
+After lots of testing, I've decided to use `datasource = A` because `CP` gives unstable 504 Gateway timeouts. It's tempting to just `furrr::future_pmap` over the rows of `geo_gauges`, but that takes about 20x as long, likely a combination of data-passing with `furrr` and additional API calls to get periods of record. We shouldn't need to do this much, but still, it's likely we'll need to more than once.
+
+We create a dataframe with the arguments to use with `purrr::pmap`. The `gauge` column is a list of tibbles, and for each one we need to unlist it to make it a character vector- `get_ts_traces` doesn't accept tibbles of gauge numbers.
+
+```{r}
+gauges_to_pull <- geo_gauges %>% 
+  st_drop_geometry() %>% 
+  select(gauge, owner, var_to) %>% 
+  nest_by(owner, var_to, .key = 'gauge')
+gauges_to_pull
+```
+
+Use a simple wrapper with matching names to make calling the main function easier by feeding defaults.
+
+```{r}
+wrap_traces <- function(owner,var_to,gauge) {
+  traces <- get_ts_traces2(state = owner, 
+                            site_list = unlist(gauge, use.names = FALSE), 
+                            var_list = var_to,
+                            start_time = 'all',
+                            end_time = 'all',
+                            interval = 'day',
+                            data_type = 'mean',
+                           datasource = 'A',
+                            returnformat = 'sitelist',
+                            .errorhandling = 'pass')
+  
+}
+```
+
+This `purrr::pmap` works most of the time, but occasionally hits a 504 Gateway Timeout, which seem to happen much more frequently with `datasource = 'CP`, but are also just haphazard. The `safely` lets it finish, but still annoying to have to re-do any missing pieces. Takes about 2 minutes.
+
+```{r}
+system.time(all_gauges <- purrr::pmap(gauges_to_pull, purrr::safely(wrap_traces)))
+
+```
+
+That produces a list with 141 gauges that's 494.3 MB (on 13 Mar 2023) in 125 seconds. Surprisingly fast, really. I'm going to save it though, both to avoid doing it every time and to have a fixed set of data to work with for reproducibility.
+
+## Cleanup
+
+Because we used `safely`, we need to parse out errors. First, are there any?
+
+```{r}
+which(purrr::map_lgl(all_gauges, \(x) !is.null(x$error)))
+```
+
+Extract just the `$result`. I could re-map this to all_gauges so I don't have so much in memory, but not going to bother.
+
+```{r}
+all_results <- purrr::map(all_gauges,
+                          \(x) purrr::pluck(x, 'result')) %>% 
+  purrr::flatten()
+```
+
+Use `is.null` to catch those that errored and didn't return.
+
+```{r}
+datarows <- purrr::map_int(all_results, 
+                           \(x) if (is.null(x)) {0} else {nrow(x)})
+datarows
+
+```
+
+Check missing data
+
+```{r}
+any(datarows == 0)
+```
+
+Check error_num
+
+```{r}
+any(purrr::map(all_results, \(x) sum(x$error_num > 0)) %>% unlist())
+```
+
+::: {#data-note}
+Gauge 412036 returns duplicate entries for every day from 1990-2004. The actual flow values differ for each pair and it's not clear which to use. It seems to be an issue straight from the API- they come in that way, no matter the datasource or subset of the period. I've left them in here, but need to cut out one or both when we use the data. See [scaling notebook](scaling_functions.qmd).
+:::
+
+### Drop to just EWR columns
+
+All we really need for the EWR tool is date and value, but we also keep the quality code id and variable on the data too so it's clear what we have until the data gets used.
+
+```{r}
+just_values <- all_results %>% 
+  purrr::map(\(x) dplyr::select(x, time, site, value, variable, 
+                                quality_codes_id, quality_codes))
+```
+
+Save the data
+
+```{r}
+if (REBUILD_DATA) {
+  saveRDS(just_values, file = file.path(hydro_dir, 'extracted_flows.rds'))
+}
+```
+
+## TODO
+
+-   save format
+
+    -   Currently separate files since each sequence has a different date range
+
+    -   Could have one file per scenario with cols for gauges, but would have lots of empty cells when dates don't match
+
+    -   whatever the standard netcdf format is, once we know what it is

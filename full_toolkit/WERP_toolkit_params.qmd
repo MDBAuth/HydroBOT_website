@@ -61,8 +61,10 @@ params:
 ---
 
 # SOME NOTES- DOES NOT WORK
-This will take some thinking to get the yml parameters to work. They come in as characters. We can unpack things that need to be evaluated with `eval(str2expression(params$LIST_ITEM))`, but there are issues. Anything assigned NULL is just not there. Params that depend on others, e.g. `hydro_dir: file.path(scenario_dir, 'hydrographs')` don't evaluate right, because `scenario_dir` doesn't exist yet.
-We can't just loop through the list and `eval(str2expression())`, because things that are actually characters try to evaluate. And we can't just declare which ones should and shouldn't evaluate, because we should be able do things like pass either a pure character to `hydro_dir` or `file.path('path')`, etc. So this will need more thought. I think it's now lower priority- using a quarto parameterisation notebook isn't that much different- we can strip all the text off if we want, anyway.
+
+This will take some thinking to get the yml parameters to work. They come in as characters. We can unpack things that need to be evaluated with `eval(str2expression(params$LIST_ITEM))`, but there are issues. Anything assigned NULL is just not there. Params that depend on others, e.g. `hydro_dir: file.path(scenario_dir, 'hydrographs')` don't evaluate right, because `scenario_dir` doesn't exist yet. We can't just loop through the list and `eval(str2expression())`, because things that are actually characters try to evaluate. And we can't just declare which ones should and shouldn't evaluate, because we should be able do things like pass either a pure character to `hydro_dir` or `file.path('path')`, etc. So this will need more thought. I think it's now lower priority- using a quarto parameterisation notebook isn't that much different- we can strip all the text off if we want, anyway.
+
+See if using the {yaml} package helps with any of this. I think it won't, really, but might make sorting things out easier.
 
 This document provides a template for running through the toolkit in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_save_steps.qmd). See the [repo readme](WERP_toolkit_demo.qmd) for overall structure of the repo and package installation.
 
