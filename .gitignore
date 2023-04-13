@@ -11,3 +11,8 @@
 _output
 
 scenario_example/
+
+/_*.local
+*_cache
+*_files
+
