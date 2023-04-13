@@ -5,7 +5,20 @@ format:
   html:
     df-print: paged
 editor: visual
+params:
+  REBUILD_DATA: FALSE
 ---
+
+```{r}
+#| echo: false
+
+# params don't get seen in interactive running, so handle that.
+if ("params" %in% ls()) {
+  REBUILD_DATA <- params$REBUILD_DATA
+} else {
+  REBUILD_DATA <- FALSE
+}
+```
 
 I'm using [flow_scaling.qmd](flow_scaling.qmd) to pull the gauges. Actually getting the scaling relationships is independent of the gauge data, and so doesn't need to happen in the same script. We could do this at the bottom of that script, but I've separated it.
 
@@ -399,8 +412,9 @@ scale_gauges <- function(gaugedata, gaugename, qc_limit = 150) {
     tidyr::nest(.by = scenario)
 
   # Save the csvs
-  purrr::pmap(gaugedata, savefun)
-
+  if (REBUILD_DATA) { 
+    purrr::pmap(gaugedata, savefun)
+  }
   # Not sure this is a good idea- might want to return NULL
   return(gaugedata)
 }
@@ -442,7 +456,7 @@ plot_hydrographs(scaled_hydro[['418002']] %>%
   facet_wrap('scenario')
 ```
 
-And now we can move on to read in to the toolkit.
+And now we can move on to read in to the toolkit proper.
 
 # TODO
 

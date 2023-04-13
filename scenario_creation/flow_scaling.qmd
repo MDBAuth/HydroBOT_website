@@ -67,7 +67,11 @@ To create the scenario hydrographs, we need to
 
 At that point, the scenario hydrographs will be created, and we can then run them through the toolkit.
 
-# Set up paths
+## Toolkit relevance
+
+The creation of flow scenarios is not part of the toolkit proper. Instead, the toolkit expects to ingest hydrographs and then handles the ongoing response models, aggregation, and analyses. Thus, hydrographs are an essential input to the toolkit. The point of this code is to generate those hydrographs.
+
+## Set up paths
 
 For the [smaller demo](scenario_creation_demo_R.qmd) the data inside the repo so users can see what's being produced. For this, we'll follow a more typical use-case where both the input and output data are external, and so we need their path. This will likely end up on MDBA blob, but for now, I'll just send it up a level locally. We'll create an internal directory for the hydrographs, since the other output goes in the `scenario_dir` as well.
 
@@ -79,7 +83,6 @@ scaling_dir <- file.path(scenario_dir, 'CC_Scenarios_WRPs')
 
 ```{r}
 if (!dir.exists(hydro_dir)) {dir.create(hydro_dir, recursive = TRUE)}
-
 ```
 
 # Identify relevant gauges
@@ -88,7 +91,7 @@ We want *all* the gauges in the EWR tool (i.e. all the gauges we can assess).
 
 ## Gauges in EWR
 
-Which gauges are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. *Use python to access the EWR table*. *Access the python objects with* `py$objname`.
+Which gauges are actually in the EWR tool? The EWR tool has a function, so use that. *Use python to access the EWR table*. *Access the python objects with* `py$objname`.
 
 ::: {#ewr_update}
 **TODO** THIS FAILS AS OF 1.0.4. I have rolled back to ewr version 1.0.1, since the necessary file just doesn't exist in 1.0.4 (and in about half the branches on github). This needs to be updated and tested.
