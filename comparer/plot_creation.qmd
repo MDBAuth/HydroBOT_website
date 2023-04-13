@@ -398,9 +398,9 @@ obj_sdl_to_plot <- agg_theme_space$sdl_units %>%
 
   # Create a grouping variable
   obj_sdl_to_plot <- obj_sdl_to_plot |>
-    dplyr::mutate(colcol = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-    dplyr::filter(!is.na(colcol)) |>
-    dplyr::arrange(colcol, env_obj)
+    dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+    dplyr::filter(!is.na(env_group)) |>
+    dplyr::arrange(env_group, env_obj)
 
   # Create a palette list
   grouplist = list(EF = 'grDevices::Purp',
@@ -412,7 +412,7 @@ obj_sdl_to_plot <- agg_theme_space$sdl_units %>%
   # need to facet by space sdl unit and create a group col to take multiple palettes
 sdl_stack <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = grouplist,
                           facet_wrapper = 'SWSDLName',
@@ -425,7 +425,7 @@ And I can specify that differently with `facet_wrap` and `facet_rows`
 ```{r}
  sdl_plot_facrow <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = grouplist,
                           facet_col = 'SWSDLName',
@@ -439,11 +439,11 @@ And it might actually look best to facet on the groups
 ```{r}
 sdl_plot_factgroup <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = grouplist,
                           facet_row = 'SWSDLName',
-                          facet_col = 'colcol',
+                          facet_col = 'env_group',
                           sceneorder = c('down4', 'base', 'up4'))
 sdl_plot_factgroup
 ```
@@ -451,13 +451,13 @@ sdl_plot_factgroup
 This is kind of a cool plot too
 
 ```{r}
-  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$colcol),
+  obj_pal <- make_pal(levels = unique(obj_sdl_to_plot$env_group),
                       palette = 'scico::berlin')
   
 sdl_plot_groupblock <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'allArith',
                           x_col = 'scenario',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           color_lab = 'Environmental\ngroup',
                           pal_list = obj_pal,
@@ -505,7 +505,7 @@ ggplot(basin_to_plot, aes(x = forcats::fct_reorder(
 
 Now that I have a function for the other way, hopefully I can just modify it to make this stack. Will need to swap x and fill, and pass in scene_pal instead of of the big palette list (in addition to, if I want to color the bar outlines?).
 
-For the same set as the function-ed stacks above (and the same as the colcol stack above, but without the grouping. this is similar to above, but now we don't give different palettes to the groups.
+For the same set as the function-ed stacks above (and the same as the env_group stack above, but without the grouping. this is similar to above, but now we don't give different palettes to the groups.
 
 ```{r}
 obj_sdl_to_plot |>
@@ -531,7 +531,7 @@ stackfacet <- obj_sdl_to_plot |>
                           colorset = 'env_obj',
                           pal_list = list('scico::berlin'),
                           facet_row = 'SWSDLName',
-                          facet_col = 'colcol',
+                          facet_col = 'env_group',
                           scales = 'free_x',
                           scene_x = FALSE,
                           scene_pal = scene_pal,
@@ -550,7 +550,7 @@ dodgefacet <- obj_sdl_to_plot |>
                           colorset = 'env_obj',
                           pal_list = list('scico::berlin'),
                           facet_row = 'SWSDLName',
-                          facet_col = 'colcol',
+                          facet_col = 'env_group',
                           scales = 'free_x',
                           scene_x = FALSE,
                           scene_pal = scene_pal,
@@ -572,7 +572,7 @@ stackfacet <- obj_sdl_to_plot |>
                           colorset = 'env_obj',
                           pal_list = list('scico::berlin'),
                           facet_row = 'SWSDLName',
-                          facet_col = 'colcol',
+                          facet_col = 'env_group',
                           scales = 'free_x',
                           scene_x = FALSE,
                           scene_pal = scene_pal,
@@ -591,7 +591,7 @@ dodgefacet <- obj_sdl_to_plot |>
                           colorset = 'env_obj',
                           pal_list = list('scico::berlin'),
                           facet_row = 'SWSDLName',
-                          facet_col = 'colcol',
+                          facet_col = 'env_group',
                           scales = 'free_x',
                           scene_x = FALSE,
                           scene_pal = scene_pal,
@@ -637,7 +637,7 @@ And we can do the same sorts of things here as elsewhere- make values relative, 
                           x_lab = 'Change in flow',
                           transx = 'log10',
                           color_lab = 'Environmental\ngroup',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
@@ -665,7 +665,7 @@ In the demo doc, Georgia had the lines as states. This should be flexible enough
                           colorset = 'SWSDLName',
                           point_group = 'env_obj',
                           pal_list = list('RColorBrewer::Dark2'),
-                          facet_row = 'colcol',
+                          facet_row = 'env_group',
                           facet_col = '.',
                           scene_pal = scene_pal,
                           sceneorder = c('down4', 'base', 'up4'),
@@ -691,7 +691,7 @@ sdl_line_catchment_smooth <- obj_sdl_to_plot |>
                           colorset = 'SWSDLName',
                           point_group = 'env_obj',
                           pal_list = list('RColorBrewer::Dark2'),
-                          facet_row = 'colcol',
+                          facet_row = 'env_group',
                           facet_col = '.',
                           scene_pal = scene_pal,
                           sceneorder = c('down4', 'base', 'up4'),
@@ -713,7 +713,7 @@ We can also use smoothing with multiple points, e.g. if we want to group data in
                           x_lab = 'Change in flow',
                           transx = 'log10',
                           color_lab = 'Environmental\ngroup',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
@@ -738,7 +738,7 @@ And if we use `method = 'lm'`, we're just taking a mean aggregation and plotting
                           x_lab = 'Change in flow',
                           transx = 'log10',
                           color_lab = 'Environmental\ngroup',
-                          colorgroups = 'colcol',
+                          colorgroups = 'env_group',
                           colorset = 'env_obj',
                           pal_list = obj_pal,
                           facet_row = 'SWSDLName',
@@ -755,6 +755,209 @@ And if we use `method = 'lm'`, we're just taking a mean aggregation and plotting
   suppressWarnings(print(sdl_smooth_mean))
 ```
 
+# Maps
+
+Maps are highly informative, but lose two potential data dimensions, and tend to provide quantitative information through fill. This means we often have to reduce the number of categories we look at and rely heavily on facetting.
+
+We can plot both polygons and points, allowing us to plot any level of spatial aggregation. We can also plot multiple layers in the foreground and background, though at present these have fewer options than the 'primary' layer (e.g. we cannot plot data as fill in multiple polygon layers).
+
+A minimal map of polygon aggregations with the basin in the background- we use `underlay` and `overlay` lists to put other layers in the background/foreground.
+
+```{r}
+obj_sdl_to_plot |>
+    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                  y_lab = 'All Arithmetic Mean',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'env_obj',
+                          facet_row = 'scenario',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          underlay_list = list(underlay = basin, 
+                                               underlay_pal = 'azure'))
+```
+
+A minimal map with gauges as the focal spatial unit
+
+```{r}
+# Still with the annoying way of handling the long names
+  env_obj_points_to_plot <- agg_theme_space$env_obj |>
+    dplyr::rename(allArith = 5)
+```
+
+```{r}
+env_obj_points_to_plot |> # for readability
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                  y_lab = 'All Arithmetic Mean',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          underlay_list = list(underlay = 'basin',
+                                               underlay_pal = 'azure')) +
+    ggplot2::theme(legend.position = 'bottom')
+```
+
+We *can* have informative fill in polygons underlying gauge data, here not with a data fill but a name fill. It is hard to find palettes for the full set of catchments. The only discrete palette available that makes sense is `ggsci::default_igv`, and it's pretty garish. Using a continuous palette (e.g. `scico::oslo` ) works fine too, but the colors aren't very well spatially-separated. We need to come up with a default set that we like, I think. Could be as simple as an actual mapping of specific colors to catchments, a la `scene_pal`.
+
+```{r}
+env_obj_points_to_plot |> # for readability
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                  y_lab = 'All arithmetic mean',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          underlay_list = list(underlay = sdl_units,
+                                               underlay_ycol = 'SWSDLName',
+                                               underlay_pal = 'ggsci::default_igv')) +
+    ggplot2::theme(legend.position = 'bottom')
+```
+
+We can use a continuous variable on the underlay fill, but have to be careful to choose palettes that don't mask each other. We can also have multiple levels of underlay polygons (e.g. if we want the basin under sdl units). Note that we can pass colors directly, and not necessarily as a palette.
+
+```{r}
+env_obj_points_to_plot |> # for readability
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('ggthemes::Orange-Gold'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          underlay_list = list(list(underlay = 'basin',
+                                                    underlay_pal = 'cornsilk'),
+                                               list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
+                                                    underlay_ycol = 'allArith',
+                                                    underlay_pal = 'scico::oslo'))) +
+    ggplot2::theme(legend.position = 'bottom')
+```
+
+We can also overlay, here with the sdl layer as 'primary', here with a single color to show where gauges are.
+
+```{r}
+obj_sdl_to_plot |>
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          underlay_list = 'basin',
+                          overlay_list = list(overlay = 'bom_basin_gauges',
+                                              overlay_pal = 'grey40',
+                                              clip = TRUE)) +
+    ggplot2::theme(legend.position = 'bottom')
+```
+
+We can also give the overlay informative colors- this outcome is similar to what we've done above, but the amount of control we have over scaling etc differs depending on whether a layer is 'primary'. I intend to make this more general, but have not yet because the conditionals keep getting more complex.
+
+```{r}
+obj_sdl_to_plot |>
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          underlay_list = 'basin',
+                          overlay_list = list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
+                                              overlay_pal = 'scico::oslo',
+                                              overlay_ycol = 'allArith',
+                                              clip = TRUE)) +
+    ggplot2::theme(legend.position = 'bottom')
+```
+
+Here, we have a primary layer at the basin scale, overlay the sdl units with empty fill, and then put gauges on with informative values. There's clearly a lot we can do here with the layering, most of which I've tested.
+
+```{r}
+agg_theme_space$mdb |>
+    dplyr::rename(allArith = 4) |> # for readability
+    dplyr::filter(Objective %in% c("Maintain water-dependent species richness",
+                                   "Increase opportunities for colonial waterbird breeding*",
+                                   "Support instream & floodplain productivity")) |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('scico::oslo'),
+                          facet_col = 'scenario',
+                          facet_row = 'Objective',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          overlay_list = list(list(overlay = 'sdl_units', overlay_pal = 'black'),
+                                              list(overlay = dplyr::filter(env_obj_points_to_plot, env_obj == 'NF1'),
+                                                    overlay_pal = 'ggthemes::Orange-Gold',
+                                                    overlay_ycol = 'allArith')))+
+    ggplot2::theme(legend.position = 'bottom')
+```
+
+As with the other plotting functions, we can compare to baseline using arbitrary functions, here `difference` and `relative` most likely.
+
+```{r}
+obj_sdl_to_plot |>
+    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('ggthemes::Orange-Blue-White Diverging'),
+                          facet_col = 'env_obj',
+                          facet_row = 'scenario',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'difference',
+                          group_cols = c('env_obj', 'polyID'), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
+                          underlay_list = list(underlay = basin, underlay_pal = 'azure'))
+```
+
+Relative
+
+```{r}
+obj_sdl_to_plot |>
+    dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'allArith',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'allArith',
+                          pal_list = list('ggthemes::Orange-Blue-White Diverging'),
+                          facet_col = 'env_obj',
+                          facet_row = 'scenario',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          base_lev = 'base',
+                          comp_fun = 'relative',
+                          zero_adjust = 'auto',
+                          transy = 'log10',
+                          group_cols = c('env_obj', 'polyID'), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
+                          underlay_list = list(underlay = basin, underlay_pal = 'azure'))
+```
+
 # Aggsequencing
 
 For most plots (except hydrographs), we need a way to choose which aggsequences to plot. It needs to work for the column-format and the name-format (though I guess we could force one).
@@ -767,8 +970,8 @@ Otherwise, I think we should be able to feed it a funsequence that may be a subs
 
 We're going to want this all the time to choose what to plot/process. But it will be essential for the tile explanatory plots.
 
-# Maps
-
 # Tiles
 
 # Causal networks
+
+I think I'll bring this over during the big revamp of demo/example/templating
