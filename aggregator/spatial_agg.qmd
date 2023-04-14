@@ -182,25 +182,22 @@ obj2poly2
 
 We can see we get the same result as `obj2poly` with different ways of specifying `aggCols` and `groupers`.
 
-**STOPPED HERE 14/4/2023**
-
-There are times when we might want to send a vector of names, but ignore those not in the data. Most likely would be something like grouping on `gauge` if it exists, and ignoring if not. It fails by default, but setting `failmissing = FALSE` allows it to pass. I want that to be in `…` to pass to `selectcreator`, but we're already using the `…` for function arguments and it gets tangled up.
+There are times when we might want to send a vector of names, but ignore those not in the data. Most likely would be something like a set of possible grouping variables but only using them if they exist, and ignoring if not. This is a bit sloppy, but is useful sometimes to send the same set of groupers to several datasets. It fails by default, but setting `failmissing = FALSE` allows it to pass. Here, the 'extra_grouper' column doesn't exist in the data and so is ignored.
 
 ```{r}
 #| message: false
 
-obj2polyF <- spatial_aggregate(dat = sumdat, 
-                             to_geo = rps,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
+obj2polyF <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = c('scenario', 'env_obj', 'extra_grouper'),
+                             aggCols = ends_with('ewr_achieved'),
                              funlist = ArithmeticMean,
                              keepAllPolys = TRUE,
                              failmissing = FALSE)
-
-ggplot(obj2polyF, aes(fill = spatial_ArithmeticMean_ewr_achieved)) +
-  geom_sf() + 
-  facet_grid(scenario~.)
+obj2polyF
 ```
+
+**STOPPED HERE 14/4/2023**
 
 ### Functions
 
