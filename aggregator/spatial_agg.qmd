@@ -8,59 +8,53 @@ editor: visual
 ---
 
 ```{r}
-#| warning: false
-#| message: false
-
-## GITHUB INSTALL
-# credentials::set_github_pat()
-# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
-
-## LOCAL INSTALL- easier for quick iterations, but need a path.
-# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
-
-# And for very fast iteration (no building, but exposes too much, often)
-# devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
-
-```
-
-```{r}
 library(werptoolkitr)
+library(dplyr)
 library(ggplot2)
 library(patchwork)
 ```
 
 ## Overview
 
-We will often have spatial data that we want to aggregate into larger scales. We therefore want a set of functions that allow us to read in data, specify the larger units into which it gets aggregated and the functions to use to do that aggregation. I'll assume at the moment that we primarily have point data (gauges), rather than rasters, but handling rasters is a reasonably straightforward modification (and I have the code to do it elsewhere). Because of the current focus on gauges, I'm using `sf` primarily, but `stars` could be useful depending on where we get with input formats (netcdf etc) and higher-dimension data, or if we end up using rasters.
+We will often have spatial data that we want to aggregate into larger scales. We therefore want a set of functions that allow us to read in data, specify the larger units into which it gets aggregated and the functions to use to do that aggregation. Further, there is clear need to handle grouping, most obviously for scenarios, but we also need to keep theme groupings separated during spatial aggregation steps.
 
-I originally built this as a standalone spatial aggregator, but am now integrating with the combined aggregator, just demoing how that works with only space. I demo multi-step, even if some of the steps aren't particularly interesting now, they allow us to develop a general process and we just need polygons to point at.
+There is a standalone spatial aggregator `spatial_aggregate`, which I demonstrate here, along with `multi_aggregate`, which wraps both `spatial_aggregate` and `theme_aggregate` to allow interleaved aggregaton steps in a standardised format. This document focuses on spatial aggregation, while [theme aggregation](theme_agg.qmd) and [interleaved spatial and theme aggregation](theme_space_agg.qmd) are demonstrated in separate notebooks, allowing us to dig a little deeper into how each component works.
+
+We often will want to only perform a single spatial aggregation (e.g. from gauges to sdl units), but there are instances where that isn't true- perhaps we want to aggregate from sdl units to states or the basin. Thus, I demonstrate multi-step spatial aggregation, including the situation where aggregation units (polygons) are not nested, as would be the case for sdl units and states, for example. Even if some of the steps in this demonstration aren't particularly interesting now, they allow us to develop the general process that can accept any set of polygons we want to aggregate into from any other spatial data.
+
+This document delves fairly in-depth into *capabilities*, including things like argument types and how they relate to other functions and permit certain tricks. Not all of these will be used or needed to understand by most users- typically there will be a set of aggregation steps fed to `multi_aggregate` and that will be that. This sort of simpler setup is shown in the [combined aggregation notebook](theme_space_agg.qmd) and the [full-toolkit runs](full_toolkit/full_toolkit_overview.qmd). But it is helpful to document them for when they are needed.
 
 ## Inputs
 
-We will need to be able to accept inputs at arbitrary theme aggregation levels. Note that those spatial scales attached to the theme axis are the scale at which definitions of outcomes change, not the scale at which those outcomes must be assessed, and so are NOT about spatial agg. For example, just because `Specific_objectives` are differently defined between planning units, we may be scaling them up in space from gauge to basin, with no reference to planning unit at all.
+We will need to be able to accept inputs at arbitrary aggregation levels (theme, spatial, or temporal). In other words, the spatial aggregation should aggregate any input spatial data into any set of spatial units, whatever that input data represents. The `multi_aggregate` function runs without spatial info until it reaches a step calling for spatial aggregation, at which point that data must be spatial. Beyond this requirement, `multi_aggregate` doesn't care what theme or spatial scale that input data is- e.g. we could give it Objectives already at the Catchment scale, and then use it to move up.
 
-In order for theme aggregations to be able to be spatially aggregated, they'll need to have some spatial referencing. The `multi_aggregate` runs without spatial info until it needs it, but needs to be fed spatial data if we want to do spatial aggregation. I have intentionally split the data prep out of the aggregation, and so `multi_aggregate` operating on spatial aggregations doesn't care what theme or spatial scale that input data is- e.g. we could give it Objectives already at the Catchment scale, and then use it to move up. For now, though, let's start with gauge-referenced data at the `env_obj` theme scale.
+::: {#spatial-themes style="border: 2px solid gray; color: gray"}
+Note: in some cases, the definitions for outcomes along the 'Objective' axis are defined spatially; for example, the definition of `Specific_objectives` might vary between planning units. However, these are the scale at which *definitions* of outcomes change, not the scale at which those outcomes must be assessed. For example, just because `Specific_objectives` are differently defined between planning units, we can still scale them up in space from gauge to basin, with no reference to planning unit.
+:::
 
-## Demo setup
+For this demonstration, we start with gauge-referenced data at the `env_obj` theme scale.
+
+## Demonstration setup
+
+First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](controller/controller_ewr_wrapped_R.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
+
+```{r}
+project_dir <- file.path('scenario_example')
+ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+```
 
 ### Theme aggregated inputs
 
-The new `multi_aggregate` can do this all at once, but because I want this doc to demo only spatial, I'm going to do a theme agg right away separately to get to the desired Theme level to feed to spatial.
+The `multi_aggregate` function can combine theme and spatial aggregation, but because I want this document to demonstrate spatial aggregation, I have split up the process to be clear what is happening. First, we do a theme aggregation to get to the desired Theme level to feed to spatial.
 
-```{r}
-scenario_dir <- file.path('scenario_example')
-ewr_results <- file.path(scenario_dir, 'module_output', 'EWR')
-geo_data_dir <- system.file("extdata", package = 'werptoolkitr')
-```
-
-Get the data, and make it spatial (`gauge2geo` pairs gauge numbers with locations inside `prep_ewr_agg`.
+Before any aggregation, we need to read the data in and make it spatial (`gauge2geo` pairs gauge numbers with locations provided in the `geopath` argument inside `prep_ewr_agg`. Note that this prep step is wrapped in `read_and_agg`, reducing user input. I show it here so we can more clearly see what is happening.
 
 ```{r}
 #| message: false
 sumdat <- prep_ewr_agg(ewr_results, type = 'summary', geopath = bom_basin_gauges)
 ```
 
-Set theme aggregation lists super simple, just to `env_obj` level
+Define simple theme aggregation lists to get to `env_obj` level, assuming that any pass on `ewr_code_timing` yields a pass for `ewr_code` and `ewr_code`s are averaged into `env_obj`. More complexity for the theme aggregations are shown [in the theme notebook](theme_agg.qmd).
 
 ```{r}
 themeseq <- list(c('ewr_code_timing', 'ewr_code'),
@@ -70,15 +64,15 @@ funseq <- list(c('CompensatingFactor'),
                c('ArithmeticMean'))
 ```
 
-Do a simple theme aggregation so we have some test data. Don't save intermediate. Edges are only relevant for the theme, so make them here. When they're interleaved, we can feed it the full agg set, but for clarity here I'm separating the theme inputs from later spatial agg.
+Perform that simple theme aggregation so we have some test data. Since edges are only relevant for theme aggregation, make them in the call. This and everything that follows could be done with interleaved theme and spatial sequences starting with `themeseq` and `funseq` fed to `multi_aggregate`, but here I split them apart to better accentuate the spatial aggregation.
 
 ```{r}
 #| message: false
 #| warning: false
-themeedges <- make_edges(causal_ewr, themeseq)
+
 
 simpleThemeAgg <- multi_aggregate(dat = sumdat,
-                         causal_edges = themeedges,
+                         causal_edges = make_edges(causal_ewr, themeseq),
                          groupers = c('scenario', 'gauge'),
                          aggCols = 'ewr_achieved',
                          aggsequence = themeseq,
@@ -86,85 +80,109 @@ simpleThemeAgg <- multi_aggregate(dat = sumdat,
 simpleThemeAgg
 ```
 
-Now we have a theme-aggregated tibbles to play with. They each have scenario and gauge cols, so we can use those.
+This provides a spatially-referenced (to gauge) theme-aggregated tibble to use to demonstrate spatial aggregation. Note that this has the gauge (spatial unit), but also two groupings that we want to preserve when we spatially aggregate- `scenario` and the current level of theme grouping, `env_obj`.
 
 ### Spatial inputs (polygons)
 
-We will aggregate into polygons, and we want to be able to do that several times. So we need a set of polygons to aggregate into. Should be a path, either to wherever we're keeping things at MDBA or online. Because it will be needed for testing, I'm going to include the catchment polygons in `data-raw/`. That might need to move, since polygons are reasonably large files and we'll want a couple different ones for testing. But I'm going to sort out data paths later.
+Spatial aggregation requires polygons to aggregate into, and we want the capability to do that several times. The user can read in any desired polygons with `sf::read_sf(path/to/polygon.shp)`, but here we use those provided in the standard set with {werptoolkitr}. We'll use SDL units, catchments (from cewo), and the basin to show how the aggregation can have multiple steps with polygons that may not be nested (though care should be taken when that is the case).
 
-For now, let's use resource plan areas, catchments (from cewo), and the basin. I'm also going to bring in the gauge locations to make them easy to look at, even though those are linked to the EWR results in `simpleThemeagg`.
+# Demonstrations
 
-*NOTE*- these are just in the package now. `sdl_units`, etc...
+We'll now use that input data to demonstrate how to do the spatial aggregation, demonstrate capabilities and options provided by the function, and provide additional information useful to the user.
 
-```{r}
-basin <- read_sf(file.path(geo_data_dir, 
-                           'basin.shp'))
+## Single aggregation
 
-rps <- read_sf(file.path(geo_data_dir, 'resource_plan.shp')) %>%
-  st_make_valid()
+We might just want to aggregate spatially once. We can do this simply by passing the input data (anything spatial, in this case `simpleThemeAgg`), a set of polygons, and providing a length-one `funlist`.
 
-ltv <-read_sf(file.path(geo_data_dir, 'cewo_valleys.shp')) %>%
-  st_make_valid()
-
-# Read in the gauges too, for looking at?
-
-```
-
-## Core spatial agg function
-
-We might just want to aggregate spatially once. In the simplest case, we can pass the ewr outcomes themselves. This uses the `spatial_aggregate` function.
+Note that the `aggCols` argument is `ends_with(original_name)` to reference the *original* name of the column of values- it may have a [long name tracking its aggregation history](aggregation_overview.qmd), so we give it the tidyselect `ends_with` to find the column. More generally, both `aggCols` and `groupers` can take any tidyselect syntax or bare names or characters.
 
 ```{r}
 #| message: false
 
-obj2poly <- spatial_aggregate(dat = sumdat, 
-                             to_geo = rps,
+obj2poly <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
                              groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
+                             aggCols = ends_with('ewr_achieved'),
                              funlist = ArithmeticMean,
                              keepAllPolys = TRUE)
+obj2poly
+```
 
-ggplot(obj2poly, aes(fill = spatial_ArithmeticMean_ewr_achieved)) +
+Note that that has a horribly long name tracking the aggregation history, and has lost the theme levels- e.g. the different `env_obj`s are no longer there and were all averaged together. The `multi_aggregate` function automatically handles this preservation, but `spatial_aggregate` is more general, and does not make any assumptions about the grouping structure of the data. Thus, to keep the `env_obj` groupings (as we should, otherwise we're inadvertently theme-aggregating over all of them), we need to add `env_obj` to the `groupers` argument.
+
+```{r}
+
+obj2poly <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = c('scenario', 'env_obj'),
+                             aggCols = ends_with('ewr_achieved'),
+                             funlist = ArithmeticMean,
+                             keepAllPolys = TRUE)
+obj2poly
+```
+
+A quick plot shows what we're dealing with. We'll simplify the names and choose a subset of the environmental objectives.
+
+There are many built-in plotting options in the toolkit, which we will use shortly. First, though a quick ggplot to see what those standardised plot functions start with.
+
+```{r}
+# The name is horrible, so change it.
+obj2poly %>% 
+  rename(ewr_achieved = spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved) %>% 
+  filter(grepl('^EF', env_obj)) %>% 
+ggplot(aes(fill = ewr_achieved)) +
   geom_sf() + 
-  facet_grid(scenario~.)
+  facet_grid(scenario~env_obj)
+```
+
+Moving forward, we'll use the built-in plotting functions to keep consistent with the rest of the project.
+
+```{r}
+scene_pal <- make_pal(unique(simpleThemeAgg$scenario), palette = 'ggsci::nrc_npg', refvals = 'base', refcols = 'black')
+```
+
+```{r}
+obj2poly %>% 
+  rename(ewr_achieved = spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved) %>% 
+  filter(grepl('^EF[1-3]', env_obj)) %>% 
+plot_outcomes(y_col = 'ewr_achieved',
+                  y_lab = 'Arithmetic Mean',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'ewr_achieved',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'env_obj',
+                          facet_row = 'scenario',
+                          scene_pal = scene_pal,
+                          sceneorder = c('down4', 'base', 'up4'),
+                          underlay_list = list(underlay = basin, 
+                                               underlay_pal = 'azure'))
 ```
 
 ### Argument options and syntax
 
-We might want to use `tidyselect` syntax in `aggCols` or `groupers`. For example, maybe we want to use `ends_with('ewr_achieved)` to grab pre-aggregated columns with long name histories, as in `simpleThemeAgg` . We can either wrap the arguments here with `expr()`, e.g. `expr(starts_with('sce'))`, or we can use bare tidyselect and wrap them in `enquo` inside the function. That's more general, and takes pressure off the user to do the wrapping in an argument, which is ugly and easy to forget.
+Both `aggCols` and `groupers` can be character vectors, bare data-variable names, or we might want to use `tidyselect` syntax. For example, maybe we want to use `ends_with('ewr_achieved')` as above to grab pre-aggregated columns with long name histories, as in `simpleThemeAgg` . This is handled under the hood by `selectcreator` and careful parsing in the function stack. Above, we had groupers as a character vector and aggCols as tidyselect, but now we flip, and `groupers` is a vector of tidyselect and bare names, while `aggCols` is a character.
+
+::: {#tidyselect style="border: 2px solid gray; color: gray"}
+Note that `multi_aggregate` takes advantage of this tidyselect ability under the hood to deal with the ever-lengthening column names (and sometimes expanding number of value columns if we have multiple aggregation functions at a step).
+
+Also, if we were doing all the aggregation in one go using `multi_aggregate`, we could avoid the super long names by just using `namehistory = FALSE`. We'll get to that in the [combined aggregation](theme_space.qmd).
+:::
 
 ```{r}
-obj2polytidy <- spatial_aggregate(dat = simpleThemeAgg, 
-                             to_geo = rps,
-                             groupers = starts_with('sce'),
-                             aggCols = ends_with('ewr_achieved'),
+obj2poly2 <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = c(starts_with('sce'), env_obj),
+                             aggCols = "env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved",
                              funlist = ArithmeticMean,
                              keepAllPolys = TRUE)
 
-# The name is horrible, so change it.
-ggplot(obj2polytidy, aes(fill = spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved)) +
-  geom_sf() + 
-  facet_grid(scenario~.) +
-  labs(fill = 'ewr_achieved')
+obj2poly2
 ```
 
-If we were doing all the aggregation in one go using `multi_aggregate`, we could avoid that horrible rename by just using `namehistory = FALSE`. We'll get to that in `theme_space.qmd`.
+We can see we get the same result as `obj2poly` with different ways of specifying `aggCols` and `groupers`.
 
-Because we're using `enquo` to capture `tidyselect`, we can even send bare column names.
-
-```{r}
-#| message: false
-obj2polytidybare <- spatial_aggregate(sumdat, 
-                             to_geo = rps,
-                             groupers = scenario,
-                             aggCols = ewr_achieved,
-                             funlist = ArithmeticMean,
-                             keepAllPolys = TRUE)
-
-ggplot(obj2polytidybare, aes(fill = spatial_ArithmeticMean_ewr_achieved)) +
-  geom_sf() + 
-  facet_grid(scenario~.)
-```
+**STOPPED HERE 14/4/2023**
 
 There are times when we might want to send a vector of names, but ignore those not in the data. Most likely would be something like grouping on `gauge` if it exists, and ignoring if not. It fails by default, but setting `failmissing = FALSE` allows it to pass. I want that to be in `…` to pass to `selectcreator`, but we're already using the `…` for function arguments and it gets tangled up.
 

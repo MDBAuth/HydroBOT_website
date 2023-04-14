@@ -71,3 +71,7 @@ Load the package
 # Additional info
 
 More info will go here.
+
+# Figures outlining the flow
+
+# Integrate with the readme

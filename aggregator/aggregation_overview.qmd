@@ -1,0 +1,36 @@
+---
+title: "Aggregation overview"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Goals
+
+Incoming data from modules is typically very granular in many dimensions (as it should be if the modules are modelling data near the scale of processes). However, this means that there are thousands of different outcomes across the basin and through time. To make that useful for anything other than targeted local planning, we need to aggregate. Here, we aggregate along three dimensions- space, time, and 'Objective', where 'Objective' is the axis along increasing organisational levels, for example flow requirements for fish spawning to fish spawning to fish populations to overall environmental success.
+
+We want to be able to aggregate along each of these dimensions with any number of aggregation functions (e.g. mean, min, max, more complex) to reflect the processes being aggregated.
+
+We want to be able to interleave the dimensions, e.g. aggregate along the Objective dimension to some intermediate level, then aggregate in space, then time, then more Objective levels, then more time and more space.
+
+To achieve this, we have developed a flexible set of aggregation functions that take a list of aggregation steps, each of which can be along any dimension, and a matching list of aggregation functions to apply to that step in the aggregation. It is possible to ask for multiple functions per step.
+
+## Tracking
+
+In general, aggregation over many steps can get quite complicated to track, particularly if some of the steps have multiple aggregation functions. Tracking the provenance of the final values is therefore critical to understand their meaning. By default, columns of values are named in a way that tracks their provenance, e.g. step_function_step_function_originalName. This is memory-friendly but ugly, and so we can also stack this information into columns (two for each step- one the step, the second the function) with the `agg_names_to_cols` function.
+
+Further, in the case of a multi-step aggregation, we can either save only the final output (better for memory) or save the entire stepwise procedure, which can be very useful both for investigating results and visualisation, and it is often the case that we want to ask questions of several levels anyway.
+
+## Limitations
+
+-   At the time of development, there was no temporally resolved output data, and so temporal aggregation is not yet available. This is very high on the priority list, and the framework is in place to do it.
+
+-    Different aggregation functions for different rows in the data (e.g. mean of fish breeding, min of bird foraging) are not yet available
+
+    -   Multiple functions are possible per step, and different functions are possible for different steps
+
+    -   Different functions for different rows *within a step* requires mapping of what those functions should be, and this does not exist. Still, the capability to do this is very high on the priority list, and should not be too difficult.
+
+## Development notes
+
+I have assumed that we primarily have point data (gauges), rather than rasters, but handling rasters is a reasonably straightforward modification (and I have the code to do it elsewhere). Because of the current focus on gauges, I'm using `sf` primarily, but `stars` could be useful depending on where we get with input formats (netcdf etc) and higher-dimension data, or if we end up using rasters.
