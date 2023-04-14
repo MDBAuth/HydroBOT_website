@@ -34,7 +34,7 @@ library(lubridate)
 library(ggplot2)
 ```
 
-Set up some directories. Once we move to MDBA, these will be easier to point at in a shared way.
+We need to set some paths to relevant directories- where we're going to save the hydrographs `hydro_dir` and where the scaling data is that we need to do the scaling here `scaling_dir`. This follows a more usual setup than [the short demo](scenario_creation_demo_R.qmd), in that we set these paths outside this repo. Typically, the hydrograph data would be in some external share directory (e.g. MDBA blob storage). Here, for simplicity for the demo, I just save it up a level.
 
 ```{r}
 scenario_dir <- '../flow_scaling_data'

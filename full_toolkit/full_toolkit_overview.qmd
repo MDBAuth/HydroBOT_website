@@ -1,0 +1,10 @@
+---
+title: "Full toolkit overview"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Purpose
+
+The toolkit may be used stepwise, that is calling the Controller, Aggregator, and Comparer. But it can also be called in one go, feeding all necessary parameters in at once. This can be done [in-memory](WERP_toolkit_in_memory.qmd), or [saving outputs at each step](WERP_toolkit_save_steps.qmd). In either case, it can be controlled interactively in notebooks, or with a `params.yml` file, which currently operates a [parameterised notebook](WERP_toolkit_params.qmd), but could be made to simply be ingested by `Rscript` at the command line.

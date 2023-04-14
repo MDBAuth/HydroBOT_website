@@ -5,6 +5,8 @@ This repo is intended to contain demonstration/template examples of using the to
 ## R
 Use `renv` to manage R environments. See the developer note for {werptoolkitr}.
 
+The EWR tool is written in python, and so while we have wrapped the necessary functions in the [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) R package, we need to be careful about data type translations. To have an R object that works as a dict in python, for example, use a named list (see a few more translation options at [my github](https://galenholt.github.io/RpyEnvs/R_py_type_passing.html)). The names can be quoted or unquoted; keep quoted to be most like python specs.
+
 ### werptoolkitr
 We expect that {werptoolkitr} will change frequently since we're simultaneously developing it. To reload and rebuild, there are several options, ranging from more structured (github) to local package install, to just loading the scripts into memory for rapid changes. Note that while the `load_all` option is tempting and very useful, it often works differently than a real package install and so all code should be tested with one of the other two methods.
 
@@ -33,7 +35,7 @@ To add a specific version, `poetry add packagename==1.0.1`. This is sometimes ne
 To call the python from R, as long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`. *Now that we have nested directories, I set the RETICULATE_PYTHON env variable in* `.Rprofile` . There's more detail about this sort of thing in the developer note in {werptoolkitr}.
 
 ## Quarto setup
-Set a common output dir in the `_quarto.yml`.
+Set a common output dir in the `_quarto.yml`. I have a `_quarto.yaml.local` to control caching, but be aware that caching can cause issues with some of the notebooks. Currently the ones that fail are the controllers, with the chunks running the EWR hanging on render. The solution when that happens is just to put `cache: false` in either the yaml header or chunk comment.
 
 ### Rebuilding data
 

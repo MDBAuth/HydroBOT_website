@@ -47,9 +47,7 @@ A larger and more complex set of scenarios is created in [the flow scaling demon
 
 The shapefiles used to see what we're doing and do the selecting were produced with within the WERP_toolkit package to keep consistency. It's possible we'll add more shapefile creation and move all the canonical versions and their creation to their own data package or repo.
 
-Set the data dir to make that easy to change. Now we're not working in the package, but in an analysis repo. These should point to external shared directories. For now though, let's point them inside the repo at untracked dirs.
-
-This needs an outdir and a location for the canonical shapefiles.
+Set the data directory to make that easy to change. These should usually point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The [larger example](scaling_scenarios.qmd) sends them externally, which would be more typical.
 
 ```{r}
 scenario_dir <- 'scenario_example'
