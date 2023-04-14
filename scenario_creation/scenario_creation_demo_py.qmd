@@ -9,6 +9,12 @@ execute:
     enabled: false
 ---
 
+# OUT OF DATE
+
+This was written early on, and so likely does not work (or work properly). Do not use. It should be brought up to date, but that's not currently a high priority.
+
+------------------------------------------------------------------------
+
 First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened? These params *should* be able to be set on render at command line, but for some reason using the Quarto CLI on this file (with or without params) causes an error in the `mdba_gauge_getter`. It works fine if I render with the button, but not if I literally copy the command the button is running, so I'm *very* confused. Changing the yaml to execute: enabled: false lets me rebuild the whole project without this breaking everything.
 
 ```{python}

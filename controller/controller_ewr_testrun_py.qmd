@@ -6,6 +6,10 @@ format:
     df-print: paged
 ---
 
+# OUT OF DATE
+This was written early on. It likely no longer works (or works properly). It should be brought up to date, but that is not currently a high priority
+
+---------------------------------------------------------------
 
 Import the external packages we need
 ```{python}
