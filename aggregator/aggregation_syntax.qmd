@@ -1,0 +1,202 @@
+---
+title: "Aggregation syntax"
+author: "Galen Holt"
+format:
+  html:
+    df-print: paged
+editor: visual
+---
+
+```{r}
+library(werptoolkitr)
+```
+
+## Argument options and syntax
+
+The aggregation functions have flexible syntax in some of their arguments, particulary for selecting grouping columns, the column(s) of values to aggregate, and the specification of aggregation functions. In general, these apply across the functions, though `multi_aggregate` has a bit less flexibility than the internal `spatial_aggregate`, `theme_aggregate`, and `general_aggregate`, largely as a consequence of passing through the call stack. Here, I use primarily the example of `spatial_aggregate` to illustrate the different arguments, their syntax, and why we might use it.
+
+I'll create test data as in the [spatial notebook](spatial_agg.qmd).
+
+```{r}
+project_dir <- file.path('scenario_example')
+ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+sumdat <- prep_ewr_agg(ewr_results, type = 'summary', geopath = bom_basin_gauges)
+
+themeseq <- list(c('ewr_code_timing', 'ewr_code'),
+               c('ewr_code', "env_obj"))
+
+funseq <- list(c('CompensatingFactor'),
+               c('ArithmeticMean'))
+
+simpleThemeAgg <- multi_aggregate(dat = sumdat,
+                         causal_edges = make_edges(causal_ewr, themeseq),
+                         groupers = c('scenario', 'gauge'),
+                         aggCols = 'ewr_achieved',
+                         aggsequence = themeseq,
+                         funsequence = funseq)
+simpleThemeAgg
+```
+
+### Selecting grouping and data columns
+
+Both `aggCols` and `groupers` can be character vectors, bare data-variable names, or we might want to use `tidyselect` syntax. For example, maybe we want to use `ends_with('ewr_achieved')` as above to grab pre-aggregated columns with long name histories, as in `simpleThemeAgg` . This is handled under the hood by `selectcreator` and careful parsing in the function stack. Above, we had groupers as a character vector and aggCols as tidyselect, but now we flip, and `groupers` is a vector of tidyselect and bare names, while `aggCols` is a character.
+
+::: {#tidyselect style="border: 2px solid gray; color: gray"}
+Note that `multi_aggregate` takes advantage of this tidyselect ability under the hood to deal with the ever-lengthening column names (and sometimes expanding number of value columns if we have multiple aggregation functions at a step). This means, though, that we *cannot* use `tidyselect` to specify `aggCols` in `multi_aggregate`- it would collide with the internal `tidyselect`, and so we are limited to characters in that case.
+
+The other restriction in `multi_aggregate` is that it does not accept bare function names, as they get lost for the purposes of naming the history by the time they get used in the call stack.
+:::
+
+```{r}
+obj2poly2 <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = c(starts_with('sce'), env_obj),
+                             aggCols = "env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved",
+                             funlist = ArithmeticMean,
+                             keepAllPolys = TRUE)
+
+obj2poly2
+```
+
+We can see we get the same result as `obj2poly` with different ways of specifying `aggCols` and `groupers`.
+
+There are times when we might want to send a vector of names, but ignore those not in the data. Most likely would be something like a set of possible grouping variables but only using them if they exist, and ignoring if not. This is a bit sloppy, but is useful sometimes to send the same set of groupers to several datasets. It fails by default, but setting `failmissing = FALSE` allows it to pass. Here, the 'extra_grouper' column doesn't exist in the data and so is ignored.
+
+```{r}
+#| message: false
+
+obj2polyF <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = c('scenario', 'env_obj', 'extra_grouper'),
+                             aggCols = ends_with('ewr_achieved'),
+                             funlist = ArithmeticMean,
+                             keepAllPolys = TRUE,
+                             failmissing = FALSE)
+obj2polyF
+```
+
+### Functions
+
+We can pass single bare aggregation function names, characters, or named lists defining functions with arguments. Above, we have been specifying the function to apply as just a single bare function name. Now, we explore some other possibilities and capabilities of the aggregator.
+
+Most simply, we can pass character names of functions instead of bare
+
+```{r}
+#| message: false
+
+doublesimplechar <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = c('scenario', 'env_obj'),
+                             aggCols = 'ewr_achieved',
+                             funlist = 'ArithmeticMean',
+                             keepAllPolys = TRUE,
+                             failmissing = FALSE)
+doublesimplechar
+```
+
+If we want to do two different aggregations on the same data, we can pass a vector of names.
+
+```{r}
+#| message: false
+simplefuns <- c('ArithmeticMean', 'GeometricMean')
+
+doublesimplec <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = c('scenario', 'env_obj'),
+                             aggCols = 'ewr_achieved',
+                             funlist = simplefuns,
+                             keepAllPolys = TRUE,
+                             failmissing = FALSE)
+doublesimplec
+```
+
+*Note*- if passing multiple functions, it does not work to pass bare names. It just gets too complex to handle, and the bare names is really just a convenience shorthand.
+
+#### Arguments to aggregation functions
+
+There are three primary ways to specify function arguments- using `…`, writing a wrapper function with the arguments specified (e.g. see `ArithmeticMean`, which is just `mean(x, na.rm = TRUE)` ), or using anonymous functions with `~` syntax in a named list. The simplest version is to use `…`, but this really only works in simple cases, like passing `na.rm = TRUE`. It *does* work for multiple functions, but starts getting convoluted and unclear if they don't share arguments or there are many arguments.
+
+```{r}
+#| message: false
+singlearg <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = 'scenario',
+                             aggCols = 'ewr_achieved',
+                 funlist = c(mean, sd),
+                 na.rm = TRUE,
+                 keepAllPolys = TRUE,
+                 failmissing = FALSE)
+singlearg
+```
+
+We can also pass arguments by sending a list of functions with their arguments. This is far more flexible than the `…` approach, as we can send any arguments to any functions this way. For clarity, we demonstrate it here for the same situation- passing the `na.rm` argument to `mean` and `sd`. This also lets us control the function names, because the list-names do not need to match the function names. The list-names are what get used in history-tracking (see the column names).
+
+```{r}
+#| message: false
+simplelamfuns <- list(meanna = ~mean(., na.rm = TRUE), 
+                     sdna = ~sd(., na.rm = TRUE))
+
+doublelam <- spatial_aggregate(dat = simpleThemeAgg, 
+                             to_geo = sdl_units,
+                             groupers = c('scenario', 'env_obj'),
+                             aggCols = 'ewr_achieved',
+                             funlist = simplelamfuns,
+                             keepAllPolys = TRUE,
+                             failmissing = FALSE)
+doublelam
+```
+
+*Note*: if using anonymous functions in a list this way, they need to use `rlang` `~` syntax, not base `\(x)` or `function(x){}`. That's on the to-do list, but it's not much of a constraint, and anything complex can be written as a standard function and called that way.
+
+It's fairly common that we'll have vector arguments, especially for the spatial aggregations. One primary example is weightings. The most flexible approach requires these vectors to be attached to the data before it enters the function (vs. creating them automatically in-function; though that is possible it gets fragile to handle arbitrary names and maintain the correct groupings). So, here we assume that the vectors will be columns in the dataset, and demonstrate with weighted means on dummy weights.
+
+```{r}
+#| message: false
+veclamfuns <- list(meanna = ~mean(., na.rm = TRUE), 
+                     sdna = ~sd(., na.rm = TRUE),
+                     wmna = ~weighted.mean(., wt, na.rm = TRUE))
+
+# Not really meaningful, but weight by the number of gauges.
+wtgauge <- simpleThemeAgg %>% 
+  dplyr::group_by(scenario, gauge) %>% 
+  dplyr::mutate(wt = dplyr::n()) %>% 
+  dplyr::ungroup()
+
+triplevec <- spatial_aggregate(dat = wtgauge, 
+                             to_geo = sdl_units,
+                             groupers = c('scenario', 'env_obj'),
+                             aggCols = 'ewr_achieved',
+                             funlist = veclamfuns,
+                             keepAllPolys = TRUE,
+                             failmissing = FALSE)
+
+triplevec
+```
+
+If we want to have custom functions with vector data arguments, we still need to use the tilde notation to point to those arguments. Making a dummy function that just adds two to the weighted mean, the `wt` argument doesn't get seen if we just say `funlist = wt2`. Instead, we need to use a list.
+
+```{r}
+#| message: false
+wt2 <- function(x, wt) {
+  2+weighted.mean(x, w = wt, na.rm = TRUE)
+}
+
+wt2list <- list(wt2 = ~wt2(., wt))
+
+
+vecnamedfun <- spatial_aggregate(dat = wtgauge, 
+                             to_geo = sdl_units,
+                             groupers = c('scenario', 'env_obj'),
+                             aggCols = 'ewr_achieved',
+                             funlist = wt2list,
+                             keepAllPolys = TRUE,
+                             failmissing = FALSE)
+
+vecnamedfun
+```
+
+#### **The 'area' exception**
+
+The only exception to attaching vector arguments are situations where the needed vector arguments depend on both sets of from and to data/polygons, and so can't be pre-attached. The main way this comes up is with area-weighting, so `spatial_joiner` calculates areas so there is always an `area` column available for weighting.
+
+In summary, we can pass single functions and their arguments in ellipses, complex lists of multiple functions using tilde-style anonymous functions, which can have vector arguments (as long as the vector is attached to the data), and lists of multiple function names. Note, however, that while we can use bare names in `spatial_aggregate` and `theme_aggregate`, we can't use bare function names in `multi_aggregate` because they get lost for the namehistory creation. The only thing we *can't* do currently is pass unattached vector args. I have to do such convoluted things for that to work with *one* function, and it's so easy to just bind them on, I think that's a tradeoff worth making. We can reassess if this becomes an issue later.

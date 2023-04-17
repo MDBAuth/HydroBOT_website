@@ -131,4 +131,3 @@ str(ewr_out$all)
 # Next steps
 
 This now has the EWR outputs saved into `project_dir/module_output/EWR` and available for further processing with the aggregator.
-

@@ -1,6 +1,7 @@
 ---
 title: "Spatial aggregation"
 author: "Galen Holt"
+cache: false
 format:
   html:
     df-print: paged
@@ -8,6 +9,7 @@ editor: visual
 ---
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 library(dplyr)
 library(ggplot2)
@@ -22,7 +24,7 @@ There is a standalone spatial aggregator `spatial_aggregate`, which I demonstrat
 
 We often will want to only perform a single spatial aggregation (e.g. from gauges to sdl units), but there are instances where that isn't true- perhaps we want to aggregate from sdl units to states or the basin. Thus, I demonstrate multi-step spatial aggregation, including the situation where aggregation units (polygons) are not nested, as would be the case for sdl units and states, for example. Even if some of the steps in this demonstration aren't particularly interesting now, they allow us to develop the general process that can accept any set of polygons we want to aggregate into from any other spatial data.
 
-This document delves fairly in-depth into *capabilities*, including things like argument types and how they relate to other functions and permit certain tricks. Not all of these will be used or needed to understand by most users- typically there will be a set of aggregation steps fed to `multi_aggregate` and that will be that. This sort of simpler setup is shown in the [combined aggregation notebook](theme_space_agg.qmd) and the [full-toolkit runs](full_toolkit/full_toolkit_overview.qmd). But it is helpful to document them for when they are needed.
+This document delves fairly in-depth into *capabilities*, including things like argument types and how they relate to other functions and permit certain tricks. Not all of these will be used or needed to understand by most users- typically there will be a set of aggregation steps fed to `multi_aggregate` and that will be that. This sort of simpler setup is shown in the [combined aggregation notebook](theme_space_agg.qmd) and the [full-toolkit runs](full_toolkit/full_toolkit_overview.qmd). But it is helpful to document them for when they are needed. See the [syntax notebook](aggregation_syntax.qmd) for a detailed look at argument construction for various purposes. Here, we use that syntax to demonstrate how the spatial aggregation works and the different ways it can be done.
 
 ## Inputs
 
@@ -92,7 +94,7 @@ We'll now use that input data to demonstrate how to do the spatial aggregation, 
 
 ## Single aggregation
 
-We might just want to aggregate spatially once. We can do this simply by passing the input data (anything spatial, in this case `simpleThemeAgg`), a set of polygons, and providing a length-one `funlist`.
+We might just want to aggregate spatially once. We can do this simply by passing the input data (anything spatial, in this case `simpleThemeAgg`), a set of polygons, and providing a length-one `funlist`. In this simple case, we just use a bare function name, here the custom `ArithmeticMean` which is just a simple wrapper of `mean` with `na.rm = TRUE`. Any function can be passed this way, custom or in-built, provided it has a single argument. More complex situations are given below.
 
 Note that the `aggCols` argument is `ends_with(original_name)` to reference the *original* name of the column of values- it may have a [long name tracking its aggregation history](aggregation_overview.qmd), so we give it the tidyselect `ends_with` to find the column. More generally, both `aggCols` and `groupers` can take any tidyselect syntax or bare names or characters.
 
@@ -132,7 +134,8 @@ obj2poly %>%
   filter(grepl('^EF', env_obj)) %>% 
 ggplot(aes(fill = ewr_achieved)) +
   geom_sf() + 
-  facet_grid(scenario~env_obj)
+  facet_grid(scenario~env_obj) + 
+  theme(legend.position = 'bottom')
 ```
 
 Moving forward, we'll use the built-in plotting functions to keep consistent with the rest of the project.
@@ -154,223 +157,79 @@ plot_outcomes(y_col = 'ewr_achieved',
                           facet_col = 'env_obj',
                           facet_row = 'scenario',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
-                          underlay_list = list(underlay = basin, 
-                                               underlay_pal = 'azure'))
+                          sceneorder = c('down4', 'base', 'up4'))
 ```
-
-### Argument options and syntax
-
-Both `aggCols` and `groupers` can be character vectors, bare data-variable names, or we might want to use `tidyselect` syntax. For example, maybe we want to use `ends_with('ewr_achieved')` as above to grab pre-aggregated columns with long name histories, as in `simpleThemeAgg` . This is handled under the hood by `selectcreator` and careful parsing in the function stack. Above, we had groupers as a character vector and aggCols as tidyselect, but now we flip, and `groupers` is a vector of tidyselect and bare names, while `aggCols` is a character.
-
-::: {#tidyselect style="border: 2px solid gray; color: gray"}
-Note that `multi_aggregate` takes advantage of this tidyselect ability under the hood to deal with the ever-lengthening column names (and sometimes expanding number of value columns if we have multiple aggregation functions at a step).
-
-Also, if we were doing all the aggregation in one go using `multi_aggregate`, we could avoid the super long names by just using `namehistory = FALSE`. We'll get to that in the [combined aggregation](theme_space.qmd).
-:::
-
-```{r}
-obj2poly2 <- spatial_aggregate(dat = simpleThemeAgg, 
-                             to_geo = sdl_units,
-                             groupers = c(starts_with('sce'), env_obj),
-                             aggCols = "env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved",
-                             funlist = ArithmeticMean,
-                             keepAllPolys = TRUE)
-
-obj2poly2
-```
-
-We can see we get the same result as `obj2poly` with different ways of specifying `aggCols` and `groupers`.
-
-There are times when we might want to send a vector of names, but ignore those not in the data. Most likely would be something like a set of possible grouping variables but only using them if they exist, and ignoring if not. This is a bit sloppy, but is useful sometimes to send the same set of groupers to several datasets. It fails by default, but setting `failmissing = FALSE` allows it to pass. Here, the 'extra_grouper' column doesn't exist in the data and so is ignored.
-
-```{r}
-#| message: false
-
-obj2polyF <- spatial_aggregate(dat = simpleThemeAgg, 
-                             to_geo = sdl_units,
-                             groupers = c('scenario', 'env_obj', 'extra_grouper'),
-                             aggCols = ends_with('ewr_achieved'),
-                             funlist = ArithmeticMean,
-                             keepAllPolys = TRUE,
-                             failmissing = FALSE)
-obj2polyF
-```
-
-**STOPPED HERE 14/4/2023**
-
-### Functions
-
-We can pass single bare aggregatoin function names, or characters. If we want to do two different aggregations on the same data, we can pass a vector.
-
-```{r}
-#| message: false
-simplefuns <- list('ArithmeticMean', 'GeometricMean')
-
-doublesimple <- spatial_aggregate(dat = sumdat, 
-                             to_geo = rps,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funlist = simplefuns,
-                             keepAllPolys = TRUE,
-                             failmissing = FALSE)
-```
-
-Using the `~` syntax of functions in a named list, we can pass arguments to the functions.
-
-```{r}
-#| message: false
-simplelamfuns <- list(mean = ~mean(., na.rm = TRUE), 
-                     sd = ~sd(., na.rm = TRUE))
-
-doublelam <- spatial_aggregate(dat = sumdat, 
-                             to_geo = rps,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funlist = simplelamfuns,
-                             keepAllPolys = TRUE,
-                             failmissing = FALSE)
-```
-
-It's fairly common that we'll have vector arguments for the spatial aggregations, for example weightings. I have fairly complex code elsewhere (and previously here) to pass in vectors separate from the data and/or create them internally. There is *much* more flexibility in how we specify functions though if we just insist they are attached to the data before it enters the function. Here, demonstrate with weighted means on dummy weights.
-
-```{r}
-#| message: false
-veclamfuns <- list(mean = ~mean(., na.rm = TRUE), 
-                     sd = ~sd(., na.rm = TRUE),
-                     wm = ~weighted.mean(., wt, na.rm = TRUE))
-
-# Not really meaningful, but weight by the number of gauges.
-wtgauge <- sumdat %>% 
-  dplyr::group_by(scenario, gauge) %>% 
-  dplyr::mutate(wt = dplyr::n()) %>% 
-  dplyr::ungroup()
-
-triplevec <- spatial_aggregate(dat = wtgauge, 
-                             to_geo = rps,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funlist = veclamfuns,
-                             keepAllPolys = TRUE,
-                             failmissing = FALSE)
-```
-
-Finally, if there is a single function, we can pass just one funlist and its arg, e.g. mean, na.rm = TRUE.
-
-```{r}
-#| message: false
-singlearg <- spatial_aggregate(dat = wtgauge, 
-                             to_geo = rps,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                 funlist = mean,
-                 na.rm = TRUE,
-                 keepAllPolys = TRUE,
-                 failmissing = FALSE)
-```
-
-In summary, we can pass single functions and their args in ellipses, complex lists of multiple functions using tilde, which can have vector args (as long as the vector is attached to the data), and lists of multiple function names. The only thing I *can't* do is pass unattached vector args. I have to do such convoluted things for that to work with *one* function, and it's so easy to just bind them on, I think that's a tradeoff I'm willing to make. I guess we can reassess if this becomes an issue later.
-
-The only exceptions to this are situations where the needed vector arguments have to depend on both sets of from and to data/polygons, and so can't be pre-attached. The main way this comes up is with area-weighting, so `spatial_joiner` calculates areas so there is always an `area` column available for weighting. If additional internal calculations are needed we'll have to make some larger changes.
 
 ## Multiple spatial levels
 
-We've been operating on resource areas, now also use ltim valleys `ltv`. These are not nested (and not even necessarily smaller). As such, it makes a good test case that catches issues with the intersection of polygons that might not happen with a simpler set of polygons. Here, colored lines are catchments `ltv`, and fill colors are resource areas `rps`.zs
+There are a number of polygon layers we might want to aggregated into in addition to SDL units, e.g. resource plan areas, hydrological catchments, or the whole basin. We can aggregate directly into them just as we have here for SDL units. However, we might also want to have several levels of spatial aggregation, which may be nested or nearly so, e.g. from SDL units to the basin, or may be nonnested, e.g. from SDL units to catchments. Typically, this would happen with intervening theme aggregations, as in the [interleaved example](theme_space_agg.qmd). The aggregation process for multiple spatial levels is similar whether or not the smaller levels nest into the larger, but more care should be taken (and more explanation is needed) in the nonnested case.
+
+Note that there is an exception to the 'vector arguments must be attached to the data' [rule](aggregation_syntax.qmd), in that an `area` column is always created, making it available for things like area-weighted means.
+
+Aggregating from SDL units to cewo valleys requires addressing issues of overlaps among the various polygons. As such, it makes a good test case that catches issues with the intersection of polygons that might not happen with a simpler set of polygons @fig-cewo-sdl .
 
 ```{r}
-ggplot() +
-  geom_sf(data = ltv, aes(color = ValleyName), fill = 'white') +
-  geom_sf(data = rps, aes(fill = SWWRPANAME), color = NA, alpha = 0.5) + 
+#| label: fig-cewo-sdl
+#| fig-cap: CEWO valleys (coloured lines) and SDL units (coloured fills) alone (a & b) and overlain (c), showing these are not nested, but instead are intersecting polygons.
+overlay_cewo_sdl <- ggplot() +
+  geom_sf(data = sdl_units, aes(fill = SWSDLName), color = NA, alpha = 0.5) +
+  geom_sf(data = cewo_valleys, aes(color = ValleyName), fill = NA) +
   theme(legend.position = 'none')
-```
 
-That's surprisingly hard to read, let's just plot them next to each other
-
-```{r}
 valleys <- ggplot() +
-  geom_sf(data = ltv, aes(color = ValleyName), fill = 'white') + 
+  geom_sf(data = cewo_valleys, aes(color = ValleyName), fill = 'white') + 
   theme(legend.position = 'none')
 
-resources <- ggplot() +
-  geom_sf(data = rps, aes(fill = SWWRPANAME), alpha = 0.5) + 
+sdls <- ggplot() +
+  geom_sf(data = sdl_units, aes(fill = SWSDLName), alpha = 0.5) + 
   theme(legend.position = 'none')
 
-valleys + resources
+valleys + sdls + overlay_cewo_sdl
 ```
 
-To aggregate from one into the other, we need to split them up and aggregate in a way that respects area or borders. In other words, if we have a polygon that lays across two of the next level up, we want to only include the bits that overlap into that next level up, and so we need `st_intersection`, which actually splits the polygons to make a new set of nonoverlapping polygons. Then we can use these pieces to aggregate into the higher-level. We still need to be careful- things like means should be area-weighted, and things like sums, minima, and maxima should be thought about carefully- area weighting can work, but needs to be done right, and so there may be custom functions involved.
+To aggregate from one set of polygons into the other, we need to split them up and aggregate in a way that respects area and borders. In other words, if we have a polygon that lays across two of the next level up, we want to only include the bits that overlap into that next level up. Under the hood, we use `sf::st_intersection`, which splits the polygons to make a new set of nonoverlapping polygons. Then we can use these pieces to aggregate into the higher level. This aggregation should carefully consider area- things like means should be area-weighted, and things like sums, minima, and maxima should be thought about carefully- if the lower 'from' data are already sums, for example, an area weighting might make sense to get a proportion of the sum, but this is highly dependent on the particular sequence of aggregation. For other functions like minima and maxima, area-weighting may or may not be appropriate, and so careful attention should be paid to constructing the aggregation sequence and custom functions may be involved.
 
-The intersection of `rps` and `ltv` puts all the `rps` into valleys, and chopped them up as necessary.
+The intersection of `sdl_units` and `cewo_valleys` chops up `sdl_units` so there are unique polygons for each sdl unit - valley combination.
 
 ```{r}
 #| warning: false
 #| message: false
-joinpolys <- st_intersection(rps, ltv)
+joinpolys <- st_intersection(sdl_units, cewo_valleys)
 joinpolys
 ```
 
-To better see the many-to-many chopping we get with this particular pair of intersecting shapefiles, we can isolate a resource area (Northern Victoria) and see that it contains bits of 8 catchments. Likewise, the Loddon catchment contains bits of two resource areas.
+To better see the many-to-many chopping we get with this particular pair of intersecting shapefiles, we can isolate an SDL unit (Victorian Murray) and see that it contains bits of 8 catchments. Likewise, the Loddon catchment contains bits of 4 SDL units @fig-sdl-valley-intersect .
 
 ```{r}
+#| label: fig-sdl-valley-intersect
+#| fig-cap: SDL units intersected with CEWO valleys and split to allow aggregation
 nvorig <- ggplot() +
-  geom_sf(data = dplyr::filter(rps, SWWRPANAME == "Northern Victoria"))
+  geom_sf(data = dplyr::filter(sdl_units, SWSDLName == "Victorian Murray"))
 
 nvpostjoin <- ggplot() +
   geom_sf(data = dplyr::filter(joinpolys, 
-                        SWWRPANAME == "Northern Victoria"), 
+                        SWSDLName == "Victorian Murray"), 
           aes(fill = ValleyName))
 
 avorig <- ggplot() +
-  geom_sf(data = dplyr::filter(ltv, ValleyName == 'Loddon'))
+  geom_sf(data = dplyr::filter(cewo_valleys, ValleyName == 'Loddon'))
 
 avpostjoin <- ggplot() +
   geom_sf(data = dplyr::filter(joinpolys, 
                         ValleyName == 'Loddon'), 
-          aes(fill = SWWRPANAME))
+          aes(fill = SWSDLName))
 
 (nvorig + nvpostjoin)/(avorig + avpostjoin)
 ```
 
-### Aggregation into each poly set
-
-Before we aggregate sequentially, let's aggregate into the other poly sets separately (catchment and basin).
-
-```{r}
-obj2ltv <- spatial_aggregate(dat = sumdat, 
-                             to_geo = ltv,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funlist = ArithmeticMean,
-                             keepAllPolys = TRUE)
-
-ggplot(obj2ltv, aes(fill = spatial_ArithmeticMean_ewr_achieved)) +
-  geom_sf() + 
-  facet_grid(scenario~.)
-```
-
-```{r}
-obj2basin <- spatial_aggregate(dat = sumdat, 
-                             to_geo = basin,
-                             groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
-                             funlist = ArithmeticMean,
-                             keepAllPolys = TRUE)
-
-ggplot(obj2basin, aes(fill = spatial_ArithmeticMean_ewr_achieved)) +
-  geom_sf() + 
-  facet_grid(scenario~.)
-```
-
-## Test poly to poly
-
-We can again do a one-off aggregation from a polygon to another polygon using `spatial_aggregate`. We have a bunch of aggregations into `rps` , use `obj2poly` as a demo.
+As a simple example, we could again do a one-off aggregation from a polygon to another polygon using `spatial_aggregate`. Here, we could use the `obj2poly` aggregation into SDL units created above as the starting point.
 
 ```{r}
 #| warning: false
 #| message: false
 simplepolypoly <- spatial_aggregate(dat = obj2poly, 
-                 to_geo = ltv,
-                 groupers = 'scenario',
+                 to_geo = cewo_valleys,
+                 groupers = c('scenario', 'env_obj'),
                  aggCols = 'ewr_achieved',
                  funlist = mean,
                  na.rm = TRUE,
@@ -379,14 +238,16 @@ simplepolypoly <- spatial_aggregate(dat = obj2poly,
 simplepolypoly
 ```
 
+As with all sequential aggregations, this approach works but can be very ad-hoc and easy to forget theme-axis grouping. Instead, just like with [interleaved theme and space](theme_space_agg.qmd), we can pass a list giving the aggregation sequence to `multi_aggregate`.
+
 ## Passing a list
 
-We can use `multi_aggregate` to aggregate through a list of polygon sets. I had a specialised function for just space, but have deprecated it in favour of `multi_aggregate`, since that allows interleaving with theme. For now, though, we're just demonstrating space.
+We can use `multi_aggregate` to aggregate through a list of polygon sets, here sdl units to cewo valleys to the basin.
 
 First, set up a list of the spatial aggregation steps, defined by the polygon sets and aggregation functions. As usual, multiple aggregation functions can happen at each stage, and they can be characters or named lists with arguments (the weighted mean needs to be a default). Now, we're taking advantage of the auto-calculated area of each polygon chunk for the weighted mean.
 
 ```{r}
-glist <- list(rps = rps, catchment = ltv, mdb = basin)
+glist <- list(sdl_units = sdl_units, catchment = cewo_valleys, mdb = basin)
 
 funlist <- list(c('ArithmeticMean', 'LimitingFactor'),
                 list(wm = ~weighted.mean(., area, na.rm = TRUE)),
@@ -396,114 +257,212 @@ funlist <- list(c('ArithmeticMean', 'LimitingFactor'),
 ```{r}
 #| warning: false
 #| message: false
-multispat <- multi_aggregate(dat = sumdat,
+multispat <- multi_aggregate(dat = simpleThemeAgg,
                          causal_edges = themeedges,
-                         groupers = 'scenario',
+                         groupers = c('scenario', 'env_obj'),
                          aggCols = 'ewr_achieved',
                          aggsequence = glist,
                          funsequence = funlist)
 ```
 
-That works, but it'll be easier to see with other options, and we want to demo some of those options.
+By default, that returns only the final outcome, here the basin scale and with the aggregation history in column names so we are sure of what the values represent @fig-final-stepwise-agg . That does not make a very readable legend, but we can rename it manually and tracking the meaning is very important.
 
 ```{r}
-ggplot(multispat) +
-  geom_sf(aes(fill = mdb_wm_catchment_wm_rps_ArithmeticMean_ewr_achieved)) +
-  facet_grid('scenario')
+#| label: fig-final-stepwise-agg
+#| fig-cap: Final basin-scale results of aggregating EWR achieved with arithmetic mean to sdl units, then weighted-mean aggregation of SDL units into CEWO valleys and weighted means of CEWO valleys to the Basin.
+multispat %>% 
+  filter(grepl('^NF[1-3]', env_obj)) %>% 
+ggplot() +
+  geom_sf(aes(fill = mdb_wm_catchment_wm_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved)) +
+  facet_grid(env_obj~scenario) + theme(legend.position = 'bottom')
 ```
 
 ### Saveintermediate and namehistory
 
-We might only want the final outcome as above, but we also might want all the steps (just as we did for the theme). And making the history in columns keeps the names easier to use, even if it eats more memory.
+We might only want the final outcome as above, but we also might want all the steps (just as we did for the [theme](theme_agg.qmd). Making the history in columns keeps the names easier to use, though it uses more memory. I am going to do something I shouldn't here, and change the column 'env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved' to 'ewr_achieved'. That's for readability and because here we're using `namehistory = FALSE` to track the history in columns. If we were truly doing this analysis, the theme-axis aggregations in simpleThemeAgg would be included in the aggsequence, and so those steps would also be handled with aggsequence columns.
 
 ```{r}
 #| message: false
 #| warning: false
-multispatb <- multi_aggregate(dat = sumdat,
-                         causal_edges = themeedges,
-                         groupers = 'scenario',
-                         aggCols = 'ewr_achieved',
-                         aggsequence = glist,
-                         funsequence = funlist,
-                               saveintermediate = TRUE,
-                               namehistory = FALSE)
+simpleclean <- simpleThemeAgg %>% 
+  rename(ewr_achieved = env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved)
+
+multispatb <- multi_aggregate(dat = simpleclean,
+                              causal_edges = themeedges,
+                              groupers = c('scenario', 'env_obj'),
+                              aggCols = 'ewr_achieved',
+                              aggsequence = glist,
+                              funsequence = funlist,
+                              saveintermediate = TRUE,
+                              namehistory = FALSE)
 ```
 
-Quick check- is that final list item scenario \* aggfun1\*aggfun2\*aggfun3 long?
+That final list item is scenario \* aggfun1\*aggfun2\*aggfun3\*env_obj long, e.g. it has a row for each scenario and env_obj by aggregation function, and the aggregation functions are factorial- both the aggregations at step 1 are subsequently aggregated at each of the following steps.
 
 ```{r}
 length(unique(multispatb$mdb$scenario)) * 
 length(unique(multispatb$mdb$aggfun_1)) * 
 length(unique(multispatb$mdb$aggfun_2)) * 
-length(unique(multispatb$mdb$aggfun_3))
+length(unique(multispatb$mdb$aggfun_3)) *
+  length(unique(multispatb$mdb$env_obj))
 
 nrow(multispatb$mdb)
 ```
 
-Now we can more easily analyse the output, but it's bigger. The three spatial levels plus the input can be mapped. This is crude- better maps in dev for comparer.
+Now we can more easily analyse the output, but it's bigger. The three spatial levels plus the input can all be mapped. We'll cut it down to a single env_obj for clarity and use the comparer standard plots, with a common set of limits. We have to choose one of the aggfun_1 values.
 
 ```{r}
-l1 <- ggplot(multispatb$sumdat) + 
-  geom_sf(data = basin) +
-  geom_sf(aes(color =  ewr_achieved))
+l1 <- multispatb$simpleclean %>% 
+  filter(grepl('^NF1', env_obj)) %>% 
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                underlay_list = 'basin',
+                setLimits = c(0,1))
 
-l2 <- ggplot(multispatb$rps) + 
-  geom_sf(data = basin) +
-  geom_sf(aes(fill =  ewr_achieved))
+l2 <- multispatb$sdl_units %>% 
+  filter(grepl('^NF1', env_obj) &
+           aggfun_1 == 'ArithmeticMean') %>% 
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                underlay_list = 'basin',
+                setLimits = c(0,1))
 
-l3 <- ggplot(multispatb$catchment) + 
-  geom_sf(data = basin) +
-  geom_sf(aes(fill = ewr_achieved))
+l3 <- multispatb$catchment %>% 
+  filter(grepl('^NF1', env_obj) &
+           aggfun_1 == 'ArithmeticMean') %>% 
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                underlay_list = 'basin',
+                setLimits = c(0,1))
 
-l4 <- ggplot(multispatb$mdb) + 
-  geom_sf(data = basin) +
-  geom_sf(aes(fill =  ewr_achieved))
+l4 <- multispatb$mdb %>% 
+  filter(grepl('^NF1', env_obj) &
+           aggfun_1 == 'ArithmeticMean') %>% 
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                underlay_list = 'basin',
+                setLimits = c(0,1))
 
-l1 + l2 + l3 + l4 + plot_layout(ncol = 2)
 ```
 
-Clearly need to make guides consistent, but that's later in plot development.
+```{r}
+#| label: fig-allsteps
+#| fig-cap: Each step in spatial aggregation from gauge to SDL unit to catchment to basin, using arithmetic means of EWR achieved
+l1 / l2 / l3 / l4 + plot_layout(guides = 'collect')
+```
 
 ### failmissing and keepallpolys
 
-As above, we might want to ignore some groupers or aggregation columns, and we might want to keep polygons that don't have data so the maps loop better.
+As above, we might want to ignore some groupers or aggregation columns, and we might want to keep polygons that don't have data so the maps look better.
 
 ```{r}
 #| message: false
 #| warning: false
-multispatextra <- multi_aggregate(sumdat, 
-                                    causal_edges = themeedges,
-                               groupers = c('scenario', 'doesnotexist'), 
-                               aggCols = c('ewr_achieved', 'notindata'),
-                               aggsequence = glist,
-                         funsequence = funlist,
-                               saveintermediate = TRUE,
-                               namehistory = FALSE,
-                               failmissing = FALSE,
-                               keepAllPolys = TRUE)
+multispatextra <- multi_aggregate(dat = simpleclean,
+                                  causal_edges = themeedges,
+                                  groupers = c('scenario', 'env_obj',
+                                               'doesnotexist'),
+                                  aggCols = c('ewr_achieved', 'notindata'),
+                                  aggsequence = glist,
+                                  funsequence = funlist,
+                                  saveintermediate = TRUE,
+                                  namehistory = FALSE,
+                                  failmissing = FALSE,
+                                  keepAllPolys = TRUE)
 ```
 
-And if we plot the version from above and this one, they should have different polys. Let's go with the ltv?
-
-The default is `keepAllPolys = FALSE`, so the original only has relevant catchments.
+We can see that the missing groupers and aggcols get ignored, while we have retained polygons without data. The default is `keepAllPolys = FALSE`, so the original `multispatb` only has relevant catchments while `multispatextra` has all of them. I've taken off the basin underlay from the plots above to make this clearer.
 
 ```{r}
 keepfalse <- multispatb$catchment %>% 
-  dplyr::filter(aggfun_1 == 'ArithmeticMean' & aggfun_2 == 'wm') %>% 
-  ggplot() + geom_sf(aes(fill = ewr_achieved))
+  filter(grepl('^NF1', env_obj) &
+           aggfun_1 == 'ArithmeticMean') %>% 
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                setLimits = c(0,1))
 
 keeptrue <- multispatextra$catchment %>% 
-  dplyr::filter(aggfun_1 == 'ArithmeticMean' & aggfun_2 == 'wm') %>% 
-  ggplot() + geom_sf(aes(fill = ewr_achieved))
-
-keepfalse + keeptrue
+  filter(grepl('^NF1', env_obj) &
+           aggfun_1 == 'ArithmeticMean') %>% 
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                setLimits = c(0,1))
 ```
 
-## Using multi for one
+```{r}
+keepfalse / keeptrue + plot_layout(guides = 'collect')
+```
 
-If we're only using one level of spatial aggregation, there's typically no need for the `multi_aggregate` wrapper. But if there is, we can use it. Replicating some of the earliest aggregations works. We do have a bit less flexibility with how we specify arguments- `aggsequence` and `funsequence` need to be lists or characters (`funsequence` cannot be bare function names). And `tidyselect` in aggCols runs into issues because it gets used again inside `multi_aggregate`, and so `tidyselect` here collides with that. That could all be sorted out, but seems low priority- easier to just enforce characters for `aggCols` and lists or characters for the sequences.
+It would be possible to make the same plot by using the catchment polys themselves as underlay, and while the default (`underlay_list = 'cewo_valleys'` ) would yield white, we also have more control over colour too (not limited to the NA grey).
 
-Typically we could use `namehistory = FALSE` to avoid the horrible long name with all the transforms in it, but there's no way for it to know the previous aggregation history when it's been done in pieces. Again, fixable, but low priority. Just do it all on one go, usually. If not, change the `labs` and call it good.
+```{r}
+keepfalse_underlay <- multispatb$catchment %>% 
+  filter(grepl('^NF1', env_obj) &
+           aggfun_1 == 'ArithmeticMean') %>% 
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                underlay_list = list(underlay = 'cewo_valleys', 
+                                     underlay_pal = 'cornsilk'),
+                setLimits = c(0,1))
+keepfalse_underlay
+```
+
+## Using `multi_aggregate` for one aggregation
+
+If we're only using one level of spatial aggregation and nothing else, there's typically no need for the `multi_aggregate` wrapper. That wrapper does work even for single steps though, and becomes almost essential for multi-step. We do have a bit less flexibility with how we specify arguments- `aggsequence` and `funsequence` need to be lists or characters (`funsequence` cannot be bare function names). Perhaps the biggest issue is that `tidyselect` in aggCols runs into issues because it gets used again inside `multi_aggregate`, and so `tidyselect` in the outer call collides with that. That could all be sorted out, but seems low priority- easier to just enforce characters for `aggCols` and lists or characters for the sequences.
+
+Typically we could use `namehistory = FALSE` to avoid the horrible long name with all the transforms in it, but there's no way for it to know the previous aggregation history when it's been done in pieces (as we say in the example above where I dangerously adjusted the name of `simpleThemeAgg` to make `multispatb`. A parsing function could handle this, but it's better to just do it all on one go anyway so this is low priority.
+
+As a quick example, here is a single-step spatial aggregation using `multi_aggregate`, not that we have slightly more restrictive specifications for `groupers`, `aggCols`, `aggsequence` and `funsequence`.
 
 ```{r}
 #| message: false
@@ -512,25 +471,14 @@ obj2polyM1 <- multi_aggregate(simpleThemeAgg,
                             causal_edges = themeedges,
                             groupers = c('scenario', 'env_obj'), 
                          aggCols = 'ewr_achieved',
-                         aggsequence = list(rps = rps),
+                         aggsequence = list(sdl_units = sdl_units),
                          funsequence = list(list(am = ~ArithmeticMean(.))),
                          keepAllPolys = TRUE)
 
-# namehistory = FALSE doesn't have a way of knowing about previous aggregation, so not much point in using it.
-ggplot(obj2polyM1, aes(fill = rps_am_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved)) +
-  geom_sf() + 
-  facet_grid(scenario~.) +
-  labs(fill = 'ewr_achieved')
+obj2polyM1
+
 ```
 
-# TODO
+## Next steps
 
--   testing
-
--   more flexible tidyselect and function arguments
-
--   default area-weighted functions
-
--   Develop plots in comparer
-
--   main aggregator todo in theme_space_agg.qmd
+The examples here are designed to dig into capability of the spatial aggregator in fairly high detail. In typical use, we'd follow something more like the [interleaved notebook](theme_space_agg.qmd), but this document hopefully provides valuable demonstrations of capability and potential for how each spatial step in that sequence might work and could be set up.
