@@ -16,6 +16,7 @@ library(readr)
 library(tidyr)
 library(lubridate)
 library(ggplot2)
+library(vicwater)
 ```
 
 Set up some directories. Once we move to MDBA, these will be easier to point at in a shared way.
@@ -441,7 +442,7 @@ Quite clearly not the same.
 
 ```{r}
 dups <- dups %>% 
-  select(site, value, time, site_short_name, variable, dupnum, qualit_codes, quality_codes_id)
+  select(site, value, time, site_short_name, variable, dupnum, quality_codes, quality_codes_id)
 dups
 ```
 

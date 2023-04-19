@@ -1,0 +1,10 @@
+---
+title: "Flow scaling full toolkit"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Goal
+
+This will be the notebook to run the full toolkit in one go with the flow scaling demonstration. We will likely want a notebook version and a parameterized yaml version (but not an in-memory).

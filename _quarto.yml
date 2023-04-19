@@ -1,7 +1,162 @@
 project:
   title: "WERP_toolkit_demo"
+  type: website
   output-dir: _output
   execute-dir: project
+  render:
+    - "*.qmd"
+    - "!TESTING_PACKAGE_INSTALL.qmd"
+    - "!controller/controller_ewr_testrun_py.qmd"
+    - "!scenario_creation/scenario_creation_demo_py.qmd"
+    - "!full_toolkit/WERP_toolkit_params.qmd"
+    - "!scenario_creation/scaling_scenarios.qmd"
+
+website:
+  title: "Using the WERP toolkit"
+  navbar:
+    backgroud: primary
+    search: true
+    left:
+      - href: WERP_toolkit_demo.qmd
+        text: Home
+      - href: scenario_creation/scenario_creation_overview.qmd
+        text: Scenario creation
+      - href: causal_networks/causal_overview.qmd
+        text: Causal networks
+      - href: controller/controller_overview.qmd
+        text: Controller
+      - href: aggregator/aggregation_overview.qmd
+        text: Aggregator
+      - href: comparer/comparer_overview.qmd
+        text: Comparer
+      - href: full_toolkit/full_toolkit_overview.qmd
+        text: Full toolkit
+
+  sidebar:
 
 
+    - title: "Home"
+      contents:
+        - WERP_toolkit_demo.qmd
+
+        - section: "Toolkit description"
+          contents:
+            - href: overview/spatial_data.qmd
+              text: "Spatial data with toolkit"
+
+
+    - title: "Scenario creation"
+      contents:
+        - scenario_creation/scenario_creation_overview.qmd
+
+        - section: "Simple"
+          contents:
+            - href: scenario_creation/scenario_creation_demo_R.qmd
+              text: "Simple scenarios for demonstration"
+            - href: scenario_creation/scenario_creation_demo_py.qmd
+              text: "Python version (old)"
+
+        - section: "Flow scaling and climate scenarios"
+          contents:
+            - href: scenario_creation/flow_scaling.qmd
+              text: "Pulling historical gauges"
+            - href: scenario_creation/scaling_scenarios.qmd
+              text: "Flow scaling to climate models"
+
+
+    - title: "Causal networks"
+      contents:
+        - causal_networks/causal_overview.qmd
+
+        - section: "Visualisation"
+          contents:
+            - href: causal_networks/causal_plots.qmd
+              text: "Plotting causal networks"
+
+
+    - title: "Controller"
+      contents:
+        - controller/controller_overview.qmd
+
+        - section: "Simple demonstration"
+          contents:
+            - href: controller/controller_ewr_wrapped_R.qmd
+              text: "Clean simple controller"
+            - href: controller/controller_ewr_stepthrough_R.qmd
+              text: "Detailed step through"
+            - href: controller/controller_ewr_testrun_py.qmd
+              text: "Python verion (old)"
+
+
+        - section: "Flow scaling and climate scenarios"
+          contents:
+            - href: controller/flow_scaling_control.qmd
+              text: "Controlling flow scaling demonstration"
+
+
+    - title: "Aggregation"
+      contents:
+        - aggregator/aggregation_overview.qmd
+        - aggregator/aggregation_syntax.qmd
+
+        - section: "Simple demonstration"
+          contents:
+            - href: aggregator/spatial_agg.qmd
+              text: "Spatial aggregation capability"
+            - href: aggregator/theme_agg.qmd
+              text: "Theme aggregation capability"
+            - href: aggregator/theme_space_agg.qmd
+              text: "Multi-axis interleaved aggregation"
+
+
+        - section: "Flow scaling and climate scenarios"
+          contents:
+            - href: aggregator/flow_scaling_aggregation.qmd
+              text: "Aggregating flow scaling demonstration"
+
+
+    - title: "Comparer"
+      contents:
+        - comparer/comparer_overview.qmd
+
+        - section: "Simple demonstration"
+          contents:
+            - href: comparer/plot_creation.qmd
+              text: "Comparer examples and capability"
+
+        - section: "Flow scaling and climate scenarios"
+          contents:
+            - href: comparer/flow_scaling_comparer.qmd
+              text: "Comparer examples for flow scaling demonstration"
+
+
+    - title: "Full toolkit"
+      contents:
+        - full_toolkit/full_toolkit_overview.qmd
+
+        - section: "Simple demonstration"
+          contents:
+            - href: full_toolkit/WERP_toolkit_save_steps.qmd
+              text: "Run toolkit, saving steps"
+            - href: full_toolkit/WERP_toolkit_in_memory.qmd
+              text: "Run toolkit wholly in-memory"
+            - href: full_toolkit/WERP_toolkit_params.qmd
+              text: "Run toolkit from params"
+
+
+        - section: "Flow scaling and climate scenarios"
+          contents:
+            - href: full_toolkit/flow_scaling_full.qmd
+              text: "Flow scaling demonstration"
+
+
+
+
+format:
+  html:
+    theme: cosmo
+    css: styles.css
+    toc: true
+
+editor: visual
 

@@ -1,0 +1,24 @@
+---
+title: "Causal networks"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Overview
+
+This needs to be fleshed out
+
+-   What are causal networks
+
+-   Where do we get them
+
+-   What are they for
+
+    -   Used in comms
+
+    -   un-black-boxing
+
+    -   They are the theme-scaling axis
+
+This links to the [causal notebook](causal_plots.qmd).

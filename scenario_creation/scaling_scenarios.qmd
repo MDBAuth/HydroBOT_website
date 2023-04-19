@@ -177,13 +177,15 @@ get_scalings <- function(unitdf) {
   # Quantile means
   q_s <- stackdf %>% 
   group_by(scenario, Month) %>%
-  reframe(qmean = get_qmean(runoff)) %>%
+    summarize(qmean = get_qmean(runoff)) %>%
+    # reframe is the new way, but needs dplyr 1.1 which breaks lots of the functions
+ # reframe(qmean = get_qmean(runoff)) %>%
   tidyr::unnest(cols = qmean)
   
   # Get the relative change
   q_s <- q_s %>% 
   group_by(scenario, Month) %>% 
-  baseline_compare(group_col = 'scenario', base_lev = 'SimR0', 
+  baseline_compare(compare_col = 'scenario', base_lev = 'SimR0', 
                    values_col = 'mean', 
                    comp_fun = `/`) %>% 
   ungroup() %>% 
@@ -425,7 +427,9 @@ scale_gauges <- function(gaugedata, gaugename, qc_limit = 150) {
 This both saves to disk and returns a list to memory. Takes about 5 minutes.
 
 ```{r}
-system.time(scaled_hydro <- purrr::map2(orig_hydro, names(orig_hydro), 
+#| cache: false
+system.time(scaled_hydro <- purrr::map2(orig_hydro, 
+                                        names(orig_hydro), 
                                         scale_gauges))
 ```
 

@@ -1,0 +1,22 @@
+---
+title: "Comparer overview"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Overview
+
+This document needs to describe what the comparer does
+
+-   Provide useful comparisons for different purposes
+
+    -   between scenarios
+
+    -   through time, space
+
+-   lots of options- uses will vary greatly
+
+The underlying comparison functions and algorithms
+
+Outputs- primarily [plots](plot_creation.qmd)

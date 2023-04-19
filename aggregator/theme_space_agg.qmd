@@ -52,7 +52,6 @@ library(ggplot2)
 ```{r}
 scenario_dir <- file.path('scenario_example')
 ewr_results <- file.path(scenario_dir, 'module_output', 'EWR')
-geo_data_dir <- system.file("extdata", package = 'werptoolkitr')
 ```
 
 ### Scenario information
@@ -100,10 +99,10 @@ This at least points to pre-prepared shapefiles that we can easily hit. Will nee
 # basin <- sf::read_sf(file.path(geo_data_dir, 
 #                            'basin.shp'))
 # 
-# rps <- sf::read_sf(file.path(geo_data_dir, 'resource_plan.shp')) %>%
+# sdl_units <- sf::read_sf(file.path(geo_data_dir, 'resource_plan.shp')) %>%
 #   sf::st_make_valid()
 # 
-# ltv <-sf::read_sf(file.path(geo_data_dir, 'cewo_valleys.shp')) %>%
+# cewo_valleys <-sf::read_sf(file.path(geo_data_dir, 'cewo_valleys.shp')) %>%
 #   sf::st_make_valid()
 ```
 
@@ -123,7 +122,7 @@ If we name the list by target instead of just have values things are a bit easie
 
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                env_obj =  c('ewr_code', "env_obj"),
-               resource_plan = resource_plan_areas,
+               sdl_units = sdl_units,
                Specific_goal = c('env_obj', "Specific_goal"),
                catchment = cewo_valleys,
                Objective = c('Specific_goal', 'Objective'),
@@ -221,7 +220,7 @@ allagg$ewr_code %>%
   dplyr::left_join(scenarios) %>% 
   ggplot() +
   geom_sf(data = basin) +
-  geom_sf(data = ltv, aes(fill = ValleyName), alpha = 0.25, show.legend = F) + 
+  geom_sf(data = cewo_valleys, aes(fill = ValleyName), alpha = 0.25, show.legend = F) + 
   geom_sf(aes(color = ewr_achieved)) +
   facet_grid(.~forcats::fct_reorder(scenario, delta))
 ```
@@ -249,17 +248,17 @@ allagg$env_obj %>%
 
 ### Sheet 4- env_obj
 
-Still env_obj, now in rps polys
+Still env_obj, now in sdl_units polys
 
 ```{r}
-allagg$rps
+allagg$sdl_units
 ```
 
 Using fct_reorder. this is where info about the scenarios would come in handy as reorder cols.
 
 ```{r}
 #| message: false
-allagg$rps %>% 
+allagg$sdl_units %>% 
   dplyr::filter(env_obj == 'NF1') %>%
   dplyr::left_join(scenarios) %>% 
   ggplot() +
@@ -270,7 +269,7 @@ allagg$rps %>%
 
 ### Sheet 5- Specific goal
 
-Still in rps polys
+Still in sdl_units polys
 
 ```{r}
 allagg$Specific_goal
@@ -291,7 +290,7 @@ allagg$Specific_goal %>%
 
 ### Sheet 6- Catchment
 
-Crossing rps specific goals into catchments (using wm). Contrived, but good test.
+Crossing sdl_units specific goals into catchments (using wm). Contrived, but good test.
 
 ```{r}
 allagg$catchment

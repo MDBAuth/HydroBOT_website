@@ -1,0 +1,10 @@
+---
+title: "Flow scaling comparer"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Goal
+
+This will be the comparer notebook for the flow scaling demonstration, including both understanding the outputs and ideally producing figures for publication.

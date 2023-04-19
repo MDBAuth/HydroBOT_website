@@ -7,19 +7,21 @@ format:
 ---
 
 # OUT OF DATE
+
 This was written early on. It likely no longer works (or works properly). It should be brought up to date, but that is not currently a high priority
 
----------------------------------------------------------------
+------------------------------------------------------------------------
 
 Import the external packages we need
+
 ```{python}
 import os
 import git
 import time
 ```
 
-Import our functions from the py package. 
-Will need to tweak this depending on how things play out.
+Import our functions from the py package. Will need to tweak this depending on how things play out.
+
 ```{python}
 from werptoolkitpy import controller_functions
 ```
@@ -33,7 +35,7 @@ repo
 
 # Goal
 
-**Use this file or the R version of this file, not the vignette, to build new test EWR output data. It provides more fine-grained access to the functions if we need to change things and test.** 
+**Use this file or the R version of this file, not the vignette, to build new test EWR output data. It provides more fine-grained access to the functions if we need to change things and test.**
 
 We want a notebook that points at a directory of scenario hydrographs, runs the EWR tool (and in future any others), processes outputs into standard format(s), puts them in standard places, and writes any metadata. Will likely point to a config file with all arguments for the run, once I sort that out.
 
