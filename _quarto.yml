@@ -10,15 +10,17 @@ project:
     - "!scenario_creation/scenario_creation_demo_py.qmd"
     - "!full_toolkit/WERP_toolkit_params.qmd"
     - "!scenario_creation/scaling_scenarios.qmd"
+    - "!macquarie_gauges.qmd"
 
 website:
   title: "Using the WERP toolkit"
+  page-footer:
+    left: "Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO"
+    background: secondary
   navbar:
     backgroud: primary
     search: true
     left:
-      - href: WERP_toolkit_demo.qmd
-        text: Home
       - href: scenario_creation/scenario_creation_overview.qmd
         text: Scenario creation
       - href: causal_networks/causal_overview.qmd
@@ -31,13 +33,17 @@ website:
         text: Comparer
       - href: full_toolkit/full_toolkit_overview.qmd
         text: Full toolkit
+    right:
+      - icon: github
+        href: https://github.com/MDBAuth/WERP_toolkit_demo
+        aria-label: GitHub
 
   sidebar:
 
 
-    - title: "Home"
+    - title: "Background"
       contents:
-        - WERP_toolkit_demo.qmd
+        - index.qmd
 
         - section: "Toolkit description"
           contents:
@@ -154,8 +160,10 @@ website:
 
 format:
   html:
-    theme: cosmo
-    css: styles.css
+    theme:
+      light: flatly
+      dark: flatly
+    # css: styles.css
     toc: true
 
 editor: visual

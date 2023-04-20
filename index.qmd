@@ -1,5 +1,5 @@
 ---
-title: "WERP_toolkit_demo"
+title: "WERP toolkit demonstration"
 editor: visual
 ---
 
@@ -7,33 +7,35 @@ This repo provides a templates and documentation for using the toolkit in variou
 
 Toolkit flow
 
--   [Controller](controller_ewr_wrapped_R.qmd)
+-   [Controller](controller/controller_overview.qmd)
 
-    -   [in additional detail](controller_ewr_stepthrough.qmd)
+    -   [in detail](controller/controller_ewr_stepthrough.qmd)
+    
+    -   [simplified](controller/controller_ewr_wrapped_R.qmd)
 
-    -   [in python *NOT UPDATED*](controller_ewr_testrun_py.qmd)
+    -   [in python *NOT UPDATED*](controller/controller_ewr_testrun_py.qmd)
 
 -   Aggregator
 
-    -   [Theme and Space](theme_space_agg.qmd)
+    -   [Theme and Space](aggregator/theme_space_agg.qmd)
 
-    -   [Theme alone with more options and plot examples](theme_agg.qmd)
+    -   [Theme alone with more options and plot examples](aggregator/theme_agg.qmd)
 
-    -   [Space alone with more options](spatial_agg.qmd)- includes multilevel spatial agg into different polygons and complex aggregation functions
+    -   [Space alone with more options](aggregator/spatial_agg.qmd)- includes multilevel spatial agg into different polygons and complex aggregation functions
 
 Necessary pieces but not part of the data flow in the toolkit
 
--   [Causal networks](causal_plots.qmd)
+-   [Causal networks](causal_networks/causal_plots.qmd)
 
     -   Causal networks are needed for aggregation and some plotting, but are not part of the flow per-se. Much of this will be integrated into the *Comparer* module
 
--   [Scenario creation](scenario_creation_demo_R.qmd)
+-   [Scenario creation](scenario_creation/scenario_creation_demo_R.qmd)
 
     -   Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit
 
     -   These are simple demo scenarios, but useful for seeing expected formats, and to let the rest of the kit work.
 
-    -   [python version *NOT UPDATED*](scenario_creation_demo_py.qmd)
+    -   [python version *NOT UPDATED*](scenario_creation/scenario_creation_demo_py.qmd)
 
 **In use, the toolkit expects that scenario hydrographs will be available and the causal networks are defined.**
 
@@ -46,26 +48,29 @@ Typically install it from github, which requires a github PAT because it's priva
 ```{r}
 #| warning: false
 #| message: false
+#| eval: false
 
-## GITHUB INSTALL
-# credentials::set_github_pat()
-# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+# GITHUB INSTALL
+credentials::set_github_pat()
+devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
 ```
 
 For rapid development, it can be much easier to install from local (or even just to `load_all`), but these rely on paths that aren't portable.
 
 ```{r}
-## LOCAL INSTALL- easier for quick iterations, but need a path.
-# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+#| eval: false
+# LOCAL INSTALL- easier for quick iterations, but need a path.
+devtools::install_local("C:/path/to/WERP_toolkit/werptoolkitr", force = TRUE)
 
 # And for very fast iteration (no building, but exposes too much, often)
-# devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
+devtools::load_all("C:/path/to/WERP_toolkit/werptoolkitr")
 ```
 
 Load the package
 
 ```{r}
-# library(werptoolkitr)
+#| eval: false
+library(werptoolkitr)
 ```
 
 # Additional info
