@@ -8,69 +8,51 @@ editor: visual
 ---
 
 ```{r}
-#| warning: false
-#| message: false
-
-## GITHUB INSTALL
-# credentials::set_github_pat()
-# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
-
-## LOCAL INSTALL- easier for quick iterations, but need a path.
-# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
-
-# And for very fast iteration (no building, but exposes too much, often)
-# devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
-
-```
-
-```{r}
 library(werptoolkitr)
 ```
 
-## Overview
+# Overview
 
-We need to aggregate outcomes along the theme dimension. For example, we might want to combine EWR pass/fails into the proportion of EWRs contributing to a proximate objective that passed, and then translate that into outcomes for 5-year targets or Waterbirds, etc.
+We need to aggregate outcomes along the theme dimension. For example, we might want to combine EWR pass/fails into the proportion of EWRs contributing to a proximate objective ('environmental objective' `env_obj`) that passed, and then translate that into outcomes for 5-year targets or Waterbirds, etc.
 
-The input data is thus the data coming out of the theme modules (e.g. EWR tool), which is then aggregated. The relationships that define the aggregations are the same as those defining the causal networks- these map finer-scale groups to coarser. Thus, we need to access those relationships (and the `make_edges` function).
+The input data is thus the data coming out of the theme modules (e.g. EWR tool), which is then aggregated. *The relationships that define the aggregations are the same as those defining the causal networks- these map finer-scale groups to coarser*. Thus, we need to access those relationships (and the `make_edges` function that builds the links). The demonstrations here are all about the EWR outputs, but the aggregator is agnostic to the input data, provided we have the causal relationships to define the aggregation groupings- we specify the columns to aggregate and any additional grouping variables, which can be anything.
 
-That data and function, along with all aggregation functions, are in the {werptoolkitr} package.
+The causal relationships for the EWR tool are provided in the [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) package as `causal_ewr`, a list of all the mappings. The {werptoolkitr} package also provides all necessary aggregation functions and handling functions for the causal relationships, though like the polygons in the [spatial aggregation](spatial_agg.qmd) it is possible to use relationships other than those provided by {werptoolkitr}. In particular, while the EWR tool provides these relationships externally to the module, they may be embedded in other modules, particularly if the responses at different theme levels are modelled mechanistically.
 
-# User setting
+In practice, we expect to interleave spatial, temporal, and thematic aggregation steps- perhaps it makes sense to aggregate along the theme axis to the `env_obj` scale at a gauge, then scale to the SDL unit, then aggregate to the `Objective`, scale, and then scale to the basin and long-term targets. We demonstrate such [interleaved aggregation](theme_space_agg.qmd) elsewhere, and here focus on demonstrating and understanding the meaning of aggregation along the theme axis and how to do it. A similar notebook for [spatial aggregation](spatial_agg.qmd) goes into the detail along the spatial dimension.
 
-This stuff will likely end up in the outer aggregation control file. They could be passed as arguments, or controlled here.
+# Inputs
 
-I'm developing separate files for theme_agg and spatial_agg, but we will want to have a version that does both interleaved.
-
-## Set paths
-
-Set the path to the scenario outputs from the EWR. **TODO** Can we make this interactive to allow people to use this without typing in paths? This could also be passed directly from the scenario controller if we want to give it master control.
-
-Need to clean this up
+The theme relationships in the causal network `causal_ewr` provide the links and structure of the theme scaling, while the values to be scaled come out of the modules. For this demonstration, we provide a set of paths to point to the input data, in this case the outputs from the EWR tool, created by [a controller notebook](controller/controller_ewr_wrapped_R.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit).
 
 ```{r}
-scenario_dir <- file.path('scenario_example')
-ewr_results <- file.path(scenario_dir, 'module_output', 'EWR')
-
-# I think I don't need gpath or ewr_causal_path anymore, I can just use bom_basin_gauges and causal_ewr directly from the package data
-# gpath <- file.path('data', 'bom_gauges.shp')
-# ewr_causal_path <- file.path('data', 'causal_networks', 'causal_ewr.rds')
+project_dir <- file.path('scenario_example')
+ewr_results <- file.path(project_dir, 'module_output', 'EWR')
 ```
 
-### Gauge for demo and detailed looks
+Input data to `multi_aggregate` should be a dataframe (e.g. a dataframe of EWR outputs, `sf` of spatial outcomes). If we want to pass a path instead of a dataframe (as we might for large runs), we would use `read_and_agg`, which wraps `multi_aggregate`, demonstrated in the [interleaved notebook](theme_space_agg.qmd). Thus, for the demonstration, we pull in the data produced by the [demonstration controller](controller_ewr_wrapped_R.qmd) and contained in-repo at the `ewr_results` path using `get_ewr_output` below.
 
-```{r}
-# Dubbo is '421001', has 24 EWRs
-# Warren Weir is '421004', has 30 EWRs. 
-example_gauge <- '421001'
-```
+## Setting aggregation parameters
 
-### Quick look at the incoming data
+For each step in the aggregation, we need to specify what levels we are aggregating from and to, the function to use to aggregate, and the mapping between the 'from' and 'to' levels.
 
-The EWR results come in two flavours- summary over the span of the run and annual. We can read them in and look at them with `get_ewr_output` which read them in and does some cleanup. Typically we would feed the path to `theme_agg_multi` which would read them in internally (see below) to avoid having the objects in memory. Note that `get_ewr_output` has additional arguments to filter by gauge and scenario on read-in, allowing parallelisation without overloading memory.
+The `aggsequence` list in `multi_aggregate` (and `theme_aggregate`) needs to be nested, e.g. links must be defined in `causal_ewrs` (or other causal mappings) from the 'from' and 'to' levels at each step. In other words, we can't go backwards, and we can't scale between levels with no defined relationship. However, this does not mean we have to always include every level. If a relationship exists, levels can be jumped (e.g. we could go straight from `env_obj` to `target_20_year_2039`), and indeed there may not be a defined ordering of some levels, and so it is perfectly reasonable to go from `env_obj` to both `Objective` and `Target`. For EWR outputs, the `aggsequence` list will typically need to start with `ewr_code_timing` and aggregate from there into `ewr_code` and `env_obj` as everything else flows from that.
 
-I could use `prep_ewr_agg`, but that wraps `get_ewr_output` and making it geographic. The geography doesn't need to happen here since we're just doing theme. Doesn't really matter either way.
+The `funsequence` is a list instead of a simple vector because multiple functions can be used at each step. When multiple functions are passed, they are factorial (each function is calculated on the results of all previous aggregations). This keeps the history clean, and allows us to easily unpick the meaning of each value in the output.
 
-The summary data
+These aggregation sequences and their associated functions are arguments to `multi_aggregate`. In practice, they will typically be set to a default value in a parameter file. There is a `theme_aggregate` function that performs a single-level of theme aggregation, much like `spatial_aggregate` does for [space](spatial_agg.qmd). I do not focus on that here, because single theme aggregations tend to be less complex than single spatial aggregations, and the capability to pass different sorts of arguments is discussed in [space](spatial_agg.qmd) and [the syntax notebook](aggregation_syntax.qmd). Instead, here we focus on the sequential aggregation provided by `multi_aggregate` to understand theme aggregation, which is most interesting as a multi-step process along the causal network.
+
+## Data overview
+
+The EWR results come in three main flavours- `summary` over the span of the run, `annual`, and `all`, a continuous set. At the time this was written, the `all` didn't exist and `annual` was broken, so we focus here on the `summary` data, with updating to handle the others very high priority. We read them in with `get_ewr_output` also provides some cleanup. The wrapper function `read_and_agg` reads them in internally and then calls `multi_aggregate` to avoid having all objects for each scenario in memory. That's what we'd do in production, typically, but here the goal is to see how the theme aggregation works. The `get_ewr_output` function has additional arguments to filter by gauge and scenario on read-in, allowing parallelisation without overloading memory.
+
+We typically would use `prep_ewr_agg` (and this is wrapped by `multi_aggregate`) but that not only calls `get_ewr_output`, it then makes the data geographic. The geography doesn't need to happen here since we're just doing theme.
+
+# Demonstration
+
+## Data
+
+We'll pull in the summary data to use for demonstration so we can use `multi_aggregate` directly. If we want to feed a path instead of a dataframe, we would need to use `read_and_agg`.
 
 ```{r}
 sumdat <- get_ewr_output(ewr_results, type = 'summary')
@@ -79,9 +61,7 @@ sumdat <- get_ewr_output(ewr_results, type = 'summary')
 sumdat
 ```
 
-And the annual-
-
-**TODO** not currently working- bug in EWR
+There's an issue with `outputType = 'annual'` in the version of the EWR tool this was built with. Until I update and test the new EWR tool, skip the annual data.
 
 ```{r}
 #| eval: false
@@ -89,19 +69,23 @@ anndat <- get_ewr_output(ewr_results, type = 'annual')
 anndat
 ```
 
-## Set aggregation parameters
+::: {#ewr-note style="border: 2px solid gray; color: gray"}
+Note: I originally wrote `get_ewr_output` to automatically get both the annual and summary ewr output files, but I think given a typical workflow it will make more sense to just wrap it if we want to more than one type of output. Even if we want to use multiple output types (summary, annual, all, etc), they won't talk to each other for any of the processing steps, so might as well run in parallel.
+:::
 
-Here, we want to set the parameters for each step of the aggregation. We need to set the sequence of aggregation steps and the aggregation functions to apply at each step. We also need the `causal_rels` list of relationships between theme levels. The dataframes in this list are currently in `Causal_networks/data` and I'm repackaging into a list. We should, however automate that when we make `Causal_networks` a package, so we can just access that list by loading the package and not need to specify. Will need to have different lists for different themes as they come online.
+We'll choose an example gauge to make it easier to visualise the data.
 
-Note that the `aggseq` list needs to be nested, though if a relationship exists levels can be jumped (e.g. we could go straight from `env_obj` to `target_20_year_2039`.
+```{r}
+# Dubbo is '421001', has 24 EWRs
+# Warren Weir is '421004', has 30 EWRs. 
+example_gauge <- '421001'
+```
 
-The `aggseq` list will typically need to start with `ewr_code_timing` and aggregate from there into `ewr_code`. A similar approach could be done if we want to lump the `ewr_code`s themselves, e.g. put EF4a,b,c,d into EF4. I'm using CompensatingFactor as teh aggregation function for that step here, assuming that passing either timing sub-code means the main code passes.
+## Aggregation
 
-The `funseq` is a list instead of a simple vector because multiple functions can be used at each step. When multiple functions are passed, though, they are factorial (each function is calculated on the results of all previous aggregations). And so it is likely that we would run the aggregation multiple times if we want to look at specific combinations.
+As a demonstration, I've set a range of theme levels that hit all the theme relationship dataframes from the causal networks defined in `causal_ewr`, and set the aggregation functions fairly simply, but with two multi-aggregation steps to illustrate how that works. For more complexity in these aggregation functions, see the [spatial notebook](spatial_agg.qmd) and [aggregation syntax](aggregation_syntax.qmd).
 
-As a demonstration, I've set a range of theme levels that hit all the theme relationship dataframes from the causal networks, and set the aggregation functions fairly simply, but with two multi-aggregation steps to illustrate how that works.
-
-We want the *possibility* to set these as arguments, but for most runs, they will take default values.
+I'm using `CompensatingFactor` as the aggregation function for the `ewr_code_timing` to `ewr_code` step here, assuming that passing either timing sub-code means the main code passes. A similar approach could be done if we want to lump the `ewr_code`s themselves, e.g. put EF4a,b,c,d into EF4. I use both `ArithmeticMean` and `LimitingFactor` for the 2nd and 3rd levels to demonstrate multiple aggregations and how the outputs from those steps get carried through subsequent steps.
 
 ```{r}
 aggseq <- list(c('ewr_code_timing', 'ewr_code'),
@@ -117,13 +101,9 @@ funseq <- list(c('CompensatingFactor'),
              c('ArithmeticMean'))
 ```
 
-We can either pass the input data as a dataframe (e.g. a dataframe of EWR outputs), or a path to a directory, in which case `get_ewr_output` goes and reads in the data.
+The `groupers` and `aggCols` arguments can take a number of different formats- character vectors, bare column names and sometimes `tidyselect`, though this is more true in `theme_aggregate` and limited for `multi_aggregate` as discussed in the [syntax documentation](aggregation_syntax.qmd). This capability gives the user quite a few options for specifying the columns to use. The use of `selectcreator` makes it robust to nonexistent columns with `failmissing = FALSE`.
 
-I originally wrote `get_ewr_output` to automatically get both the annual and summary ewr output files, but I think given a typical workflow it will make more sense to just wrap it if we want to do that. Even if we want to use both, they won't talk to each other for any of the processing steps, so might as well run in parallel.
-
-The `gaugefilter` and `scenariofilter` arguments are useful if we're only interested in some gauges or scenarios, but I ignore them until [Parallelisation]. Mostly, I developed them so we can easily parallelise this processing by feeding different sets of gauges or scenarios to this function in parallel.
-
-The `groupers` and `aggCols` arguments can take a number of different formats- character vectors, tidyselect syntax (e.g. `starts_with('ewr')`, or bare column names. I take advantage of this in `theme_agg_mutli` a bit, but it gives the user quite a few options for specifying the columns to use. The use of `selectcreator` makes it robust to nonexistent columns.
+To create the aggregation, we provide the sequence lists created above, along with the causal links, defined by the `causal_edges` argument. Because the `make_edges` function also takes a sequence of node types, we can usually just call `make_edges` on the list of relationships and the desired set of theme levels. We can also just pass in `causal_edges = causal_ewr` (the list with all possible links), and `theme_aggregate` will auto-generate the edges it needs. That's just a bit less efficient.
 
 ```{r}
 #| message: false
@@ -137,21 +117,25 @@ simpleThemeAgg <- multi_aggregate(dat = sumdat,
 simpleThemeAgg
 ```
 
-That has 4 columns of output values because the second step found the `ArithmeticMean` and `LimitingFactor` for `ewr_achieved` into `env_obj` and then the third step found the `ArithmeticMean` and `LimitingFactor` for each of those outcomes into `Specific_goal`. Each subsequent step only found the `ArithmeticMean` for each, and so the number of output columns stopped growing.
+That output has 4 columns of output values because aggregation steps are factorial in the number of aggregation functions applied. The second step found the `ArithmeticMean` and `LimitingFactor` for `ewr_achieved` into `env_obj` and then the third step found the `ArithmeticMean` and `LimitingFactor` for each of those outcomes into `Specific_goal`. Each subsequent step only found the `ArithmeticMean` for each, and so the number of output columns stopped growing.
 
-The naming of the output columns is unweildy, but describes exactly what the numbers are. For example, the last column is
+### Tracking aggregation steps
+
+Tracking aggregation steps is critical for knowing the meaning of the numbers produced. We can do that in two different ways- in column headers (names) or in columns themselves.
+
+Tracking history in column names is unweildy, but describes exactly what the numbers are and is smaller in memory. For example, the last column is
 
 ```{r}
 names(simpleThemeAgg)[ncol(simpleThemeAgg)]
 ```
 
-This says the values in this column are the 5-year targets, calculated as the arithmetic mean of Objectives, which were the arithmetic mean of Specific goals, which were calculated from env_obj as limiting factors, which were obtained from the ewrs as limiting factors and those were calculated from the ewr timings as compensating factors.
+This says the values in this column are the `5-year targets`, calculated as the arithmetic mean of `Objectives`, which were the arithmetic mean of `Specific goals`, which were calculated from `env_obj` as limiting factors, which were obtained from the `ewr_code` as limiting factors and those were calculated from the `ewr_code_timing` as compensating factors.
 
-It may be easier to think about this from the other direction- `ewr_achieved` were aggregated from `ewr_code_timing` into `ewr_code` as Compensating Factors, then into `env_obj` as limiting factors- for the env_obj to pass, all ewrs contributing to it must pass. Then the `env_obj`s were aggregated into `Specific_goal`, again as limiting factors, so to meet a goal, all contributing `env_obj` must pass. Those specific goals were then aggregated into `Objectives` with the arithmetic mean, so the value for an `Objective` is then the average of the contributing `Specific_goal`s. Since in this example the `Specific_goals` will be either 1 or 0, this average gives the proportion of `Specific_goal`s that are met for each `Objective`. Similarly, the 5-year targets were obtained by averaging the `Objective`s contributing to them.
+It may be easier to think about the meaning of the names from the other direction- `ewr_achieved` were aggregated from `ewr_code_timing` into `ewr_code` as Compensating Factors, then into `env_obj` as limiting factors- for the `env_obj` to pass, all `ewr_code`s contributing to it must pass. Then the `env_obj`s were aggregated into `Specific_goal`, again as limiting factors, so to meet a goal, all contributing `env_obj` must pass. Those `Specific_goal`s were then aggregated into `Objectives` with the arithmetic mean, so the value for an `Objective` is then the average of the contributing `Specific_goal`s. Since in this example the `Specific_goals` will be either 1 or 0, this average gives the proportion of `Specific_goal`s that are met for each `Objective`. Similarly, the 5-year targets were obtained by averaging the `Objective`s contributing to them.
 
-A different way to track the aggregations is possible by including them in columns instead of the names. This takes more memory, but can be clearer and makes subsequent uses easier in many cases. For memory purposes, I currently just parse the names into columns post-hoc. If we develop the ability to do different aggregations on different groups within a node type, we will need to make the columns as we go (and we will have to use the column method to track, since different things will happen to different values in a column).
+A different way to track the aggregations is possible by including them in columns instead of the names. This takes more memory, but can be clearer and makes subsequent uses easier in many cases. For memory purposes, I currently parse the names into columns post-hoc. When we develop the ability to do different aggregations on different groups within a node type, we will need to make the columns as we go (and we will have to use the column method to track, since different things will happen to different values in a column). This is very high priority.
 
-In the example above, we can feed the output data to `agg_names_to_cols`,
+In the example above, we can feed the output data to `agg_names_to_cols` to put the history in columns instead of names.
 
 ```{r}
 #| message: false
@@ -159,7 +143,7 @@ In the example above, we can feed the output data to `agg_names_to_cols`,
 agg_names_to_cols(simpleThemeAgg, aggsequence = aggseq, funsequence = funseq, aggCols = 'ewr_achieved')
 ```
 
-In practice, what makes most sense is to use a switch inside `multi_aggregate` to return this format.
+In practice, what makes most sense is to use a switch (`namehistory = FALSE`) inside `multi_aggregate` to return this format.
 
 ```{r}
 #| message: false
@@ -176,13 +160,13 @@ simpleColHistory
 
 # Additional demonstrations
 
-The above is just a simple example of how to use the aggregation function, but there are more things we can do with it.
+The above is a simple example of how to use the aggregation function along the theme dimension but there are more things we can do with it.
 
 ## Arbitrary input data
 
-There are two main types of input EWR data (summary and annual), but we expect there will be any number of input datasets once other modules exist. Provided the causal relationships are defined for the input sets, the specific input datasets and columns of data to aggregate are general. For example, we can feed it the annual data (`type = 'annual'`) and aggregate two different columns (feed `aggCols` a vector of column names). In the case of the annual data, we might also want to group by year in addition to gauge and scenario, and so we add *year* to the `groupers` vector. We'll keep the same sequences of aggregation and functions, but noting that they now are calculated for both `aggCols`.
+There are three main types of input EWR data (`summary`, `annual`, and `all`), but we expect there will be any number of input datasets once other modules exist. Provided the causal relationships are defined for the input sets, the specific input datasets and columns of data to aggregate are general. For example, we can feed it the annual data (`type = 'annual'`) and aggregate two different columns (feed `aggCols` a vector of column names). In the case of the annual data, we might also want to group by year in addition to gauge and scenario, and so we add *year* to the `groupers` vector. We'll keep the same sequences of aggregation and functions, noting that they now are calculated for both `aggCols`.
 
-**TODO** turn back on once EWR bug fixed
+**TODO** turn back on once update to new EWR without annual bug.
 
 ```{r}
 #| message: false
@@ -202,19 +186,10 @@ annualColHistory
 
 ## Returning every stage
 
-By default, we return only the final theme aggregation after stepping up the full sequence set by `aggsequence`. But in some cases, we might want to return all of the intermediate aggregations (e.g. at each step of `aggsequence`). This full aggregation sequence can be useful for testing and checking, but probably more importantly, allows using each step to be fed as colour or other attributes to the causal network. In this case, we pass `saveintermediate = TRUE` to `theme_agg_multi`, and it returns a list of tibbles named by the theme level instead of a single final tibble. We cannot just attach the stage results as columns to a flat df because the aggregation is many-to-many, and so the rows do not match and are not strictly nested. Thus, each stage needs its own dataframe to avoid duplicating or deleting data.
+By default, we return only the final aggregation after stepping up the full sequence set by `aggsequence`. But in some cases, we might want to return all of the intermediate aggregations (e.g. at each step of `aggsequence`). This full aggregation sequence can be useful for testing and checking, but probably more importantly, allows more complete understanding of the results. For visualization, this allows each step to be fed as colour or other attributes to the causal network. To save all steps in the aggregation sequence, we pass `saveintermediate = TRUE` to `multi_aggregate`, and it returns a list of tibbles named by the aggregation level instead of a single final tibble. We cannot just attach the stage results as columns to a flat dataframe because the aggregation is many-to-many, and so the rows do not match and are not strictly nested. Thus, each stage needs its own dataframe to avoid duplicating or deleting data. Moreover, using the additional flexibility of a list of dataframes is necessary for [interleaved aggregations across theme, space](theme_space_agg.qmd), and time axes.
 
 ```{r}
 #| message: false
-# allsteps <- theme_agg_multi(ewr_results,
-#                             type = 'summary',
-#                             causal_rels = ewr_causal_list,
-#                             aggsequence = aggseq,
-#                             funsequence = funseq,
-#                             aggCols = 'ewr_achieved',
-#                             groupers = c('scenario', 'gauge'),
-#                             saveintermediate = TRUE,
-#                             namehistory = FALSE)
 
 allsteps  <-  multi_aggregate(dat = sumdat,
                          causal_edges = make_edges(causal_ewr, aggseq),
@@ -230,31 +205,28 @@ names(allsteps)
 
 ### Causal plot
 
-By returning values at each stage, we can map those to colour (and later size) in a causal network. In practice, this will happen in the Comparer (and the initial setup data arrangement will be made into a function there), but we can demonstrate it quickly here. I'll put the values on the nodes, and so change their colour. To do this, I'll follow the usual causal_plots approach of making edges and nodes, and then use a join to attach the value to each node. This approach should be straightforward to make a function that we can call in the Comparer module.
+By returning values at each stage, we can map those to colour (and later size) in a causal network. In practice, this will happen in the Comparer (and the initial setup data arrangement will be made into a function there), but we can demonstrate it quickly here. Here, we map the values of the aggregation to node color. To do this, I'll follow the usual causal_plots approach of making edges and nodes, and then use a join to attach the value to each node.
 
-I'm limiting the edge creation to a single gauge, and so will filter the theme aggregations accordingly (or just rely on the join to drop). The `ewr_node_timing` is likely just confusing to include here, so we cut it out of the fromtos.
+To keep this demonstration from becoming too unwieldy, we limit the edge creation to a single gauge, and so will filter the theme aggregations accordingly (or just rely on the join to drop). The `ewr_node_timing` outcomes are likely just confusing to include here, so we cut it off.
+
+The first step is to generate the edges and nodes for the network we want to look at.
 
 ```{r}
 edges <- make_edges(causal_ewr, 
                     fromtos = aggseq[2:length(aggseq)],
                     gaugefilter = example_gauge)
-  # make_edges(dflist = ewr_causal_list, 
-  #              fromtos = aggseq[2:length(aggseq)],
-  #              gaugefilter = example_gauge)
 
-# 
 nodes <- make_nodes(edges)
 ```
 
-Most of what happens here needs a lightweight wrapper to make it a function in the Comparer module- basically do the `extract_vals` and the `join`, and possibly roll straight into the plot.
+Now, extract the values we want from the aggregation and join them to the nodes.
 
-**TODO** clean up the targetlevels by default. They'll be needed especially once we have spatial, here mostly around the first level.
+**TODO** this will all be done in a data prep function in the comparer that processes multi-step aggregation lists. This is high priority, but needs thought for how to handle interleaved aggregation along different axes.
 
 ```{r}
 #| message: false
 #| warning: false
 
-# set up to make a function
 # need to grab the right set of aggregations if there are multiple at some stages
 whichaggs <- c('CompensatingFactor',
                'ArithmeticMean',
@@ -281,10 +253,11 @@ aggvals <- aggvals %>% dplyr::filter(gauge == example_gauge) %>%
 nodes_with_vals <- dplyr::left_join(nodes, aggvals)
 ```
 
-Use those to make the plot. Clip to just the base scenario for now. Colours are the proportion passing, e.g. Arithmetic Means at every step. Light yellow is 1, dark purple is 0.
+Make the causal network plot with the nodes we chose and colour by the values we've just attached to them from the aggregation. At present, it is easiest to make separate plots per scenario or other grouping ( @fig-causal-base , @fig-causal-up4 ). For example, in the increased watering scenario, we see more light colours, and so better performance across the range of outcomes. Further network outputs are provided in the Comparer.
 
 ```{r}
-
+#| label: fig-causal-base
+#| fig-cap: Causal network for baseline scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 1, dark purple is 0.
 aggNetwork <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
                                         scenario == 'base'),
                  edges = edges,
@@ -296,9 +269,9 @@ aggNetwork <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals,
 DiagrammeR::render_graph(aggNetwork)
 ```
 
-This is really getting into the purview of the **Comparer**, where we will do things like calculate differences, but an obvious thing to do here is to make these networks for the different scenarios. For example, in the increased watering scenario, we see a lot more light colours, and so better performance across the range of outcomes.
-
 ```{r}
+#| label: fig-causal-up4
+#| fig-cap: Causal network for 4x scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 1, dark purple is 0.
 aggNetwork <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
                                         scenario == 'up4'),
                  edges = edges,
@@ -312,7 +285,7 @@ DiagrammeR::render_graph(aggNetwork)
 
 ## User-set functions
 
-We have established a simple set of default aggregation functions (`ArithmeticMean`, `GeometricMean`, `LimitingFactor`, and `CompensatingFactor`), available in `default_agg_functions`. I expect that list to grow, but it is also possible to ad-hoc define functions as a user and include in `funsequence`. Previously, we have used this sort of approach for things like threshold functions. For example, we might want to know the mean event length for events longer than 2 days for the ewr to objective aggregation, and thereafter scale up with `ArithmeticMean`.
+We have established a simple set of default aggregation functions (`ArithmeticMean`, `GeometricMean`, `LimitingFactor`, and `CompensatingFactor`), available in `default_agg_functions.R`. I expect that list to grow, but it is also [possible to supply user-defined functions](aggregation/aggregation_syntax.qmd) to include in `funsequence`. Previously, we have used this sort of approach for things like threshold functions. For example, we might want to know the mean event length, but only for events longer than 2 days for the ewr to objective aggregation, and thereafter scale up with `ArithmeticMean`. We can do this by specifying a new function and including it in the list given to `funsequence` .
 
 ```{r}
 event2 <- function(x) {
@@ -326,7 +299,7 @@ newfuns <- list(c('CompensatingFactor'),
              c('ArithmeticMean'))
 ```
 
-**TODO** turn back on
+**This is currently turned off until we update to the new EWR without a bug in the annual results.**
 
 ```{r}
 #| message: false
@@ -345,28 +318,9 @@ annualEv2 %>% dplyr::filter(!is.nan(event_length))
 
 ## Gauge and scenario -filtering
 
-Reading in all of the EWR results across all gauges and scenarios could be massive, depending on the spatial scale and the number of scenarios. We also just might only be interested in some subset for things like plotting. To address this, `get_ewr_output` has `gaugefilter` and `scenariofilter` arguments. I originally had that in `theme_agg_multi` itself, but now that theme and spatial use the same `multi_` function, it makes more sense to use a wrapper that does the read-in and agg. If we wanted to filter the input data once it's in memory, it would be relatively trivial to put filter options in `multi_aggregate` or, more appropriately, filter the data being fed into its `dat` argument. The `gaugefilter` and `scenariofilter` arguments to `get_ewr_output` have a different goal- only read in and process a subset of the data. This will be particularly useful once we have lots of data that doesn't fit in memory or want to parallel process.
+Reading in all of the EWR results across all gauges and scenarios could be massive, depending on the spatial scale and the number of scenarios, and so we might want to parallelise over gauges or scenarios. We also might only be interested in some subset for things like plotting. To address this, `get_ewr_output` has `gaugefilter` and `scenariofilter` arguments. This will is particularly useful once we have lots of data that doesn't fit in memory or want to parallel process - if we have *all* the data in memory already, we can just pipe it in through a filter (or filter the first argument), but if we read in in parallel from a path, we can greatly speed up processing.
 
-As a brief example, we might only want the baseline scenario for gauges `example_gauge` and 421004.
-
-If we have *all* the data in memory already, we can just pipe it in through a filter (or filter the first argument).
-
-```{r}
-#| message: false
-smallthemeagg  <-  sumdat %>% 
-  dplyr::filter(gauge %in% c(example_gauge, '421004') & scenario == 'base') %>% 
-  multi_aggregate(causal_edges = make_edges(causal_ewr,
-                                            aggseq),
-                  groupers = c('scenario', 'gauge'),
-                  aggCols = 'ewr_achieved',
-                  aggsequence = aggseq,
-                  funsequence = funseq,
-                  namehistory = FALSE)
-
-table(smallthemeagg$gauge, smallthemeagg$scenario)
-```
-
-But if we want to only read-in the relevant data, we use the `read_and_agg` wrapper. The `gaugefilter` argument only works (currently) if there are separate files for each gauge. *TODO*- once we settle on a data format, I should be able to write the gaugefilter differently to only read the desired gauge from the file.
+To only read-in the relevant data, we use the `read_and_agg` wrapper. The `gaugefilter` argument only works (currently) if there are separate files for each gauge. Once we settle on a data format, I will re-write the gaugefilter differently to only read the desired gauge from the file, though that won't be possible with interleaved spatial aggregation.
 
 ```{r}
 #| message: false
@@ -385,9 +339,9 @@ smallreadagg  <-  read_and_agg(datpath = ewr_results, type = 'summary',
 table(smallreadagg$gauge, smallreadagg$scenario)
 ```
 
-So, that's the same as above, but slower, since the read-in happens first. The advantage comes in if we don't want the original data sitting in memory, such as parallelisation.
+For a one-off that fits in memory, this is slower than filtering the data after it's in-memory, since the read-in happens first. The advantage comes when we don't want (or can't fit) all of the original data in memory, such as parallelisation over scenarios.
 
-Note, too, that if we just don't want the input data sitting in the environment, we can use `read_and_agg` with no `*filter` arguments, in which case it works just like `multi_aggregate`, but takes paths instead of objects as arguments. For example, saving all intermediate and no filtering-
+The `read_and_agg` function is also helpful if we just want to use paths as arguments instead of reading the data in and then calling `multi_aggregate`. In that case, we might not use any `*filter` arguments, in which case it works just like `multi_aggregate`, but takes paths instead of objects as arguments. For example, saving all intermediate and no filtering can be done with the path to data `ewr_results`.
 
 ```{r}
 #| message: false
@@ -406,13 +360,17 @@ names(readallsteps)
 
 ### Parallelisation
 
-The gauge and scenario filtering gives an easy way to parallelise. I haven't written this into a function yet (likely would be a wrapper around `read_and_agg`, but could be incorporated into `read_and_agg` itself, but we can demo how it works here. Parallelisation will not only speed up the processing, but because we can do the data reads inside the function, parallelisation over gauges and scenarios avoids reading all the data in at once and so can avoid smashing memory.
+The gauge and scenario filtering gives an easy way to parallelise. I haven't written this into a function yet until we settle on how to use Azure batching with the toolkit. It will likely involve a wrapper around `read_and_agg`, but could be incorporated as parameters fed to `read_and_agg` itself. We demo how it works here. Parallelisation will not only speed up the processing, but because we can do the data reads inside the function, parallelisation over scenarios (and gauges, if not spatially-aggregating) avoids reading all the data in at once and so reduces unnecessary memory use.
 
-We'd obviously need to get the gauge and scenario lists from somewhere other than previously-read data, but that's easy. And we'd want to be smarter about the size of the chunks we're processing than just doing each gauge-scenario combo in its own thread, but again, that's not hard. A bit of nitty-gritty: `future` is supposed to handle the `.export` from the calling environment, and seems to do just fine with everything except the aggregation functions. That can happen with nested `foreach` inside functions, but I think here it might be happening because of the way we're using `{{}}` to pass an arbitrary set of functions. Easy enough to fix, by passing something to `.export`, but annoying.
+For this demonstration, we are getting the gauge and scenario lists from previously-read data, but in typical use they would be available from scenario metadata.
 
-This creates the same thing as `simpleThemeAgg`, but done in parallel. Which is slower for the toy, but has the potential to be much faster.
+::: {#future-export .border: .2px .solid .gray; .color: .gray}
+Note: `future` is supposed to handle the `.export` from the calling environment, and seems to do just fine with everything except the aggregation functions. That can happen with nested `foreach` inside functions, but I think here it might be happening because of the way we're using `{{}}` to pass an arbitrary set of functions. Easy enough to fix, by passing something to `.export`, but annoying. If we end up not using {future} for parallelisation on Azure, this will be moot.
+:::
 
-The current data format has changed a bit, so not using a gauge loop here for the moment until we sort out file formats. Requires a bit of a hack, but not worth spending time on it until we have a format.
+The example below performs the same processing as above to produce output identical to `simpleThemeAgg`, but done in parallel. This is slower for this small simple demonstration because of overhead, but has the potential to be much faster for larger jobs.
+
+We're not parallelizing over gauges here because we're unlikely to be able to do so with interleaved aggregation steps, but a nested loop would work if we are only aggregating in time or theme dimensions.
 
 ```{r}
 #| message: false
@@ -426,14 +384,10 @@ allgauges <- 'all' # unique(simpleThemeAgg$gauge)
 allscenes <- unique(simpleThemeAgg$scenario)
 
 parThemeAgg <- foreach(s = allscenes, 
-                       .combine = dplyr::bind_rows) %:%
-  foreach(g = allgauges, 
-          .combine = dplyr::bind_rows) %dopar% {
-    
-            # annoying hack to not have a gaugefilter but keep the loop for later
-            if (g == 'all') {
-              g <- NULL
-            }
+                       .combine = dplyr::bind_rows) %dopar% {
+  # If parallel over gauges
+  # foreach(g = allgauges, 
+  #         .combine = dplyr::bind_rows) %dopar% {
             
     read_and_agg(datpath = ewr_results, type = 'summary',
                  geopath = bom_basin_gauges,
@@ -443,49 +397,11 @@ parThemeAgg <- foreach(s = allscenes,
                  aggsequence = aggseq,
                  funsequence = funseq,
                  namehistory = TRUE, 
-                 gaugefilter = g,
+                 gaugefilter = NULL,
                  scenariofilter = s)
   }
 
 parThemeAgg
 ```
 
-If we're doing something here that is too big to return the full output, it would also be straightforward for the parallel loop to save the iterations and not return anything. Then we could read the output in in pieces into the comparer. There's also the possibility of using things like arrow to handle analysis of data too big for memory.
-
-# Still to do/next steps
-
--   tests
-
-    -   Robustness of aggCols and groupers to different tidyselect, bare names, etc
-
-    -   Robustness of functions to different formats
-
-    -   Everything else- formats, missing columns, etc
-
--   Establish defaults
-
--   Lumped EWR codes (EF4a,b,c, --\> EF4).
-
-    -   Would just be adding a column and aggregation step
-
--   Different aggregation for different groups of values (e.g. bird breeding using min(), fish persistence using mean()).
-
-    -   Need to think about the best way to do this. It has the potential to be a very complex set of mappings. I could do something like how i assigned different colour palettes to different groups in the causal plotting.
-
-    -   Or we could chop the data up and do them one at a time.
-
-    -   The history tracking would have to go in columns in this case, and have to be generated on the fly, not post-hoc from the names.
-
--   Save metadata, including the funlists etc.
-
--   re-write `gaugefilter` and `scenariofilter` once we have a data format so we can leave the bits we don't want on-disk.
-
--   Cleaner way of dealing with the input test data. Probably in `data/`, or `data-raw/`, but need to coordinate with the scenario controller and `hydrotesting`
-
--   Actual input data should be pointed to with a config file.
-
--   Cleaner causal data- have the causal `data/` have the list instead of the tables, and access it through that.
-
--   Parallelisation integrated into the flow
-
--   Overarching beginning to end flow notebook/script
+If we're doing something here that is too big to return the full output (likely in practice), it would also be straightforward for the parallel loop to save the iterations and not return anything. Then we could read the output in in pieces into the comparer.

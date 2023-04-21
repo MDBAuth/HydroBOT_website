@@ -37,7 +37,9 @@ The user potentially has control over a number of decisions for the aggregation-
 
 Many of these can be specified in a number of ways. I have tried to demonstrate a number of these capabilities and options in the [spatial](spatial_agg.qmd) and [theme](theme_agg.qmd) notebooks, while keeping to simpler, more typical uses in the [interleaved example](theme_space_agg.qmd) and the [full toolkit](full_toolkit/full_toolkit_overview.qmd). Some of the most useful, but also trickiest, capabilities revolve around being able to format the groupers and aggregation columns as bare names, character vectors, or `tidyselect` syntax, and the functions as single or multiple at each step, defined as bare names, characters, or lists with arguments. These approaches make the functions highly general and flexible to new datasets (and sequential aggregation) and custom aggregation functions.
 
-The other powerful user input is the foundation of the multidimensional aggregator- the sequencing lists. These are demonstrated in all the notebooks, but are perhaps most interesting in the [interleaved version](theme_space_agg.qmd). By default, only the final output is saved, but `saveintermediate = TRUE` saves a list of each step, which can be very useful.
+The other powerful user input is the foundation of the multidimensional aggregator- the sequencing lists. These are demonstrated in all the notebooks, but are perhaps most interesting in the [interleaved version](theme_space_agg.qmd). By default, only the final output is retained, but `saveintermediate = TRUE` saves a list of each step, which can be very useful.
+
+The data itself and output data are also controlled by the user (by necessity). For inputs, `multi_aggregate` expects the incoming data to be in memory. There is also a wrapper `read_and_agg` that takes paths as arguments and does the read-in of the data internally and then runs `multi_aggregate`. This is often a useful approach, allowing parallelisation, better memory management, and it is far easier to use paths in a config file of arguments. Outputs from `multi_aggregate` are R objects- a dataframe or a list- and are returned back to the calling environment. The `read_and_agg` wrapper, however, can both return R objects to the session `returnList = TRUE` and save to a file if `savepath = "path/to/outfile"` .
 
 ## Arguments and use-cases
 
@@ -49,13 +51,18 @@ We show the aggregation happening in multiple notebooks, [spatial_agg.qmd](spati
 
 -   Different aggregation functions for different rows in the data (e.g. mean of fish breeding, min of bird foraging) are not yet available
 
-```{=html}
 <!-- -->
-```
+
     -   Multiple functions are possible per step, and different functions are possible for different steps
 
     -   Different functions for different rows *within a step* requires mapping of what those functions should be, and this does not exist. Still, the capability to do this is very high on the priority list, and should not be too difficult.
 
+::: {#dev-notes style="border: 2px solid gray; color: gray"}
 ## Development notes
 
 I have assumed that we primarily have point data (gauges), rather than rasters, but handling rasters is a reasonably straightforward modification (and I have the code to do it elsewhere). Because of the current focus on gauges, I'm using `sf` primarily, but `stars` could be useful depending on where we get with input formats (netcdf etc) and higher-dimension data, or if we end up using rasters.
+
+Typically, aggregating (and some other operations) on \`sf\` dataframes with geometry is \*much\* slower than without. So I've put a heavy focus on safely stripping and re-adding geometry. This allows us to use dataframes that reference geometry without the geometry itself attached and only take the performance hit from geometry if it is needed.
+
+Spatial aggregation is inherently slow because of the geometric operations (specifically `sf::st_intersection`) but we've optimized the amount of intersecting and unpicked space where possible so nothing is slowed down by being spatial unless absolutely necessary (including the actual aggregation of the spatial data). We're doing the absolute minimum spatially-aware processing, and doing that in a way that early spatial processing does not slow down later non-spatial processing.
+:::
