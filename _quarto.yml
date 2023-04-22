@@ -127,8 +127,10 @@ website:
 
         - section: "Simple demonstration"
           contents:
-            - href: comparer/plot_creation.qmd
-              text: "Comparer examples and capability"
+            - href: comparer/hydrographs.qmd
+              text: "Hydrographs and baselining"
+            - href: comparer/bar_plots.qmd
+              text: "Bar plots"
 
         - section: "Flow scaling and climate scenarios"
           contents:

@@ -10,7 +10,7 @@ Toolkit flow
 -   [Controller](controller/controller_overview.qmd)
 
     -   [in detail](controller/controller_ewr_stepthrough.qmd)
-    
+
     -   [simplified](controller/controller_ewr_wrapped_R.qmd)
 
     -   [in python *NOT UPDATED*](controller/controller_ewr_testrun_py.qmd)

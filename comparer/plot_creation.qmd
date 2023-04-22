@@ -55,31 +55,6 @@ I think I probably want to make a standard ordering of the scenarios. Can I push
 sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
 ```
 
-# Standard appearance
-
-## Theme
-
-Let's try to develop a werp toolkit theme that we can use to get a consistent look. We'll also want to do colours, but that will come later.
-
-Just want to start something here that I can build on.
-
-```{r}
-# theme_werp_toolkit <- function(base_size = 10, ...) {
-#   
-#   ggplot2::theme_bw(base_size = base_size) +
-#     ggplot2::theme(strip.background = ggplot2::element_blank(),
-#           panel.grid = ggplot2::element_blank(),
-#           ...)
-#     
-# }
-```
-
-## Colour
-
-I don't think I want to necessarily enforce a standard set of colours (yet)- they'll change between scenarios/projects. But I *could* enforce palettes.
-
-At the least, I want to establish the infrastructure to set consistent colors. Let's do that by setting a scenario
-
 # Descriptive
 
 ## Hydrographs

@@ -1,0 +1,60 @@
+---
+title: "Heatmap"
+author: "Galen Holt"
+format:
+  html:
+    df-print: paged
+editor: visual
+---
+
+```{r}
+library(werptoolkitr)
+library(ggplot2)
+library(dplyr)
+```
+
+# Overview
+
+This notebook provides examples of creating heatmaps to plot outcomes as colors with two driver axes (e.g. temperature and rainfall changes). At present, we only have one axis of change in both the simple 4x demonstration and the flow scaling. Once we have two axes, these heatmaps should come together quickly, including the ability to overplot points and fit kernel densities.
+
+For a 1-d version, with variation in a single driver axis and outcomes on the y (instead of color), see the [bar plots](comparer/bar_plots.qmd) and [line plots](comparer/line_plots.qmd)
+
+## Demonstration setup
+
+As usual, we need paths to the data.
+
+```{r}
+project_dir <- file.path('scenario_example')
+agg_dir <- file.path(project_dir, 'aggregator_output')
+```
+
+## Scenario information
+
+This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
+
+```{r}
+scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+```
+
+## Subset for demo
+
+We have a lot of hydrographs, so for this demonstration, we will often use a subset.
+
+```{r}
+gauges_to_plot <- c('412002', '419001', '422028', '421001')
+```
+
+# Standard scenario appearance
+
+We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.
+
+```{r}
+sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
+scene_pal <- make_pal(unique(scenarios$scenario), 
+                      palette = 'ggsci::nrc_npg', 
+                      refvals = 'base', refcols = 'black')
+```
+
+# Plot heatmaps
+
+Once we have data that needs heatmaps, we'd read in those aggregated outcome lists and make the demo plots here.

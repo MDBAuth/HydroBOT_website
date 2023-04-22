@@ -4,7 +4,7 @@ author: "Galen Holt"
 format:
   html:
     df-print: paged
-    # code-link: true # Doesn't do anything without either cran or pkgdown site
+    code-link: true # Doesn't do anything without either cran or pkgdown site, btu that's still kind of useful for external (especially {pkgname})
 editor: visual
 params:
   REBUILD_DATA: FALSE
@@ -399,6 +399,8 @@ allagg$target_5_year_2024 |>
 ## Simple inputs and saving
 
 In practice, we often won't call `multi_aggregate` directly, but will use `read_and_agg` to run `multi_aggregate`, since it automates data read-in and processing and saving. To do the same analysis as above but using `read_and_agg`, we give it the path to the data instead of the data itself. Note also that the `geopath` and `causalpath` arguments can be objects or paths; we use objects here because they are provided with the {werptoolkitr} package. We use `returnList` to return the output to the active session, and `savepath` to save an .rds file to `out_path` (but only if we're rebuilding data).
+
+*Note*- to `readRDS` `sf` objects produced here, we need to have `sf` loaded in the reading script.
 
 ```{r}
 #| lst-label: lst-save-out
