@@ -1,0 +1,348 @@
+---
+title: "Test Gauge Data"
+author: "Galen Holt"
+format:
+  html:
+    df-print: paged
+editor: visual
+execute:
+    enabled: false
+---
+
+# OUT OF DATE
+
+This was written early on, and so likely does not work (or work properly). Do not use. It should be brought up to date, but that's not currently a high priority.
+
+------------------------------------------------------------------------
+
+First, do we actually want to rebuild the `data/` directory, or just use this to investigate and document what happened? These params *should* be able to be set on render at command line, but for some reason using the Quarto CLI on this file (with or without params) causes an error in the `mdba_gauge_getter`. It works fine if I render with the button, but not if I literally copy the command the button is running, so I'm *very* confused. Changing the yaml to execute: enabled: false lets me rebuild the whole project without this breaking everything.
+
+```{python}
+#| tags: [parameters]
+ 
+REBUILD_DATA = False
+```
+
+```{python}
+import pandas as pd
+import geopandas as gpd
+import git
+import plotnine as pn
+import mdba_gauge_getter as gg
+import datetime
+import os
+import copy
+```
+
+Check we're using the right py env. Quarto says it will find any `.venv` below the project dir, but should double-check to confirm. Otherwise, might need to [set Quarto environment variables](https://quarto.org/docs/projects/environment.html). In the other version using R first, we had to tell {reticulate} where the venv is in .Rprofile, but here in pure python we shouldn't, but we might have to do something different to hit the right environment.
+
+```{python}
+import sys
+print(sys.executable)
+```
+
+Should be `WERP_toolkit/.venv/Scripts/pythonw.exe`.
+
+Have set `execute_dir:` to `file` in the project yaml, and then re-get the R project dir for interal referencing. Annoying, but works.
+
+```{python}
+repo = git.Repo('.', search_parent_directories=True).working_tree_dir
+rpkgdir = os.path.join(repo, 'werptoolkitr')
+```
+
+## Dev note
+
+In general, we'll have to be careful about mixing R and Python in the package to ensure users have the right environments. Here, though, we assume that this file is only run by devs to create package data, and that these devs have access to the full git repo with the Python env, and so we can be a bit more in control about python envs and locations.
+
+There is [another version](scenario_creation_R_demo.qmd) that is only in R except for the bits that *have* to be in python.
+
+Because I've now changed the code to save the `sf` objects as `.rda` files in `data/`, I could skip all the shapefile reading below. But to keep consistent with the python version, which will need to read `.shp` files, I'll do that here too.
+
+None of this actually ends up saving to `data/` because the point is to generate test data that looks like the real data we'd use on input, which currently is csv. So we save all the generated data here to `inst/extdata/`.
+
+# Creation of test data
+
+We need to create test data for several scenarios for several gauges. This finds the gauges to pull based on location, gets the data, and modifies it into scenarios. The first case study is just the Macquarie, but I think I'd also like some additional catchments so the spatial aggregation demonstrations are more interesting. Is there any reason not to do that? Not really.
+
+The shapefiles used to see what we're doing and do the selecting were produced with `data_creation/spatial_data_creation.qmd`.
+
+I output clean test data to `data`, following R package data conventions. But set a 'datadir', so we can change that easily to somewhere else if desired.
+
+Set the data dir to make that easy to change.
+
+```{python}
+datarawdir = 'data-raw'
+dataoutdir = 'data'
+dataextdir = 'inst/extdata'
+```
+
+## Read in gauges
+
+Use the bom gauges, since this is what were contained in the EWR tool.
+
+```{python}
+gaugegeo = gpd.read_file(os.path.join(rpkgdir, dataextdir, 'bom_gauges.shp'))
+```
+
+## Read in polygons
+
+I'll read in a few options, and then choose- basin, resource plan areas, sdl areas (which is where David got the Macquarie polygon), and catchments. I have cut out the testing of David's single polygon- it is the Macquarie-Castlereagh in the sdls.
+
+```{python}
+basin = gpd.read_file(os.path.join(rpkgdir, dataextdir, 'basin.shp'))
+rps = gpd.read_file(os.path.join(rpkgdir, dataextdir, 'resource_plan.shp'))
+sdl = gpd.read_file(os.path.join(rpkgdir, dataextdir, 'sdl_units.shp'))
+ltv = gpd.read_file(os.path.join(rpkgdir, dataextdir, 'cewo_valleys.shp'))
+```
+
+crs all match from the creation.
+
+### Plot the polygons and data checks
+
+Basin
+
+```{python}
+pn.ggplot(basin) + pn.geom_map(fill = 'powderblue')
+```
+
+Resource plan areas
+
+```{python}
+pn.ggplot(rps) + pn.geom_map(pn.aes(fill = 'SWWRPANAME'))
+```
+
+These have 'SW' codes
+
+```{python}
+rps
+```
+
+SDL plan areas
+
+```{python}
+pn.ggplot(sdl) + pn.geom_map(pn.aes(fill = 'SWSDLName'))
+```
+
+These have 'SS' codes.
+
+```{python}
+sdl
+```
+
+Catchments
+
+```{python}
+pn.ggplot(ltv) + pn.geom_map(pn.aes(fill = 'ValleyName'))
+```
+
+```{python}
+ltv
+```
+
+## Cut to demo polygons
+
+The Macquarie shapefile from David is the Macquarie-Castlereagh from `rps`. I want a few catchments to play with for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan. That might be a LOT of gauges, though.
+
+```{python}
+catch_demo = rps.query("SWWRPANAME in ['Macquarie-Castlereagh', 'Lachlan', 'Namoi']")
+```
+
+```{python}
+(pn.ggplot(catch_demo) + pn.geom_map(pn.aes(fill = 'SWWRPANAME')) +
+pn.scale_fill_brewer(type = 'qual', palette = 8))
+```
+
+## Get relevant gauges
+
+### Cut to the polygons
+
+Cut the gaugegeo from the whole country to just those four catchments
+
+```{python}
+demo_gauges = gpd.sjoin(gaugegeo, catch_demo, how = 'inner', predicate = 'within')
+```
+
+How many are we talking?
+
+```{python}
+demo_gauges.info()
+```
+
+295 rows is a lot, but unlikely they'll all be in the EWR.
+
+### Extract their names
+
+To feed to the gauge extractor, we need their gauge numbers.
+
+```{python}
+gaugenums = demo_gauges['gauge'].tolist()
+```
+
+## Get the values
+
+We can feed lists to `gg.gauge_pull`, so can feed it that way. We might *want* to loop for parallelising extraction or modifications, but the real scenarios won't be made this way anyway, so not worth it here.
+
+What time span do we want? 10 years to start
+
+```{python}
+starttime = datetime.date(2010, 1, 1)
+endtime = datetime.date(2019, 12, 31)
+```
+
+How many are actually in the EWR tool? I could go get the table myself, but the EWR tool has a function, so use that. I had some trouble getting `py-ewr` to install but poetry finally figured out the conflicts.
+
+```{python}
+from py_ewr.data_inputs import get_EWR_table
+ewrs, badewrs = get_EWR_table()
+```
+
+What are those gauges, and which are in both the ewr and the desired catchments?
+
+```{python}
+ewrgauges = ewrs['Gauge'].tolist()
+ewr_demo_gauges = set(gaugenums) & set(ewrgauges)
+len(ewr_demo_gauges)
+```
+
+47 seems ok. Let's go with that.
+
+### Get all the gauge data
+
+Now we have a list of gauges, go actually get their hydrographs. Takes a while, be patient
+
+```{python}
+#| message: false
+
+demo_levs = gg.gauge_pull(ewr_demo_gauges, start_time_user = starttime, end_time_user = endtime)
+demo_ids = demo_levs.SITEID.unique()
+len(demo_ids)
+```
+
+I guess that's not terrible. 157k rows is fine in general, but likely overkill for testing. I could cut it to fewer gauges and less time, probably, but it will be good to have reasonable time periods for testing time windowing if this doesn't eat too much time elsewhere.
+
+For some reason `demo_levs['VALUE']` is an object and not numeric. And `'DATETIME'` needs to be named `Date` for the EWR tool to read it.
+
+```{python}
+demo_levs['VALUE'] = demo_levs['VALUE'].astype('float')
+demo_levs.rename(columns = {'DATETIME':'Date'}, inplace = True)
+```
+
+### Map the gauges
+
+```{python}
+gaugegeo.rename(columns = {'gauge number':'gauge'}, inplace = True)
+demo_geo = gaugegeo.query("gauge in @demo_ids")
+```
+
+Looks reasonable. Probably overkill for testing, but can do a cut down version too.
+
+```{python}
+(pn.ggplot() + 
+pn.geom_map(data = basin, fill = 'lightsteelblue') +
+pn.geom_map(data = catch_demo, mapping = pn.aes(fill = 'SWWRPANAME')) +
+pn.geom_map(data = demo_geo, color = 'black') +
+pn.scale_fill_brewer(type = 'qual', palette = 8))
+```
+
+## Make test scenarios
+
+### Demo scenarios
+
+For now, the test scenarios are just multiplying by 4 or 0.25 to give something to work with. This section could easily be modified for other simple scenarios.
+
+```{python}
+down4 = copy.deepcopy(demo_levs)
+up4 = copy.deepcopy(demo_levs)
+
+down4['VALUE'] = down4['VALUE'] * 0.25
+up4['VALUE'] = up4['VALUE'] * 4
+```
+
+### Make the data look like IQQM
+
+I read this in with the EWR tool's code, but need to be able to read into the EWR tool through the `scenario_handling`. That's sort of convoluted, and could be fixed by splitting up `process_scenarios` into a read-in bit and a bit that calls `evaluate_EWRs.calc_sorter`. The end of `process_scenarios` starting with `gauge_results = {}` is the same as `process_gauges` and so could be shared.
+
+For now though, just tell EWR it's IQQM so I can use `scenario_handling`. As long as I have a date column `Date` and other columns with gauge numbers for names, I can get the EWR tool to work by telling it it's IQQM. It can have multiple gauges, with each having its own column. I had originally set up for single files per scenario-gauge combination, but let's use multi-cols for now. The read-in should work either way.
+
+### Save the output
+
+Not being too fussed about structure, since the structure is going to change once we have actual scenarios.
+
+I will still do the dir/file structure even with one file as it allows easier changes and more flexibility.
+
+```{python}
+scenenames = ['base', 'up4', 'down4']
+
+# # the full scenarios
+# for x in scenenames:
+#     scenedir = os.path.join(rpkgdir, dataextdir, 'testscenarios', x)
+#     if not os.path.exists(scenedir):
+#         os.makedirs(scenedir)
+
+# a minimal set
+for x in scenenames:
+    scenedirS = os.path.join(rpkgdir, dataextdir, 'testsmall', x)
+    if not os.path.exists(scenedirS):
+        os.makedirs(scenedirS)
+```
+
+Create clean dataframes to save.
+
+```{python}
+base = demo_levs[['Date', 'VALUE', 'SITEID']].pivot(index=['Date'],columns="SITEID", values="VALUE")
+
+up4 = up4[['Date', 'VALUE', 'SITEID']].pivot(index=['Date'],columns="SITEID", values="VALUE")
+
+down4 = down4[['Date', 'VALUE', 'SITEID']].pivot(index=['Date'],columns="SITEID", values="VALUE")
+```
+
+Save. could do this above easily enough, but getting lots of dots and hard to read.
+
+```{python}
+# if REBUILD_DATA:
+#     base.to_csv(os.path.join(rpkgdir, dataextdir, 'testscenarios', 'base', 'base.csv'))
+#     up4.to_csv(os.path.join(rpkgdir, dataextdir, 'testscenarios', 'up4', 'up4.csv'))
+#     down4.to_csv(os.path.join(rpkgdir, dataextdir, 'testscenarios', 'down4', 'down4.csv'))
+```
+
+### Smaller set
+
+I also want a very limited set of test data that runs faster through the EWR tool and the rest of the toolkit. It still needs to have \> 1 gauge in \> 1 catchment theough. Let's do three gauges in two catchments, 5 years.
+
+Which gauges?
+
+```{python}
+mac = rps.query("SWWRPANAME in ['Macquarie-Castlereagh']")
+lach = rps.query("SWWRPANAME in ['Lachlan']")
+macgauge = gpd.sjoin(demo_geo, mac, how = 'inner', predicate = 'within')
+lachgauge = gpd.sjoin(demo_geo, lach, how = 'inner', predicate = 'within')
+```
+
+I'll just choose three of each
+
+```{python}
+macsub = macgauge.query("gauge in ['421004', '421001', '421011']")
+lachsub = lachgauge.query("gauge in ['412005', '412002', '412038']")
+
+minigauge = gpd.GeoDataFrame(pd.concat([macsub, lachsub], ignore_index=True), crs=[macsub, lachsub][0].crs)
+
+minigauges = minigauge.gauge.unique()
+```
+
+```{python}
+(pn.ggplot() + 
+pn.geom_map(data = basin, fill = 'lightsteelblue') +
+pn.geom_map(data = catch_demo, mapping = pn.aes(fill = 'SWWRPANAME')) +
+pn.geom_map(data = minigauge, color = 'black') +
+pn.scale_fill_brewer(type = 'qual', palette = 8))
+```
+
+```{python}
+if REBUILD_DATA:
+    start15 = datetime.date(2015, 1, 1)
+
+    base.query('Date > @start15').filter(items = minigauges).to_csv(os.path.join(rpkgdir, dataextdir, 'testsmall', 'base', 'base.csv'))
+    down4.query('Date > @start15').filter(items = minigauges).to_csv(os.path.join(rpkgdir, dataextdir, 'testsmall', 'down4', 'down4.csv'))
+    up4.query('Date > @start15').filter(items = minigauges).to_csv(os.path.join(rpkgdir, dataextdir, 'testsmall', 'up4', 'up4.csv'))
+
+```

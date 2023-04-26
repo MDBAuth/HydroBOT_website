@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Galen Holt">
+
+<title>Using the WERP toolkit - Aggregation syntax</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<link href="../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Using the WERP toolkit</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../scenario_creation/scenario_creation_overview.html">
+ <span class="menu-text">Scenario creation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../causal_networks/causal_overview.html">
+ <span class="menu-text">Causal networks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../controller/controller_overview.html">
+ <span class="menu-text">Controller</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../aggregator/aggregation_overview.html" aria-current="page">
+ <span class="menu-text">Aggregator</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../comparer/comparer_overview.html">
+ <span class="menu-text">Comparer</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../full_toolkit/full_toolkit_overview.html">
+ <span class="menu-text">Full toolkit</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo"><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Aggregation syntax</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../aggregator/aggregation_overview.html" class="sidebar-item-text sidebar-link">Aggregation overview</a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../aggregator/aggregation_syntax.html" class="sidebar-item-text sidebar-link active">Aggregation syntax</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Simple demonstration</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../aggregator/spatial_agg.html" class="sidebar-item-text sidebar-link">Spatial aggregation capability</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../aggregator/theme_agg.html" class="sidebar-item-text sidebar-link">Theme aggregation capability</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../aggregator/theme_space_agg.html" class="sidebar-item-text sidebar-link">Multi-axis interleaved aggregation</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Flow scaling and climate scenarios</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../aggregator/flow_scaling_aggregation.html" class="sidebar-item-text sidebar-link">Aggregating flow scaling demonstration</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#argument-options-and-syntax" id="toc-argument-options-and-syntax" class="nav-link active" data-scroll-target="#argument-options-and-syntax">Argument options and syntax</a>
+  <ul class="collapse">
+  <li><a href="#selecting-grouping-and-data-columns" id="toc-selecting-grouping-and-data-columns" class="nav-link" data-scroll-target="#selecting-grouping-and-data-columns">Selecting grouping and data columns</a></li>
+  <li><a href="#functions" id="toc-functions" class="nav-link" data-scroll-target="#functions">Functions</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Aggregation syntax</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Galen Holt </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-1_1901b1c52cd8f513781775353e67e20c">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(werptoolkitr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="argument-options-and-syntax" class="level2">
+<h2 class="anchored" data-anchor-id="argument-options-and-syntax">Argument options and syntax</h2>
+<p>The aggregation functions have flexible syntax in some of their arguments, particulary for selecting grouping columns, the column(s) of values to aggregate, and the specification of aggregation functions. In general, these apply across the functions, though <code>multi_aggregate</code> has a bit less flexibility than the internal <code>spatial_aggregate</code>, <code>theme_aggregate</code>, and <code>general_aggregate</code>, largely as a consequence of passing through the call stack. Here, I use primarily the example of <code>spatial_aggregate</code> to illustrate the different arguments, their syntax, and why we might use it.</p>
+<p>I’ll create test data as in the <a href="../aggregator/spatial_agg.html">spatial notebook</a>.</p>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-2_d45131d25170f709aa530df98aefe0fb">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'scenario_example'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>ewr_results <span class="ot">&lt;-</span> <span class="fu">file.path</span>(project_dir, <span class="st">'module_output'</span>, <span class="st">'EWR'</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>sumdat <span class="ot">&lt;-</span> <span class="fu">prep_ewr_agg</span>(ewr_results, <span class="at">type =</span> <span class="st">'summary'</span>, <span class="at">geopath =</span> bom_basin_gauges)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>themeseq <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">'ewr_code_timing'</span>, <span class="st">'ewr_code'</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>               <span class="fu">c</span>(<span class="st">'ewr_code'</span>, <span class="st">"env_obj"</span>))</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>funseq <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">c</span>(<span class="st">'CompensatingFactor'</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>               <span class="fu">c</span>(<span class="st">'ArithmeticMean'</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>simpleThemeAgg <span class="ot">&lt;-</span> <span class="fu">multi_aggregate</span>(<span class="at">dat =</span> sumdat,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                         <span class="at">causal_edges =</span> <span class="fu">make_edges</span>(causal_ewr, themeseq),</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                         <span class="at">groupers =</span> <span class="fu">c</span>(<span class="st">'scenario'</span>, <span class="st">'gauge'</span>),</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                         <span class="at">aggCols =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                         <span class="at">aggsequence =</span> themeseq,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                         <span class="at">funsequence =</span> funseq)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Linking to GEOS 3.9.3, GDAL 3.5.2, PROJ 8.2.1; sf_use_s2() is TRUE</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining, by = "gauge"
+Joining, by = c("gauge", "ewr_code", "ewr_code_timing", "PlanningUnitID")
+Joining, by = "gauge"
+Joining, by = c("gauge", "ewr_code", "PlanningUnitID")</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>simpleThemeAgg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3444 features and 5 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 144.8811 ymin: -33.86951 xmax: 151.1435 ymax: -29.92117
+Geodetic CRS:  GDA94
+# A tibble: 3,444 × 6
+   scenario gauge  polyID      env_obj env_obj_Arith…¹             geometry
+   &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;       &lt;chr&gt;             &lt;dbl&gt;          &lt;POINT [°]&gt;
+ 1 base     412002 r3cxx2uk3v7 EF1               0.714 (148.6839 -33.83301)
+ 2 base     412002 r3cxx2uk3v7 EF2               0.417 (148.6839 -33.83301)
+ 3 base     412002 r3cxx2uk3v7 EF3               0     (148.6839 -33.83301)
+ 4 base     412002 r3cxx2uk3v7 EF3a              0.667 (148.6839 -33.83301)
+ 5 base     412002 r3cxx2uk3v7 EF4               0     (148.6839 -33.83301)
+ 6 base     412002 r3cxx2uk3v7 EF5               0.25  (148.6839 -33.83301)
+ 7 base     412002 r3cxx2uk3v7 EF6               0     (148.6839 -33.83301)
+ 8 base     412002 r3cxx2uk3v7 EF7               0     (148.6839 -33.83301)
+ 9 base     412002 r3cxx2uk3v7 NF1               0.556 (148.6839 -33.83301)
+10 base     412002 r3cxx2uk3v7 NF2               0.667 (148.6839 -33.83301)
+# … with 3,434 more rows, and abbreviated variable name
+#   ¹​env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved</code></pre>
+</div>
+</div>
+<section id="selecting-grouping-and-data-columns" class="level3">
+<h3 class="anchored" data-anchor-id="selecting-grouping-and-data-columns">Selecting grouping and data columns</h3>
+<p>Both <code>aggCols</code> and <code>groupers</code> can be character vectors, bare data-variable names, or we might want to use <code>tidyselect</code> syntax. For example, maybe we want to use <code>ends_with('ewr_achieved')</code> as above to grab pre-aggregated columns with long name histories, as in <code>simpleThemeAgg</code> . This is handled under the hood by <code>selectcreator</code> and careful parsing in the function stack. Above, we had groupers as a character vector and aggCols as tidyselect, but now we flip, and <code>groupers</code> is a vector of tidyselect and bare names, while <code>aggCols</code> is a character.</p>
+<div id="tidyselect" style="border: 2px solid gray; color: gray">
+<p>Note that <code>multi_aggregate</code> takes advantage of this tidyselect ability under the hood to deal with the ever-lengthening column names (and sometimes expanding number of value columns if we have multiple aggregation functions at a step). This means, though, that we <em>cannot</em> use <code>tidyselect</code> to specify <code>aggCols</code> in <code>multi_aggregate</code>- it would collide with the internal <code>tidyselect</code>, and so we are limited to characters in that case.</p>
+<p>The other restriction in <code>multi_aggregate</code> is that it does not accept bare function names, as they get lost for the purposes of naming the history by the time they get used in the call stack.</p>
+</div>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-3_dfe46c62c0c1693d92ccfddc669102a9">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>obj2poly2 <span class="ot">&lt;-</span> <span class="fu">spatial_aggregate</span>(<span class="at">dat =</span> simpleThemeAgg, </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">to_geo =</span> sdl_units,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">groupers =</span> <span class="fu">c</span>(<span class="fu">starts_with</span>(<span class="st">'sce'</span>), env_obj),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">aggCols =</span> <span class="st">"env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">funlist =</span> ArithmeticMean,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">keepAllPolys =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>obj2poly2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3939 features and 7 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 138.5685 ymin: -37.68199 xmax: 152.4821 ymax: -24.5893
+Geodetic CRS:  GDA94
+# A tibble: 3,939 × 8
+   scenario env_obj polyID      spatial_ArithmeticMean…¹ SWSDLID SWSDL…² StateID
+ * &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;                          &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 base     EF1     r602ydft049                   0.571  SS16    Lachlan NSW    
+ 2 base     EF1     r6367k2uy6m                   0.217  SS20    Macqua… NSW    
+ 3 base     EF1     r6d2dwp48wm                   0.238  SS21    Namoi   NSW    
+ 4 base     EF2     r602ydft049                   0.416  SS16    Lachlan NSW    
+ 5 base     EF2     r6367k2uy6m                   0.219  SS20    Macqua… NSW    
+ 6 base     EF2     r6d2dwp48wm                   0.227  SS21    Namoi   NSW    
+ 7 base     EF3     r602ydft049                   0.0417 SS16    Lachlan NSW    
+ 8 base     EF3     r6367k2uy6m                   0.128  SS20    Macqua… NSW    
+ 9 base     EF3     r6d2dwp48wm                   0.182  SS21    Namoi   NSW    
+10 base     EF3a    r602ydft049                   0.506  SS16    Lachlan NSW    
+# … with 3,929 more rows, 1 more variable: geometry &lt;MULTIPOLYGON [°]&gt;, and
+#   abbreviated variable names
+#   ¹​spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved,
+#   ²​SWSDLName</code></pre>
+</div>
+</div>
+<p>We can see we get the same result as <code>obj2poly</code> with different ways of specifying <code>aggCols</code> and <code>groupers</code>.</p>
+<p>There are times when we might want to send a vector of names, but ignore those not in the data. Most likely would be something like a set of possible grouping variables but only using them if they exist, and ignoring if not. This is a bit sloppy, but is useful sometimes to send the same set of groupers to several datasets. It fails by default, but setting <code>failmissing = FALSE</code> allows it to pass. Here, the ‘extra_grouper’ column doesn’t exist in the data and so is ignored.</p>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-4_39b8d21f2d42322266457159cece04fe">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>obj2polyF <span class="ot">&lt;-</span> <span class="fu">spatial_aggregate</span>(<span class="at">dat =</span> simpleThemeAgg, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">to_geo =</span> sdl_units,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">groupers =</span> <span class="fu">c</span>(<span class="st">'scenario'</span>, <span class="st">'env_obj'</span>, <span class="st">'extra_grouper'</span>),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">aggCols =</span> <span class="fu">ends_with</span>(<span class="st">'ewr_achieved'</span>),</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">funlist =</span> ArithmeticMean,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">keepAllPolys =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">failmissing =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>obj2polyF</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3939 features and 7 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 138.5685 ymin: -37.68199 xmax: 152.4821 ymax: -24.5893
+Geodetic CRS:  GDA94
+# A tibble: 3,939 × 8
+   scenario env_obj polyID      spatial_ArithmeticMean…¹ SWSDLID SWSDL…² StateID
+ * &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;                          &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 base     EF1     r602ydft049                   0.571  SS16    Lachlan NSW    
+ 2 base     EF1     r6367k2uy6m                   0.217  SS20    Macqua… NSW    
+ 3 base     EF1     r6d2dwp48wm                   0.238  SS21    Namoi   NSW    
+ 4 base     EF2     r602ydft049                   0.416  SS16    Lachlan NSW    
+ 5 base     EF2     r6367k2uy6m                   0.219  SS20    Macqua… NSW    
+ 6 base     EF2     r6d2dwp48wm                   0.227  SS21    Namoi   NSW    
+ 7 base     EF3     r602ydft049                   0.0417 SS16    Lachlan NSW    
+ 8 base     EF3     r6367k2uy6m                   0.128  SS20    Macqua… NSW    
+ 9 base     EF3     r6d2dwp48wm                   0.182  SS21    Namoi   NSW    
+10 base     EF3a    r602ydft049                   0.506  SS16    Lachlan NSW    
+# … with 3,929 more rows, 1 more variable: geometry &lt;MULTIPOLYGON [°]&gt;, and
+#   abbreviated variable names
+#   ¹​spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved,
+#   ²​SWSDLName</code></pre>
+</div>
+</div>
+</section>
+<section id="functions" class="level3">
+<h3 class="anchored" data-anchor-id="functions">Functions</h3>
+<p>We can pass single bare aggregation function names, characters, or named lists defining functions with arguments. Above, we have been specifying the function to apply as just a single bare function name. Now, we explore some other possibilities and capabilities of the aggregator.</p>
+<p>Most simply, we can pass character names of functions instead of bare</p>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-5_1fd7524169bc2ff0def5618c46d518e3">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>doublesimplechar <span class="ot">&lt;-</span> <span class="fu">spatial_aggregate</span>(<span class="at">dat =</span> simpleThemeAgg, </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">to_geo =</span> sdl_units,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">groupers =</span> <span class="fu">c</span>(<span class="st">'scenario'</span>, <span class="st">'env_obj'</span>),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">aggCols =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">funlist =</span> <span class="st">'ArithmeticMean'</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">keepAllPolys =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">failmissing =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>doublesimplechar</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3939 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 138.5685 ymin: -37.68199 xmax: 152.4821 ymax: -24.5893
+Geodetic CRS:  GDA94
+# A tibble: 3,939 × 7
+   scenario env_obj polyID     SWSDLID SWSDL…¹ StateID                  geometry
+ * &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;MULTIPOLYGON [°]&gt;
+ 1 base     EF1     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 2 base     EF1     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 3 base     EF1     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 4 base     EF2     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 5 base     EF2     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 6 base     EF2     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 7 base     EF3     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 8 base     EF3     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 9 base     EF3     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+10 base     EF3a    r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+# … with 3,929 more rows, and abbreviated variable name ¹​SWSDLName</code></pre>
+</div>
+</div>
+<p>If we want to do two different aggregations on the same data, we can pass a vector of names.</p>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-6_1d4906a70b742d2759719d34706449ea">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>simplefuns <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'ArithmeticMean'</span>, <span class="st">'GeometricMean'</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>doublesimplec <span class="ot">&lt;-</span> <span class="fu">spatial_aggregate</span>(<span class="at">dat =</span> simpleThemeAgg, </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">to_geo =</span> sdl_units,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">groupers =</span> <span class="fu">c</span>(<span class="st">'scenario'</span>, <span class="st">'env_obj'</span>),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">aggCols =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">funlist =</span> simplefuns,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">keepAllPolys =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">failmissing =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>doublesimplec</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3939 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 138.5685 ymin: -37.68199 xmax: 152.4821 ymax: -24.5893
+Geodetic CRS:  GDA94
+# A tibble: 3,939 × 7
+   scenario env_obj polyID     SWSDLID SWSDL…¹ StateID                  geometry
+ * &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;MULTIPOLYGON [°]&gt;
+ 1 base     EF1     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 2 base     EF1     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 3 base     EF1     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 4 base     EF2     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 5 base     EF2     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 6 base     EF2     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 7 base     EF3     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 8 base     EF3     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 9 base     EF3     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+10 base     EF3a    r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+# … with 3,929 more rows, and abbreviated variable name ¹​SWSDLName</code></pre>
+</div>
+</div>
+<p><em>Note</em>- if passing multiple functions, it does not work to pass bare names. It just gets too complex to handle, and the bare names is really just a convenience shorthand.</p>
+<section id="arguments-to-aggregation-functions" class="level4">
+<h4 class="anchored" data-anchor-id="arguments-to-aggregation-functions">Arguments to aggregation functions</h4>
+<p>There are three primary ways to specify function arguments- using <code>…</code>, writing a wrapper function with the arguments specified (e.g.&nbsp;see <code>ArithmeticMean</code>, which is just <code>mean(x, na.rm = TRUE)</code> ), or using anonymous functions with <code>~</code> syntax in a named list. The simplest version is to use <code>…</code>, but this really only works in simple cases, like passing <code>na.rm = TRUE</code>. It <em>does</em> work for multiple functions, but starts getting convoluted and unclear if they don’t share arguments or there are many arguments.</p>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-7_0d41fe41e9ff72edbd33fdcb249055de">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>singlearg <span class="ot">&lt;-</span> <span class="fu">spatial_aggregate</span>(<span class="at">dat =</span> simpleThemeAgg, </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">to_geo =</span> sdl_units,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">groupers =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">aggCols =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">funlist =</span> <span class="fu">c</span>(mean, sd),</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">na.rm =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">keepAllPolys =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">failmissing =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>singlearg</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 87 features and 5 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 138.5685 ymin: -37.68199 xmax: 152.4821 ymax: -24.5893
+Geodetic CRS:  GDA94
+# A tibble: 87 × 6
+   scenario polyID      SWSDLID SWSDLName      StateID                  geometry
+ * &lt;chr&gt;    &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;          &lt;chr&gt;          &lt;MULTIPOLYGON [°]&gt;
+ 1 base     r602ydft049 SS16    Lachlan        NSW     (((146.4428 -32.33613, 1…
+ 2 base     r6367k2uy6m SS20    Macquarie–Cas… NSW     (((147.4064 -30.14296, 1…
+ 3 base     r6d2dwp48wm SS21    Namoi          NSW     (((148.3669 -29.78047, 1…
+ 4 down4    r602ydft049 SS16    Lachlan        NSW     (((146.4428 -32.33613, 1…
+ 5 down4    r6367k2uy6m SS20    Macquarie–Cas… NSW     (((147.4064 -30.14296, 1…
+ 6 down4    r6d2dwp48wm SS21    Namoi          NSW     (((148.3669 -29.78047, 1…
+ 7 up4      r602ydft049 SS16    Lachlan        NSW     (((146.4428 -32.33613, 1…
+ 8 up4      r6367k2uy6m SS20    Macquarie–Cas… NSW     (((147.4064 -30.14296, 1…
+ 9 up4      r6d2dwp48wm SS21    Namoi          NSW     (((148.3669 -29.78047, 1…
+10 base     r1gkz59ex7z SS10    South Austral… SA      (((140.9917 -32.26605, 1…
+# … with 77 more rows</code></pre>
+</div>
+</div>
+<p>We can also pass arguments by sending a list of functions with their arguments. This is far more flexible than the <code>…</code> approach, as we can send any arguments to any functions this way. For clarity, we demonstrate it here for the same situation- passing the <code>na.rm</code> argument to <code>mean</code> and <code>sd</code>. This also lets us control the function names, because the list-names do not need to match the function names. The list-names are what get used in history-tracking (see the column names).</p>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-8_ea1cd38ce6d66362a220454779003989">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>simplelamfuns <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">meanna =</span> <span class="sc">~</span><span class="fu">mean</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">sdna =</span> <span class="sc">~</span><span class="fu">sd</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>doublelam <span class="ot">&lt;-</span> <span class="fu">spatial_aggregate</span>(<span class="at">dat =</span> simpleThemeAgg, </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">to_geo =</span> sdl_units,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                             <span class="at">groupers =</span> <span class="fu">c</span>(<span class="st">'scenario'</span>, <span class="st">'env_obj'</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                             <span class="at">aggCols =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                             <span class="at">funlist =</span> simplelamfuns,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">keepAllPolys =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">failmissing =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>doublelam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3939 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 138.5685 ymin: -37.68199 xmax: 152.4821 ymax: -24.5893
+Geodetic CRS:  GDA94
+# A tibble: 3,939 × 7
+   scenario env_obj polyID     SWSDLID SWSDL…¹ StateID                  geometry
+ * &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;MULTIPOLYGON [°]&gt;
+ 1 base     EF1     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 2 base     EF1     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 3 base     EF1     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 4 base     EF2     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 5 base     EF2     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 6 base     EF2     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 7 base     EF3     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 8 base     EF3     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 9 base     EF3     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+10 base     EF3a    r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+# … with 3,929 more rows, and abbreviated variable name ¹​SWSDLName</code></pre>
+</div>
+</div>
+<p><em>Note</em>: if using anonymous functions in a list this way, they need to use <code>rlang</code> <code>~</code> syntax, not base <code>\(x)</code> or <code>function(x){}</code>. That’s on the to-do list, but it’s not much of a constraint, and anything complex can be written as a standard function and called that way.</p>
+<p>It’s fairly common that we’ll have vector arguments, especially for the spatial aggregations. One primary example is weightings. The most flexible approach requires these vectors to be attached to the data before it enters the function (vs.&nbsp;creating them automatically in-function; though that is possible it gets fragile to handle arbitrary names and maintain the correct groupings). So, here we assume that the vectors will be columns in the dataset, and demonstrate with weighted means on dummy weights.</p>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-9_1a2c724b9f1d29927993effa80010854">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>veclamfuns <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">meanna =</span> <span class="sc">~</span><span class="fu">mean</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">sdna =</span> <span class="sc">~</span><span class="fu">sd</span>(., <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">wmna =</span> <span class="sc">~</span><span class="fu">weighted.mean</span>(., wt, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Not really meaningful, but weight by the number of gauges.</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>wtgauge <span class="ot">&lt;-</span> simpleThemeAgg <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(scenario, gauge) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">wt =</span> dplyr<span class="sc">::</span><span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>()</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>triplevec <span class="ot">&lt;-</span> <span class="fu">spatial_aggregate</span>(<span class="at">dat =</span> wtgauge, </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">to_geo =</span> sdl_units,</span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">groupers =</span> <span class="fu">c</span>(<span class="st">'scenario'</span>, <span class="st">'env_obj'</span>),</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>                             <span class="at">aggCols =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>                             <span class="at">funlist =</span> veclamfuns,</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>                             <span class="at">keepAllPolys =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>                             <span class="at">failmissing =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>triplevec</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3939 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 138.5685 ymin: -37.68199 xmax: 152.4821 ymax: -24.5893
+Geodetic CRS:  GDA94
+# A tibble: 3,939 × 7
+   scenario env_obj polyID     SWSDLID SWSDL…¹ StateID                  geometry
+ * &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;MULTIPOLYGON [°]&gt;
+ 1 base     EF1     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 2 base     EF1     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 3 base     EF1     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 4 base     EF2     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 5 base     EF2     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 6 base     EF2     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 7 base     EF3     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 8 base     EF3     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 9 base     EF3     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+10 base     EF3a    r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+# … with 3,929 more rows, and abbreviated variable name ¹​SWSDLName</code></pre>
+</div>
+</div>
+<p>If we want to have custom functions with vector data arguments, we still need to use the tilde notation to point to those arguments. Making a dummy function that just adds two to the weighted mean, the <code>wt</code> argument doesn’t get seen if we just say <code>funlist = wt2</code>. Instead, we need to use a list.</p>
+<div class="cell" data-hash="aggregation_syntax_cache/html/unnamed-chunk-10_cb64ff001e670c2de9a1299f357d3ef3">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>wt2 <span class="ot">&lt;-</span> <span class="cf">function</span>(x, wt) {</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="dv">2</span><span class="sc">+</span><span class="fu">weighted.mean</span>(x, <span class="at">w =</span> wt, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>wt2list <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">wt2 =</span> <span class="sc">~</span><span class="fu">wt2</span>(., wt))</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>vecnamedfun <span class="ot">&lt;-</span> <span class="fu">spatial_aggregate</span>(<span class="at">dat =</span> wtgauge, </span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>                             <span class="at">to_geo =</span> sdl_units,</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>                             <span class="at">groupers =</span> <span class="fu">c</span>(<span class="st">'scenario'</span>, <span class="st">'env_obj'</span>),</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>                             <span class="at">aggCols =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>                             <span class="at">funlist =</span> wt2list,</span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>                             <span class="at">keepAllPolys =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>                             <span class="at">failmissing =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>vecnamedfun</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 3939 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 138.5685 ymin: -37.68199 xmax: 152.4821 ymax: -24.5893
+Geodetic CRS:  GDA94
+# A tibble: 3,939 × 7
+   scenario env_obj polyID     SWSDLID SWSDL…¹ StateID                  geometry
+ * &lt;chr&gt;    &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;          &lt;MULTIPOLYGON [°]&gt;
+ 1 base     EF1     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 2 base     EF1     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 3 base     EF1     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 4 base     EF2     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 5 base     EF2     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 6 base     EF2     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+ 7 base     EF3     r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+ 8 base     EF3     r6367k2uy… SS20    Macqua… NSW     (((147.4064 -30.14296, 1…
+ 9 base     EF3     r6d2dwp48… SS21    Namoi   NSW     (((148.3669 -29.78047, 1…
+10 base     EF3a    r602ydft0… SS16    Lachlan NSW     (((146.4428 -32.33613, 1…
+# … with 3,929 more rows, and abbreviated variable name ¹​SWSDLName</code></pre>
+</div>
+</div>
+</section>
+<section id="the-area-exception" class="level4">
+<h4 class="anchored" data-anchor-id="the-area-exception"><strong>The ‘area’ exception</strong></h4>
+<p>The only exception to attaching vector arguments are situations where the needed vector arguments depend on both sets of from and to data/polygons, and so can’t be pre-attached. The main way this comes up is with area-weighting, so <code>spatial_joiner</code> calculates areas so there is always an <code>area</code> column available for weighting.</p>
+<p>In summary, we can pass single functions and their arguments in ellipses, complex lists of multiple functions using tilde-style anonymous functions, which can have vector arguments (as long as the vector is attached to the data), and lists of multiple function names. Note, however, that while we can use bare names in <code>spatial_aggregate</code> and <code>theme_aggregate</code>, we can’t use bare function names in <code>multi_aggregate</code> because they get lost for the namehistory creation. The only thing we <em>can’t</em> do currently is pass unattached vector args. I have to do such convoluted things for that to work with <em>one</em> function, and it’s so easy to just bind them on, I think that’s a tradeoff worth making. We can reassess if this becomes an issue later.</p>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO</div>   
+  </div>
+</footer>
+
+
+
+</body></html>

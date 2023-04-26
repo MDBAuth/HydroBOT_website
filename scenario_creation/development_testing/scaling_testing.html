@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Galen Holt">
+
+<title>Using the WERP toolkit - Scaling functions</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Using the WERP toolkit</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../scenario_creation/scenario_creation_overview.html">
+ <span class="menu-text">Scenario creation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../causal_networks/causal_overview.html">
+ <span class="menu-text">Causal networks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../controller/controller_overview.html">
+ <span class="menu-text">Controller</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../aggregator/aggregation_overview.html">
+ <span class="menu-text">Aggregator</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../comparer/comparer_overview.html">
+ <span class="menu-text">Comparer</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../full_toolkit/full_toolkit_overview.html">
+ <span class="menu-text">Full toolkit</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo"><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setting-up-the-scaling-functions" id="toc-setting-up-the-scaling-functions" class="nav-link active" data-scroll-target="#setting-up-the-scaling-functions">Setting up the scaling functions</a></li>
+  <li><a href="#background-and-definitions" id="toc-background-and-definitions" class="nav-link" data-scroll-target="#background-and-definitions">Background and definitions</a>
+  <ul class="collapse">
+  <li><a href="#make-numeric-metadata" id="toc-make-numeric-metadata" class="nav-link" data-scroll-target="#make-numeric-metadata">Make numeric metadata</a></li>
+  </ul></li>
+  <li><a href="#bring-in-the-data" id="toc-bring-in-the-data" class="nav-link" data-scroll-target="#bring-in-the-data">Bring in the data</a></li>
+  <li><a href="#scale" id="toc-scale" class="nav-link" data-scroll-target="#scale">Scale</a></li>
+  <li><a href="#testing" id="toc-testing" class="nav-link" data-scroll-target="#testing">Testing</a>
+  <ul class="collapse">
+  <li><a href="#break-into-groups-rank-and-bin" id="toc-break-into-groups-rank-and-bin" class="nav-link" data-scroll-target="#break-into-groups-rank-and-bin">Break into groups, rank and bin</a></li>
+  <li><a href="#change-ratio" id="toc-change-ratio" class="nav-link" data-scroll-target="#change-ratio">Change ratio</a></li>
+  <li><a href="#stacked" id="toc-stacked" class="nav-link" data-scroll-target="#stacked">Stacked</a>
+  <ul class="collapse">
+  <li><a href="#plot" id="toc-plot" class="nav-link" data-scroll-target="#plot">Plot</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#test-adjustment" id="toc-test-adjustment" class="nav-link" data-scroll-target="#test-adjustment">Test adjustment</a>
+  <ul class="collapse">
+  <li><a href="#whats-the-process-here" id="toc-whats-the-process-here" class="nav-link" data-scroll-target="#whats-the-process-here">What’s the process here?</a>
+  <ul class="collapse">
+  <li><a href="#find-the-quantiles-for-historical-data" id="toc-find-the-quantiles-for-historical-data" class="nav-link" data-scroll-target="#find-the-quantiles-for-historical-data">find the quantiles for historical data</a></li>
+  <li><a href="#need-a-match-to-sdl-unit-step" id="toc-need-a-match-to-sdl-unit-step" class="nav-link" data-scroll-target="#need-a-match-to-sdl-unit-step">NEED A MATCH TO SDL UNIT STEP</a></li>
+  <li><a href="#do-the-shift" id="toc-do-the-shift" class="nav-link" data-scroll-target="#do-the-shift">Do the shift</a></li>
+  </ul></li>
+  <li><a href="#format-cleanup" id="toc-format-cleanup" class="nav-link" data-scroll-target="#format-cleanup">Format cleanup</a></li>
+  </ul></li>
+  <li><a href="#todo" id="toc-todo" class="nav-link" data-scroll-target="#todo">TODO</a></li>
+  <li><a href="#testing-1" id="toc-testing-1" class="nav-link" data-scroll-target="#testing-1">Testing</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Scaling functions</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Galen Holt </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="setting-up-the-scaling-functions" class="level2">
+<h2 class="anchored" data-anchor-id="setting-up-the-scaling-functions">Setting up the scaling functions</h2>
+<p>I’m using <a href="flow_scaling.qmd">flow_scaling.qmd</a> to pull the gauges and scale them, but actually getting the scaling relationships is independent, and so doesn’t need to happen in the same script. I’ll do that here.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-1_cb7e35b529aefaebe9d23348fe695a77">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(werptoolkitr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(vicwater)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Set up some directories. Once we move to MDBA, these will be easier to point at in a shared way.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-2_80dc2c9ff4d2cc8111a5afec6d4837ed">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>scenario_dir <span class="ot">&lt;-</span> <span class="st">'../flow_scaling_data'</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hydro_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(scenario_dir, <span class="st">'hydrographs'</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>scaling_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(scenario_dir, <span class="st">'CC_Scenarios_WRPs'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="background-and-definitions" class="level2">
+<h2 class="anchored" data-anchor-id="background-and-definitions">Background and definitions</h2>
+<p>Bring in David’s climate scenarios NOTE: Only go to 31-Jan-2019.</p>
+<p>Prec and ETp (PE) are historical (not needed here)</p>
+<p>SimR0 is simulated historical runnoff using actual historical Prec and ETp (PE)</p>
+<p>SimR1 - SimR7 are simulated with +7% PE but different Rainfall:</p>
+<ol type="1">
+<li><p>-20%</p></li>
+<li><p>-15% (“High change scenario”)</p></li>
+<li><p>-10%</p></li>
+<li><p>-5% (“Moderate change scenario”)</p></li>
+<li><p>+0%</p></li>
+<li><p>+5% (“Low change scenario”)</p></li>
+<li><p>+10%</p></li>
+</ol>
+<section id="make-numeric-metadata" class="level3">
+<h3 class="anchored" data-anchor-id="make-numeric-metadata">Make numeric metadata</h3>
+<p>The format of this may change, but we’re going to want something. Lists are going to be easier to yaml than dataframes (though a dataframe is easier to construct).</p>
+<p>Though it sounds like the scenario yamls are likely to <em>not</em> be lists, but single values, ie each one gets their own value to create it, and that’s it (which makes sense).</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-3_83dd5de7a5e39b6e1caf7cecd14b3521">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rain_multiplier <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="at">from =</span> <span class="fl">0.8</span>, <span class="at">to =</span> <span class="fl">1.1</span>, <span class="at">by =</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(<span class="fu">paste0</span>(<span class="st">'R'</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">7</span>))</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>scenario_meta <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">PE_multiplier =</span> <span class="fl">1.07</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">rain_multiplier =</span> rain_multiplier,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">scenario_name =</span> <span class="fu">names</span>(rain_multiplier)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Don't run yet, since I don't know the format we'll be using, but this works to create yaml metadata</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># yaml::write_yaml(scenario_meta, file = 'path/to/file.yml')</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Suggestion is to compare each scenario to simulated historic baseline, work out the ratio and apply the difference to the gauge records… Would be good to get ‘cease to flow’ events for the scenarios.</p>
+</section>
+</section>
+<section id="bring-in-the-data" class="level2">
+<h2 class="anchored" data-anchor-id="bring-in-the-data">Bring in the data</h2>
+<p>Get the list of files and read them in (to a list of dfs)</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-4_31370e26bd4e99cf4357cd0ab6e2409d">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>CCSc_FileList <span class="ot">&lt;-</span> <span class="fu">list.files</span>(scaling_dir, <span class="at">pattern =</span> <span class="st">'.csv'</span>, </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>scenario_list <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(CCSc_FileList,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                            \(x) <span class="fu">read_csv</span>(<span class="at">file =</span> x, <span class="at">id =</span> <span class="st">'path'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(stringr<span class="sc">::</span><span class="fu">str_extract</span>(CCSc_FileList, <span class="st">"SS[0-9]+"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="scale" class="level2">
+<h2 class="anchored" data-anchor-id="scale">Scale</h2>
+<p>We follow the basic method for q-q scaling from <a href="https://www.climatechangeinaustralia.gov.au/en/obtain-data/application-ready-data/scaling-methods/">climate change australia</a>, with the following modifications</p>
+<ul>
+<li><p>Use 2% bins (e.g.&nbsp;50 bins) instead of 10 + 10 in final</p></li>
+<li><p>Month-matching quantiles (e.g.&nbsp;90th %ile for June separate from September). The method given might do that too, it’s unclear.</p></li>
+</ul>
+</section>
+<section id="testing" class="level1">
+<h1>Testing</h1>
+<p>I’m going to figure out how to do this with a single df- I think I’m going to do it almost orthogonal to George’s approach- we don’t need hydrographs at all- we just want to develop the transforms here. Macquarie is SS20, use that to test.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-5_e805bdbfa7276252bfa17044e6ec644b">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>testdf <span class="ot">&lt;-</span> scenario_list<span class="sc">$</span>SS20</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>I’m going to follow climate change australia with the monthly binning, but we might do yearly or daily or windowed. Yearly seems weird, since day of year is likely more important than year. Doesn’t really matter- the main thing here is to have a grouper, and we can change what it is (though rolling windows will need to be fancier with the timeseries). Months will introduce artificial discontinuities, but we aren’t trying to be perfect. On reading that site, I don’t think they’re actually month-matching, I think they’re just using it to smooth and treating all months as interchangeable- e.g.&nbsp;for each month they get the quantiles, but then they average those? I think? It’s poorly explained. Month-matching makes more sense to create statistics that are at least partially reflective of the major changes through the water year- e.g.&nbsp;it is useful to know the 90th percentile for the low points of the year too, and we’d never see that if we just pooled the data.</p>
+<section id="break-into-groups-rank-and-bin" class="level3">
+<h3 class="anchored" data-anchor-id="break-into-groups-rank-and-bin">Break into groups, rank and bin</h3>
+<p>Use 2% bins (e.g.&nbsp;50 bins) instead of 10 + 10 in final.</p>
+<p>Should I do this with a bigger function that does it all in one go instead of a series of mutates? Probably- this gets weird with the quantile groupings when treating it as a df. I think it makes more sense to think of this as vectors, write the relevant fun, and then roll it out.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-6_4c98054c3d91698cd1fcfe664ef6aeb6">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>testvec <span class="ot">&lt;-</span> testdf <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Month <span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> <span class="fu">select</span>(SimR7) <span class="sc">%&gt;%</span> <span class="fu">pull</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Bin- <strong>don’t use</strong> <code>cut</code> directly- it bins the RANGE, not the VALUES. We could rank and then cut, or we can get quantiles.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-7_fd1a7089263660437ad8859daf222a6b">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># binvec &lt;- cut(testvec, 50, labels = FALSE)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>qs <span class="ot">&lt;-</span> <span class="fu">quantile</span>(testvec, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="fl">0.02</span>), <span class="at">type =</span> <span class="dv">5</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>binvec <span class="ot">&lt;-</span> <span class="fu">cut</span>(testvec, qs, <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">labels =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Quantile mean</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-8_afaf96bf6c4c2bce398d5ffe423642c2">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>qmean <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(<span class="at">x =</span> testvec, <span class="at">by =</span> <span class="fu">list</span>(binvec), <span class="at">FUN =</span> mean) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setNames</span>(<span class="fu">c</span>(<span class="st">'quantile'</span>, <span class="st">'mean'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Make that a function</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-9_2e853b8e235557993f1e6b67c21e3fbf">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>get_qmean <span class="ot">&lt;-</span> <span class="cf">function</span>(vals, <span class="at">q_perc =</span> <span class="fl">0.02</span>) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  qs <span class="ot">&lt;-</span> <span class="fu">quantile</span>(vals, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>, q_perc), <span class="at">type =</span> <span class="dv">5</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  binvec <span class="ot">&lt;-</span> <span class="fu">cut</span>(vals, qs, <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">labels =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  qmean <span class="ot">&lt;-</span> <span class="fu">aggregate</span>(<span class="at">x =</span> vals, <span class="at">by =</span> <span class="fu">list</span>(binvec), <span class="at">FUN =</span> mean) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">setNames</span>(<span class="fu">c</span>(<span class="st">'quantile'</span>, <span class="st">'mean'</span>)) <span class="co">#%&gt;% </span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># tidyr::nest(q_m = everything())</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Get the qmeans in a summarise- this is going to be funny, because they return 50 rows, but I think that’s OK. Just select one column at first.</p>
+<p>I suppose the other way to do this is to make the data long and group_by scenario (and whatever else we want).</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-10_a281d57ba7ecfa0e18569abe6b69ff24">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>test_mean <span class="ot">&lt;-</span> testdf <span class="sc">%&gt;%</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Month) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Year, Month, Day, SimR7) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">get_qmean</span>(SimR7, <span class="at">q_perc =</span> <span class="fl">0.02</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Month'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-11_631cb08a45c5696c61b9704b7cdc577d">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(test_mean, <span class="fu">aes</span>(<span class="at">x =</span> quantile, <span class="at">y =</span> mean, <span class="at">color =</span> <span class="fu">as.factor</span>(Month))) <span class="sc">+</span> <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-12_ce9965b2dfdbcf098b721b909aed1c05">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(test_mean, <span class="fu">aes</span>(<span class="at">x =</span> Month, <span class="at">y =</span> mean, <span class="at">color =</span> <span class="fu">as.factor</span>(quantile))) <span class="sc">+</span> <span class="fu">geom_line</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="change-ratio" class="level3">
+<h3 class="anchored" data-anchor-id="change-ratio">Change ratio</h3>
+<p>I could get the change ratio in a function, but a couple things jump out- I’d have to feed each scenario the baseline scenario and re-calculate it. And I’d lose the ability to gut-check the quantiles. So, let’s do it as a stepwise summarize - mutate</p>
+<p>The “change ratios” defined</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-13_59c7745e4a8aad840a15ea5ba11a8f18">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>test_q <span class="ot">&lt;-</span> testdf <span class="sc">%&gt;%</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Month) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the quantiles and their means</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">'Sim'</span>), get_qmean, <span class="at">.names =</span> <span class="st">"{.col}"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Clean up- unnest because each summary is a df of both q and m, </span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">'Sim'</span>), <span class="at">names_sep =</span> <span class="st">'_'</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># only need one quantile column</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">quantile =</span> SimR0_quantile) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">ends_with</span>(<span class="st">'_quantile'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the change ratio</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">starts_with</span>(<span class="st">'Sim'</span>), \(x) ((x<span class="sc">-</span>SimR0_mean)<span class="sc">/</span>SimR0_mean),</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">.names =</span> <span class="st">"{.col}_cr"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Month'. You can override using the
+`.groups` argument.</code></pre>
+</div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-14_d18d513e74b3b54184c1b08a186db663">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>test_q</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 600 × 18
+# Groups:   Month [12]
+   Month quant…¹ SimR0…² SimR1…³ SimR2…⁴ SimR3…⁵ SimR4…⁶ SimR5…⁷ SimR6…⁸ SimR7…⁹
+   &lt;dbl&gt;   &lt;int&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+ 1     1       1 0.00434 0.00273 0.00308 0.00342 0.00376 0.00408 0.00439 0.00468
+ 2     1       2 0.00500 0.00306 0.00346 0.00386 0.00426 0.00466 0.00507 0.00548
+ 3     1       3 0.00563 0.00327 0.00375 0.00423 0.00473 0.00521 0.00573 0.00629
+ 4     1       4 0.00619 0.00350 0.00404 0.00459 0.00514 0.00571 0.00626 0.00683
+ 5     1       5 0.00655 0.00384 0.00435 0.00491 0.00544 0.00601 0.00660 0.00721
+ 6     1       6 0.00690 0.00412 0.00462 0.00517 0.00576 0.00633 0.00697 0.00766
+ 7     1       7 0.00735 0.00434 0.00488 0.00546 0.00610 0.00674 0.00745 0.00822
+ 8     1       8 0.00787 0.00457 0.00515 0.00574 0.00646 0.00724 0.00797 0.00875
+ 9     1       9 0.00841 0.00482 0.00543 0.00610 0.00687 0.00768 0.00850 0.00930
+10     1      10 0.00890 0.00506 0.00573 0.00649 0.00727 0.00812 0.00901 0.00992
+# … with 590 more rows, 8 more variables: SimR0_mean_cr &lt;dbl&gt;,
+#   SimR1_mean_cr &lt;dbl&gt;, SimR2_mean_cr &lt;dbl&gt;, SimR3_mean_cr &lt;dbl&gt;,
+#   SimR4_mean_cr &lt;dbl&gt;, SimR5_mean_cr &lt;dbl&gt;, SimR6_mean_cr &lt;dbl&gt;,
+#   SimR7_mean_cr &lt;dbl&gt;, and abbreviated variable names ¹​quantile, ²​SimR0_mean,
+#   ³​SimR1_mean, ⁴​SimR2_mean, ⁵​SimR3_mean, ⁶​SimR4_mean, ⁷​SimR5_mean,
+#   ⁸​SimR6_mean, ⁹​SimR7_mean</code></pre>
+</div>
+</div>
+<p>Does that make sense that they’re negative through R5? Yes, that’s the no change in rain, but still increased PET. Rain doesn’t increase until R6 and 7.</p>
+</section>
+<section id="stacked" class="level2">
+<h2 class="anchored" data-anchor-id="stacked">Stacked</h2>
+<p>Do a bit of cleanup separate from the processing pipe</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-15_e2aee0800ffc22c77fcee995d7d2b817">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>test_stack <span class="ot">&lt;-</span> testdf <span class="sc">%&gt;%</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sdl =</span> stringr<span class="sc">::</span><span class="fu">str_extract</span>(path, <span class="st">"SS[0-9]+"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(sdl, Year, Month, Day, <span class="fu">starts_with</span>(<span class="st">'Sim'</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">'Sim'</span>), </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">'scenario'</span>, <span class="at">values_to =</span> <span class="st">'runoff'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-16_0d18e550d7bedd2079e210cf08de1d28">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>test_q_s <span class="ot">&lt;-</span> test_stack <span class="sc">%&gt;%</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(scenario, Month) <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the quantiles and their means</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">qmean =</span> <span class="fu">get_qmean</span>(runoff)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Clean up- unnest because each summary is a df of both q and m, </span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> qmean) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'scenario', 'Month'. You can override using
+the `.groups` argument.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>relfun <span class="ot">&lt;-</span> <span class="cf">function</span>(x,y) {(x<span class="sc">-</span>y)<span class="sc">/</span>y}</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Use `werptoolkitr::baseline_compare` so we don't have to manually extract</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>test_q_s <span class="ot">&lt;-</span> test_q_s <span class="sc">%&gt;%</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(scenario, Month) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">baseline_compare</span>(<span class="at">compare_col =</span> <span class="st">'scenario'</span>, <span class="at">base_lev =</span> <span class="st">'SimR0'</span>, </span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                   <span class="at">values_col =</span> <span class="st">'mean'</span>, </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                   <span class="at">comp_fun =</span> relfun) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="at">scenario =</span> scenario.x, <span class="fu">everything</span>(), </span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">change_ratio =</span> relfun_mean, </span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>         <span class="sc">-</span>scenario.y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Adding missing grouping variables: `scenario`</code></pre>
+</div>
+</div>
+<section id="plot" class="level3">
+<h3 class="anchored" data-anchor-id="plot">Plot</h3>
+<p>Just the means, then the change ratios</p>
+<p>This will be easier stacked. I actually think the whole thing is likely easier stacked.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-17_a9349e69c737f2806f119bf04ae3a5aa">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># just look at a couple quantiles</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>test_q_s <span class="sc">%&gt;%</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(quantile <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">25</span>,<span class="dv">50</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> scenario, <span class="at">y =</span> mean, <span class="at">fill =</span> <span class="fu">as.factor</span>(quantile))) <span class="sc">+</span> <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="fu">position_dodge</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Probably want to look at different things on those dims</p>
+<p>Do the quantiles look smooth</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-18_6be6d1d2e4dc48fc137f1f6445637966">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># just look at a couple quantiles</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>test_q_s <span class="sc">%&gt;%</span> </span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(quantile), <span class="at">y =</span> mean, <span class="at">fill =</span> scenario)) <span class="sc">+</span> <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="fu">position_dodge</span>()) <span class="sc">+</span> <span class="fu">facet_grid</span>(Month <span class="sc">~</span> scenario)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-19_3c1bc6ce39b5fb4a480f0cb023775233">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>test_q_s <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> quantile, </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                       <span class="at">y =</span> mean, <span class="at">color =</span> scenario)) <span class="sc">+</span> </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="st">'Month'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="test-adjustment" class="level1">
+<h1>Test adjustment</h1>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-20_356c44443043083c8201c34a18d1d66b">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>orig_hydro <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(hydro_dir, <span class="st">'extracted_flows.rds'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Just grab one for testing that’s flow, reasonably long, but not too long.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-21_38d29f81b0877cadb55d8bf25e671649">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>test_hydro <span class="ot">&lt;-</span> orig_hydro[[<span class="dv">25</span>]]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="whats-the-process-here" class="level2">
+<h2 class="anchored" data-anchor-id="whats-the-process-here">What’s the process here?</h2>
+<ol type="1">
+<li>find the quantile of each value in the orig_hydro data for each group-unit (e.g.&nbsp;Month)
+<ol type="1">
+<li>Not with <code>get_qmean</code>, because we <em>just</em> want to identify quantile of each value, not summarise to their mean.</li>
+</ol></li>
+<li>multiply by change ratio for each quantile, group-unit, and scenario</li>
+<li>do that over all the sdl units</li>
+</ol>
+<section id="find-the-quantiles-for-historical-data" class="level3">
+<h3 class="anchored" data-anchor-id="find-the-quantiles-for-historical-data">find the quantiles for historical data</h3>
+<p>We don’t want <code>get_qmean</code>, but instead just want to ID the quantile of each value.</p>
+<p>And we need to group</p>
+<p>Write the function. I can probably do this above, and use it in <code>get_qmean</code></p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-22_348385e8a76b31428afecd43ee6dfbc8">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>get_q <span class="ot">&lt;-</span> <span class="cf">function</span>(vals, q_perc) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  qs <span class="ot">&lt;-</span> <span class="fu">quantile</span>(vals, <span class="at">probs =</span> <span class="fu">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>, q_perc), <span class="at">type =</span> <span class="dv">5</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  binvec <span class="ot">&lt;-</span> <span class="fu">cut</span>(vals, qs, <span class="at">include.lowest =</span> <span class="cn">TRUE</span>, <span class="at">labels =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(binvec)</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We need a grouping variable, been using Month, so stick with that for testing. means we need to create it. Obviously this could get more complicated</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-23_c879825cd0a3068a463e15592b37ce9b">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>test_hydro <span class="ot">&lt;-</span> test_hydro <span class="sc">%&gt;%</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(time))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s find the quantile of each value</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-24_33a7951592a7d0c8721f5ea855505a9a">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>test_hydro_q <span class="ot">&lt;-</span> test_hydro <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Month) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">quantile =</span> <span class="fu">get_q</span>(value, <span class="at">q_perc =</span> <span class="fl">0.02</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Plot check</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-25_9a42678d02aae4dc3c1a6c9e91f17735">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(test_hydro_q, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> value, <span class="at">color =</span> quantile)) <span class="sc">+</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Looks right, but we can also check within months</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-26_ea09bfd83e918e1a68d9d48521286db4">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(test_hydro_q, <span class="fu">aes</span>(<span class="at">x =</span> lubridate<span class="sc">::</span><span class="fu">mday</span>(time), </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">y =</span> value, <span class="at">color =</span> quantile,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">group =</span> lubridate<span class="sc">::</span><span class="fu">year</span>(time))) <span class="sc">+</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="st">'Month'</span>) <span class="sc">+</span> </span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_viridis_c</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="need-a-match-to-sdl-unit-step" class="level3">
+<h3 class="anchored" data-anchor-id="need-a-match-to-sdl-unit-step">NEED A MATCH TO SDL UNIT STEP</h3>
+<p>I pair them up in <code>flow_scaling.qmd</code>, but that then gets lost by the time they’re here. Can we go back over there and keep it?</p>
+</section>
+<section id="do-the-shift" class="level3">
+<h3 class="anchored" data-anchor-id="do-the-shift">Do the shift</h3>
+<p>The <code>multiple = all</code> here is because otherwise it throws a warning that it duplicates rows x scenarios. That’s fine. But it might make more sense to do the scenarios as a list anyway, since they’ll get saved different places. Doesn’t matter right this instant.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-27_5ad27a227678a351f373073f57da365c">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>test_hydro_q <span class="ot">&lt;-</span> test_hydro_q <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(test_q_s, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'Month'</span>, <span class="st">'quantile'</span>), <span class="at">multiple =</span> <span class="st">'all'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Do the transform</p>
+<p><strong>All of this change ratio stuff is unnecessarily convoluted</strong>- just multiple F/H, don’t do this weird multiply then add thing. It’s <em>exactly the same</em> algebraically.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-28_43536463e516e913e289adafd5297d06">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>test_hydro_q <span class="ot">&lt;-</span> test_hydro_q <span class="sc">%&gt;%</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">adj_val =</span> (value<span class="sc">*</span>change_ratio <span class="sc">+</span> value))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Plot check. too hard to see overplotted.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-29_712aa1c7e951641767faec2597d0eaaf">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>test_hydro_q <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(scenario <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'SimR1'</span>, <span class="st">'SimR4'</span>, <span class="st">'SimR7'</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> adj_val, <span class="at">color =</span> scenario)) <span class="sc">+</span> </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> <span class="fu">geom_line</span>() <span class="sc">+</span> </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_brewer</span>(<span class="at">palette =</span> <span class="st">'Dark2'</span>) <span class="sc">+</span> </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="st">'scenario'</span>) <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="format-cleanup" class="level2">
+<h2 class="anchored" data-anchor-id="format-cleanup">Format cleanup</h2>
+<p>I want to then separate the scenarios and save a version that’s just time, site, and adj_val, but with ‘site’ as the name. This makes a nested tibble, which we could then loop over to save.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-30_93de9252cc41eb03a208ae4b5bcb2b57">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>thqs <span class="ot">&lt;-</span> test_hydro_q <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Just the needed cols</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(scenario, site, time, adj_val) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># pivot so the gauge name is col name</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">names_from =</span> site, <span class="at">values_from =</span> adj_val) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># collapse to a list-tibble with one row per scenario</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">nest</span>(<span class="at">.by =</span> scenario)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then I just need to write it out.</p>
+<p><strong>Question</strong> do I want to do this differently so I can more easily save gauges within scenarios? or just do them one at a time? I think the way the data works (e.g.&nbsp;coming in as single gauges and scenarios all together), it gets convoluted either way, really. I think keep it how it is, and if memory holds it all I could paste them together, otherwise save a million csvs. That might be better anyway given the different date ranges.</p>
+</section>
+</section>
+<section id="todo" class="level1">
+<h1>TODO</h1>
+<ul>
+<li><p>Plot check- Done</p></li>
+<li><p>make that easy to use for adjusting the hyrdographs. Done, I think.</p></li>
+<li><p>Run it over the full list of SDL units</p></li>
+<li><p>settle on the grouping- use months</p></li>
+<li><p>a version with long data- would it make more sense? Done, and I think yes</p></li>
+<li><p>I’m curently doing the gauge pull, and then this. But does it make more sense to create the scaling dfs/lists here and save them, and then read them in and do the scaling over there? I think probably.</p>
+<ul>
+<li>Then, for example, we wouldn’t need to re-match to sdl units, we’d have the mapping there already in <code>geo_gauge</code>, and could pull sdl from the gauge name.</li>
+</ul></li>
+</ul>
+</section>
+<section id="testing-1" class="level1">
+<h1>Testing</h1>
+<p>In the clean version, I’m getting a warning about list-columns and not-distinctly defined variables. It comes from duplicated data coming in from the API. I’ve cut out most of the hunting around to find the issue, but it’sworth keeping the issue itself here.</p>
+<p>Re-pull- is it comign from the API?</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-31_5441d27db49904754c6b55c21574e1a2">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>re_dup <span class="ot">&lt;-</span> <span class="fu">get_ts_traces2</span>(<span class="at">state =</span> <span class="st">'NSW'</span>, </span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">site_list =</span> <span class="st">'412036'</span>, </span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">var_list =</span> <span class="dv">141</span>,</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">start_time =</span> <span class="st">'all'</span>,</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">end_time =</span> <span class="st">'all'</span>,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">interval =</span> <span class="st">'day'</span>,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data_type =</span> <span class="st">'mean'</span>,</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">datasource =</span> <span class="st">'A'</span>,</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">returnformat =</span> <span class="st">'df'</span>,</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">.errorhandling =</span> <span class="st">'pass'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: executing %dopar% sequentially: no parallel backend registered</code></pre>
+</div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-32_58aa9e22c1e4840b7117caa16ce8359b">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(re_dup)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 43891</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>re_dup <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(time) <span class="sc">%&gt;%</span> <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 38686</code></pre>
+</div>
+</div>
+<p>Yes. Why?</p>
+<p>is there an obvious pattern? Yes, every day starting in 1990 to 2004-04-01.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-33_9d367e0779df5500cff3d10a7e2b7ad2">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>duptimes <span class="ot">&lt;-</span> re_dup<span class="sc">$</span>time[<span class="fu">duplicated</span>(re_dup<span class="sc">$</span>time)]</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">min</span>(duptimes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "1990-01-01 09:00:00 UTC"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">max</span>(duptimes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "2004-04-01 09:00:00 UTC"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(duptimes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Are the values the same? e.g.&nbsp;can we just dump the dups?</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-34_80cc18dfd2c4b8cbe1c3a2d4e5d4b83c">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>dups <span class="ot">&lt;-</span> re_dup <span class="sc">%&gt;%</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(time) <span class="sc">%&gt;%</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dupnum =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(time) <span class="co"># makes the comparisons easier</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Quite clearly not the same.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-35_d5f2c98cd3c99a27d01c509af34582d8">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>dups <span class="ot">&lt;-</span> dups <span class="sc">%&gt;%</span> </span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(site, value, time, site_short_name, variable, dupnum, quality_codes, quality_codes_id)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>dups</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10,410 × 8
+# Groups:   time [5,205]
+   site   value time                site_short_…¹ varia…² dupnum quali…³ quali…⁴
+   &lt;chr&gt;  &lt;dbl&gt; &lt;dttm&gt;              &lt;chr&gt;         &lt;chr&gt;    &lt;int&gt; &lt;chr&gt;     &lt;int&gt;
+ 1 412036 1011. 1990-01-01 09:00:00 LACHLAN JEMA… 141.00       1 Not qu…     130
+ 2 412036 1061. 1990-01-01 09:00:00 LACHLAN JEMA… 141.00       2 Not qu…     130
+ 3 412036 1005. 1990-01-02 09:00:00 LACHLAN JEMA… 141.00       1 Not qu…     130
+ 4 412036 1056. 1990-01-02 09:00:00 LACHLAN JEMA… 141.00       2 Not qu…     130
+ 5 412036  899. 1990-01-03 09:00:00 LACHLAN JEMA… 141.00       1 Not qu…     130
+ 6 412036  953. 1990-01-03 09:00:00 LACHLAN JEMA… 141.00       2 Not qu…     130
+ 7 412036  796. 1990-01-04 09:00:00 LACHLAN JEMA… 141.00       1 Not qu…     130
+ 8 412036  842. 1990-01-04 09:00:00 LACHLAN JEMA… 141.00       2 Not qu…     130
+ 9 412036  692. 1990-01-05 09:00:00 LACHLAN JEMA… 141.00       1 Not qu…     130
+10 412036  731. 1990-01-05 09:00:00 LACHLAN JEMA… 141.00       2 Not qu…     130
+# … with 10,400 more rows, and abbreviated variable names ¹​site_short_name,
+#   ²​variable, ³​quality_codes, ⁴​quality_codes_id</code></pre>
+</div>
+</div>
+<p>It’s not just that they have different codes</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-36_bd619ff0dc68e01fc022620d4db49418">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(dups<span class="sc">$</span>quality_codes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+                     Data Unavailable Not quality coded - subject to change 
+                                   18                                 10392 </code></pre>
+</div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-37_1a9115598760d0fb9c027c4efd4e7ed0">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dups, <span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> value, <span class="at">color =</span> <span class="fu">factor</span>(dupnum))) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Is there a consistent difference between them</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-38_c149140015d24b3655961d6f940778db">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>dupwide <span class="ot">&lt;-</span> dups <span class="sc">%&gt;%</span> <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> dupnum, <span class="at">names_prefix =</span> <span class="st">'dup_'</span>, <span class="at">id_cols =</span> <span class="fu">c</span>(site, time, site_short_name, variable)) <span class="sc">%&gt;%</span> </span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dupdif =</span> dup_2<span class="sc">-</span>dup_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-39_8e3369b1bff7002dc2aa9558c1c68df1">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dupwide, <span class="fu">aes</span>(<span class="at">x =</span> dup_1, <span class="at">y =</span> dupdif)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>No obvious pattern to their relative difference.</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-40_1880824b54fa27c6672522f963ba6f05">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(dupwide, <span class="fu">aes</span>(<span class="at">x =</span> dup_1, <span class="at">y =</span> dup_2)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="scaling_testing_files/figure-html/unnamed-chunk-40-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>At least they both go up together?</p>
+<p>If we re-pull only in that range, do we still get the issue?</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-41_074b33d685a23e75f911ef084503e04f">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>re_dup_short <span class="ot">&lt;-</span> <span class="fu">get_ts_traces2</span>(<span class="at">state =</span> <span class="st">'NSW'</span>, </span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">site_list =</span> <span class="st">'412036'</span>, </span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">var_list =</span> <span class="dv">141</span>,</span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">start_time =</span> <span class="st">'19950101'</span>,</span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">end_time =</span> <span class="st">'19960101'</span>,</span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">interval =</span> <span class="st">'day'</span>,</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data_type =</span> <span class="st">'mean'</span>,</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">datasource =</span> <span class="st">'A'</span>,</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">returnformat =</span> <span class="st">'df'</span>,</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">.errorhandling =</span> <span class="st">'pass'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: executing %dopar% sequentially: no parallel backend registered</code></pre>
+</div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-42_9641deb3947da67fa008a92f1b4f4de7">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>dupshort <span class="ot">&lt;-</span> re_dup_short <span class="sc">%&gt;%</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(time) <span class="sc">%&gt;%</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="fu">n</span>() <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">dupnum =</span> <span class="fu">row_number</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(time) <span class="co"># makes the comparisons easier</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Does a different datasource fix it?</p>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-43_80f6b38253f5a07e470204ffadb4a3ec">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>re_dup_short_cp <span class="ot">&lt;-</span> <span class="fu">get_ts_traces2</span>(<span class="at">state =</span> <span class="st">'NSW'</span>, </span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">site_list =</span> <span class="st">'412036'</span>, </span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">var_list =</span> <span class="dv">141</span>,</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">start_time =</span> <span class="st">'19950101'</span>,</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">end_time =</span> <span class="st">'19960101'</span>,</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>                            <span class="at">interval =</span> <span class="st">'day'</span>,</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>                            <span class="at">data_type =</span> <span class="st">'mean'</span>,</span>
+<span id="cb60-8"><a href="#cb60-8" aria-hidden="true" tabindex="-1"></a>                           <span class="at">datasource =</span> <span class="st">'CP'</span>,</span>
+<span id="cb60-9"><a href="#cb60-9" aria-hidden="true" tabindex="-1"></a>                            <span class="at">returnformat =</span> <span class="st">'df'</span>,</span>
+<span id="cb60-10"><a href="#cb60-10" aria-hidden="true" tabindex="-1"></a>                            <span class="at">.errorhandling =</span> <span class="st">'pass'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-hash="scaling_testing_cache/html/unnamed-chunk-44_4d1c989bc903d091351263dc8d6aa806">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(<span class="fu">duplicated</span>(re_dup_short_cp<span class="sc">$</span>time))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 366</code></pre>
+</div>
+</div>
+<p>No, still there. So, what to do? I think either throw out the gauge, or throw out one set of values.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO</div>   
+  </div>
+</footer>
+
+
+
+</body></html>

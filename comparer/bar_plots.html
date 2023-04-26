@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Galen Holt">
+
+<title>Using the WERP toolkit - Bar plots</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Using the WERP toolkit</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../scenario_creation/scenario_creation_overview.html">
+ <span class="menu-text">Scenario creation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../causal_networks/causal_overview.html">
+ <span class="menu-text">Causal networks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../controller/controller_overview.html">
+ <span class="menu-text">Controller</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../aggregator/aggregation_overview.html">
+ <span class="menu-text">Aggregator</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../comparer/comparer_overview.html" aria-current="page">
+ <span class="menu-text">Comparer</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../full_toolkit/full_toolkit_overview.html">
+ <span class="menu-text">Full toolkit</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo"><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Bar plots</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/comparer_overview.html" class="sidebar-item-text sidebar-link">Comparer overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Simple demonstration</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/hydrographs.html" class="sidebar-item-text sidebar-link">Hydrographs and baselining</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/bar_plots.html" class="sidebar-item-text sidebar-link active">Bar plots (qual x)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/line_plots.html" class="sidebar-item-text sidebar-link">Line plots (quant x)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/maps.html" class="sidebar-item-text sidebar-link">Maps</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/causal_plots.html" class="sidebar-item-text sidebar-link">Outcomes on causal networks</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Flow scaling and climate scenarios</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/flow_scaling_comparer.html" class="sidebar-item-text sidebar-link">Comparer examples for flow scaling demonstration</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#demonstration-setup" id="toc-demonstration-setup" class="nav-link" data-scroll-target="#demonstration-setup">Demonstration setup</a>
+  <ul class="collapse">
+  <li><a href="#scenario-information" id="toc-scenario-information" class="nav-link" data-scroll-target="#scenario-information">Scenario information</a></li>
+  <li><a href="#subset-for-demo" id="toc-subset-for-demo" class="nav-link" data-scroll-target="#subset-for-demo">Subset for demo</a></li>
+  </ul></li>
+  <li><a href="#standard-scenario-appearance" id="toc-standard-scenario-appearance" class="nav-link" data-scroll-target="#standard-scenario-appearance">Standard scenario appearance</a></li>
+  <li><a href="#make-bar-plots" id="toc-make-bar-plots" class="nav-link" data-scroll-target="#make-bar-plots">Make bar plots</a>
+  <ul class="collapse">
+  <li><a href="#choosing-example-data" id="toc-choosing-example-data" class="nav-link" data-scroll-target="#choosing-example-data">Choosing example data</a></li>
+  <li><a href="#scenario-fills" id="toc-scenario-fills" class="nav-link" data-scroll-target="#scenario-fills">Scenario fills</a>
+  <ul class="collapse">
+  <li><a href="#basin-scale" id="toc-basin-scale" class="nav-link" data-scroll-target="#basin-scale">Basin scale</a></li>
+  <li><a href="#sdl-units" id="toc-sdl-units" class="nav-link" data-scroll-target="#sdl-units">SDL units</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#colors-from-outcomes" id="toc-colors-from-outcomes" class="nav-link" data-scroll-target="#colors-from-outcomes">Colors from outcomes</a>
+  <ul class="collapse">
+  <li><a href="#grouped-colors" id="toc-grouped-colors" class="nav-link" data-scroll-target="#grouped-colors">Grouped colors</a></li>
+  <li><a href="#manual-color-definition" id="toc-manual-color-definition" class="nav-link" data-scroll-target="#manual-color-definition">Manual color definition</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Bar plots</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Galen Holt </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-1_cf098ec6ba0669b1bb2ac76df7c0d7f3">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(werptoolkitr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<p>This notebook provides examples of creating bar plots, e.g.&nbsp;plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, scenario. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit and type of response.</p>
+<p>For a quantitative x-axis, we would typically use <a href="comparer/line_plots.qmd">line plots</a>.</p>
+</section>
+<section id="demonstration-setup" class="level1">
+<h1>Demonstration setup</h1>
+<p>As usual, we need paths to the data.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-2_7438083c9301e661acf615bd90e9c0af">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'scenario_example'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>agg_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(project_dir, <span class="st">'aggregator_output'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="scenario-information" class="level2">
+<h2 class="anchored" data-anchor-id="scenario-information">Scenario information</h2>
+<p>This will be attached to metadata, typically. For now, I’m just using it for diagnostic plots and the demonstration data is simple, so make it here.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-3_72b7c5d7b83269985260ee3de547a5f1">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">scenario =</span> <span class="fu">c</span>(<span class="st">'base'</span>, <span class="st">'down4'</span>, <span class="st">'up4'</span>), <span class="at">delta =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.25</span>, <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="subset-for-demo" class="level2">
+<h2 class="anchored" data-anchor-id="subset-for-demo">Subset for demo</h2>
+<p>We have a lot of hydrographs, so for this demonstration, we will often use a subset.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-4_684ba1c419318e681aff8978d7ed3308">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gauges_to_plot <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'412002'</span>, <span class="st">'419001'</span>, <span class="st">'422028'</span>, <span class="st">'421001'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="standard-scenario-appearance" class="level1">
+<h1>Standard scenario appearance</h1>
+<p>We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-5_5f10defc6890bc1c9bfb0465906f727a">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sceneorder <span class="ot">&lt;-</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(scenarios<span class="sc">$</span>scenario, scenarios<span class="sc">$</span>delta)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scene_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="fu">unique</span>(scenarios<span class="sc">$</span>scenario), </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">palette =</span> <span class="st">'ggsci::nrc_npg'</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">refvals =</span> <span class="st">'base'</span>, <span class="at">refcols =</span> <span class="st">'black'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="make-bar-plots" class="level1">
+<h1>Make bar plots</h1>
+<section id="choosing-example-data" class="level2">
+<h2 class="anchored" data-anchor-id="choosing-example-data">Choosing example data</h2>
+<p>First, we read in the aggregated data and make a simple demonstration bar plot. There is example data provided by the toolkit (<code>agg_theme_space</code> and <code>agg_theme_space_colsequence</code>), but to continue with the demonstration, we will use the aggregations created here in the <a href="aggregator/theme_space_agg.qmd">interleaved aggregation notebook</a>.</p>
+<p><em>Note</em>- to <code>readRDS</code> <code>sf</code> objects, we need to have <code>sf</code> loaded.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-6_8ef67c2a819d45eb0a641633d38fbf28">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>agged_data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(agg_dir, <span class="st">'summary_aggregated.rds'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>That has all the steps in the aggregation, so we’ll choose one (the Objective theme scale at the basin spatial scale, <code>agged_data$mdb</code>) for the first set of plots and another (<code>agged_data$sdl_units</code> at the SDL unit scale and <code>env_obj</code> theme scale for the second set of plots. This finer scale lets us look at complicating factors like multiple spatial units and grouping outcomes.</p>
+<p>To make these examples more easily, we create some slightly simpler dataframes here for those examples, but this isn’t really necessary- small data manipulations are easily piped in to <code>plot_outcomes</code>. The basin-scale needs a bit of cleanup because Objectives (and many of the other categories other than codes, e.g.&nbsp;yearly targets) are really long. We could fold them in the facet labels with <code>ggplot2::label_wrap_gen()</code>, but they’re so long it blocks out the plots. Ideally, we would use descriptive short names for each, but that’s a large manual job to assign them. For this demonstration, I’ll just cut them off and make them unique, but we need a better solution. The SDL units data is given a grouping column that puts the many <code>env_obj</code> variables in groups defined by their first two letters, e.g.&nbsp;<code>EF</code> for Ecosystem Function.</p>
+<p>If we had used multiple aggregation functions at any step, we should filter down to the one we want here, but we only used one for this example.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-7_69fa21eb30c2da26f582a936acd0be15">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make the super long names shorter but less useful.</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>basin_to_plot <span class="ot">&lt;-</span> agged_data<span class="sc">$</span>mdb <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Objective)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">Objective =</span> stringr<span class="sc">::</span><span class="fu">str_trunc</span>(Objective, <span class="dv">15</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(scenario, Objective) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">id =</span> <span class="fu">as.character</span>(<span class="fu">row_number</span>())) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">Objective =</span> stringr<span class="sc">::</span><span class="fu">str_c</span>(Objective, <span class="st">'_'</span>, id)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>id)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a grouping variable</span></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="ot">&lt;-</span> agged_data<span class="sc">$</span>sdl_units <span class="sc">|&gt;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">env_group =</span> stringr<span class="sc">::</span><span class="fu">str_extract</span>(env_obj, <span class="st">'^[A-Z]+'</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(env_group)) <span class="sc">|&gt;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(env_group, env_obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="scenario-fills" class="level2">
+<h2 class="anchored" data-anchor-id="scenario-fills">Scenario fills</h2>
+<section id="basin-scale" class="level3">
+<h3 class="anchored" data-anchor-id="basin-scale">Basin scale</h3>
+<p>We can make plots looking at how scenarios differ for each of the outcome categories. This uses <code>facet_wrapper</code> to just wrap the single facet axis, looking at the basin scale and Objectives first. If we had more than one spatial unit, we would need to either filter to a target unit or facet by them. As with {ggplot2} itself, we tend to use <code>facet_wrap</code> for single-variable facetting and <code>facet_row</code> and <code>facet_grid</code> for specifying rows and columns, though here we use <code>facet_row</code> and <code>facet_col</code> to feed <code>facet_grid</code>. Plots at the basin scale are the simplest because we don’t have to worry about different bars for different spatial units.</p>
+<p>The <code>colorset</code> argument is the column that determines color, while the <code>pal_list</code> defines those colors, here as a named <code>colors</code> object, but as we see below it can also be palette names. The <code>sceneorder</code> argument lets us explicitly set the order of the scenarios. This is typically easiest to have a <code>Factor</code> object with the scenarios and their orders, as here. But we can also just use a character vector (demonstrated later).</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-8_9e57f9a33e5c3de0e3d025d8298ed060">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(basin_to_plot, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">facet_wrapper =</span> <span class="st">'Objective'</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pal_list =</span> scene_pal,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We retain the axis names as-is from the incoming dataframe, as they provide the true meaning of each value. But we can change them, either inside the <code>plot_outcomes</code> function or post-hoc. We can also set the <code>sceneorder</code> with a character vector if that’s easier than setting up a Factor.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-9_fca5efbed6c49eea7c91b64fa49f4d5e">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(basin_to_plot, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_lab =</span> <span class="st">'Proportion Objectives</span><span class="sc">\n</span><span class="st">Achieved'</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">x_lab =</span> <span class="st">'Scenario'</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">color_lab =</span> <span class="st">'Scenario'</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">facet_wrapper =</span> <span class="st">'Objective'</span>, </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pal_list =</span> scene_pal,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Because these are just ggplot objects, we can also change the labels outside the function, which can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-10_3a904d743f5ae9f26040c7d0d9760398">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>scenebar <span class="ot">&lt;-</span> <span class="fu">plot_outcomes</span>(basin_to_plot, </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">facet_wrapper =</span> <span class="st">'Objective'</span>, </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pal_list =</span> scene_pal,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>scenebar <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">'Proportion</span><span class="sc">\n</span><span class="st">Objectives Achieved'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Another approach is to put the outcomes on the x-axis, and color by scenario. This requires using the special <code>scene_pal</code> argument currently instead of <code>pal_list</code>. This is a bit of a historical holdover and will be made more general.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-11_b211c385bcc17fdd43b2b65e38c117ed">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(basin_to_plot, </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">x_col =</span> <span class="st">'Objective'</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Using dodged bars can allow clearer comparisons, particularly accentuating the variation in sensitivity of the different outcomes to the scenarios, though there are a lot of bars to try to read here.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-12_d6471035ac3dcfb551da3edbcd2ef748">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(basin_to_plot, </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">x_col =</span> <span class="st">'Objective'</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">position =</span> <span class="st">'dodge'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="sdl-units" class="level3">
+<h3 class="anchored" data-anchor-id="sdl-units">SDL units</h3>
+<p>We can use the aggregation step of <code>env_obj</code> and SDL units to demonstrate plotting that not only addresses the outcomes for scenarios, but how they differ across space. I’ll often use subsets of the <code>env_obj</code> codes here to keep the number of plots visible.</p>
+<p>First, we look at how the different scenarios perform for the Ecosystem Function objectives in each SDL unit</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-13_e122faefc095bd5bbb63ae3eddb0eef8">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">%&gt;%</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">'^EF'</span>, env_obj)) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>, </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">"SWSDLName"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">pal_list =</span> scene_pal,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We address a few ways to handle groups of outcome variables, one of the simplest is to simply facet these plots by those groups, with all the outcomes in the group getting their own bars. This puts the objectives on x and colors by scenario, with the groups accentuated by facets. These can be stacked (<code>position = 'stack'</code>- the default) or dodged (demonstrated here).</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-14_3f7e8c8cbd3efffabd270b10ed2f1c75">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dodgefacet <span class="ot">&lt;-</span> obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scales =</span> <span class="st">'free_x'</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> sceneorder,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">position =</span> <span class="st">'dodge'</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>dodgefacet <span class="sc">+</span> <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>) <span class="sc">+</span> </span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">'Environmental Objective'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="colors-from-outcomes" class="level1">
+<h1>Colors from outcomes</h1>
+<p>Rather than facetting, we can stack each of the outcome categories (here, Objectives). To do this, we simply change the <code>colorset</code> to “Objective” instead of ‘scenario’ (the default <code>x_col</code> is scenario, so it remains on x). We also change the <code>pal_list</code> to a {paletteer} name, providing the palette from which to choose colors for each Objective. This yields a more compact plot that shows overall outcomes at the expense of making it harder to see what any particular objective is doing, particularly with many outcomes and long names. But with careful selection of a color palette and cleaner naming (or just far fewer categories), this could be a very useful approach.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-15_566f9fc6b18840cc3c2add557e6d4193">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(basin_to_plot,</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'Objective'</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">"scico::oslo"</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder) <span class="sc">+</span> </span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">ncol =</span> <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>In another example of colors from other information in the data, when we have multiple spatial units we might color by them instead of coloring by outcome category. Here, we show how to color by SDL unit (SWSDLName) instead of <code>env_obj</code>. That still stacks the <code>env_obj</code> outcomes in each catchment, but coloring them all the same, and so is itself a sort of simple aggregation.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-16_c31ff7a1a3dec64fefc46efaa018dcd5">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(obj_sdl_to_plot,</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">"ggsci::default_jama"</span>),</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>That shows that while all SDL units are affected by the changes in the flow, the Lachlan is less sensitive.</p>
+<p>We can also use <code>position = 'dodge'</code> to have side-by-side bars instead of stacked. Note that in this case, where we’re coloring by SDL unit but there are many <code>env_obj</code> values, those <code>env_obj</code> no longer stack, and so we have to manually stack them by calculating their sum. This would not be the case if we were coloring by individual rows (<code>env_obj</code>)- see examples of that below.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-17_2cc2ac9a9d72e3e6eba65e74725c030b">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(SWSDLName, scenario) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">ewr_achieved =</span> <span class="fu">sum</span>(ewr_achieved, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">"calecopal::lake"</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>              <span class="at">position =</span> <span class="st">'dodge'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We are about to consider grouped colors as a way to assign different palettes to different groups. But a simpler way to show outcomes groups is to color by the groups directly if we don’t care what the individual <code>env_obj</code>s are doing between them. This is very similar to the plots coloring by SDL unit above.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-18_45d23c0dd2e46d67934a33ae429e0616">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(obj_sdl_to_plot,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">"scico::berlin"</span>),</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">facet_row =</span> <span class="st">'.'</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>colors not specified per level. Trying to use the 'colors' argument as a palette
+name</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<section id="grouped-colors" class="level2">
+<h2 class="anchored" data-anchor-id="grouped-colors">Grouped colors</h2>
+<p>We have the ability to assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly <a href="causal_networks/causal_plots.qmd">causal networks</a>. For example, we might categorize the <code>env_obj</code> outcomes into the larger scale groups (e.g.&nbsp;‘NF’, ‘EF’, etc). We can then assign each of these a separate palette, and so the individual <code>env_obj</code>s get different colors chosen from different palettes.</p>
+<p>Achieving this requires specifying two columns- the <code>colorset</code>, as above, is the column that determines color. The <code>colorgroups</code> column specifies the groupings of those <code>colorset</code> values, and so what palette to use. Thus, the <code>pal_list</code> needs to be either length 1 (everything gets the same palette) or <code>length(unique(data$colorgroups))</code>. Note also that the <code>colorset</code> values must be unique to <code>colorgroups</code>- this cannot be a one-to-many mapping because each <code>colorset</code> value must get a color from a single palette defined by the <code>colorgroup</code> it is in.</p>
+<p>We demonstrate with <code>env_obj</code> variables mapped to larger environmental groups, making it easier to see at a glance the sorts of environmental objectives that are more or less affected, while also allowing views of the individual environmental objectives. Here we use <code>facet_col</code> and <code>facet_row</code> to ensure the SDL units don’t wrap around. We made the <code>env_groups</code> column when we chose the data initially.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-19_44d5e89fd6a81836b9f12a209bfc0681">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a palette list</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>env_pals <span class="ot">=</span> <span class="fu">list</span>(<span class="at">EF =</span> <span class="st">'grDevices::Purp'</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">NF =</span> <span class="st">'grDevices::Mint'</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">NV =</span> <span class="st">'grDevices::Burg'</span>,</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">OS =</span> <span class="st">'grDevices::Blues'</span>,</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">WB =</span> <span class="st">'grDevices::Peach'</span>)</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># need to facet by space sdl unit and give it the colorgroup argument to take multiple palettes</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>sdl_stack <span class="ot">&lt;-</span> obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorgroups =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorset =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>                <span class="at">pal_list =</span> env_pals,</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">'.'</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder)</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>sdl_stack</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Adding facetting by those groups can make that easier to read if the goal is to focus on changes within groups, but more plots.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-20_3ccb1982dbca64bbadeb368422d02133">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorgroups =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorset =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">pal_list =</span> env_pals,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We could also split those bars sideways instead of stack them, but that likely makes more sense if there are fewer categories than here. We again use <code>position = 'dodge'</code>, but now we don’t need to sum because we’re stacking each row already. I’ve flipped the facetting and taken advantage of the fact that these are just ggplot objects to remove the legend, making it very slightly easier to read (but harder to interpret).</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-21_0967e6710a9b3af4a513359284e3c0a3">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorgroups =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorset =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">pal_list =</span> env_pals,</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder,</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">position =</span> <span class="st">'dodge'</span>) <span class="sc">+</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Another approach to groups of outcomes without the colors explicitly grouped is to not use <code>colorgroup</code>, but instead just facet by the group and give every <code>colorset</code> value a color from the same palette. Depending on the palette chosen and the breaks, this can be quicker, but will not accentuate groups as well.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-22_6c748028aafb1b35d23e6d15004d9fc8">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::berlin'</span>),</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scales =</span> <span class="st">'free_x'</span>,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_x =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> sceneorder) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>These plots are interesting, but in typical use, the plots above using facets for the groups or coloring by the groups themselves are likely to be easier to read, unless we really are interested in this level of granularity. Whatever approach we choose for a given plot, accentuating the differences between outcome groups can be a powerful interpretation tool.</p>
+</section>
+<section id="manual-color-definition" class="level2">
+<h2 class="anchored" data-anchor-id="manual-color-definition">Manual color definition</h2>
+<p>Though the above examples using {paletteer} palettes are the easiest way to specify coloring, we don’t have to let the palettes auto-choose colors, and can instead pass <code>colors</code> objects, just as we do for scenarios. This can be particularly useful with small numbers of groups (defining too many colors is cumbersome- that’s what palettes are for) when we want to control which is which. Just as with scenarios, we use <code>make_pal</code> . Here, we will use ‘scico::berlin’ as the base, but define several ‘reference’ values manually. This demonstration uses <code>includeRef = TRUE</code> so we <em>replace</em> the palette values with the refs, rather than choose them from the set of values with refs removed. This tends to yield better spread of colors (and lets us sometimes ref colors and sometimes not if we also used <code>returnUnref</code>). For example, maybe we want to sometimes really accentuate ecosystem function and native vegetation, but not in all plots.</p>
+<p>First, we create the palettes with and without the (garish) ref values.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-23_d01d3e51b48c2b8adbdda4649b64c013">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>obj_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="at">levels =</span> <span class="fu">unique</span>(obj_sdl_to_plot<span class="sc">$</span>env_group),</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">palette =</span> <span class="st">'scico::lisbon'</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">refvals =</span> <span class="fu">c</span>(<span class="st">'EF'</span>, <span class="st">'NV'</span>), <span class="at">refcols =</span> <span class="fu">c</span>(<span class="st">'purple'</span>, <span class="st">'orange'</span>), <span class="at">includeRef =</span> <span class="cn">TRUE</span>, <span class="at">returnUnref =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then we can create an accentuated plot sometimes, if, perhaps, we want to highlight how EF performed.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-24_2fc97800fe321061211a7fa493a10f39">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(obj_sdl_to_plot,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> obj_pal<span class="sc">$</span>refcols,</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">facet_row =</span> <span class="st">'.'</span>,</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>But for other plots maybe we don’t want that accentuation and we can use the <code>unrefcols</code> to retain the standard coloring- note that ‘NF’, ‘OS’, and ‘WB’ colors are unchanged.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-25_bf0465b2b519f05f5eddd5347b06a38c">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(obj_sdl_to_plot,</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> obj_pal<span class="sc">$</span>unrefcols,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">facet_row =</span> <span class="st">'.'</span>,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="bar_plots_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO</div>   
+  </div>
+</footer>
+
+
+
+</body></html>

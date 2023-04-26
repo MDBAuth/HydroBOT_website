@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Galen Holt">
+
+<title>Using the WERP toolkit - Maps</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Using the WERP toolkit</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../scenario_creation/scenario_creation_overview.html">
+ <span class="menu-text">Scenario creation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../causal_networks/causal_overview.html">
+ <span class="menu-text">Causal networks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../controller/controller_overview.html">
+ <span class="menu-text">Controller</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../aggregator/aggregation_overview.html">
+ <span class="menu-text">Aggregator</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../comparer/comparer_overview.html" aria-current="page">
+ <span class="menu-text">Comparer</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../full_toolkit/full_toolkit_overview.html">
+ <span class="menu-text">Full toolkit</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo"><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Maps</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/comparer_overview.html" class="sidebar-item-text sidebar-link">Comparer overview</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Simple demonstration</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/hydrographs.html" class="sidebar-item-text sidebar-link">Hydrographs and baselining</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/bar_plots.html" class="sidebar-item-text sidebar-link">Bar plots (qual x)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/line_plots.html" class="sidebar-item-text sidebar-link">Line plots (quant x)</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/maps.html" class="sidebar-item-text sidebar-link active">Maps</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/causal_plots.html" class="sidebar-item-text sidebar-link">Outcomes on causal networks</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Flow scaling and climate scenarios</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../comparer/flow_scaling_comparer.html" class="sidebar-item-text sidebar-link">Comparer examples for flow scaling demonstration</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#demonstration-setup" id="toc-demonstration-setup" class="nav-link" data-scroll-target="#demonstration-setup">Demonstration setup</a>
+  <ul class="collapse">
+  <li><a href="#scenario-information" id="toc-scenario-information" class="nav-link" data-scroll-target="#scenario-information">Scenario information</a></li>
+  <li><a href="#subset-for-demo" id="toc-subset-for-demo" class="nav-link" data-scroll-target="#subset-for-demo">Subset for demo</a></li>
+  </ul></li>
+  <li><a href="#standard-scenario-appearance" id="toc-standard-scenario-appearance" class="nav-link" data-scroll-target="#standard-scenario-appearance">Standard scenario appearance</a>
+  <ul class="collapse">
+  <li><a href="#choosing-example-data" id="toc-choosing-example-data" class="nav-link" data-scroll-target="#choosing-example-data">Choosing example data</a></li>
+  </ul></li>
+  <li><a href="#make-maps" id="toc-make-maps" class="nav-link" data-scroll-target="#make-maps">Make maps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Maps</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Galen Holt </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-1_b43e9739eff2324ba01929e2f1f66a16">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(werptoolkitr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="overview" class="level1">
+<h1>Overview</h1>
+<p>This notebook provides examples of creating maps to display toolkit data and especially aggregated outcomes. Typically, these have quantitative fill that is spatially-relevant, whether that is a point (gauge) or polygon (SDL unit, basin, etc). The numerical values can be more difficult to ascertain precisely from maps, but they are often the clearest way to present spatial data, especially when the message is one of spatial variation. Because maps lose two dimensions for data, we often have to reduce the number of categories we look at and rely heavily on facetting.</p>
+<p>As with all plots in {werptoolkitr}, maps have the ability to use color and different color palettes to include additional information, including type of response. These settings are dealt with more completely in the <a href="../comparer/bar_plots.html">bar_plots</a>, with much of the mechanics the same for maps and <a href="../comparer/line_plots.html">lines</a> e.g.&nbsp;the use of <code>colorgroups</code> and a list for <code>pal_list</code>.</p>
+<p>With maps, we can also plot multiple layers in the foreground <code>overlay</code> and background <code>underlay</code>, though at present these have fewer options than the ‘primary’ layer (e.g.&nbsp;we cannot plot data as fill in multiple polygon layers).</p>
+</section>
+<section id="demonstration-setup" class="level1">
+<h1>Demonstration setup</h1>
+<p>As usual, we need paths to the data.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-2_9edcc540fbd2b166f13b97b25c61b089">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'scenario_example'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>agg_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(project_dir, <span class="st">'aggregator_output'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="scenario-information" class="level2">
+<h2 class="anchored" data-anchor-id="scenario-information">Scenario information</h2>
+<p>This will be attached to metadata, typically. For now, I’m just using it for diagnostic plots and the demonstration data is simple, so make it here.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-3_b8e485c29b3618426014044584a1f7de">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">scenario =</span> <span class="fu">c</span>(<span class="st">'base'</span>, <span class="st">'down4'</span>, <span class="st">'up4'</span>), <span class="at">delta =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.25</span>, <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="subset-for-demo" class="level2">
+<h2 class="anchored" data-anchor-id="subset-for-demo">Subset for demo</h2>
+<p>We have a lot of hydrographs, so for this demonstration, we will often use a subset.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-4_9dc219d0da70270c59a4fab49ee7f0c6">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gauges_to_plot <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'412002'</span>, <span class="st">'419001'</span>, <span class="st">'422028'</span>, <span class="st">'421001'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="standard-scenario-appearance" class="level1">
+<h1>Standard scenario appearance</h1>
+<p>We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-5_29881d2169d4d7f7ee5c7cfdeabfa3f0">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sceneorder <span class="ot">&lt;-</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(scenarios<span class="sc">$</span>scenario, scenarios<span class="sc">$</span>delta)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scene_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="fu">unique</span>(scenarios<span class="sc">$</span>scenario), </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">palette =</span> <span class="st">'ggsci::nrc_npg'</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">refvals =</span> <span class="st">'base'</span>, <span class="at">refcols =</span> <span class="st">'black'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="choosing-example-data" class="level2">
+<h2 class="anchored" data-anchor-id="choosing-example-data">Choosing example data</h2>
+<p>First, we read in the aggregated data. There is example data provided by the toolkit (<code>agged_data</code> and <code>agged_data_colsequence</code>), but to continue with the demonstration, we will use the aggregations created here in the <a href="../aggregator/theme_space_agg.html">interleaved aggregation notebook</a>.</p>
+<p><em>Note</em>- to <code>readRDS</code> <code>sf</code> objects, we need to have <code>sf</code> loaded.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-6_714201e3c3533c675c71b891a17aea9c">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>agged_data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(agg_dir, <span class="st">'summary_aggregated.rds'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As with <a href="../comparer/line_plots.html">line plots</a>, we’ll make a grouping variable in the SDL-scale <code>env_obj</code> data for demonstrating grouped palettes, but will leave the other aggregation levels alone, and do any minor modifications there while piping into <code>plot_outcomes</code>.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-7_f3525f25be7d3fe3c435fb1db4c0fe8b">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a grouping variable</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="ot">&lt;-</span> agged_data<span class="sc">$</span>sdl_units <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(scenarios) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">env_group =</span> stringr<span class="sc">::</span><span class="fu">str_extract</span>(env_obj, <span class="st">'^[A-Z]+'</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(env_group)) <span class="sc">|&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">arrange</span>(env_group, env_obj)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining, by = "scenario"</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="make-maps" class="level1">
+<h1>Make maps</h1>
+<p>A minimal map of polygon aggregations with the basin in the background- we use <code>underlay</code> and <code>overlay</code> lists to put other layers in the background/foreground. Because maps lose two dimensions, we subset to the Waterbirds grouping to reduce dimensionality.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-8_abf5a58e6b8e7af20dc149bff5482b87">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(env_group <span class="sc">==</span> <span class="st">'WB'</span>) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">y_lab =</span> <span class="st">'Proportion EWR</span><span class="sc">\n</span><span class="st">achieved'</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::berlin'</span>),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">underlay_list =</span> <span class="fu">list</span>(<span class="at">underlay =</span> basin, </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">underlay_pal =</span> <span class="st">'azure'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>A minimal map can be created with gauges as the focal spatial unit, e.g.&nbsp;before any spatial aggregation has occurred.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-9_e9ed15a9900e73a09af040412f162496">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>agged_data<span class="sc">$</span>env_obj <span class="sc">|&gt;</span> <span class="co"># for readability</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(env_obj <span class="sc">==</span> <span class="st">'NF1'</span>) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">y_lab =</span> <span class="st">'All Arithmetic Mean'</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::berlin'</span>),</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>),</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">underlay_list =</span> <span class="fu">list</span>(<span class="at">underlay =</span> <span class="st">'basin'</span>,</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">underlay_pal =</span> <span class="st">'azure'</span>)) <span class="sc">+</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>While we can’t have informative fill in multiple layers, we <em>can</em> have informative fill in polygons underlying point (gauge) data. Here, we include a fill in the underlay for SDL unit name (e.g.&nbsp;not a data fill, but still informative). It is hard to find palettes for the full set of catchments. The only discrete palette available that makes sense is <code>ggsci::default_igv</code>, and it’s pretty garish. Using a continuous palette (e.g.&nbsp;<code>scico::oslo</code> ) works fine too, but the colors aren’t very well spatially-separated. We need to come up with a default set that we like, I think. Could be as simple as an actual mapping of specific colors to catchments, a la <code>scene_pal</code>.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-10_497506dd2c2765a1a1f0a1919c7c9988">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>agged_data<span class="sc">$</span>env_obj <span class="sc">|&gt;</span> <span class="co"># for readability</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(env_obj <span class="sc">==</span> <span class="st">'NF1'</span>) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">y_lab =</span> <span class="st">'All arithmetic mean'</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::berlin'</span>),</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>),</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">underlay_list =</span> <span class="fu">list</span>(<span class="at">underlay =</span> sdl_units,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">underlay_ycol =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>                                               <span class="at">underlay_pal =</span> <span class="st">'ggsci::default_igv'</span>)) <span class="sc">+</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We can use a continuous variable on the underlay fill, but have to be careful to choose palettes that don’t mask each other. We can also have multiple levels of underlay polygons (e.g.&nbsp;if we want the basin under sdl units). Note that we can pass colors directly, and not necessarily as a palette.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-11_2b44f2104e04d6fe83ba3bc2cc3f410c">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>agged_data<span class="sc">$</span>env_obj <span class="sc">|&gt;</span> <span class="co"># for readability</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(env_obj <span class="sc">==</span> <span class="st">'NF1'</span>) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'ggthemes::Orange-Gold'</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>),</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">underlay_list =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="at">underlay =</span> <span class="st">'basin'</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>                                                    <span class="at">underlay_pal =</span> <span class="st">'cornsilk'</span>),</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>                                               <span class="fu">list</span>(<span class="at">underlay =</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(obj_sdl_to_plot, env_obj <span class="sc">==</span> <span class="st">'NF1'</span>),</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>                                                    <span class="at">underlay_ycol =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>                                                    <span class="at">underlay_pal =</span> <span class="st">'scico::oslo'</span>))) <span class="sc">+</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We can also overlay, here with the sdl layer as ‘primary’, here with a single color to show where gauges are.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-12_42a01691d2bc15e728c98a6773195b7f">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(env_obj <span class="sc">==</span> <span class="st">'NF1'</span>) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::berlin'</span>),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">underlay_list =</span> <span class="st">'basin'</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">overlay_list =</span> <span class="fu">list</span>(<span class="at">overlay =</span> <span class="st">'bom_basin_gauges'</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">overlay_pal =</span> <span class="st">'grey40'</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">clip =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We can also give the overlay informative colors- this outcome is similar to what we’ve done above, but the amount of control we have over scaling etc differs depending on whether a layer is ‘primary’. I intend to make this more general, but will need to be careful.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-13_98a0d9b5efc5a5a0c00b40f16b6228a6">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(env_obj <span class="sc">==</span> <span class="st">'NF1'</span>) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::berlin'</span>),</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> sceneorder,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">underlay_list =</span> <span class="st">'basin'</span>,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">overlay_list =</span> <span class="fu">list</span>(<span class="at">overlay =</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(agged_data<span class="sc">$</span>env_obj, env_obj <span class="sc">==</span> <span class="st">'NF1'</span>),</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">overlay_pal =</span> <span class="st">'scico::oslo'</span>,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">overlay_ycol =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>                                              <span class="at">clip =</span> <span class="cn">TRUE</span>)) <span class="sc">+</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Here, we have a primary layer at the basin scale, overlay the sdl units with empty fill, and then put gauges on with informative values. There’s clearly a lot we can do here with the layering, most of which has been tested, but isn’t particularly interesting for a demonstration without a particular goal in mind.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-14_de658500cb2ebc26823395a9ea6c84bc">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>agged_data<span class="sc">$</span>mdb <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(Objective <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Maintain water-dependent species richness"</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Increase opportunities for colonial waterbird breeding*"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="st">"Support instream &amp; floodplain productivity"</span>)) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::oslo'</span>),</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'Objective'</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>),</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">overlay_list =</span> <span class="fu">list</span>(<span class="fu">list</span>(<span class="at">overlay =</span> <span class="st">'sdl_units'</span>, <span class="at">overlay_pal =</span> <span class="st">'black'</span>),</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>                                              <span class="fu">list</span>(<span class="at">overlay =</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(agged_data<span class="sc">$</span>env_obj, env_obj <span class="sc">==</span> <span class="st">'NF1'</span>),</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                                                    <span class="at">overlay_pal =</span> <span class="st">'ggthemes::Orange-Gold'</span>,</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>                                                    <span class="at">overlay_ycol =</span> <span class="st">'ewr_achieved'</span>)))<span class="sc">+</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    ggplot2<span class="sc">::</span><span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'bottom'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>As with the other plotting functions, we can compare to baseline using arbitrary functions, here <code>difference</code> to get the arithmetic change in outcomes. In both cases, the scale is fixed to be centered on the reference value (0 for difference, 1 for relative), and so using a diverging palette will make that centering clear.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-15_6bc0b32210d0de324c8e957a871d88f8">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(env_group <span class="sc">==</span> <span class="st">'WB'</span>) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'ggthemes::Orange-Blue-White Diverging'</span>),</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>),</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">base_lev =</span> <span class="st">'base'</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">comp_fun =</span> <span class="st">'difference'</span>,</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>                          <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'env_obj'</span>, <span class="st">'polyID'</span>), <span class="co"># Do I need to group_by polyID for the maps? Yes. should probably automate that.</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>                          <span class="at">underlay_list =</span> <span class="fu">list</span>(<span class="at">underlay =</span> basin, <span class="at">underlay_pal =</span> <span class="st">'azure'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>And the <code>relative</code> change is likely to be the most informative and appropriate in many cases. We use the <code>add_eps</code> argument to add a small amount (half the minimum value) to zeros, otherwise we end up taking the log of 0.</p>
+<div class="cell" data-hash="maps_cache/html/unnamed-chunk-16_a242bfa971d59be7c9ca14f4f0bbe7df">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(env_group <span class="sc">==</span> <span class="st">'WB'</span>) <span class="sc">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">x_col =</span> <span class="st">'map'</span>,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'ggthemes::Orange-Blue-White Diverging'</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'scenario'</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>),</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>                          <span class="at">base_lev =</span> <span class="st">'base'</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">comp_fun =</span> <span class="st">'relative'</span>,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">add_eps =</span> <span class="fu">min</span>(obj_sdl_to_plot<span class="sc">$</span>ewr_achieved[obj_sdl_to_plot<span class="sc">$</span>ewr_achieved <span class="sc">&gt;</span> <span class="dv">0</span>], </span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>                              <span class="at">na.rm =</span> <span class="cn">TRUE</span>)<span class="sc">/</span><span class="dv">2</span>,</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>                          <span class="at">zero_adjust =</span> <span class="st">'auto'</span>,</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>                          <span class="at">transy =</span> <span class="st">'log10'</span>,</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>                          <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'env_obj'</span>, <span class="st">'polyID'</span>), <span class="co"># Do I need to group_by polyID for the maps? Yes. should probably automate that.</span></span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>                          <span class="at">underlay_list =</span> <span class="fu">list</span>(<span class="at">underlay =</span> basin, <span class="at">underlay_pal =</span> <span class="st">'azure'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="maps_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO</div>   
+  </div>
+</footer>
+
+
+
+</body></html>

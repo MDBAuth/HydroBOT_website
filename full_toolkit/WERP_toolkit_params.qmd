@@ -1,0 +1,271 @@
+---
+title: "WERP_toolkit_demo"
+editor: visual
+params:
+  # Outer directory for scenario
+  scenario_dir: file.path('scenario_example')
+  
+  # Preexisting data
+  # Hydrographs (expected to exist already)
+  hydro_dir: file.path(scenario_dir, 'hydrographs')
+  # Geographic data (relevant polygons and gauge locations- use canonical in pkg)
+  geo_data_dir: system.file("extdata", package = 'werptoolkitr')
+  
+  # Generated data
+  # EWR outputs (will be created here in controller, read from here in aggregator)
+  ewr_results: file.path(scenario_dir, 'module_output', 'EWR')
+  # outputs of aggregator. There may be multiple modules
+  # NULL doesn't save it, but holds in memory.
+  agg_results: NULL # file.path(scenario_dir, 'agg_output', 'EWR')
+  
+  # Model type
+  model_format: 'IQQM - NSW 10,000 years'
+  
+  # Climate
+  climate: 'Standard - 1911 to 2018 climate categorisation'
+  
+  # output and return
+  outputType: list('summary')
+  returnType: list('summary') # list('summary', 'all')
+  
+  # What to aggregate
+  aggType: 'summary'
+  
+  # Aggregation settings
+  agg_groups: 'scenario'
+  agg_var: 'ewr_achieved'
+  aggReturn: TRUE
+  
+  # Aggregation control lists
+  aggseq: list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+                 env_obj =  c('ewr_code', "env_obj"),
+                 resource_plan = resource_plan_areas,
+                 Specific_goal = c('env_obj', "Specific_goal"),
+                 catchment = cewo_valleys,
+                 Objective = c('Specific_goal', 'Objective'),
+                 mdb = basin,
+                 target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+  
+  
+  funseq: list(c('CompensatingFactor'),
+                 c('ArithmeticMean'),
+                 c('ArithmeticMean'),
+                 c('ArithmeticMean'),
+                 list(wm = ~weighted.mean(., w = area,
+                                          na.rm = TRUE)),
+                 c('ArithmeticMean'),
+  
+                 list(wm = ~weighted.mean(., w = area,
+                                      na.rm = TRUE)),
+                 c('ArithmeticMean'))
+---
+
+# SOME NOTES- DOES NOT WORK
+
+This will take some thinking to get the yml parameters to work. They come in as characters. We can unpack things that need to be evaluated with `eval(str2expression(params$LIST_ITEM))`, but there are issues. Anything assigned NULL is just not there. Params that depend on others, e.g. `hydro_dir: file.path(scenario_dir, 'hydrographs')` don't evaluate right, because `scenario_dir` doesn't exist yet. We can't just loop through the list and `eval(str2expression())`, because things that are actually characters try to evaluate. And we can't just declare which ones should and shouldn't evaluate, because we should be able do things like pass either a pure character to `hydro_dir` or `file.path('path')`, etc. So this will need more thought. I think it's now lower priority- using a quarto parameterisation notebook isn't that much different- we can strip all the text off if we want, anyway.
+
+See if using the {yaml} package helps with any of this. I think it won't, really, but might make sorting things out easier.
+
+This document provides a template for running through the toolkit in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_save_steps.qmd). See the [repo readme](WERP_toolkit_demo.qmd) for overall structure of the repo and package installation.
+
+Load the package
+
+```{r}
+library(werptoolkitr)
+```
+
+## Structure
+
+To run the toolkit, we need to provide paths to directories for input data and output data, as well as arguments for the aggregation.
+
+One option is to do that in a parameters file, and then treat this as a parameterised notebook.
+
+The other option is to have this *be* the parameterising file, so we can have a bit more text around the parameterisations. Not sure which makes more sense, but they're not mutually exclusive, and the answer likely depends on whether we're working interactively or want to fire off 1,000 runs.
+
+# Parameters
+
+## Directories
+
+### Input and output directories
+
+Use the `scenario_example/` directory [created](scenario_creation_demo_R.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
+
+*Normally* `scenario_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo. *I will probably change that when I move to Azure*.
+
+```{r}
+# # Outer directory for scenario
+# scenario_dir = file.path('scenario_example')
+# 
+# # Preexisting data
+# # Hydrographs (expected to exist already)
+# hydro_dir = file.path(scenario_dir, 'hydrographs')
+# # Geographic data (relevant polygons and gauge locations- use canonical in pkg)
+# geo_data_dir <- system.file("extdata", package = 'werptoolkitr')
+# 
+# # Generated data
+# # EWR outputs (will be created here in controller, read from here in aggregator)
+# ewr_results <- file.path(scenario_dir, 'module_output', 'EWR')
+# # outputs of aggregator. There may be multiple modules
+# # NULL doesn't save it, but holds in memory.
+# agg_results <- NULL # file.path(scenario_dir, 'agg_output', 'EWR')
+```
+
+## Controller
+
+### Format
+
+Format will be IQQM, at least for a while
+
+```{r}
+# Options
+# 'Bigmod - MDBA'
+# 'IQQM - NSW 10,000 years'
+# 'Source - NSW (res.csv)'
+
+# model_format = 'IQQM - NSW 10,000 years'
+```
+
+### Climate info
+
+I have the functions set up to have default values of MINT, MAXT, DUR, and DRAW. Those can be set though if the user wants.
+
+```{r}
+# MINT = (100 - 0)/100
+# MAXT = (100 + 0 )/100
+# DUR = (100 - 0 )/100
+# DRAW = (100 -0 )/100
+
+# climate = 'Standard - 1911 to 2018 climate categorisation'
+```
+
+### Control output and return
+
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`, with more I need to add to reflect new EWR functionality. These have to be lists to work right- To make a `list` in python, need to have unnamed lists in R. Named lists become dicts.
+
+*there's an issue with* `'annual'` *in py-ewr- I'm getting an error inside the EWR tool. Until the bug is found, skip that*
+
+**TODO**
+
+-   this *should* work either reading off-disk (using outputType other than 'none'), *or* keeping in-memory and flowing straight into the aggregator. TEST BOTH.
+
+-   use {targets} or similar to controll rebuilding that output
+
+```{r}
+# outputType <- list('none')
+# returnType <- list('summary') # list('summary', 'all')
+```
+
+## Aggregator
+
+I'm just going to keep this simple, passing one aggregation list and using the `read_and_agg` wrapper. See the more detailed documents for the different ways to specify those aggregation lists.
+
+### What to aggregate
+
+The aggregator needs to know which set of EWR outputs to use (to navigate the directory or list structure). It *should* accept multiple types, but that's not well tested, so for now just use one.
+
+```{r}
+# aggType <- 'summary'
+```
+
+We need to tell it the variable to aggregate, and any grouping variables other than the themes and spatial groups. Typically, `scenario` will be a grouper, but there may be others.
+
+```{r}
+# agg_groups <- 'scenario'
+# agg_var <- 'ewr_achieved'
+```
+
+Do we want it to return to the active session? For this demo, I'm keeping nothing interactive.
+
+```{r}
+# aggReturn <- TRUE
+```
+
+### How to aggregate
+
+Fundamentally, the aggregator needs paths and two lists
+
+-   sequence of aggregations
+
+-   sequence of aggregation functions (can be multiple per step)
+
+Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the [spatial](spatial_agg.qmd) and [theme](theme_agg.qmd) docs for more examples.
+
+```{r}
+
+# aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+#                env_obj =  c('ewr_code', "env_obj"),
+#                resource_plan = resource_plan_areas,
+#                Specific_goal = c('env_obj', "Specific_goal"),
+#                catchment = cewo_valleys,
+#                Objective = c('Specific_goal', 'Objective'),
+#                mdb = basin,
+#                target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+# 
+# 
+# funseq <- list(c('CompensatingFactor'),
+#                c('ArithmeticMean'),
+#                c('ArithmeticMean'),
+#                c('ArithmeticMean'),
+#                list(wm = ~weighted.mean(., w = area, 
+#                                         na.rm = TRUE)),
+#                c('ArithmeticMean'),
+#                
+#                list(wm = ~weighted.mean(., w = area, 
+#                                     na.rm = TRUE)),
+#                c('ArithmeticMean'))
+
+```
+
+# Run the toolkit
+
+## Controller
+
+```{r}
+#| message: false
+ewr_out <- prep_run_save_ewrs_R(scenario_dir = params$hydro_dir, output_dir = params$scenario_dir, model_format = params$model_format, climate = params$climate,
+outputType = params$outputType, returnType = params$returnType)
+```
+
+## Aggregator
+
+**TODO** LET THIS SAVE. And tell it where.
+
+```{r}
+aggout <- read_and_agg(datpath = params$ewr_results,
+             type = params$aggType,
+             geopath = bom_basin_gauges,
+             causalpath = causal_ewr,
+             groupers = params$agg_groups,
+             aggCols = params$agg_var,
+             aggsequence = params$aggseq,
+             funsequence = params$funseq,
+             saveintermediate = TRUE,
+             namehistory = FALSE,
+             keepAllPolys = TRUE,
+             returnList = params$aggReturn,
+             savepath = params$agg_results)
+```
+
+# Quick check
+
+Plotting will be developed in the comparer, this is just a quick check to see that there is data. Code borrowed from [theme x space demo](theme_space_agg.qmd).
+
+But only if we returned the output.
+
+```{r}
+# #| message: false
+if (params$aggReturn) {
+  # dummy scenario metadata
+  scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'),
+                              delta = c(1, 0.25, 4))
+  # plot
+aggout$catchment %>%
+  dplyr::filter(Specific_goal == 'All recorded fish species') %>%
+  dplyr::left_join(scenarios) %>%
+  ggplot2::ggplot() +
+  ggplot2::geom_sf(data = basin) +
+  ggplot2::geom_sf(ggplot2::aes(fill = ewr_achieved)) +
+  ggplot2::facet_grid(.~forcats::fct_reorder(scenario, delta))
+}
+
+```

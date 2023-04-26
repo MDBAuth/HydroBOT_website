@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Galen Holt">
+
+<title>Using the WERP toolkit - Scenario controller in detail</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<link href="../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
+<script src="../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Using the WERP toolkit</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../scenario_creation/scenario_creation_overview.html">
+ <span class="menu-text">Scenario creation</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../causal_networks/causal_overview.html">
+ <span class="menu-text">Causal networks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../controller/controller_overview.html" aria-current="page">
+ <span class="menu-text">Controller</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../aggregator/aggregation_overview.html">
+ <span class="menu-text">Aggregator</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../comparer/comparer_overview.html">
+ <span class="menu-text">Comparer</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../full_toolkit/full_toolkit_overview.html">
+ <span class="menu-text">Full toolkit</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo"><i class="bi bi-github" role="img" aria-label="GitHub">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div class="quarto-toggle-container">
+                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+              </div>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+    <div class="container-fluid d-flex justify-content-between">
+      <h1 class="quarto-secondary-nav-title">Scenario controller in detail</h1>
+      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
+        <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../controller/controller_overview.html" class="sidebar-item-text sidebar-link">Controller</a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Simple demonstration</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../controller/controller_ewr_wrapped_R.html" class="sidebar-item-text sidebar-link">Clean simple controller</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../controller/controller_ewr_stepthrough_R.html" class="sidebar-item-text sidebar-link active">Detailed step through</a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../controller/controller_ewr_testrun_py.qmd" class="sidebar-item-text sidebar-link">Python verion (old)</a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Flow scaling and climate scenarios</a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../controller/flow_scaling_control.html" class="sidebar-item-text sidebar-link">Controlling flow scaling demonstration</a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a>
+  <ul class="collapse">
+  <li><a href="#set-paths" id="toc-set-paths" class="nav-link" data-scroll-target="#set-paths">Set paths</a></li>
+  <li><a href="#format" id="toc-format" class="nav-link" data-scroll-target="#format">Format</a></li>
+  <li><a href="#climate-info" id="toc-climate-info" class="nav-link" data-scroll-target="#climate-info">Climate info</a></li>
+  </ul></li>
+  <li><a href="#processing-internals" id="toc-processing-internals" class="nav-link" data-scroll-target="#processing-internals">Processing internals</a>
+  <ul class="collapse">
+  <li><a href="#set-up-output-directories" id="toc-set-up-output-directories" class="nav-link" data-scroll-target="#set-up-output-directories">Set up output directories</a></li>
+  <li><a href="#run-the-ewr-tool" id="toc-run-the-ewr-tool" class="nav-link" data-scroll-target="#run-the-ewr-tool">Run the ewr tool</a></li>
+  </ul></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next steps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title d-none d-lg-block">Scenario controller in detail</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Galen Holt </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+
+</div>
+<p>Load the package</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(werptoolkitr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, the series of steps below is wrapped. Once we have the directory and set any other needed parameters (e.g.&nbsp;point at a config file), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I’m stepping through that here so we can see what’s happening and where we need to tweak as formats change; this document is intended to expose some of the inner workings of the black box. Wrapped versions of <a href="../controller/controller_ewr_wrapped_R.html">the controller alone</a> and <a href="full_toolkit/full_toolkit_overview.qmd">the whole toolkit</a> are available to illustrate this more normal use.</p>
+<section id="setup" class="level1">
+<h1>Setup</h1>
+<section id="set-paths" class="level2">
+<h2 class="anchored" data-anchor-id="set-paths">Set paths</h2>
+<p>We need to set the path to this demonstration. This should all be in a single outer directory <code>project_dir</code>, and there should be an inner directory with the input data <code>/hydrographs</code>. These would typically point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The saved data goes to <code>project_dir/module_output</code> automatically. The <code>/hydrographs</code> subdirectory could be made automatic as well, but I’m waiting for the input data format to firm up.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">=</span> <span class="fu">file.path</span>(<span class="st">'scenario_example'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hydro_dir <span class="ot">=</span> <span class="fu">file.path</span>(project_dir, <span class="st">'hydrographs'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="format" class="level2">
+<h2 class="anchored" data-anchor-id="format">Format</h2>
+<p>We need to pass the data format to the downstream modules so they can parse the data. Currently the demo csvs are created in a format that parses like IQQM, and the netcdf will be. The EWR tool (the only current module) has three options currently 1) <code>'Bigmod - MDBA'</code>, 2) <code>'IQQM - NSW 10,000 years'</code>, and 3) <code>'Source - NSW (res.csv)'</code>. I’m exposing this for the example, but we can auto-set this to the IQQM default in normal use.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Options</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 'Bigmod - MDBA'</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 'IQQM - NSW 10,000 years'</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 'Source - NSW (res.csv)'</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>model_format <span class="ot">=</span> <span class="st">'IQQM - NSW 10,000 years'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="climate-info" class="level2">
+<h2 class="anchored" data-anchor-id="climate-info">Climate info</h2>
+<p>Like the format, <code>allowance</code> and <code>climate</code> are arguments to the EWR tool, so I set them here to be clear what we’re doing, but in general they would be set by default.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>MINT <span class="ot">&lt;-</span> (<span class="dv">100</span> <span class="sc">-</span> <span class="dv">0</span>)<span class="sc">/</span><span class="dv">100</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>MAXT <span class="ot">&lt;-</span> (<span class="dv">100</span> <span class="sc">+</span> <span class="dv">0</span> )<span class="sc">/</span><span class="dv">100</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>DUR <span class="ot">&lt;-</span> (<span class="dv">100</span> <span class="sc">-</span> <span class="dv">0</span> )<span class="sc">/</span><span class="dv">100</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>DRAW <span class="ot">&lt;-</span> (<span class="dv">100</span> <span class="sc">-</span><span class="dv">0</span> )<span class="sc">/</span><span class="dv">100</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># A named list in R becomes a dict in python</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>allowance <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'minThreshold'</span> <span class="ot">=</span> MINT, <span class="st">'maxThreshold'</span> <span class="ot">=</span> MAXT, <span class="st">'duration'</span> <span class="ot">=</span> DUR, <span class="st">'drawdown'</span> <span class="ot">=</span> DRAW)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>climate <span class="ot">&lt;-</span> <span class="st">'Standard - 1911 to 2018 climate categorisation'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="processing-internals" class="level1">
+<h1>Processing internals</h1>
+<p>Above, we’ve been setting variables that should be set by default to expose what they are. Now we move into the processing step, which is typically wrapped into a single function, but here we pull off the wrapping to step through the processing sequence. All of this is typically hidden in <code>prep_run_save_ewrs</code>, as in the <a href="controller_ewr_wrapped.qmd">wrapped example</a>, but I’m exposing the steps here for easier viewing and testing, especially as the formats change.</p>
+<section id="set-up-output-directories" class="level2">
+<h2 class="anchored" data-anchor-id="set-up-output-directories">Set up output directories</h2>
+<p>We get the information about the gauges and filepaths <code>project_dir</code> as a dict with <code>make_scenario_info</code>. The scenarios need to be in separate directories inside <code>/hydro_dir</code>, but the files in those directories could come in multiple arrangements. Currently, we allow multiple csvs of single-gauge hydrographs or single csvs of multiple-gauge hydrographs. Once the netcdf format settles down, we will include parsing that. If there are multiple gauges within each csv, they enter the dict as a ‘gauge’ value. If not, the ‘gauge’ value is just the filename, so these need to be gauge numbers. For this example, we have single csvs with multiple gauges.</p>
+<p>The output directory and subdirs for scenarios is created by <code>make_output_dir</code>, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so <code>paths_gauges</code> just unfolds the dict to give that. There will likely be continued changes to these functions as we settle on standard directory structures and data formats. These functions are currently all python wrapped by R for historical reasons, but as they are just directory creation and querying could be easily re-written in R to tighten up the package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gives file locations as a dict- </span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sceneinfodict <span class="ot">&lt;-</span> <span class="fu">make_scenario_info_R</span>(hydro_dir)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># make the output directory structure</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>outpath <span class="ot">&lt;-</span> <span class="fu">make_output_dir_R</span>(project_dir, sceneinfodict)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># unfold the sceneinfodict to make it easy to get the lists of paths and gauges</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># everyhydro = paths_gauges(sceneinfodict)[0]</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The inner level turned into characters in R and needs to stay as a list. This is annoying but needed *only in R*</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(sceneinfodict)) {</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    sceneinfodict[[i]][[j]] <span class="ot">&lt;-</span> <span class="fu">as.list</span>(sceneinfodict[[i]][[j]])</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># more list-making to work from R-Python</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>everyhydro <span class="ot">&lt;-</span> <span class="fu">as.list</span>(<span class="fu">paths_gauges</span>(sceneinfodict)[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="run-the-ewr-tool" class="level2">
+<h2 class="anchored" data-anchor-id="run-the-ewr-tool">Run the ewr tool</h2>
+<p>Now we run the ewr tool with the parameters given and save the output.</p>
+<p>There’s an issue with <code>outputType = 'annual'</code> in the version of the EWR tool this was built with. Until I update and test the new EWR tool, skip the annual data. There are still a number of messages printed by the EWR code, about pulling the data and gauge dependencies. Those are useful when using the code, but I’ll suppress printing them here since there are so many.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To make a list in python, need to have unnamed lists in R</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>params<span class="sc">$</span>REBUILD_DATA) {</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  outputType <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'none'</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (params<span class="sc">$</span>REBUILD_DATA) {</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  outputType <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'summary'</span>, <span class="st">'all'</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>ewr_out <span class="ot">&lt;-</span> <span class="fu">run_save_ewrs_R</span>(everyhydro, outpath, <span class="at">model_format =</span> model_format, <span class="at">allowance =</span> allowance, <span class="at">climate =</span> climate, <span class="at">outputType =</span> outputType, <span class="at">datesuffix =</span> <span class="cn">FALSE</span>, <span class="at">returnType =</span> <span class="fu">list</span>(<span class="st">'summary'</span>, <span class="st">'all'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Briefly, we can see that that has returned dataframes from the EWR (with some leftover pandas datetime environments that we could clean up if we wanted to use this in-memory). Typically, though, we just save this out.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ewr_out)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "summary" "all"    </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(ewr_out<span class="sc">$</span>summary)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   2736 obs. of  19 variables:
+ $ Scenario          : chr  "hydrographs\\base\\base" "hydrographs\\base\\base" "hydrographs\\base\\base" "hydrographs\\base\\base" ...
+ $ Gauge             : chr  "412002" "412002" "412002" "412002" ...
+ $ PlanningUnit      : chr  "Upper Lachlan River" "Upper Lachlan River" "Upper Lachlan River" "Upper Lachlan River" ...
+ $ EwrCode           : chr  "BF1_a" "BF1_b" "BF2_a" "BF2_b" ...
+ $ Multigauge        : chr  "" "" "" "" ...
+ $ EventYears        : num  9 10 9 11 1 1 0 0 1 3 ...
+ $ Frequency         : num  82 91 82 100 9 9 0 0 9 27 ...
+ $ TargetFrequency   : chr  "50" "100" "50" "100" ...
+ $ AchievementCount  : num  9 11 9 13 1 1 0 0 1 4 ...
+ $ AchievementPerYear: num  0.8182 1 0.8182 1.1818 0.0909 ...
+ $ EventCount        : num  9 11 9 13 1 1 0 0 1 4 ...
+ $ EventCountAll     : num  43 43 19 19 3 6 0 0 10 21 ...
+ $ EventsPerYear     : num  0.8182 1 0.8182 1.1818 0.0909 ...
+ $ EventsPerYearAll  : num  3.909 3.909 1.727 1.727 0.273 ...
+ $ AverageEventLength: num  78.47 78.47 108.42 108.42 2.67 ...
+ $ ThresholdDays     : num  3374 3374 2060 2060 8 ...
+ $ MaxInterEventYears: chr  "1" "1" "2" "2" ...
+ $ NoDataDays        : num  0 0 0 0 0 0 0 0 0 0 ...
+ $ TotalDays         : num  3652 3652 3652 3652 3652 ...
+ - attr(*, "pandas.index")=Int64Index([   0,    1,    2,    3,    4,    5,    6,    7,    8,    9,
+            ...
+            2726, 2727, 2728, 2729, 2730, 2731, 2732, 2733, 2734, 2735],
+           dtype='int64', length=2736)</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(ewr_out<span class="sc">$</span>all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   60050 obs. of  10 variables:
+ $ scenario     : chr  "hydrographs\\base\\base" "hydrographs\\base\\base" "hydrographs\\base\\base" "hydrographs\\base\\base" ...
+ $ gauge        : chr  "412033" "412033" "412033" "412033" ...
+ $ pu           : chr  "Belubula River" "Belubula River" "Belubula River" "Belubula River" ...
+ $ ewr          : chr  "CF1_a" "CF1_a" "CF1_a" "CF1_a" ...
+ $ waterYear    : num  2009 2009 2009 2010 2012 ...
+ $ startDate    :List of 60050
+  ..$ :2010-01-01
+  ..$ :2010-02-23
+  ..$ :2010-03-17
+  ..$ :2010-04-09
+  ..$ :2012-10-16
+  ..$ :2014-11-10
+  ..$ :2014-11-28
+  ..$ :2014-12-20
+  ..$ :2015-01-07
+  ..$ :2015-02-08
+  ..$ :2015-02-23
+  ..$ :2015-02-27
+  ..$ :2015-03-07
+  ..$ :2016-01-16
+  ..$ :2016-02-18
+  ..$ :2016-03-16
+  ..$ :2016-04-02
+  ..$ :2019-03-05
+  ..$ :2019-05-29
+  ..$ :2019-08-09
+  ..$ :2019-09-01
+  ..$ :2010-01-01
+  ..$ :2010-02-23
+  ..$ :2010-03-17
+  ..$ :2010-04-09
+  ..$ :2012-10-16
+  ..$ :2014-11-10
+  ..$ :2014-11-28
+  ..$ :2014-12-20
+  ..$ :2015-01-07
+  ..$ :2015-02-08
+  ..$ :2015-02-23
+  ..$ :2015-02-27
+  ..$ :2015-03-07
+  ..$ :2016-01-16
+  ..$ :2016-02-18
+  ..$ :2016-03-16
+  ..$ :2016-04-02
+  ..$ :2019-03-05
+  ..$ :2019-05-29
+  ..$ :2019-08-09
+  ..$ :2019-09-01
+  ..$ :2010-01-01
+  ..$ :2010-02-23
+  ..$ :2010-03-17
+  ..$ :2010-04-09
+  ..$ :2012-10-16
+  ..$ :2014-11-10
+  ..$ :2014-11-28
+  ..$ :2014-12-20
+  ..$ :2015-01-07
+  ..$ :2015-02-08
+  ..$ :2015-02-23
+  ..$ :2015-02-27
+  ..$ :2015-03-07
+  ..$ :2016-01-16
+  ..$ :2016-02-18
+  ..$ :2016-03-16
+  ..$ :2016-04-02
+  ..$ :2019-03-05
+  ..$ :2019-05-29
+  ..$ :2019-08-09
+  ..$ :2019-09-01
+  ..$ :2010-02-14
+  ..$ :2010-03-08
+  ..$ :2010-07-17
+  ..$ :2010-07-30
+  ..$ :2011-07-01
+  ..$ :2011-11-11
+  ..$ :2011-11-23
+  ..$ :2012-07-01
+  ..$ :2012-10-17
+  ..$ :2013-01-07
+  ..$ :2013-02-22
+  ..$ :2013-03-17
+  ..$ :2013-03-28
+  ..$ :2013-04-18
+  ..$ :2013-04-23
+  ..$ :2013-05-10
+  ..$ :2013-05-15
+  ..$ :2013-07-01
+  ..$ :2013-10-22
+  ..$ :2013-11-13
+  ..$ :2013-11-28
+  ..$ :2013-12-07
+  ..$ :2013-12-19
+  ..$ :2014-01-10
+  ..$ :2014-01-16
+  ..$ :2014-01-20
+  ..$ :2014-02-05
+  ..$ :2014-02-11
+  ..$ :2014-02-13
+  ..$ :2014-02-26
+  ..$ :2014-03-25
+  ..$ :2014-04-16
+  ..$ :2014-05-05
+  ..$ :2014-05-28
+  ..$ :2014-07-01
+  ..$ :2014-10-07
+  .. [list output truncated]
+ $ endDate      :List of 60050
+  ..$ :2010-02-13
+  ..$ :2010-03-06
+  ..$ :2010-04-06
+  ..$ :2010-07-13
+  ..$ :2012-10-16
+  ..$ :2014-11-15
+  ..$ :2014-12-04
+  ..$ :2014-12-26
+  ..$ :2015-01-09
+  ..$ :2015-02-13
+  ..$ :2015-02-23
+  ..$ :2015-03-01
+  ..$ :2015-04-04
+  ..$ :2016-01-19
+  ..$ :2016-03-12
+  ..$ :2016-03-16
+  ..$ :2016-05-03
+  ..$ :2019-03-06
+  ..$ :2019-06-09
+  ..$ :2019-08-14
+  ..$ :2019-12-31
+  ..$ :2010-02-13
+  ..$ :2010-03-06
+  ..$ :2010-04-06
+  ..$ :2010-07-13
+  ..$ :2012-10-16
+  ..$ :2014-11-15
+  ..$ :2014-12-04
+  ..$ :2014-12-26
+  ..$ :2015-01-09
+  ..$ :2015-02-13
+  ..$ :2015-02-23
+  ..$ :2015-03-01
+  ..$ :2015-04-04
+  ..$ :2016-01-19
+  ..$ :2016-03-12
+  ..$ :2016-03-16
+  ..$ :2016-05-03
+  ..$ :2019-03-06
+  ..$ :2019-06-09
+  ..$ :2019-08-14
+  ..$ :2019-12-31
+  ..$ :2010-02-13
+  ..$ :2010-03-06
+  ..$ :2010-04-06
+  ..$ :2010-07-13
+  ..$ :2012-10-16
+  ..$ :2014-11-15
+  ..$ :2014-12-04
+  ..$ :2014-12-26
+  ..$ :2015-01-09
+  ..$ :2015-02-13
+  ..$ :2015-02-23
+  ..$ :2015-03-01
+  ..$ :2015-04-04
+  ..$ :2016-01-19
+  ..$ :2016-03-12
+  ..$ :2016-03-16
+  ..$ :2016-05-03
+  ..$ :2019-03-06
+  ..$ :2019-06-09
+  ..$ :2019-08-14
+  ..$ :2019-12-31
+  ..$ :2010-02-17
+  ..$ :2010-03-10
+  ..$ :2010-07-28
+  ..$ :2011-06-30
+  ..$ :2011-11-06
+  ..$ :2011-11-15
+  ..$ :2012-06-30
+  ..$ :2012-10-15
+  ..$ :2013-01-01
+  ..$ :2013-02-16
+  ..$ :2013-03-11
+  ..$ :2013-03-21
+  ..$ :2013-04-13
+  ..$ :2013-04-20
+  ..$ :2013-05-05
+  ..$ :2013-05-11
+  ..$ :2013-06-30
+  ..$ :2013-10-19
+  ..$ :2013-11-06
+  ..$ :2013-11-23
+  ..$ :2013-11-30
+  ..$ :2013-12-17
+  ..$ :2014-01-06
+  ..$ :2014-01-14
+  ..$ :2014-01-16
+  ..$ :2014-02-01
+  ..$ :2014-02-07
+  ..$ :2014-02-11
+  ..$ :2014-02-22
+  ..$ :2014-03-21
+  ..$ :2014-04-14
+  ..$ :2014-04-19
+  ..$ :2014-05-25
+  ..$ :2014-06-30
+  ..$ :2014-10-05
+  ..$ :2014-10-30
+  .. [list output truncated]
+ $ eventDuration: num  44 12 21 96 1 6 7 7 3 6 ...
+ $ eventLength  : num  44 12 21 96 1 6 7 7 3 6 ...
+ $ Multigauge   : chr  "" "" "" "" ...
+ - attr(*, "pandas.index")=Int64Index([    0,     1,     2,     3,     4,     5,     6,     7,     8,
+                9,
+            ...
+            60040, 60041, 60042, 60043, 60044, 60045, 60046, 60047, 60048,
+            60049],
+           dtype='int64', length=60050)</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="next-steps" class="level1">
+<h1>Next steps</h1>
+<p>This now has the EWR outputs saved into <code>project_dir/module_output/EWR</code> and available for further processing with the aggregator.</p>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO</div>   
+  </div>
+</footer>
+
+
+
+</body></html>
