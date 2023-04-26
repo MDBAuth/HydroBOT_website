@@ -364,9 +364,7 @@ The gauge and scenario filtering gives an easy way to parallelise. I haven't wri
 
 For this demonstration, we are getting the gauge and scenario lists from previously-read data, but in typical use they would be available from scenario metadata.
 
-::: {#future-export .border: .2px .solid .gray; .color: .gray}
-Note: `future` is supposed to handle the `.export` from the calling environment, and seems to do just fine with everything except the aggregation functions. That can happen with nested `foreach` inside functions, but I think here it might be happening because of the way we're using `{{}}` to pass an arbitrary set of functions. Easy enough to fix, by passing something to `.export`, but annoying. If we end up not using {future} for parallelisation on Azure, this will be moot.
-:::
+::: {#future-export .border: .2px .solid .gray; .color: .gray} Note: `future` is supposed to handle the `.export` from the calling environment, and seems to do just fine with everything except the aggregation functions. That can happen with nested `foreach` inside functions, but I think here it might be happening because of the way we're using `{{}}` to pass an arbitrary set of functions. Easy enough to fix, by passing something to `.export`, but annoying. If we end up not using {future} for parallelisation on Azure, this will be moot. :::
 
 The example below performs the same processing as above to produce output identical to `simpleThemeAgg`, but done in parallel. This is slower for this small simple demonstration because of overhead, but has the potential to be much faster for larger jobs.
 
