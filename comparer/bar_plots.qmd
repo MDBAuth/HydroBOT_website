@@ -4,6 +4,7 @@ author: "Galen Holt"
 ---
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 library(ggplot2)
 library(dplyr)
@@ -12,9 +13,9 @@ library(sf)
 
 # Overview
 
-This notebook provides examples of creating heatmaps to plot outcomes as colors with two driver axes (e.g. temperature and rainfall changes). At present, we only have one axis of change in both the simple 4x demonstration and the flow scaling. Once we have two axes, these heatmaps should come together quickly, including the ability to overplot points and fit kernel densities.
+This notebook provides examples of creating bar plots, e.g. plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, scenario. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit and type of response.
 
-For a 1-d version, with variation in a single driver axis and outcomes on the y (instead of color), see the [bar plots](comparer/bar_plots.qmd) and [line plots](comparer/line_plots.qmd)
+For a quantitative x-axis, we would typically use [line plots](comparer/line_plots.qmd).
 
 # Demonstration setup
 
@@ -217,7 +218,7 @@ In another example of colors from other information in the data, when we have mu
 plot_outcomes(obj_sdl_to_plot,
               y_col = 'ewr_achieved',
               colorset = 'SWSDLName',
-              pal_list = list("calecopal::lake"),
+              pal_list = list("ggsci::default_jama"),
               sceneorder = sceneorder)
 ```
 
@@ -370,3 +371,4 @@ plot_outcomes(obj_sdl_to_plot,
               facet_row = '.',
               sceneorder = sceneorder)
 ```
+
