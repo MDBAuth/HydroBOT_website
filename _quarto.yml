@@ -130,7 +130,13 @@ website:
             - href: comparer/hydrographs.qmd
               text: "Hydrographs and baselining"
             - href: comparer/bar_plots.qmd
-              text: "Bar plots"
+              text: "Bar plots (qual x)"
+            - href: comparer/line_plots.qmd
+              text: "Line plots (quant x)"
+            - href: comparer/maps.qmd
+              text: "Maps"
+            - href: comparer/causal_plots.qmd
+              text: "Outcomes on causal networks"
 
         - section: "Flow scaling and climate scenarios"
           contents:

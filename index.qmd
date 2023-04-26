@@ -15,7 +15,7 @@ Toolkit flow
 
     -   [in python *NOT UPDATED*](controller/controller_ewr_testrun_py.qmd)
 
--   Aggregator
+-   [Aggregator](aggregator/aggregator_overview.qmd)
 
     -   [Theme and Space](aggregator/theme_space_agg.qmd)
 
@@ -23,7 +23,13 @@ Toolkit flow
 
     -   [Space alone with more options](aggregator/spatial_agg.qmd)- includes multilevel spatial agg into different polygons and complex aggregation functions
 
-Necessary pieces but not part of the data flow in the toolkit
+-   [Comparer](comparer/comparer_overview.qmd)
+
+    -   [hydrographs](comparer/hydrographs.qmd)
+
+    -   [bar](comparer/bar_plots.qmd), [line](line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from the toolkit
+
+-   Necessary pieces but not part of the data flow in the toolkit
 
 -   [Causal networks](causal_networks/causal_plots.qmd)
 
