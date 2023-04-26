@@ -1,14 +1,26 @@
 ---
-title: "WERP_toolkit_demo"
+title: "Run full toolkit (saving)"
 editor: visual
+params:
+  REBUILD_DATA: FALSE
 ---
 
-This document provides a template for running through the toolkit, saving the output of each step along the way in a single document. Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_in_memory). See the [repo readme](WERP_toolkit_demo.qmd) for overall structure of the repo and package installation.
+```{r}
+#| echo: false
 
-Load the package
+# params don't get seen in interactive running, so handle that.
+if ("params" %in% ls()) {
+  REBUILD_DATA <- params$REBUILD_DATA
+} else {
+  REBUILD_DATA <- FALSE
+}
+```
+
+This document provides a template for running through the toolkit, saving the output of each step along the way in a single document (e.g. not running the Controller, Aggregator, and Comparer as separate notebooks). Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_in_memory).
 
 ```{r}
 library(werptoolkitr)
+library(sf)
 ```
 
 ## Structure
@@ -17,7 +29,7 @@ To run the toolkit, we need to provide paths to directories for input data and o
 
 One option is to do that in a parameters file, and then treat this as a parameterised notebook.
 
-The other option is to have this *be* the parameterising file, so we can have a bit more text around the parameterisations. Not sure which makes more sense, but they're not mutually exclusive, and the answer likely depends on whether we're working interactively or want to fire off 1,000 runs.
+The other option is to have this *be* the parameterising file, so we can have a bit more text around the parameterisations. These are not mutually exclusive options, just different interfaces to the code. The answer for any particular analysis likely depends on whether we're working interactively or want to fire off a large number of parallel runs.
 
 # Parameters
 
@@ -27,64 +39,32 @@ The other option is to have this *be* the parameterising file, so we can have a 
 
 Use the `scenario_example/` directory [created](scenario_creation_demo_R.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
 
-*Normally* `scenario_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo. *I will probably change that when I move to Azure*.
+*Normally* `project_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.The [flow scaling example](flow_scaling_full.qmd) takes the more typical approach of pointing to data external to the repo.
 
 ```{r}
 # Outer directory for scenario
-scenario_dir = file.path('scenario_example')
+project_dir = file.path('scenario_example')
 
 # Preexisting data
 # Hydrographs (expected to exist already)
-hydro_dir = file.path(scenario_dir, 'hydrographs')
-# Geographic data (relevant polygons and gauge locations- use canonical in pkg)
-geo_data_dir <- system.file("extdata", package = 'werptoolkitr')
+hydro_dir = file.path(project_dir, 'hydrographs')
 
 # Generated data
 # EWR outputs (will be created here in controller, read from here in aggregator)
-ewr_results <- file.path(scenario_dir, 'module_output', 'EWR')
+ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+
 # outputs of aggregator. There may be multiple modules
-agg_results <- file.path(scenario_dir, 'agg_output', 'EWR')
+agg_results <- file.path(project_dir, 'aggregator_output')
+
 ```
 
 ## Controller
 
-### Format
-
-Format will be IQQM, at least for a while
-
-```{r}
-# Options
-# 'Bigmod - MDBA'
-# 'IQQM - NSW 10,000 years'
-# 'Source - NSW (res.csv)'
-
-model_format = 'IQQM - NSW 10,000 years'
-```
-
-### Climate info
-
-I have the functions set up to have default values of MINT, MAXT, DUR, and DRAW. Those can be set though if the user wants.
-
-```{r}
-MINT = (100 - 0)/100
-MAXT = (100 + 0 )/100
-DUR = (100 - 0 )/100
-DRAW = (100 -0 )/100
-
-climate = 'Standard - 1911 to 2018 climate categorisation'
-```
+We use the default IQQM model format and climate categorisations, though those could be passed here as well (see [controller](../controller/controller_ewr_stepthrough_R.qmd)).
 
 ### Control output and return
 
-To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`, with more I need to add to reflect new EWR functionality. These have to be lists to work right- To make a `list` in python, need to have unnamed lists in R. Named lists become dicts.
-
-*there's an issue with* `'annual'` *in py-ewr- I'm getting an error inside the EWR tool. Until the bug is found, skip that*
-
-**TODO**
-
--   this *should* work either reading off-disk (using outputType other than 'none'), *or* keeping in-memory and flowing straight into the aggregator. TEST BOTH.
-
--   use {targets} or similar to controll rebuilding that output
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`. For this demonstration I'll just use `summary` and not return anything to memory.
 
 ```{r}
 outputType <- list('summary')
@@ -93,7 +73,7 @@ returnType <- list('none') # list('summary', 'all')
 
 ## Aggregator
 
-I'm just going to keep this simple, passing one aggregation list and using the `read_and_agg` wrapper. See the more detailed documents for the different ways to specify those aggregation lists.
+To keep this simple, we use one aggregation list and the `read_and_agg` wrapper to only have to pass paths. See the [more detailed documents](../aggregator/aggregation_overview.qmd) for the different ways to specify those aggregation lists.
 
 ### What to aggregate
 
@@ -110,10 +90,10 @@ agg_groups <- 'scenario'
 agg_var <- 'ewr_achieved'
 ```
 
-Do we want it to return to the active session? For this demo, I'm keeping nothing interactive.
+Do we want it to return to the active session? For this demo, nothing should return here- we're saving outputs, not returning them to the session.
 
 ```{r}
-aggReturn <- TRUE
+aggReturn <- FALSE
 ```
 
 ### How to aggregate
@@ -124,7 +104,7 @@ Fundamentally, the aggregator needs paths and two lists
 
 -   sequence of aggregation functions (can be multiple per step)
 
-Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the [spatial](spatial_agg.qmd) and [theme](theme_agg.qmd) docs for more examples.
+Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
 
 ```{r}
 
@@ -158,16 +138,23 @@ funseq <- list(c('CompensatingFactor'),
 
 ```{r}
 #| message: false
-ewr_out <- prep_run_save_ewrs_R(hydro_dir, scenario_dir, model_format, climate,
-outputType, returnType)
+
+if (REBUILD_DATA) {
+  ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
+                                  output_dir = project_dir, 
+                                  outputType = outputType,
+                                  returnType = returnType)
+}
+
 ```
 
 ## Aggregator
 
-**TODO** LET THIS SAVE. And tell it where.
-
 ```{r}
-aggout <- read_and_agg(datpath = ewr_results, 
+#| error: true
+
+if (REBUILD_DATA) {
+  aggout <- read_and_agg(datpath = ewr_results, 
              type = aggType,
              geopath = bom_basin_gauges,
              causalpath = causal_ewr,
@@ -180,28 +167,43 @@ aggout <- read_and_agg(datpath = ewr_results,
              keepAllPolys = TRUE,
              returnList = aggReturn,
              savepath = agg_results)
+}
+
 ```
+
+It would be straightforward here to run the comparer as well, but as discussed above, there is not much reason until we settle on a couple canonical outputs.
 
 # Quick check
 
-Plotting will be developed in the comparer, this is just a quick check to see that there is data. Code borrowed from [theme x space demo](theme_space_agg.qmd).
-
-But only if we returned the output.
+To check here that we did in fact run the toolkit, we read in the data and make a quick plot.
 
 ```{r}
 #| message: false
-if (aggReturn) {
-  # dummy scenario metadata
-  scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), 
-                              delta = c(1, 0.25, 4))
-  # plot
-aggout$catchment %>% 
-  dplyr::filter(Specific_goal == 'All recorded fish species') %>%
-  dplyr::left_join(scenarios) %>% 
-  ggplot2::ggplot() +
-  ggplot2::geom_sf(data = basin) +
-  ggplot2::geom_sf(ggplot2::aes(fill = ewr_achieved)) +
-  ggplot2::facet_grid(.~forcats::fct_reorder(scenario, delta))
-}
+agged_data <- readRDS(file.path(agg_results, 'summary_aggregated.rds'))
 
+# Scenario data
+scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
+scene_pal <- make_pal(unique(scenarios$scenario), 
+                      palette = 'ggsci::nrc_npg', 
+                      refvals = 'base', refcols = 'black')
+
+# Quick plot
+agged_data$sdl_units |>
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'ewr_achieved',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'ewr_achieved',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = sceneorder,
+                          underlay_list = 'basin',
+                          overlay_list = list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'NF1'),
+                                              overlay_pal = 'scico::oslo',
+                                              overlay_ycol = 'ewr_achieved',
+                                              clip = TRUE)) +
+    ggplot2::theme(legend.position = 'bottom')
 ```
