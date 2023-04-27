@@ -110,7 +110,7 @@ Here, I'm using an interleaved list of theme and spatial aggregations (see [the 
 
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                env_obj =  c('ewr_code', "env_obj"),
-               resource_plan = resource_plan_areas,
+               sdl_units = sdl_units,
                Specific_goal = c('env_obj', "Specific_goal"),
                catchment = cewo_valleys,
                Objective = c('Specific_goal', 'Objective'),

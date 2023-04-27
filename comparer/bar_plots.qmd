@@ -371,4 +371,3 @@ plot_outcomes(obj_sdl_to_plot,
               facet_row = '.',
               sceneorder = sceneorder)
 ```
-

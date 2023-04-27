@@ -1,0 +1,463 @@
+---
+title: "Toolkit walkthrough"
+format:
+  revealjs: 
+    theme: default
+echo: true
+---
+
+## Full toolkit run
+
+```{r}
+library(werptoolkitr)
+library(sf)
+library(dplyr)
+```
+
+-   Many options we could set
+
+-   See options at [github pages site](https://special-disco-eyonrvy.pages.github.io/){target="_blank"} for [WERP_toolkit_demo](https://github.com/MDBAuth/WERP_toolkit_demo){target="_blank"}
+
+-   Can run with minimal arguments
+
+# User arguments
+
+-   Paths to input
+
+-   Paths to save output
+
+-   Module arguments (minimal)
+
+-   Aggregation sequence and functions
+
+## Paths
+
+```{r}
+# Outer directory for scenario
+project_dir = file.path('scenario_example')
+
+# Hydrographs (expected to exist already)
+hydro_dir = file.path(project_dir, 'hydrographs')
+
+# Generated data
+# EWR outputs (will be created here in controller, read from here in aggregator)
+ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+
+# outputs of aggregator. There may be multiple modules
+agg_results <- file.path(project_dir, 'aggregator_output')
+```
+
+## EWR controls
+
+-   Other modules as they are available
+
+```{r}
+outputType <- list('summary')
+returnType <- list('none') # list('summary', 'all')
+```
+
+## Aggregation sequencing {.smaller}
+
+-   Sequence of steps
+
+-   Sequence of functions
+
+```{r}
+aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               env_obj =  c('ewr_code', "env_obj"),
+               sdl_units = sdl_units,
+               Specific_goal = c('env_obj', "Specific_goal"),
+               catchment = cewo_valleys,
+               Objective = c('Specific_goal', 'Objective'),
+               mdb = basin,
+               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+
+funseq <- list(c('CompensatingFactor'),
+               c('ArithmeticMean'),
+               c('ArithmeticMean'),
+               c('ArithmeticMean'),
+               list(wm = ~weighted.mean(., w = area, 
+                                        na.rm = TRUE)),
+               c('ArithmeticMean'),
+               
+               list(wm = ~weighted.mean(., w = area, 
+                                    na.rm = TRUE)),
+               c('ArithmeticMean'))
+```
+
+# Run the toolkit
+
+Typically automatically
+
+-   Run hydrographs through modules
+
+-   Aggregate and save responses
+
+-   Comparisons/analyses
+
+## Module
+
+-   Currently just EWR
+
+-   Where are hydrographs
+
+-   Where to save output
+
+```{r}
+#| eval: false
+ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
+                                  output_dir = project_dir, 
+                                  outputType = outputType,
+                                  returnType = returnType)
+```
+
+## Aggregator
+
+Returning instead of saving for presentation
+
+-   Sequence (levels of each theme, space, time axis)
+
+-   Aggregation functions at each step
+
+```{r}
+agged_data <- read_and_agg(datpath = ewr_results, 
+           type = 'summary',
+           geopath = bom_basin_gauges,
+           causalpath = causal_ewr,
+           groupers = 'scenario',
+           aggCols = 'ewr_achieved',
+           aggsequence = aggseq,
+           funsequence = funseq,
+           saveintermediate = TRUE,
+           namehistory = FALSE,
+           keepAllPolys = FALSE,
+           returnList = TRUE,
+           savepath = 'none')
+```
+
+# Outputs
+
+-   Standardised formats using `plot_outcomes` function
+
+-   Different plots for different purposes
+
+-   Small selection follows
+
+```{r}
+#| echo: false
+#| message: false
+# Scenario data
+scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
+scene_pal <- make_pal(unique(scenarios$scenario), 
+                      palette = 'ggsci::nrc_npg', 
+                      refvals = 'base', refcols = 'black')
+
+```
+
+```{r}
+#| echo: false
+# make the super long names shorter but less useful.
+basin_to_plot <- agged_data$mdb %>% 
+  dplyr::filter(!is.na(Objective)) %>% 
+  dplyr::mutate(Objective = stringr::str_trunc(Objective, 15)) %>% 
+  dplyr::group_by(scenario, Objective) %>% 
+  dplyr::mutate(id = as.character(row_number())) %>% 
+  dplyr::ungroup() %>% 
+  dplyr::mutate(Objective = stringr::str_c(Objective, '_', id)) %>% 
+  dplyr::select(-id)
+
+# Create a grouping variable
+obj_sdl_to_plot <- agged_data$sdl_units |>
+  left_join(scenarios) |>
+  dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
+  dplyr::filter(!is.na(env_group)) |>
+  dplyr::arrange(env_group, env_obj)
+```
+
+## Input hydrographs
+
+```{r}
+#| echo: false
+scenehydros <- read_hydro(hydro_dir, long = TRUE, format = 'csv')
+
+plot_hydrographs(scenehydros, gaugefilter = c('412002', '422028', '421019', '421001'), colors = scene_pal)
+```
+
+## Maps and spatial scaling
+
+```{r}
+#| message: false
+#| echo: false
+
+# Quick plot
+map_example <- agged_data$sdl_units |>
+    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+    plot_outcomes(y_col = 'ewr_achieved',
+                          x_col = 'map',
+                          colorgroups = NULL,
+                          colorset = 'ewr_achieved',
+                          pal_list = list('scico::berlin'),
+                          facet_col = 'scenario',
+                          facet_row = 'env_obj',
+                          scene_pal = scene_pal,
+                          sceneorder = sceneorder,
+                          underlay_list = 'basin',
+                          overlay_list = list(overlay = dplyr::filter(
+                            agged_data$env_obj,
+                            env_obj == 'NF1'),
+                            overlay_pal = 'scico::oslo',
+                            overlay_ycol = 'ewr_achieved',
+                            clip = TRUE)) +
+    ggplot2::theme(legend.position = 'bottom')
+
+map_example
+```
+
+## Bars- SDL units and scenarios
+
+SDL unit differences in all environmental objectives
+
+```{r}
+#| echo: false
+agged_data$sdl_units %>% 
+  group_by(SWSDLName, scenario) %>% 
+  summarise(ewr_achieved = sum(ewr_achieved, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+plot_outcomes(y_col = 'ewr_achieved',
+              colorset = 'SWSDLName',
+              pal_list = list("calecopal::lake"),
+              sceneorder = sceneorder,
+              position = 'dodge')
+```
+
+## Objective and scenario comparisons
+
+::: panel-tabset
+### Basin
+
+```{r}
+#| echo: false
+plot_outcomes(basin_to_plot, 
+                 y_col = 'ewr_achieved',
+                 x_col = 'Objective',
+                 colorset = 'scenario',
+                 scene_pal = scene_pal,
+                 sceneorder = sceneorder,
+              position = 'dodge')
+```
+
+### SDL units
+
+```{r}
+#| echo: false
+#| message: false
+# Create a palette list
+env_pals = list(EF = 'grDevices::Purp',
+                NF = 'grDevices::Mint',
+                NV = 'grDevices::Burg',
+                OS = 'grDevices::Blues',
+                WB = 'grDevices::Peach')
+
+# need to facet by space sdl unit and give it the colorgroup argument to take multiple palettes
+sdl_stack <- obj_sdl_to_plot |>
+  plot_outcomes(y_col = 'ewr_achieved',
+                colorgroups = 'env_group',
+                colorset = 'env_obj',
+                pal_list = env_pals,
+                facet_col = 'SWSDLName',
+                facet_row = '.',
+                sceneorder = sceneorder)
+sdl_stack
+```
+:::
+
+## Lines and baseline
+
+Change relative to baseline available to all plots
+
+-   Disproportionate response
+
+```{r}
+#| echo: false
+sdl_line_groups_facet <- obj_sdl_to_plot |>
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'delta',
+                y_lab = 'Proportion met',
+                x_lab = 'Change in flow',
+                transx = 'log10',
+                transy = 'log10',
+                color_lab = 'Environmental\ngroup',
+                colorgroup = 'env_group',
+                colorset = 'env_obj',
+                pal_list = env_pals,
+                facet_row = 'SWSDLName',
+                facet_col = 'env_group',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                base_lev = 'base',
+                comp_fun = 'relative',
+                add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
+                              na.rm = TRUE)/2,
+                group_cols = c('env_obj', 'polyID'))
+
+sdl_line_groups_facet + ggplot2::theme(legend.position = 'none')
+```
+
+## Fits
+
+Smoothed fit of all environmental objectives in each group
+
+-   Relative to baseline
+
+```{r}
+#| echo: false
+#| message: false
+sdl_fit_sdl <- obj_sdl_to_plot |>
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'delta',
+                y_lab = 'Proportion met',
+                x_lab = 'Change in flow',
+                transx = 'log10',
+                transy = 'log10',
+                color_lab = 'SDL unit',
+                colorset = 'SWSDLName',
+                pal_list = list("ggsci::default_jama"),
+                facet_wrapper = 'env_group',
+                scene_pal = scene_pal,
+                sceneorder = c('down4', 'base', 'up4'),
+                base_lev = 'base',
+                comp_fun = 'relative',
+                add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
+                              na.rm = TRUE)/2,
+                group_cols = c('env_obj', 'polyID'),
+                smooth = TRUE)
+
+suppressWarnings(print(sdl_fit_sdl))
+```
+
+## Causal networks
+
+::: panel-tabset
+```{r}
+#| echo: false
+# Which steps are theme? This glosses over potential changes with space
+themesteps <- purrr::map_lgl(aggseq, is.character)
+
+
+themeseq <- aggseq[themesteps]
+
+# If there were more than 1 aggfun per step, we'd need to choose one
+themefuns <- funseq[themesteps]
+
+ewr_edges <- make_edges(dflist = causal_ewr, 
+                        fromtos = themeseq[2:length(themeseq)],
+                        gaugefilter = '421001')
+
+nodes <- make_nodes(ewr_edges)
+```
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+
+# What is the column that defines the value?
+valcol <- 'ewr_achieved'
+
+# Get the values for each node
+targetlevels <- names(themesteps)[themesteps]
+
+aggvals <- extract_vals_causal(agged_data, themefuns, valcol, 
+                               targetlevels = targetlevels)
+
+# cut to relevant gauge (or no gauge for higher spatial levels)
+  # THis is slow- I think what we'd actually do is find the matching sdl and cut to that earlier
+gaugematch <-  st_intersects(bom_basin_gauges[bom_basin_gauges$gauge == '421001',], aggvals, sparse = FALSE)
+
+aggvals <- aggvals[as.vector(gaugematch),] |>
+  st_drop_geometry()
+# aggvals <- aggvals %>% dplyr::filter(gauge == '421001' | is.na(gauge)) %>% 
+#   dplyr::select(-gauge)
+
+# join to the nodes
+nodes_with_vals <- nodes |> 
+  dplyr::filter(NodeType != 'ewr_code_timing') |> 
+  dplyr::left_join(aggvals) |>
+  dplyr::filter(!is.na(scenario))
+```
+
+### Down 4
+
+```{r}
+#| echo: false
+aggNetworkdown <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
+                                        scenario == 'down4'),
+                 edges = ewr_edges,
+                 edge_pal = 'black',
+                 node_pal = list(value = 'scico::tokyo'),
+                 node_colorset = 'ewr_achieved',
+                 render = FALSE)
+
+DiagrammeR::render_graph(aggNetworkdown)
+```
+
+### Baseline
+
+```{r}
+#| echo: false
+aggNetworkbase <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
+                                        scenario == 'base'),
+                 edges = ewr_edges,
+                 edge_pal = 'black',
+                 node_pal = list(value = 'scico::tokyo'),
+                 node_colorset = 'ewr_achieved',
+                 render = FALSE)
+
+DiagrammeR::render_graph(aggNetworkbase)
+```
+
+### Up 4
+
+```{r}
+#| echo: false
+aggNetworkup <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
+                                        scenario == 'up4'),
+                 edges = ewr_edges,
+                 edge_pal = 'black',
+                 node_pal = list(value = 'scico::tokyo'),
+                 node_colorset = 'ewr_achieved',
+                 render = FALSE)
+
+DiagrammeR::render_graph(aggNetworkup)
+```
+:::
+
+# Where next?
+
+:::: {.columns}
+
+::: {.column width="40%"}
+-   Real scenarios
+    -   Flow scaling
+
+    -   Case study
+-   Capacity extension
+    -   Modules
+
+    -   Aggregation
+    
+    -   Azure/large runs
+:::
+
+::: {.column width="60%"}
+-   Socialisation
+    -   Users/maintainers/builders
+
+    -   Output needs and targets
+
+    -   Links to other programs
+:::
+
+::::

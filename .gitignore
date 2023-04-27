@@ -12,6 +12,7 @@
 
 # quarto output- will need to make visible to produce docs
 _output
+/none/
 
 # Demonstration data outputs
 scenario_example/
