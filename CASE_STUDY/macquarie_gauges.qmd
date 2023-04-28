@@ -82,3 +82,55 @@ ggplot() +
   geom_sf(data = mac_poly) +
   geom_sf(data = mac_gauges, mapping = aes(color = in_ewr))
 ```
+
+# Gauges in EWR
+
+```{r}
+
+# Get the number of EWRs at each gauge in each catchment 
+newrs <- causal_ewr$ewr2obj %>% 
+  group_by(gauge) %>% 
+  summarise(n_ewrs = n_distinct(ewr_code)) %>% 
+  gauge2geo(bom_basin_gauges) %>% 
+  st_join(sdl_units) %>% 
+  filter(!is.na(SWSDLName)) 
+
+
+```
+
+```{r}
+library(paletteer)
+ewrhist <- newrs %>% 
+  ggplot(aes(x = n_ewrs, fill = SWSDLName)) + 
+  geom_histogram() +
+  labs(x = 'Number EWRs', y = 'Number gauges', fill = 'SDL unit') + 
+  scale_fill_paletteer_d(palette = 'ggsci::default_igv') +
+  theme_werp_toolkit()
+ewrhist 
+```
+
+```{r}
+    # plot_outcomes(newrs,
+    #               y_col = 'n_ewrs',
+    #               y_lab = 'Number EWRs',
+    #                       x_col = 'map',
+    #                       colorgroups = NULL,
+    #                       colorset = 'n_ewrs',
+    #                       pal_list = list('scico::oslo'),
+    #                       underlay_list = sdl_units)
+
+ewrmap <- ggplot() +
+  geom_sf(data = sdl_units, fill = 'azure', color = 'grey') +
+  geom_sf(data = newrs, mapping = aes(color = n_ewrs)) +
+  scale_color_paletteer_c('scico::bamako') +
+  theme_werp_toolkit() +
+  labs(color = 'Number\nEWRs')
+
+ewrmap
+```
+
+```{r}
+ggsave('CASE_STUDY/ewr_hist.png', ewrhist, width = 12, height = 8, units = 'cm', dpi = 300)
+
+ggsave('CASE_STUDY/ewr_map.png', ewrmap, width = 10, height = 8, units = 'cm', dpi = 300)
+```

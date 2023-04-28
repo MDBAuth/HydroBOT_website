@@ -156,6 +156,8 @@ website:
               text: "Run toolkit wholly in-memory"
             - href: full_toolkit/WERP_toolkit_params.qmd
               text: "Run toolkit from params"
+            - href: Presentation/walkthrough_presentation.qmd
+              text: "Walkthrough presentation"
 
 
         - section: "Flow scaling and climate scenarios"

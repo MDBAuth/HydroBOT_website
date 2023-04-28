@@ -339,6 +339,8 @@ suppressWarnings(print(sdl_fit_sdl))
 
 ## Causal networks
 
+-   Single gauge
+
 ::: panel-tabset
 ```{r}
 #| echo: false
