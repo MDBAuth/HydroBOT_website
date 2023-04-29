@@ -18,6 +18,8 @@ Nearly all plots of outcomes (e.g not hydrographs) are made with `plot_outcomes`
 
 Nearly all plots (with the current exception of the causal networks) are made in `ggplot2` and return `ggplot2` objects, which can easily be further modified. The plot functions here just wrap the ggplot2 to standardise appearance and data preparation. Though it can be annoying to not use `ggplot()` directly to make the plots, one **MAJOR** advantage of the plotting function here is that any data changes that clean it for a given plot aren't preserved, and so it's far easier to keep the data clean, know what the data is, and avoid accidental overwriting or mislabeling of data. If we consistently do the same changes with slight modification, we can write a function, e.g. `plot_prep` , avoiding lots of copy-paste and its attendant errors.
 
+There is clear opportunity for reactivity with nearly all plots, allowing a user to select plot types, any filtering (espcially for networks, spatial units, etc), and produces the plot.
+
 # Comparisons
 
 Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes. It can also calculate comparison values and plot these. There are a few primary sorts of plots,

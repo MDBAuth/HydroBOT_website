@@ -21,4 +21,4 @@ This needs to be fleshed out
 
     -   They are the theme-scaling axis
 
-This links to the [causal notebook](causal_plots.qmd).
+This links to the notebooks for [creation and manipulation](causal_manipulation.qmd) and [causal plots](causal_plots.qmd).

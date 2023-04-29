@@ -74,11 +74,15 @@ website:
       contents:
         - causal_networks/causal_overview.qmd
 
+        - section: "Creation and manipulation"
+          contents:
+            - href: causal_networks/causal_manipulation.qmd
+              text: "Building and manipulating causal networks"
+
         - section: "Visualisation"
           contents:
             - href: causal_networks/causal_plots.qmd
               text: "Plotting causal networks"
-
 
     - title: "Controller"
       contents:

@@ -1,0 +1,18 @@
+---
+title: "Causal network functions"
+author: "Galen Holt"
+---
+
+# Purpose
+
+This document will cover the functions provided by {werptoolkitr} to interact with and manipulate causal networks.
+
+For example
+
+-   `make_nodes`
+
+-   `make_edges`
+
+-   The pruning function `find_realted_nodes`
+
+-   others

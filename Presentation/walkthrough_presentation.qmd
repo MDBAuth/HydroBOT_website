@@ -281,6 +281,14 @@ Change relative to baseline available to all plots
 
 ```{r}
 #| echo: false
+
+line_pals = list(EF = 'scico::acton',
+                NF = 'scico::bamako',
+                NV = 'scico::batlow',
+                OS = 'scico::lajolla',
+                WB = 'scico::hawaii')
+
+
 sdl_line_groups_facet <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
                 x_col = 'delta',
@@ -291,7 +299,7 @@ sdl_line_groups_facet <- obj_sdl_to_plot |>
                 color_lab = 'Environmental\ngroup',
                 colorgroup = 'env_group',
                 colorset = 'env_obj',
-                pal_list = env_pals,
+                pal_list = line_pals,
                 facet_row = 'SWSDLName',
                 facet_col = 'env_group',
                 scene_pal = scene_pal,
@@ -338,8 +346,6 @@ suppressWarnings(print(sdl_fit_sdl))
 ```
 
 ## Causal networks
-
--   Single gauge
 
 ::: panel-tabset
 ```{r}
@@ -438,8 +444,7 @@ DiagrammeR::render_graph(aggNetworkup)
 
 # Where next?
 
-:::: {.columns}
-
+::: columns
 ::: {.column width="40%"}
 -   Real scenarios
     -   Flow scaling
@@ -449,7 +454,7 @@ DiagrammeR::render_graph(aggNetworkup)
     -   Modules
 
     -   Aggregation
-    
+
     -   Azure/large runs
 :::
 
@@ -461,5 +466,4 @@ DiagrammeR::render_graph(aggNetworkup)
 
     -   Links to other programs
 :::
-
-::::
+:::

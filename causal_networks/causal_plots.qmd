@@ -8,25 +8,13 @@ editor: visual
 ---
 
 ```{r}
-#| warning: false
-#| message: false
-
-## GITHUB INSTALL
-# credentials::set_github_pat()
-# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
-
-## LOCAL INSTALL- easier for quick iterations, but need a path.
-# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
-```
-
-```{r}
 library(werptoolkitr)
 library(dplyr)
 ```
 
 # Plots of causal networks
 
-This document demonstrates and discusses the causal network plotting code. There are many directions this could go, in terms of what is plotted, how it is plotted, and the interface to do so. There are several reasons to present causal networks, each of which likely will require different characteristic plots. This develops some of the foundational work needed to allow a flexible range of those uses. And it gives us something concrete to modify.
+This document demonstrates and discusses the causal network plotting code. There are many reasons to present causal networks, each of which likely will require different characteristic plots. This develops some of the foundational work needed to allow a flexible range of those uses. Causal networks are inherently complex, and there are different aspects we might want to accentuate, and some capability we need to prune/focus them. Thus, {werptoolkitr} provides a number of helper functions and plotting options.
 
 -   Why plot causal networks?
 
@@ -34,7 +22,9 @@ This document demonstrates and discusses the causal network plotting code. There
 
     -   Present results information reflected in node size/colour, edge colour/width, etc
 
--   Needs
+        -   See [theme aggregation](../aggregator/theme_agg.qmd)
+
+-   Capacity requirements
 
     -   Filtering the parts of the network plotted
 
@@ -48,11 +38,7 @@ This document demonstrates and discusses the causal network plotting code. There
 
 ## Get the network relationships
 
-First we need the relationships defining the network, which are made in [causal_data](causal_data.qmd). We could make these directly from the raw csvs (run the data cleaning functions directly), but a more robust and consistent workflow will be to separate the plot creation from data cleaning. So, we assume that the causal data has been cleaned and that cleaned data is in a directory. For now, set the directory, though in a package this can happen by default.
-
-In standard R package structure, the data is in `.rda` format and located in `data/` and with standard names when read in.
-
-The list of causal relationships is available by default with the package load as `causal_ewr`, so we don't need to read anything in here.
+First we need the relationships defining the network, which are extracted from tables in {werptoolkitr} and provided as the dataset `werptoolkitr::causal_ewrs`.
 
 ## Process data for network plots
 
@@ -64,13 +50,17 @@ Causal networks need an edges dataframe specifying all pairwise connections, and
 
 2.  A key feature of the network isn't just the existence of connections, but their directionality, and so we want to specify that explicitly.
 
-I build the nodes and edges for a specific plot or set of plots by first building a dataframe of edges, and then extracting the nodes.
+3.  We want to have the general ability to make edges and nodes available for other uses, e.g. aggregations
+
+    1.  {werptoolkitr} exports `make_edges` and `make_nodes`, along with some other network-manipulation functions
+
+To build the nodes and edges for a specific plot or set of plots, we first build a dataframe of edges, and then extract nodes.
 
 ### Construct edge dataframe
 
-The `edges` dataframe contains all pairwise links between nodes in `from` and `to` columns. To get that, we need to pass it dataframes specifying links. There will usually be multiple datasets, reflecting the differing scales of the nodes (see \[causal_data\](causal_data.qmd)). These dataframes may include many columns of potential nodes, so we need to provide the node columns we actually want to map and their directionality- what are the 'from-to' pairings. We may want to filter to only some subset of nodes; for example we may only be interested in the environmental objectives related to waterbirds. Further, we will likely want to filter by geography, currently possible by either gauge or planning unit.
+The `edges` dataframe contains all pairwise links between nodes in `from` and `to` columns. To get that, we need to pass it dataframes specifying links. There will usually be multiple datasets, reflecting the differing scales of the nodes (as in the `causal_ewrs` list provided by {werptoolkitr}). These dataframes may include many columns of potential nodes, e.g. they might provide the mapping for several steps in the network. Thus, we need to provide the node columns we actually want to map and their directionality- what are the 'from-to' pairings. We may want to filter to only some subset of nodes; for example we may only be interested in the environmental objectives related to waterbirds. Further, we will likely want to filter by geography, currently possible by either gauge or planning unit (deprecated).
 
-As an example, we can make the relationships present at gauge 409025 linking EWRs to environmental objectives, environmental objectives to specific goals, Specific goals to Targets, and environmental objectives to 5-year targets. The filtering on gauge needs to know what the matching planning unit is (and vice-versa if we were using a `pufilter`). That can be passed explicitly, or the function tries to find it internally (which I rely on here).
+As an example, we can make the relationships present at gauge 409025 linking EWRs to environmental objectives, environmental objectives to specific goals, Specific goals to Targets, and environmental objectives to 5-year targets. There are many more possible connections to include in the `fromtos`, which to include will depend on the questions being asked. I've just chosen these for a quick demo.
 
 ```{r}
 edges <- make_edges(dflist = causal_ewr, 
@@ -79,35 +69,17 @@ edges <- make_edges(dflist = causal_ewr,
                               c('Specific_goal', 'Target'), 
                               c('env_obj', 'target_5_year_2024')),
                gaugefilter = '409025')
-# View that in the notebook
+
 edges
 ```
 
-This example does *not* include filtering the particular nodes within those node categories (e.g. `env_obj`s related to waterbirds). There are many more possible connections to include in the `fromtos`, which to include will depend on the questions being asked. I've just chosen these for a quick demo.
+There's also the opportunity to filter the specific nodes to include with `fromfilter` and `tofilter`. This allows things like filtering the particular nodes within those node categories (e.g. `env_obj`s related to waterbirds). However, it is typically better to use `find_related_nodes` *after* creation of the network, as that does network-aware filtering.
 
-That's quite a lot to specify in one function, and I haven't done any filtering of the specific nodes (which is possible with `fromfilter` and `tofilter`. There's an obvious next step for cleanup, where we can specify default values for `dflist` and `fromtos` to really clean it up (and the `gaugefilter` might be determined by the case study).
-
-Although we can specify defaults, this function is also reasonably generic and so can be used far beyond whatever defaults we set- it only depends on WERP-specific things in that the spatial filtering happens on `gauge` and `PlannngUnitID` columns (and those are cross-referenced). The `fromtos` list should have a default too, but is more likely to be user-adjusted.
-
-#### Some notes
-
--   This is an ugly function call, but suggests a really fairly straightforward interactive interface where a user can select nodetypes and it populates that `fromtos` list and makes the plot.
-
--   There are a huge number of possible from-tos and, as exemplified above, some node sets can link to multiple others.
-
-    -   It is likely that we will want to specify a default list or lists of from-tos
-
-    -   These will need to reflect both 1) the actual causal links (what are the links and directionality) and b) what groups of nodes to plot (we don't always want to plot 5,10, and 20 year targets, for example).
-
--   Filtering the from-to columns should probably be avoided in general at this point. Instead, use `find_related_nodes` (which comes in later), as that does a network-aware filtering.
-
--   I have made single-df versions of this that are simpler `make_edges_bare` and `make_edges_char`, but we will need multi-df functionality, so they've been set aside.
-
-    -   As above, we could treat this as a single-df problem with a massively factorial input df, but that seems worse.
+Although we can specify defaults, this function is also reasonably generic and so can be used far beyond whatever defaults we set- it only depends on WERP-specific things in that the spatial filtering happens on `gauge` (and those are cross-referenced). For a particular set of analyses, we would typically set default `fromtos` lists, most relevantly in the Aggregator and Comparer. If we are producing plots for illustrating the network, there may be ad-hoc adjustments to that list.
 
 ### Construct node dataframe
 
-The node dataframe defines the 'boxes'. The simplest way to make it is to extract it from the edges. Basically, we just grab all the nodes that are in either the `from` or `to` columns of the `edges` df. The `make_nodes` function does a bit more than just get unique node values from the `edges` df, it also attaches a column specifying the node order, reflecting their sequence in the causal network. There is a default sequence specified for WERP in here, but others can be specified with the `typeorder` argument. And it is expected that that default sequence will need to change when new sorts of relationships come online.
+The node dataframe defines the 'boxes'. The simplest way to make it is to extract it from the edges. Basically, we just grab all the nodes that are in either the `from` or `to` columns of the `edges` df. The `make_nodes` function does a bit more than just get unique node values from the `edges` df, it also attaches a column specifying the node order, reflecting their sequence in the causal network. There is a default sequence specified for WERP EWRs, but others can be specified with the `typeorder` argument. We expect that new default sequences will need to be created when new sorts of relationships come online.
 
 ```{r}
 nodes <- make_nodes(edges)
@@ -115,7 +87,7 @@ nodes <- make_nodes(edges)
 nodes
 ```
 
-I'll now jump into a plot, and then zoom back in to demo some options under the hood.
+We can now create a minimal plot before digging back in to demo some options under the hood.
 
 # Plots
 
@@ -123,14 +95,15 @@ Plotting takes these dataframes, adds some attributes, and generates the plots. 
 
 We will look under the hood at those later ([Plot setup- more options and next steps])- there's quite a bit of functionality there to do things like isolate relevant parts of the network, colour within node groups or by the outcomes of the toolkit (e.g. change in relationships between scenarios or native fish populations).
 
-Firstz, let's just make a default plot. By default it saves the network to an object so we can modify/use it later. We can turn that off (`returnnetwork = FALSE`), along with switches for whether to render in place and/or save as png and pdf (`save = TRUE`). If `render = TRUE`, it renders in place just fine when using as a notebook, but doesn't get picked up when the quarto renders to html (and presumably pdf etc). Works fine as a two-step process though, so going with that for now.
+First, let's just make a default plot. By default it saves the network to an object so we can modify/use it later. We can turn that off (`returnnetwork = FALSE`), along with switches for whether to render in place and/or save as png and pdf (`save = TRUE`). If `render = TRUE`, it renders in place just fine when using as a notebook, but doesn't get picked up when the quarto renders to html (and presumably pdf etc). So for these demonstrations, we'll use a two-step process of returning the network and then rendering it.
 
 ```{r}
+#| message: false
 default_network <- make_causal_plot(nodes, edges, render = FALSE)
 DiagrammeR::render_graph(default_network)
 ```
 
-That's clearly a bit much, even just for a single gauge. One thing we could do would be to just drop the 5-year nodes, (now not saving the network to avoid clutter). Doing the two-step render so quarto can make html.
+That's clearly a bit much, even just for a single gauge. One thing we could do would be to just drop the 5-year nodes, (now piping the network straight to `render_graph` to avoid clutter). We do this drop simply here by filtering the `nodes` dataframe. Without those nodes available, the relevant parts of the network just get dropped.
 
 ```{r}
 make_causal_plot(filter(nodes, NodeType != 'target_5_year_2024'),
@@ -138,11 +111,9 @@ make_causal_plot(filter(nodes, NodeType != 'target_5_year_2024'),
   DiagrammeR::render_graph()
 ```
 
-That's a bit better, but now we've dropped those targets. It all depends on what we're trying to show. The point here is the flexibility to show different things relatively easily, depending on the question.
-
 ## Node-relevant network
 
-One thing we're fairly likely to want to do is ask about the connections that relate to a node or a small set of nodes. To do that, we need to be able to traverse the network upstream and downstream, using the `focalnodes` argument, which calls the `find_related_nodes` function. This function will also be useful in the theme aggregator. Now we can include the 5-year targets again because we've reduce the nodes. Note that the `focalnodes` don't have to be related to each other or at the same level.
+One thing we're fairly likely to want to do is ask about the connections that relate to a node or a small set of nodes. To do that, we need to be able to traverse the network upstream and downstream, using the `focalnodes` argument, which calls the `find_related_nodes` function. This is a more complete network restructuring than just filtering a target level, as we did above, because it traces the full network and only returns nodes at any level that relate to the targets. Now we can include the 5-year targets again because we've reduce the nodes. Note that the `focalnodes` don't have to be related to each other or at the same level- `find_related_nodes` prunes the network to all connections involving all the `focalnodes`.
 
 ```{r}
 make_causal_plot(nodes, edges, 
@@ -150,13 +121,11 @@ make_causal_plot(nodes, edges,
   DiagrammeR::render_graph()
 ```
 
-Why doesn't that get taller and easier to read? Because setting size with relative values has been low on my priority list.
-
 ## Plot setup- more options and next steps
 
-The above is running with defaults, but there's quite a bit more that can be done. Some I've developed, other bits I haven't. Primarily, I'm thinking about how we'll want to feed the outputs of the toolkit to the the network (e.g. shifts in the relationships or values of the nodes, such as fewer birds). That could be done with colour, node size, or edge penwidth. Colour could also be specified differently than is done by default above, such as coloring the nodes within the node groups. And then there's the obvious step of making it interactive/dynamic.
+The above is running with defaults, but there's quite a bit more capacity to change what is plotted and the look of the graphs. Primarily, I've focused on development related to how we'll want to feed the outputs of the toolkit to the the network (e.g. shifts in the relationships or values of the nodes, such as fewer birds- see for example [theme aggregation](../aggregator/theme_agg.qmd) and [overview presentation](../Presentation/walkthrough_presentation.qmd). That could be done with colour, node size, or edge penwidth.
 
-The size and interactivity are both easy to see a direction, but I haven't done anything with them at present. Colour is currently possible to change (and a similar appoach should work for size, I just haven't built it yet). I'll demo a few ways we can do that.
+Colour can be specified differently than is done by default above, such as coloring the nodes within the node groups by outcome, or assigning different node groups different color palettes, following the same idea as the generic `colorgroups` and `colorset` arguments in all the plotting functions. There's an obvious step of making it interactive/dynamic, but that hasn't been implemented yet.
 
 ### Colour to indicate a value
 
@@ -181,7 +150,7 @@ make_causal_plot(nodes,
 
 #### Nodes (and single-colour edges)
 
-We can also colour the nodes by results. Here I've also set the edges just to a single color - feeding `edge_pal` or `node_pal` a single character value specifying a colour or a character vector of length `nrow` of the relevant dataframe will just insert those values and bypass the palettes. Again, I start by dummying up some 'toolkit results' in a `value` column.
+We can also colour the nodes by results. Here I've also set the edges just to a single color - feeding `edge_pal` or `node_pal` a single character value specifying a colour or a character vector of length `nrow` of the relevant dataframe will just insert those values and bypass the palettes. Again, I start by dummying up some 'toolkit results' in a `value` column. Examples where these values do come out of EWR results is in the [theme aggregation notebook](../aggregator/theme_agg.qmd) and the [overview presentation](../Presentation/walkthrough_presentation.qmd).
 
 ```{r}
 nodewithvals <- nodes %>% 
@@ -199,9 +168,9 @@ make_causal_plot(nodewithvals,
 
 ### Colour within node groups
 
-We might want to use different colour palettes within the different node groups, but colour the nodes themselves within them. To do that, we set the `*_pal` arguments as named lists of palettes, and also pass `*_colorgroups` arguments so it knows how to split the data into those palettes. I'll demonstrate with nodes again. And I'll plot the whole network again so we can see what's happening.
+We might want to use different colour palettes within the different node groups, but colour the nodes themselves within them. To do that, we set the `*_pal` arguments as named lists of palettes, and also pass `*_colorgroups` arguments so it knows how to split the data into those palettes. This parallels the use in `plot_outcomes` for other plot types, where `colorgroups` is the groups that get the palette, while `colorset` are the individual units within each group that receive colors from the respective palette. Here, we demonstrate with nodes and plot the whole network so we can see what's happening.
 
-First, set the list of palettes. This could be set by default somewhere.
+First, set the list of palettes. This could be set by default for the project, along with other default colors.
 
 ```{r}
 node_list_c = list(ewr_code = 'viridis::mako', 
@@ -236,7 +205,7 @@ node_list_g <- list(ewr_code = 'viridis::mako',
                     target_5_year_2024 = 'calecopal::eschscholzia')
 ```
 
-why does this need node_pal at all? Because it lets us set the within-node_colorgroups palettes. The `node_colorset = 'werp'` just creates a new column in the data that gives rows values we want (e.g. the first two letters of the ewr_codes), which are then used to choose colors from that particular palette. It's a way to have fewer colors (and more meaningful colors) *within* the colorgroups.
+This lets us set the within-node_colorgroups palettes. The `node_colorset = 'werp'` just creates a new column in the data that gives rows values we want (e.g. the first two letters of the ewr_codes), which are then used to choose colors from that particular palette. It's a way to have fewer colors (and more meaningful colors) *within* the colorgroups.
 
 ```{r}
 make_causal_plot(nodes, edges, 
@@ -252,50 +221,4 @@ make_causal_plot(nodes, edges,
 
 There's clearly a *lot* more that could be done here. The nature of the output and the way I've set it up are really aimed at being interactive and usable to investigate the network.
 
-How do I see this being used? I think most likely in either interactive sites (Shiny etc) or notebooks to investigate the networks themselves or use them to plot results. That gives flexibility to get at whatever the particular question is. I do expect that outputs of the toolkit produce results in the form of a network, and those can hopefully be done with set arguments.
-
-I've set `make_causal_plot` up to be fairly general so we can do quite a lot with it- change the way we do colour, filter to nodes feeding into and out of other nodes, etc, and given it a set of defaults. Are those the right defaults? I doubt it, but they're a start.
-
-## Still to do
-
--   Pass in colors and/or nodesize from toolkit outputs
-
-    -   Colors work now as demonstrated, just need to run toolkit to get them
-
--   Dynamic version to allow user playing
-
--   Wrapper function? not much do do here, really, just incorporate `make_edges`, `make_nodes` on top of `make_causal_plot`. Might depend on how this is actually used in practice
-
--   Default color palettes for all nodetypes (the situations where the colour palettes differ between groups)?
-
--   Default `typeorder` (exists, but move out of `make_nodes`, and make sure it's complete)
-
--   Default node types to include in the plot? I lean towards no here, since part of the utility here is being able to explore the network. They might make sense in the toolkit output use cases though.
-
--   Change all sizing to use a reference
-
-    -   see [`vizNetwork`](https://datastorm-open.github.io/visNetwork/) I think for some documentation
-
--   Write tests
-
--   make sure all called functions are package-referenced (`::`)
-
--   Make a package (in conjunction with the data cleaning)
-
-    -   And if so, R package convention would be to have the input data (the edges) in the `data/` directory as .rda files, which are created by the causal_data.qmd (or similar) residing in `data-raw/`. I've basically set this up.
-
--   Look into other plotting options, especially for dynamic interactive networks
-
-    -   The node and edge structure should be fairly consistent, as they need to be specified no matter what
-
-    -   Plotting tools
-
-        -   Currently `Diagrammer`, which produces `Graphviz` output, and so is multiplatform
-
-            -   New release includes `visNetwork`, which uses the `vis.js` library
-
-        -   Static (at present, +/- html tooltips), but easy access to filtering etc to make dynamic
-
-        -   Dynamic would be better, especially for comms (e.g. Shiny, or Quarto plays well with Observable) or ???
-
--   Allow other colour palettes besides those in `paletteer`
+The setup here is actually quite similar to the other [plot outputs](../comparer/comparer_overview.qmd). In all cases, there is much opportunity to adjust the look of the plots to target different uses, but also the ability to establish a consistent default (and look). These plots lend themselves to both notebooks (as here), web, and interactive interfaces (Shiny, observablejs, etc) to investigate the networks themselves or use them to plot results. That gives flexibility to get at whatever the particular question is. Though causal networks are not a typical way to present outputs, here we see that they can be incredibly powerful for not only showing the relationships, but understanding how they change under different scenarios.
