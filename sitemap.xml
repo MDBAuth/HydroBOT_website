@@ -1,127 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://MDBAuth.github.io/WERP_toolkit_demo/Presentation/walkthrough_presentation.html</loc>
+    <lastmod>2023-04-29T13:15:46.929Z</lastmod>
+  </url>
+  <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/aggregator/aggregation_overview.html</loc>
-    <lastmod>2023-04-26T12:33:24.958Z</lastmod>
+    <lastmod>2023-04-29T13:15:48.978Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/aggregator/aggregation_syntax.html</loc>
-    <lastmod>2023-04-26T12:33:28.068Z</lastmod>
+    <lastmod>2023-04-29T13:15:51.072Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/aggregator/flow_scaling_aggregation.html</loc>
-    <lastmod>2023-04-26T12:33:28.798Z</lastmod>
+    <lastmod>2023-04-29T13:15:51.800Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/aggregator/spatial_agg.html</loc>
-    <lastmod>2023-04-26T12:34:12.474Z</lastmod>
+    <lastmod>2023-04-29T13:16:29.525Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/aggregator/theme_agg.html</loc>
-    <lastmod>2023-04-26T12:34:28.031Z</lastmod>
+    <lastmod>2023-04-29T13:16:42.437Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/aggregator/theme_space_agg.html</loc>
-    <lastmod>2023-04-26T12:34:47.539Z</lastmod>
+    <lastmod>2023-04-29T13:16:58.222Z</lastmod>
+  </url>
+  <url>
+    <loc>https://MDBAuth.github.io/WERP_toolkit_demo/causal_networks/causal_manipulation.html</loc>
+    <lastmod>2023-04-29T13:16:59.299Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/causal_networks/causal_overview.html</loc>
-    <lastmod>2023-04-26T12:34:48.580Z</lastmod>
+    <lastmod>2023-04-29T13:16:59.979Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/causal_networks/causal_plots.html</loc>
-    <lastmod>2023-04-26T12:34:51.448Z</lastmod>
+    <lastmod>2023-04-29T13:17:09.180Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/bar_plots.html</loc>
-    <lastmod>2023-04-26T12:35:38.536Z</lastmod>
+    <lastmod>2023-04-29T13:17:11.555Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/causal_plots.html</loc>
-    <lastmod>2023-04-26T12:35:39.194Z</lastmod>
+    <lastmod>2023-04-29T13:17:12.328Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/comparer_overview.html</loc>
-    <lastmod>2023-04-26T12:35:39.949Z</lastmod>
+    <lastmod>2023-04-29T13:17:12.996Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/flow_scaling_comparer.html</loc>
-    <lastmod>2023-04-26T12:35:40.748Z</lastmod>
+    <lastmod>2023-04-29T13:17:13.691Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/heatmap.html</loc>
-    <lastmod>2023-04-26T12:35:45.423Z</lastmod>
+    <lastmod>2023-04-29T13:17:15.578Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/hydrographs.html</loc>
-    <lastmod>2023-04-26T12:35:57.946Z</lastmod>
+    <lastmod>2023-04-29T13:17:17.503Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/line_plots.html</loc>
-    <lastmod>2023-04-26T12:37:00.613Z</lastmod>
+    <lastmod>2023-04-29T13:17:19.815Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/maps.html</loc>
-    <lastmod>2023-04-26T12:37:02.697Z</lastmod>
+    <lastmod>2023-04-29T13:17:21.947Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/comparer/plot_creation.html</loc>
-    <lastmod>2023-04-26T12:38:43.367Z</lastmod>
+    <lastmod>2023-04-29T13:17:25.222Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/controller/controller_ewr_stepthrough_R.html</loc>
-    <lastmod>2023-04-26T12:42:19.385Z</lastmod>
+    <lastmod>2023-04-29T13:20:59.086Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/controller/controller_ewr_wrapped_R.html</loc>
-    <lastmod>2023-04-26T12:46:06.065Z</lastmod>
+    <lastmod>2023-04-29T13:24:35.121Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/controller/controller_overview.html</loc>
-    <lastmod>2023-04-26T12:46:07.007Z</lastmod>
+    <lastmod>2023-04-29T13:24:36.080Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/controller/flow_scaling_control.html</loc>
-    <lastmod>2023-04-26T12:46:07.651Z</lastmod>
+    <lastmod>2023-04-29T13:24:36.688Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/full_toolkit/WERP_toolkit_in_memory.html</loc>
-    <lastmod>2023-04-26T12:46:09.856Z</lastmod>
+    <lastmod>2023-04-29T13:24:38.697Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/full_toolkit/WERP_toolkit_save_steps.html</loc>
-    <lastmod>2023-04-26T12:46:11.855Z</lastmod>
+    <lastmod>2023-04-29T13:24:40.666Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/full_toolkit/flow_scaling_full.html</loc>
-    <lastmod>2023-04-26T12:46:12.548Z</lastmod>
+    <lastmod>2023-04-29T13:24:41.490Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/full_toolkit/full_toolkit_overview.html</loc>
-    <lastmod>2023-04-26T12:46:13.274Z</lastmod>
+    <lastmod>2023-04-29T13:24:42.361Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/index.html</loc>
-    <lastmod>2023-04-26T12:46:15.315Z</lastmod>
+    <lastmod>2023-04-29T13:24:44.103Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/overview/spatial_data.html</loc>
-    <lastmod>2023-04-26T12:46:17.604Z</lastmod>
+    <lastmod>2023-04-29T13:24:46.644Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/scenario_creation/development_testing/scaling_testing.html</loc>
-    <lastmod>2023-04-26T12:46:20.508Z</lastmod>
+    <lastmod>2023-04-29T13:24:49.352Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/scenario_creation/flow_scaling.html</loc>
-    <lastmod>2023-04-26T12:46:23.300Z</lastmod>
+    <lastmod>2023-04-29T13:24:52.145Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/scenario_creation/scenario_creation_demo_R.html</loc>
-    <lastmod>2023-04-26T12:46:25.997Z</lastmod>
+    <lastmod>2023-04-29T13:24:54.932Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/WERP_toolkit_demo/scenario_creation/scenario_creation_overview.html</loc>
-    <lastmod>2023-04-26T12:46:26.782Z</lastmod>
+    <lastmod>2023-04-29T13:24:55.701Z</lastmod>
   </url>
 </urlset>

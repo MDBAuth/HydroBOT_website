@@ -225,6 +225,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <a href="../full_toolkit/WERP_toolkit_params.qmd" class="sidebar-item-text sidebar-link">Run toolkit from params</a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../Presentation/walkthrough_presentation.html" class="sidebar-item-text sidebar-link">Walkthrough presentation</a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -375,10 +380,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>sequence of aggregation functions (can be multiple per step)</p></li>
 </ul>
 <p>Here, I’m using an interleaved list of theme and spatial aggregations (see <a href="../aggregator/theme_space_agg.html">the detailed docs</a> for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the <a href="../aggregator/spatial_agg.html">spatial</a> and <a href="../aggregator/theme_agg.html">theme</a> docs for more examples.</p>
-<div class="cell" data-hash="WERP_toolkit_save_steps_cache/html/unnamed-chunk-8_b436046010214a22d54db2f96a2b0279">
+<div class="cell" data-hash="WERP_toolkit_save_steps_cache/html/unnamed-chunk-8_355a7f571884dad3682363a08d39ac02">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>aggseq <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">ewr_code =</span> <span class="fu">c</span>(<span class="st">'ewr_code_timing'</span>, <span class="st">'ewr_code'</span>),</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">env_obj =</span>  <span class="fu">c</span>(<span class="st">'ewr_code'</span>, <span class="st">"env_obj"</span>),</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">resource_plan =</span> resource_plan_areas,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">sdl_units =</span> sdl_units,</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">Specific_goal =</span> <span class="fu">c</span>(<span class="st">'env_obj'</span>, <span class="st">"Specific_goal"</span>),</span>
 <span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>               <span class="at">catchment =</span> cewo_valleys,</span>
 <span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>               <span class="at">Objective =</span> <span class="fu">c</span>(<span class="st">'Specific_goal'</span>, <span class="st">'Objective'</span>),</span>
