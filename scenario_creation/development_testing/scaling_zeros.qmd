@@ -1,0 +1,1060 @@
+---
+title: "Scaling functions"
+author: "Galen Holt"
+format: html
+editor: visual
+---
+
+## Setting up the scaling functions
+
+I'm using [flow_scaling.qmd](flow_scaling.qmd) to pull the gauges and scale them, but actually getting the scaling relationships is independent, and so doesn't need to happen in the same script. I'll do that here.
+
+```{r}
+library(werptoolkitr)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(lubridate)
+library(ggplot2)
+library(vicwater)
+library(patchwork)
+library(fitdistrplus)
+```
+
+Set up some directories. Once we move to MDBA, these will be easier to point at in a shared way.
+
+```{r}
+scenario_dir <- '../flow_scaling_data'
+hydro_dir <- file.path(scenario_dir, 'hydrographs')
+scaling_dir <- file.path(scenario_dir, 'CC_Scenarios_WRPs')
+```
+
+## Background and definitions
+
+Bring in David's climate scenarios NOTE: Only go to 31-Jan-2019.
+
+Prec and ETp (PE) are historical (not needed here)
+
+SimR0 is simulated historical runnoff using actual historical Prec and ETp (PE)
+
+SimR1 - SimR7 are simulated with +7% PE but different Rainfall:
+
+1.  -20%
+
+2.  -15% ("High change scenario")
+
+3.  -10%
+
+4.  -5% ("Moderate change scenario")
+
+5.  +0%
+
+6.  +5% ("Low change scenario")
+
+7.  +10%
+
+### Make numeric metadata
+
+The format of this may change, but we're going to want something. Lists are going to be easier to yaml than dataframes (though a dataframe is easier to construct).
+
+Though it sounds like the scenario yamls are likely to *not* be lists, but single values, ie each one gets their own value to create it, and that's it (which makes sense).
+
+```{r}
+
+rain_multiplier <- seq(from = 0.8, to = 1.1, by = 0.05) %>% 
+  setNames(paste0('R', 1:7))
+
+scenario_meta <- list(
+  PE_multiplier = 1.07,
+  rain_multiplier = rain_multiplier,
+  scenario_name = names(rain_multiplier)
+)
+
+# Don't run yet, since I don't know the format we'll be using, but this works to create yaml metadata
+# yaml::write_yaml(scenario_meta, file = 'path/to/file.yml')
+```
+
+Suggestion is to compare each scenario to simulated historic baseline, work out the ratio and apply the difference to the gauge records... Would be good to get 'cease to flow' events for the scenarios.
+
+## Bring in the data
+
+Get the list of files and read them in (to a list of dfs)
+
+```{r}
+#| message: false
+CCSc_FileList <- list.files(scaling_dir, pattern = '.csv', 
+                            full.names = TRUE)
+
+scenario_list <- purrr::map(CCSc_FileList,
+                            \(x) read_csv(file = x, id = 'path')) %>% 
+  setNames(stringr::str_extract(CCSc_FileList, "SS[0-9]+"))
+```
+
+## Scale
+
+David's email
+
+Have given this some thought and think I've come up with a practical solution.
+
+I think the easiest way will be to
+
+a.  Compute ranks/percentiles for both the observed and modelled future time series
+
+b.  Construct a new time series based on the observed ranks and replaces the observed values with the corresponding value for the same rank in the future time series.
+
+This will give us a new future time series but if the distributions of the historical modelled and observed time series are different then the time series will not be a realistic representation of the future observations. So then my suggestion is to bias-correct the new future time series to make it look like a future observations time series.
+
+To do the bias correction my thought is to set up a regression model between the observations and historical time series where we fudge it to deal with the zero-value problem.
+
+Assuming that the flow time series are roughly log-normally distributed, we can set up a regression between the values of corresponding ranks Log(obs~r~ + delta) = a + b\*log(model~r~ + delta)
+
+Where:
+
+obs~r~ is the observation for rank r
+
+model~r~ is the modelled value of rank r
+
+delta is a small non-zero value 0.1 or 0.01, probably the latter
+
+a and b are the regression coefficients.
+
+When fitting the regression to the observations and historical (no change) streamflow we set all the values where obs = 0 to missing.  I don't think that the model output will have zero values given they are area-weighted averages of gridded data
+
+When applying the regression to correct bias in the new future time series, then we are likely to generate negative values that can just be reset to zero.
+
+I think that the above will also allow for the probability of zero values to increase or decrease, as the modelled time series shouldn't have zero values in it...
+
+# Testing
+
+I'm going to figure out how to do this with a single hydrograph and scenario to make sure it works and then roll it out how I already rolled out the q-q version
+
+```{r}
+test_model <- scenario_list$SS20
+orig_hydro <- readRDS(file.path(hydro_dir, 'extracted_flows.rds'))
+test_hydro <- orig_hydro[[20]]
+```
+
+I'm going to continue with monthly binning, but we could just drop the binning if it gets too complicated or we don't have the data to support it But we know the hydrographs will behave differently throughout the year, so might as well let them. Months will introduce artificial discontinuities, but we aren't trying to be perfect.Month-matching makes more sense to create statistics that are at least partially reflective of the major changes through the water year- e.g. it is useful to know the 90th percentile for the low points of the year too, and we'd never see that if we just pooled the data.
+
+I think I'll ignore monthly binning while sorting out the method though
+
+### Rank
+
+Model
+
+```{r}
+test_model <- test_model %>% 
+  mutate(histrank = rank(SimR0)) %>% 
+  mutate(date = lubridate::make_date(Year, Month, Day))
+```
+
+Double check runoff timeseries
+
+```{r}
+test_model %>% 
+ggplot(aes(x = date, y = SimR0)) +
+  geom_line()
+```
+
+and the ranking
+
+```{r}
+test_model %>% 
+ggplot(aes(x = histrank, y = SimR0)) +
+  geom_line()
+```
+
+Hydrograph
+
+Drop bad codes
+
+```{r}
+qc_limit <- 150
+
+test_hydro <- test_hydro %>% 
+  mutate(hyd_vals = ifelse(quality_codes_id > qc_limit, NA, value)) %>% 
+  mutate(hydrank = rank(hyd_vals))
+```
+
+Are there zeros?
+
+```{r}
+sum(test_hydro$hyd_vals == 0, na.rm = TRUE)
+```
+
+Check hydrograph and show where the 0 are.
+
+```{r}
+ggplot(test_hydro, aes(x = time, y = hyd_vals)) + geom_line() + 
+  geom_point(data = filter(test_hydro, hyd_vals == 0), mapping = aes(color = hyd_vals == 0))
+```
+
+and the ranking
+
+```{r}
+test_hydro %>% 
+ggplot(aes(x = hydrank, y = hyd_vals)) +
+  geom_line()
+```
+
+## Prob dists
+
+Before we even get to the replacing and unbiasing, what do those probability distributions look like? Are they remotely similar? Logging the data- loses the 0s but this is just a quick look
+
+```{r}
+# hyddens <- test_hydro %>% 
+# ggplot(aes(x = log(hyd_vals))) +
+#   geom_density()
+# 
+# scenedens <- test_model %>% 
+#   ggplot(aes(x = log(SimR0))) +
+#   geom_density()
+# 
+# hyddens + scenedens
+
+ggplot() +
+geom_density(data = test_model, 
+             mapping = aes(x = log(SimR0)), color = 'dodgerblue') + 
+  geom_density(data = test_hydro, 
+               mapping = aes(x = log(hyd_vals)), color = 'forestgreen') +
+  xlab('log(value)')
+```
+
+And the cdfs
+
+```{r}
+ggplot() +
+stat_ecdf(data = test_model, 
+             mapping = aes(x = log(SimR0)), color = 'dodgerblue') + 
+  stat_ecdf(data = test_hydro, 
+               mapping = aes(x = log(hyd_vals)), color = 'forestgreen') +
+  xlab('log(value)')
+```
+
+Quite a bit different. And slightly trimodal, though not nearly as pronounced as orig_hydros\[\[25\]\].
+
+## Rank-replacement
+
+This replaces the values of rank x in the past hydro with values of rank x in modelled. It therefore gets the *sequence* of the real hydrograph, but the *distribution* of the modelled runoff.
+
+We need to deal with duplicate ranks. The most common will be zeros in the hydrograph, but they could occur in the modelled data too.
+
+```{r}
+sum(duplicated(test_hydro$hydrank))
+sum(duplicated(test_model$histrank))
+```
+
+The modelled data is not duplicated on 0, necessarily
+
+```{r}
+test_model %>% group_by(histrank) %>% summarise(nr = n(), val = first(SimR0)) %>% filter(nr > 1)
+```
+
+The hydrographs are usually 0 duplication, but not always
+
+```{r}
+test_hydro %>% group_by(hydrank) %>% summarise(nr = n(), val = first(hyd_vals)) %>% filter(nr > 1)
+```
+
+Is this fundamentally the same issue as the data length issue below? We have x ranks in the hydrograph, and x + z ranks in the model. So all the data with rank d (duplicated) should get the same value, which is the same issue as if there were only one value of d and just fewer datapoints in the hydrograph than the data. One argument against the median for the ranks as I suggest is that when 0 is duplicated, we would end up pushing the median of several ranks to it instead of the minimum.
+
+And we need to deal with two situations of data length- hydrographs longer than model, and model longer than hydrograph (more typical). In the first, we need to duplicately assign model rank-values. In the second, we need to assign multiple ranks to a single rank. Maybe the median. Or we can use quantiles instead of ranks to break it up into the same size chunks.
+
+Simple code for rank-replacing. will need to modify
+
+```{r}
+a <- tibble(vals = c(5,1,3), ranks = c(3,1,2))
+b <- tibble(vals = c(4,3,8), ranks = c(2,1,3))
+bina <- match(b$ranks, a$ranks)
+b$vala <- a$vals[bina]
+b
+```
+
+And the duplication issues. I'm going to move away from tibbles, we can do this with `$` and `[]` more generally to end up with a function. We might still apply that with a mutate to do the grouping though.
+
+```{r}
+h <- c(5,1,1,0,3,0,0,4,8,5,0,0,0,0, NA)
+m <- c(6,10,9,9,4,7,2,5,NA,2,3,6,9,5,2,3,10,9,4)
+
+rankh <- rank(h, na.last = 'keep')
+rankm <- rank(m, na.last = 'keep')
+```
+
+There's not actually a clean way to get rankings that aren't affected by duplication- `ties.method` first, last, min and max all end up giving each value a different rank and skipping numbers depending on how many dups there are at a given level, and average gives all duplicated values the same rank (good), but skips ranks based on how many duplicates there are. Which isn't good- we will have different numbers of duplicates in the two datasets.
+
+So, we need to cut to unique values, rank them, and use those rankings. Use `na.last = 'keep'` to not give NAs unique rankings. Though it would also work to drop NA when we get the unique values.
+
+```{r}
+hu <- unique(h)
+mu <- unique(m)
+
+rhu <- rank(hu, na.last = 'keep')
+rmu <- rank(mu, na.last = 'keep')
+```
+
+Now, I was thinking I would map those ranks back to the original data, so we have, for example, 7 rank 1s in h (the zeros). But then we run up against the issue of different lengths. Rank 8 in `hu` is the highest value, while `mu` goes to 10.
+
+So, do we actually want to go back to `findInterval`, with the number of intervals being `min(length(h), length(m))`? I think so (though those should probably be hu and mu. That quickly suggests we could just get back to q-q scaling too, and skip the straight replacements. Maybe- if the debiasing requires replaced values, that won't work. Get there and see.
+
+A general quantile function I developed earlier. The trick will be to make q_perc right to give as many values as possible (rankings) instead of quantiles. e.g each value should be in its own quantile for the smallest data. Again, is this necessary? Or can we q-q scale (instead of value-replace) and then debias the zeros?
+
+```{r}
+get_q <- function(vals, q_perc) {
+  qs <- quantile(vals, probs = seq(0,1, q_perc), type = 5, na.rm = TRUE)
+  # cut fails with lots of zeros (well, any duplicate bins)
+  # binvec <- cut(vals, qs, include.lowest = TRUE, labels = FALSE)
+  # findInterval is OK with duplicate bins, but combines them, eg. if there are 10 bins that are all 0, it will call them all q10. 
+  binvec <- findInterval(vals, qs, rightmost.closed = TRUE)
+  return(binvec)
+}
+```
+
+```{r}
+fewest <- min(length(unique(h)), length(unique(m)))
+
+hi <- get_q(h, q_perc = 1/fewest)
+mi <- get_q(m, q_perc = 1/fewest)
+```
+
+That doesn't actually work though- the quantiles goof it up because the duplicates necessarily shift the distribution. Instead, to get as close to a ranking as we can, we need to use the unique values for quantiles, but then findInterval on the full vectors. I think.
+
+```{r}
+qsh <- quantile(hu, probs = seq(0,1, 1/fewest), type = 5, na.rm = TRUE)
+qsm <- quantile(mu, probs = seq(0,1, 1/fewest), type = 5, na.rm = TRUE)
+
+hi <- findInterval(h, qsh, rightmost.closed = TRUE)
+mi <- findInterval(m, qsm, rightmost.closed = TRUE)
+```
+
+There are still some funny issues there (some quantiles can go missing), though that is primarily because of small test data.
+
+Now, let's do the replacement. Use the median (or mean?) of the modelled data? In this dummy case, q4 has both 5 and 6 in it, so we should end up with somethign happening here.
+
+```{r}
+table(mi, m)
+```
+
+Aggregate produces a df, so at this point I probably should switch to dplyr since it's easier.
+
+We need the summary of the ranks for the modelled data, but not for the hydrology- we need a single value to replace for each rank, but we can put it in many rows for the replacement.
+
+```{r}
+# mm <- aggregate(m, by = list(mi), FUN = median)
+
+# 
+mdf <- tibble(mod_vals = m, ranks = mi) %>% 
+  group_by(ranks) %>% 
+  summarise(mod_vals = median(mod_vals))
+
+hdf <- tibble(hyd_vals = h, ranks = hi)
+
+# we could use `match` and indexing, but we're already in dplyr so
+
+hdf <- left_join(hdf, mdf, by = 'ranks')
+
+ggplot(hdf, aes(x = hyd_vals, y = mod_vals)) + geom_point()
+```
+
+Make all that a function so we can apply it to the actual data. The binning is very similar to before, it just uses unique values instead of all values to approximate a ranking.
+
+## Re-build data cleanly
+
+we had ranks in above, we want to do that differently now, so start from scratch
+
+```{r}
+qc_limit <- 150
+
+test_model <- scenario_list$SS20
+test_hydro <- orig_hydro[[20]]
+
+test_hydro <- test_hydro %>% 
+  mutate(hyd_vals = ifelse(quality_codes_id > qc_limit, NA, value))
+
+test_model <- test_model %>%
+  mutate(date = lubridate::make_date(Year, Month, Day))
+```
+
+The simple binning function
+
+```{r}
+get_q <- function(vals, q_perc) {
+  qs <- quantile(unique(vals), probs = seq(0,1, q_perc), type = 5, na.rm = TRUE)
+  binvec <- findInterval(vals, qs, rightmost.closed = TRUE)
+  return(binvec)
+}
+```
+
+Data arrangement functions- actually, sort this out later, I think we can probably roll in the regression and apply across the sims, and so we want to sort it out here
+
+```{r}
+
+# Get the number of 'ranks' (bins)
+fewest <- min(length(unique(test_hydro$hyd_vals)), length(unique(test_model$SimR0)))
+
+# Rank the hydrograph
+test_hydro <- test_hydro %>%
+  mutate(ranks = get_q(hyd_vals, 1/fewest))
+
+# Rank the model outputs
+model_rankvals <- test_model %>%
+  mutate(ranks = get_q(SimR0, 1/fewest)) %>% 
+  group_by(ranks) %>% 
+  # tempting to apply this `across(stars_with('Sim'))`, but the ranks will differ and so we need to be careful. Might be as easy as `across` in the ranks too?
+  summarise(mod_vals = median(SimR0))
+
+# replace (really, add another column)
+test_hydro <- left_join(test_hydro, model_rankvals, by = 'ranks')
+```
+
+## Check plots
+
+Do the rankings seem to work?
+
+```{r}
+ggplot(test_hydro, aes(x = hyd_vals, y = mod_vals)) + geom_line()
+```
+
+Funny steps, but that's likely to be expected.
+
+What does the timeseries look like?
+
+```{r}
+ggplot(test_hydro, aes(x = time)) + geom_line(aes(y = hyd_vals), color = 'forestgreen') + geom_line(aes(y = mod_vals*500), color = 'dodgerblue')
+```
+
+The variance is quite obviously different here, and that's potentially an issue.
+
+We already know the distributions look different from above. How do they look relative to rankings?Those are very different distributions, even when rescaled. Which is not surprising.
+
+```{r}
+# yes, I should pivot longer but i want to go quick.
+ggplot(test_hydro, aes(x = ranks)) + geom_line(aes(y = hyd_vals), color = 'forestgreen') + geom_line(aes(y = mod_vals*500), color = 'dodgerblue')
+```
+
+So, now the question is whether we can get the bias-correction regression to make the blue look like the green.
+
+# Regression bias correction
+
+What are we regressing? Rank-matched hydrograph and model data
+
+```{r}
+ggplot(test_hydro, aes(x = mod_vals, y = hyd_vals)) + geom_point()
+```
+
+We know we need to log
+
+```{r}
+bump0 <- ggplot(test_hydro, aes(x = log(mod_vals + 0.01), y = log(hyd_vals + 0.01))) + 
+  geom_point() +
+  geom_smooth(method = 'lm')
+
+drop0 <- ggplot(test_hydro, aes(x = log(mod_vals), y = log(hyd_vals))) + 
+  geom_point() +
+  geom_smooth(method = 'lm')
+
+bump0 + drop0
+```
+
+There's quite clearly no way that we will get reasonable estimates of hyd_vals from predictions from mod_vals- we'd get the line, and that's obviously wrong. Doesn't matter if we bump zeros or drop them, both are terrible fits.
+
+As a check, let's go ahead and make those distributions, and see just how terrible they are.
+
+```{r}
+test_log <- test_hydro %>% 
+  mutate(log_hyd = log(hyd_vals),
+         log_mod = log(mod_vals)) %>% 
+  filter(!is.infinite(log_hyd))
+
+logregression <- lm(log_hyd ~ log_mod, data = test_log)
+
+test_log$pred_log_hyd <- predict(logregression, newdata = tibble(log_mod = test_log$log_mod))
+
+test_log$pred_hyd <- exp(test_log$pred_log_hyd)
+```
+
+How does that distribution compare to the data? Note that this has dropped zeros in both sets of data, because we've logged.
+
+```{r}
+ggplot(test_log) +
+  stat_ecdf(mapping = aes(x = pred_log_hyd), color = 'dodgerblue') + 
+  stat_ecdf(mapping = aes(x = log(hyd_vals)), color = 'forestgreen')
+```
+
+And the PDF
+
+```{r}
+ggplot(test_log) +
+  geom_density(mapping = aes(x = pred_log_hyd), color = 'dodgerblue') + 
+  geom_density(mapping = aes(x = log(hyd_vals)), color = 'forestgreen')
+```
+
+We could conceivably do a two-piece regression with only the mod_vals logged (e.g. in this plot, we could clearly throw together a piecewise regression with a knot at about -3)
+
+```{r}
+ggplot(test_hydro, aes(x = log(mod_vals), y = hyd_vals)) + 
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+But that isn't going to be general across gauges. It seems like a better plan will be to actually operate on the distributions themselves. Which potentially brings us back to the original approach.
+
+# Distribution shifting
+
+I think there are two ways to go here-
+
+1.  as we've done, replace flow with rank-matched model data. Then shift that distribution to re-match flow.
+
+    1.  For other scenarios, use that same distributional shift to get from model to flow
+
+2.  Get the distributional shifts for the different model data, and apply these to the flow distribution
+
+    1.  This is the q-q scaling, if we were to stop here
+
+    2.  Use parametric dists for the flow, so those shifts can bring the data up and down across 0.
+
+3.  Will either of those ever bring zeros up? I'm still not seeing how that happens.
+
+## The model distributions
+
+Above we compared the ecdfs for the SimR0 and the flow, but let's look at how consistent the distributions are for the other Sims. We don't care about time, so just let it fall off in the pivot. The green line is the hydrograph values.
+
+```{r}
+simpivot <- test_model %>% 
+  pivot_longer(cols = starts_with('Sim'), 
+               names_to = 'Sim', values_to = 'value')
+```
+
+```{r}
+ggplot(simpivot) +
+  stat_ecdf(mapping = aes(x = log(value), color = Sim)) + 
+  stat_ecdf(data = test_hydro, 
+               mapping = aes(x = log(hyd_vals)), color = 'forestgreen')
+```
+
+Can we fit those distributions?
+
+Try hydrograph first
+
+```{r}
+cleanhydro <- test_hydro$hyd_vals[!is.na(test_hydro$hyd_vals) & 
+                                    test_hydro$hyd_vals > 0]
+fit_hydro <- MASS::fitdistr(cleanhydro, densfun = 'lognormal')
+
+xvals <- min(test_hydro$hyd_vals, na.rm = T):round(max(test_hydro$hyd_vals, na.rm = T))
+
+pfit <- plnorm(xvals, fit_hydro$estimate[1], fit_hydro$estimate[2])
+dfit <- dlnorm(xvals, fit_hydro$estimate[1], fit_hydro$estimate[2])
+logfit <- tibble(xval = xvals, fitcdf = pfit, fitpdf = dfit)
+```
+
+Not perfect, but that's not going to be possible.
+
+```{r}
+ggplot(test_hydro) +
+  stat_ecdf(mapping = aes(x = log(hyd_vals)), color = 'forestgreen') +
+  geom_line(data = logfit, mapping = aes(x = log(xval), y = fitcdf), 
+            color = 'firebrick') + 
+  stat_ecdf(data = test_log, mapping = aes(x = pred_log_hyd), color = 'dodgerblue')
+```
+
+PDF. It doesn't look super great, really.
+
+```{r}
+ggplot(test_hydro) +
+  geom_density(mapping = aes(x = hyd_vals), color = 'forestgreen') +
+  geom_line(data = logfit, mapping = aes(x = xval, y = fitpdf), 
+            color = 'firebrick') + 
+  coord_cartesian(xlim = c(-1, 1000))
+```
+
+We can't just log(x) for the lognorm pdf because of the nonlinear transform. But we can look at it by directly building a normal pdf on the lognorm scale.
+
+```{r}
+cleanhydrolog <- log(cleanhydro)
+
+fit_hydrolog <- MASS::fitdistr(cleanhydrolog, densfun = 'normal')
+
+xvals2 <- seq(min(cleanhydrolog, na.rm = T), 
+              round(max(cleanhydrolog, na.rm = T)), 
+              by = 0.1)
+
+pfitlog <- pnorm(xvals2, fit_hydrolog$estimate[1], fit_hydrolog$estimate[2])
+dfitlog <- dnorm(xvals2, fit_hydrolog$estimate[1], fit_hydrolog$estimate[2])
+
+logfitlog <- tibble(xval = xvals2, fitcdf = pfitlog, fitpdf = dfitlog)
+```
+
+```{r}
+ggplot() +
+  geom_density(data = tibble(hydro = cleanhydrolog), aes(x = hydro), color = 'forestgreen') +
+  geom_line(data = logfitlog, aes(x = xvals2, y = fitpdf), color = 'firebrick')
+```
+
+That's much better. So why isn't it working for the unlogged with lognormal. Is it because truncated?
+
+The rnorm with those dims works/matches. SO what's up with the lognormal? Truncated doesn't really make sense. Will need to look into it a bit more.
+
+```{r}
+testcurve <- rnorm(length(cleanhydrolog), 
+                   fit_hydrolog$estimate[1], fit_hydrolog$estimate[2])
+
+ggplot() +
+  geom_density(data = tibble(hydro = cleanhydrolog), aes(x = hydro), color = 'forestgreen') +
+    geom_density(data = tibble(testdist = testcurve), aes(x = testdist), color = 'purple') +
+  geom_line(data = logfitlog, aes(x = xvals2, y = fitpdf), color = 'firebrick')
+```
+
+Now, how abot sim0
+
+```{r}
+cleansim <- test_model$SimR0[!is.na(test_model$SimR0) & 
+                                    test_model$SimR0 > 0]
+fit_sim <- MASS::fitdistr(cleansim, densfun = 'lognormal')
+
+xvalsim <- exp(seq(-6.5, 3, by = 0.01))
+pfitsim <- plnorm(xvalsim, fit_sim$estimate[1], fit_sim$estimate[2])
+
+logfitsim <- tibble(xval = xvalsim, fitcdf = pfitsim)
+```
+
+Interesting. Thats a worse fit to the lognormal than the hydrographs were.
+
+```{r}
+ggplot(test_model) +
+  stat_ecdf(mapping = aes(x = log(SimR0)), color = 'dodgerblue') +
+  geom_line(data = logfitsim, mapping = aes(x = log(xval), y = fitcdf), color = 'firebrick')
+```
+
+### Fitting censored data
+
+Let's assume the hydrograph data is left-censored (essentially a detection limit, below which data is zero). That should yield better distributional fits than above where we just threw the zeros out and fit what was left. We can get the estimates with `fitdistrplus::fitdistcens`. I'll do this with `test_hydro` directly (and compare with other fits to check it makes sense).
+
+First, we need a new dataframe to define the censoring. We use `hyd_vals` because that has dropped the values that are just bad. What do we want to say the 'detection limit' is? I guess the smallest nonzero value
+
+```{r}
+detectionlimit <- 1 #min(test_hydro$hyd_vals[test_hydro$hyd_vals > 0], na.rm = TRUE)
+sum(test_hydro$hyd_vals < detectionlimit, na.rm = TRUE)
+```
+
+Create the needed dataframe
+
+```{r}
+censframe <- test_hydro |> 
+  dplyr::filter(!is.na(hyd_vals)) |> # Throw out the NAs, we want a distribution
+  dplyr::mutate(left = ifelse(hyd_vals == 0, NA, hyd_vals),
+                right = ifelse(hyd_vals == 0, detectionlimit, hyd_vals)) |> 
+  dplyr::select(left, right) |> 
+  data.frame() # annoyingly tibbles break fitdistcens
+```
+
+Fit and get the parameters. Get the naive version too, to see how different it is. This is the same as above, but I'm trying to keep this self-contained.
+
+```{r}
+fit_cens <- fitdistrplus::fitdistcens(censdata = censframe, distr = 'lnorm')
+
+fit_censW <- fitdistrplus::fitdistcens(censdata = censframe, distr = 'weibull')
+
+# fitdistr just needs the vector
+fit_naive <- test_hydro |> 
+  dplyr::filter(!is.na(hyd_vals) & hyd_vals > 0) |> 
+  dplyr::select(hyd_vals) |> 
+  pull() |> 
+  MASS::fitdistr(densfun = 'lognormal')
+
+fit_cens
+fit_naive
+```
+
+Those are really very different. Let's make some plots to compare the distributions. Get the pdf and cdf we'd get for both those distributions.
+
+```{r}
+df_dists <- tibble(x = seq(0,10000, by = 0.1), 
+                 cdf_cens = plnorm(x, 
+                             fit_cens$estimate['meanlog'],
+                             fit_cens$estimate['sdlog']),
+                 cdf_naive = plnorm(x, 
+                             fit_naive$estimate['meanlog'],
+                             fit_naive$estimate['sdlog']),
+                 cdf_weib = pweibull(x, 
+                             fit_censW$estimate['shape'],
+                             fit_censW$estimate['scale']),
+                 pdf_cens = dlnorm(x, 
+                             fit_cens$estimate['meanlog'],
+                             fit_cens$estimate['sdlog']),
+                 pdf_naive = dlnorm(x, 
+                             fit_naive$estimate['meanlog'],
+                             fit_naive$estimate['sdlog']),
+                 # And random data
+                 rand_cens = rlnorm(length(x), 
+                             fit_cens$estimate['meanlog'],
+                             fit_cens$estimate['sdlog']),
+                 rand_naive = rlnorm(length(x), 
+                             fit_naive$estimate['meanlog'],
+                             fit_naive$estimate['sdlog']))
+```
+
+Plot CDFs. The censored fit is terrible.
+
+```{r}
+ggplot() + 
+  stat_ecdf(data = test_hydro, mapping = aes(x = hyd_vals),
+            color = 'black') + 
+  # stat_ecdf(data = df_dists, mapping = aes(x = rand_cens), 
+  #           color = 'darkseagreen') +
+  geom_line(data = df_dists, mapping = aes(x = x, y = cdf_cens),
+            color = 'darkgreen') +
+  # stat_ecdf(data = df_dists, mapping = aes(x = rand_naive), 
+  #           color = 'cyan') +
+  geom_line(data = df_dists, mapping = aes(x = x, y = cdf_naive),
+            color = 'dodgerblue') +
+    geom_line(data = df_dists, mapping = aes(x = x, y = cdf_weib),
+            color = 'firebrick') +
+  geom_vline(xintercept = detectionlimit) +
+  coord_cartesian(xlim = c(-1, 1000))
+```
+
+Wait, this is always going to be crap if fit with plnorm (or weibull). Because those distributions are *actually* limited at 0, but the data is levelling off and wants to go *below* zero. So, we *do* need to go normal manually first. Or shift up, or something.
+
+### Shifting up
+
+Does it work to just shift up?
+
+First, we need a new dataframe to define the censoring. We use `hyd_vals` because that has dropped the values that are just bad. What do we want to say the 'detection limit' is? I guess the smallest nonzero value
+
+```{r}
+detectionlimit <- 5000
+
+test_hydro$hyd_vals_shift <- test_hydro$hyd_vals + detectionlimit
+```
+
+Create the needed dataframe
+
+```{r}
+censframe <- test_hydro |> 
+  dplyr::filter(!is.na(hyd_vals)) |> # Throw out the NAs, we want a distribution
+  dplyr::mutate(left = ifelse(hyd_vals_shift == detectionlimit, NA, hyd_vals_shift),
+                right = ifelse(hyd_vals_shift == detectionlimit, detectionlimit, hyd_vals_shift)) |> 
+  dplyr::select(left, right) |> 
+  data.frame() # annoyingly tibbles break fitdistcens
+```
+
+Fit and get the parameters. Get the naive version too, to see how different it is. This is the same as above, but I'm trying to keep this self-contained.
+
+```{r}
+fit_cens <- fitdistrplus::fitdistcens(censdata = censframe, distr = 'lnorm')
+
+fit_censW <- fitdistrplus::fitdistcens(censdata = censframe, distr = 'weibull')
+
+# fitdistr just needs the vector
+fit_naive <- test_hydro |> 
+  dplyr::filter(!is.na(hyd_vals_shift) & hyd_vals_shift > 0) |> 
+  dplyr::select(hyd_vals_shift) |> 
+  pull() |> 
+  MASS::fitdistr(densfun = 'lognormal')
+
+fit_cens
+fit_censW
+fit_naive
+```
+
+Those are really very different. Let's make some plots to compare the distributions. Get the pdf and cdf we'd get for both those distributions.
+
+```{r}
+df_dists <- tibble(x = seq(0,10000, by = 0.1), 
+                 cdf_cens = plnorm(x, 
+                             fit_cens$estimate['meanlog'],
+                             fit_cens$estimate['sdlog']),
+                 cdf_naive = plnorm(x, 
+                             fit_naive$estimate['meanlog'],
+                             fit_naive$estimate['sdlog']),
+                 cdf_weib = pweibull(x, 
+                             fit_censW$estimate['shape'],
+                             fit_censW$estimate['scale']),
+                 pdf_cens = dlnorm(x, 
+                             fit_cens$estimate['meanlog'],
+                             fit_cens$estimate['sdlog']),
+                 pdf_naive = dlnorm(x, 
+                             fit_naive$estimate['meanlog'],
+                             fit_naive$estimate['sdlog']),
+                 # And random data
+                 rand_cens = rlnorm(length(x), 
+                             fit_cens$estimate['meanlog'],
+                             fit_cens$estimate['sdlog']),
+                 rand_naive = rlnorm(length(x), 
+                             fit_naive$estimate['meanlog'],
+                             fit_naive$estimate['sdlog']))
+```
+
+Plot CDFs. The censored fit is terrible.
+
+```{r}
+ggplot() + 
+  stat_ecdf(data = test_hydro, mapping = aes(x = hyd_vals_shift),
+            color = 'black') + 
+  # stat_ecdf(data = df_dists, mapping = aes(x = rand_cens), 
+  #           color = 'darkseagreen') +
+  geom_line(data = df_dists, mapping = aes(x = x, y = cdf_cens),
+            color = 'darkgreen') +
+  # stat_ecdf(data = df_dists, mapping = aes(x = rand_naive), 
+  #           color = 'cyan') +
+  geom_line(data = df_dists, mapping = aes(x = x, y = cdf_naive),
+            color = 'dodgerblue') +
+    geom_line(data = df_dists, mapping = aes(x = x, y = cdf_weib),
+            color = 'firebrick') +
+  geom_vline(xintercept = detectionlimit) +
+  coord_cartesian(xlim = c(-1, 10000))
+```
+
+Those are actually a lot better. Does this actually work? Or should we do it on the logged scale and normal dists? How much to shift?
+
+### Optimized upshifts
+
+I've done a bunch of testing elsewhere with known distributions, and come up with a set of functions to determine the shift (and spit out a dataframe for diagnostic plots).
+
+```{r}
+fitshift <- function(rawdata, shift_up) {
+  # Handle the zero case- we just use the next value up
+    if (shift_up == 0) {rightlim <- min(rawdata[rawdata>0])
+    } else {
+      rightlim <- shift_up}
+  
+  inshift <- rawdata + shift_up
+    
+    upcens <- tibble(left = ifelse(inshift <= shift_up, NA, inshift),
+                right = ifelse(inshift <= shift_up, rightlim, inshift))
+    
+    suppressWarnings(fit_up <- fitdistcens(censdata = data.frame(upcens),
+                                           distr = 'lnorm'))
+    
+    return(fit_up)
+}
+
+
+opt_up <- function(shift_up, rawdata) {
+  
+  fit_up <- fitshift(rawdata, shift_up)
+  
+  return(-fit_up$loglik)
+}
+
+
+optshift <- function(rawdata) {
+  
+  # This is about distributions, NOT data order, so get rid of NAs
+  rawdata <- na.omit(rawdata)
+  
+  # get the optimal shift
+  shift <- optimize(opt_up, interval = c(0, 1000), rawdata = rawdata)
+  
+  # Get the fit at that shift (would be nice to kick this out of opt_up somehow)
+  
+  fit_up <- fitshift(rawdata, shift$minimum)
+  
+ # Create a df for output
+  # The shifted data
+  shiftdf <- tibble(orig_data = rawdata, 
+                    shift_data = rawdata + shift$minimum, 
+                    optimum_shift = shift$minimum)
+  
+
+   # This isn't ideal, but we can shove the cdf on here too, it just has rows that don't mean the same thing. prevents us saving a list though.
+  shiftdf <- shiftdf |> 
+    mutate(x = row_number()/10,
+           cdf_up = plnorm(x, 
+                             fit_up$estimate['meanlog'],
+                             fit_up$estimate['sdlog']),
+           pdf_up = dlnorm(x, 
+                             fit_up$estimate['meanlog'],
+                             fit_up$estimate['sdlog']),
+           # Some diagnostics
+           fitloglik = fit_up$loglik)
+  
+  # and a shifted-back version of the cdf/pdf just needs a shifted x. The
+  # backshift of the data is just the original `rawdata`.
+  shiftdf <- shiftdf |> 
+    mutate(x_back = x-shift$minimum)
+
+}
+```
+
+Now, let's try running that for the data
+
+```{r}
+optimal_fit <- optshift(test_hydro$hyd_vals)
+```
+
+Plot that- how are we doing? It's OK, likely is the best fit, the distribution just isn't lognormal.
+
+```{r}
+ggplot(optimal_fit) +
+  stat_ecdf(aes(x = shift_data)) +
+  geom_line(aes(x = x, y = cdf_up), linetype = 2) +
+  coord_cartesian(xlim = c(0,2000))
+```
+
+How does that look compared to the non-shifted fit? I'll shift this fit back to where it should be. They're better in different places. But the shifted version is the only one that can possibly handle the truncation. And we know from the optimisation that it has a better log-likelihood, since 0 was an option.
+
+```{r}
+ggplot(optimal_fit) +
+  stat_ecdf(aes(x = orig_data), 
+            color = 'firebrick') +
+  geom_line(aes(x = x_back, y = cdf_up), 
+            color = 'firebrick', linetype = 2) +
+  geom_line(data = logfit, mapping = aes(x = xval, y = fitcdf), 
+            color = 'dodgerblue') +
+  coord_cartesian(xlim = c(-70,3000))
+```
+
+#### Weibull?
+
+Does a weibull fit better, now that we have the shift? No
+
+```{r}
+fitshift_w <- function(rawdata, shift_up) {
+  # Handle the zero case- we just use the next value up
+    if (shift_up == 0) {rightlim <- min(rawdata[rawdata>0])
+    } else {
+      rightlim <- shift_up}
+  
+  inshift <- rawdata + shift_up
+    
+    upcens <- tibble(left = ifelse(inshift <= shift_up, NA, inshift),
+                right = ifelse(inshift <= shift_up, rightlim, inshift))
+    
+    suppressWarnings(fit_up <- fitdistcens(censdata = data.frame(upcens),
+                                           distr = 'weibull'))
+    
+    return(fit_up)
+}
+
+opt_up_w <- function(shift_up, rawdata) {
+  
+  fit_up <- fitshift_w(rawdata, shift_up)
+  
+  return(-fit_up$loglik)
+}
+
+
+optshift_w <- function(rawdata) {
+  
+  # This is about distributions, NOT data order, so get rid of NAs
+  rawdata <- na.omit(rawdata)
+  
+  # get the optimal shift
+  shift <- optimize(opt_up_w, interval = c(0, 1000), rawdata = rawdata)
+  
+  # Get the fit at that shift (would be nice to kick this out of opt_up somehow)
+  
+  fit_up <- fitshift_w(rawdata, shift$minimum)
+  
+ # Create a df for output
+  # The shifted data
+  shiftdf <- tibble(orig_data = rawdata, 
+                    shift_data = rawdata + shift$minimum, 
+                    optimum_shift = shift$minimum)
+  
+
+   # This isn't ideal, but we can shove the cdf on here too, it just has rows that don't mean the same thing. prevents us saving a list though.
+  shiftdf <- shiftdf |> 
+    mutate(x = row_number()/10,
+           cdf_up = pweibull(x, 
+                             fit_up$estimate['shape'],
+                             fit_up$estimate['scale']),
+           pdf_up = dweibull(x, 
+                             fit_up$estimate['shape'],
+                             fit_up$estimate['scale']),
+           # Some diagnostics
+           fitloglik = fit_up$loglik)
+  
+  # and a shifted-back version of the cdf/pdf just needs a shifted x. The
+  # backshift of the data is just the original `rawdata`.
+  shiftdf <- shiftdf |> 
+    mutate(x_back = x-shift$minimum)
+
+}
+```
+
+```{r}
+optimal_fit_w <- optshift_w(test_hydro$hyd_vals)
+```
+
+```{r}
+ggplot(optimal_fit_w) +
+  stat_ecdf(aes(x = shift_data)) +
+  geom_line(aes(x = x, y = cdf_up), linetype = 2) +
+  coord_cartesian(xlim = c(0,2000))
+```
+
+## Shifting between distributions
+
+Couple questions-
+
+1.  if we have data with one distribution, how do we give it another known distribution. I seem to remember somethign about f(g(x)) and g(x)\^-1, but conceptually, what are we doing?
+2.  Even if we can do that, is there a way to shift them to yield numbers below zero? or above, for that matter? Or are we just re-developing a more complex q-q?
+
+We have some x-value (say, flow). We want to shift it to a new distribution. I think conceptually, we go up to its value in the plots above, then over to the corresponding p(x) on the other distribution, then down to get a new value.
+
+So, for the hydrographs, start with `cleanhydro`, the values of the hydrographs
+
+```{r}
+# Get the probs for each hydrograph value- this is the ecdf, which creates a *function* that takes x as arguments and returns probabilities
+phydro <- ecdf(log(cleanhydro))
+phydrop <- phydro(log(cleanhydro))
+
+# Get the hydrograph value for the matching probs for the fit lognormal
+lnh <- qlnorm(phydrop, fit_hydro$estimate[1], fit_hydro$estimate[2])
+
+shifthyd <- tibble(hyd_vals = cleanhydro, fit_val = lnh)
+```
+
+```{r}
+ggplot(test_hydro) +
+  # ecdf of the hydrograph data
+  stat_ecdf(mapping = aes(x = log(hyd_vals)), color = 'forestgreen') +
+  # lognormal cdf
+  geom_line(data = logfit, mapping = aes(x = log(xval), y = fitcdf), color = 'firebrick') +
+  # ecdf of the transformed data, should match the lognormal cdf
+  stat_ecdf(data = shifthyd, mapping = aes(x = log(fit_val)), color = 'dodgerblue', linetype = 2)
+```
+
+So that's dead on. What does it look like as a timeseries next to the real data. I think I can just join on the hyd_vals
+
+```{r}
+test_hydro2 <- test_hydro %>% left_join(shifthyd, by = 'hyd_vals')
+```
+
+```{r}
+ggplot(test_hydro2, aes(x = time)) + 
+  geom_line(mapping = aes(y = hyd_vals), color = 'forestgreen') +
+  geom_line(mapping = aes(y = fit_val), color = 'dodgerblue', linetype = 2)
+```
+
+Yikes. some of those are a bit extreme, huh?
+
+```{r}
+hyddata <- ggplot(test_hydro2, aes(x = time)) + 
+  geom_line(mapping = aes(y = hyd_vals), color = 'forestgreen')
+
+fitdata <- ggplot(test_hydro2, aes(x = time)) +
+  geom_line(mapping = aes(y = fit_val), color = 'dodgerblue')
+
+hyddata + fitdata
+```
+
+Yikes. why are we just blowing the top off?
+
+```{r}
+ggplot(shifthyd, aes(x = hyd_vals, y = fit_val)) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0)
+```
+
+Sure doesn't track on the log scale either.
+
+```{r}
+ggplot(shifthyd, aes(x = log(hyd_vals), y = log(fit_val))) + 
+  geom_point() + 
+  geom_abline(slope = 1, intercept = 0)
+```
+
+And we're still left with the issue of what to do with this if it works- can we ever shift this in a way to give more or less zeros?
