@@ -68,7 +68,8 @@ website:
               text: "Pulling historical gauges"
             - href: scenario_creation/scaling_scenarios.qmd
               text: "Flow scaling to climate models"
-
+            - href: scenario_creation/flow_scaling_methods.qmd
+              text: "Exploring flow scaling methods"
 
     - title: "Causal networks"
       contents:

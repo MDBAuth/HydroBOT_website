@@ -17,3 +17,5 @@ _output
 # Demonstration data outputs
 scenario_example/
 *.png
+
+scenario_creation/test_scaling.rdata

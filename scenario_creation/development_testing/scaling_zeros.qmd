@@ -132,6 +132,10 @@ I'm going to figure out how to do this with a single hydrograph and scenario to 
 test_model <- scenario_list$SS20
 orig_hydro <- readRDS(file.path(hydro_dir, 'extracted_flows.rds'))
 test_hydro <- orig_hydro[[20]]
+
+# save that so we don't have to pass this around as we clean things up
+save(test_hydro, test_model, 
+     file = file.path('scenario_creation', 'test_scaling.rdata'))
 ```
 
 I'm going to continue with monthly binning, but we could just drop the binning if it gets too complicated or we don't have the data to support it But we know the hydrographs will behave differently throughout the year, so might as well let them. Months will introduce artificial discontinuities, but we aren't trying to be perfect.Month-matching makes more sense to create statistics that are at least partially reflective of the major changes through the water year- e.g. it is useful to know the 90th percentile for the low points of the year too, and we'd never see that if we just pooled the data.
@@ -1065,7 +1069,7 @@ newhydro <- ggplot(optimal_fit, aes(x = time)) +
 newhydro
 ```
 
-Yikes. some of those are a bit extreme, huh?
+Yikes. some of those are a bit extreme, huh? Lognormal tails are dangerous.
 
 ```{r}
 newhydro + coord_cartesian(ylim = c(0, 5000))
@@ -1098,3 +1102,240 @@ And we're still left with the issue of what to do with this if it works- can we 
 # Scaling dists
 
 How do we shift these distributions?
+
+Let's start by fitting the scenarios. I fit the baseline as manually-logged normal above, but I think here I'm trying to stick to just using the `lnorm` functions for simplicity.
+
+```{r}
+
+# make a table from the fit
+fittabler <- function(x) {
+  fitout <- fitdist(x, distr = 'lnorm')
+  
+  fittable <- tibble(meanlog = fitout$estimate['meanlog'],
+                     sdlog = fitout$estimate['sdlog'],
+                     loglik = fitout$loglik)
+  
+  return(fittable)
+}
+
+scene_fits <- test_model %>% 
+  pivot_longer(starts_with('Sim')) %>% 
+  group_by(name) %>% 
+  summarize(fit_sims = fittabler(value)) %>% 
+  ungroup() %>% 
+  unnest(fit_sims)
+```
+
+Let's draw the pdfs. The sims only go to 30
+
+```{r}
+
+makecdf_df <- function(name, meanlog, sdlog, loglik, x = seq(0, 30, by = 0.01)) {
+  cdf <- plnorm(x, meanlog, sdlog)
+  
+  return(tibble(x = x, cdf = cdf, scenario = name))
+}
+
+scenecdf <- purrr::pmap(scene_fits, makecdf_df) %>% 
+  bind_rows()
+```
+
+And to make things easier for plotting
+
+```{r}
+model_long <- test_model %>% 
+  pivot_longer(starts_with('Sim'), names_to = 'scenario', values_to = 'runoff')
+```
+
+How do those look?
+
+```{r}
+ggplot() +
+  stat_ecdf(data = model_long, mapping = aes(x = runoff, color = scenario)) +
+  geom_line(data = scenecdf, mapping = aes(x = x, y = cdf, 
+                                           color = scenario),
+            linetype = 2) +
+  coord_cartesian(xlim = c(0, 1))
+```
+
+That's really hard to see, what if we just limit it to the lowest and highest?
+
+```{r}
+ggplot() +
+  stat_ecdf(data = filter(model_long, scenario %in% c('SimR1', 'SimR7')),
+            mapping = aes(x = runoff, color = scenario)) +
+  geom_line(data = filter(scenecdf, scenario %in% c('SimR1', 'SimR7')),
+            mapping = aes(x = x, y = cdf, 
+                                           color = scenario),
+            linetype = 2) +
+  coord_cartesian(xlim = c(0, 1))
+```
+
+Certainly not perfect, but nothing will be.
+
+Now, how do we shift the distributions? The means and sds here are on the log scale, and so can be treated like normal parameters. AND, because they're on the log scale, arithmetic changes in mean yield multiplicative changes in the data.
+
+So, to shift NORMAL distributions, we just add means and so we need the difference from each scenario mean to the SimR0. And to shift the sds, we use a multiplicative shift.
+
+A simple function I've used previously to shift data is
+
+```{r}
+
+# Shift the mean
+shift_mean <- function(sample_vals, mean_want) {
+  mean_sample <- mean(sample_vals)
+
+  mean_shift <- mean_want - mean_sample
+
+  shiftsample <- sample_vals + mean_shift
+  
+  return(shiftsample)
+}
+
+# Shift sd
+shift_sd <- function(sample_vals, sd_want) {
+  sd_sample <- sd(sample_vals)
+
+  sd_shift <- sd_want/sd_sample
+
+  shiftsample <- sample_vals * sd_shift
+  
+  return(shiftsample)
+}
+
+# Shift both
+shift_mean_sd <- function(sample_vals, 
+                          sd_want, mean_want) {
+  
+  shiftedsd <- shift_sd(sample_vals, sd_want)
+  
+  shiftedboth <- shift_mean(shiftedsd, mean_want)
+}
+```
+
+But here, we don't really want to do that directly to the data, we want to figure out what the shifts need to be based on the shifts between SimR0 and the others and yielding equivalent shifts from *arbitrary other distributions*. But seeing how the shifts need to work can help with that.
+
+Basically, the mean shift needs to be calculated as the mean_new - mean_reference and the sd shift needs to be sd_new/sd_reference, where `*new` are the SimR1\...7, and `*reference` are the SimR0. And then to apply them to the hydrograph distribution, the new sd is old_sd\*sd_shift and new mean is old_mean + mean_shift.
+
+So, let's get those shift values for each scenario.
+
+*I need to fix werptoolkitr to allow extra columns, but need to get this done more* so, do the mean and log separately and glue together.
+
+```{r}
+scene_fits_mean <- scene_fits %>% 
+  dplyr::select(name, meanlog) %>% 
+  baseline_compare(compare_col = 'name', 
+                   base_lev = 'SimR0', 
+                   values_col = 'meanlog', 
+                   comp_fun = 'difference')
+
+scene_fits_sd <- scene_fits %>% 
+  dplyr::select(name, sdlog) %>% 
+  baseline_compare(compare_col = 'name', 
+                   base_lev = 'SimR0', 
+                   values_col = 'sdlog', 
+                   comp_fun = 'relative')
+
+scene_fits_shift <- scene_fits %>% 
+  left_join(scene_fits_mean) %>% 
+  left_join(scene_fits_sd)
+```
+
+I don't really want to be operating out of a dataframe just to get single numbers, but I think I will for the moment to keep things consistent and clean up later.
+
+Shift the *hydrograph* parameters to match the shifts in the *runoff* parameters
+
+```{r}
+hydro_shift <- scene_fits_shift %>% 
+  mutate(hydro_meanlog = optimal_fit$meanlog[1] + difference_meanlog,
+         hydro_sdlog = optimal_fit$sdlog[1] * relative_sdlog,
+         hydro_shift = optimal_fit$optimum_shift[1])
+```
+
+Now, generate the cdfs and look at them. Again, need to clean this up. Using the same function as above, so drop and rename some columns
+
+```{r}
+hydro_shift_cdf <- hydro_shift %>% 
+  dplyr::select(name, loglik, meanlog = hydro_meanlog, sdlog = hydro_sdlog) %>%
+  purrr::pmap(makecdf_df, x = seq(0,10000, by = 0.1)) %>% 
+  bind_rows() |> 
+    mutate(x_back = x-hydro_shift$hydro_shift)
+```
+
+```{r}
+ggplot() +
+  geom_line(data = hydro_shift_cdf, mapping = aes(x = x_back, y = cdf, 
+                                           color = scenario)) +
+  stat_ecdf(data = test_hydro, mapping = aes(x = value), color = 'black')
+```
+
+Ugh, that really isn't very good. It crosses almost all of the lines- e.g. the difference between the scenarios is less than the difference between the data and a lognormal distribution.
+
+```{r}
+ggplot() +
+  geom_line(data = hydro_shift_cdf, mapping = aes(x = x_back, y = cdf, 
+                                           color = scenario)) +
+  stat_ecdf(data = test_hydro, mapping = aes(x = value), color = 'black') +
+  coord_cartesian(xlim = c(-50, 1000))
+```
+
+Log scale
+
+```{r}
+ggplot() +
+  geom_line(data = hydro_shift_cdf, mapping = aes(x = x_back, y = cdf, 
+                                           color = scenario)) +
+  stat_ecdf(data = test_hydro, mapping = aes(x = value), color = 'black') +
+  scale_x_continuous(trans = 'log')
+```
+
+Let's look at the fits on the normal scale
+
+```{r}
+make_norm_dfs <- function(name, meanlog, sdlog, 
+                         x = seq(-5, 10, by = 0.01)) {
+  cdf <- pnorm(x, meanlog, sdlog)
+  pdf <- dnorm(x, meanlog, sdlog)
+  
+  return(tibble(x = x, cdf = cdf, pdf = pdf, scenario = name))
+}
+
+hydro_shift_norm <- hydro_shift %>% 
+  dplyr::select(name, meanlog = hydro_meanlog, sdlog = hydro_sdlog) %>%
+  purrr::pmap(make_norm_dfs) %>% 
+  bind_rows()
+
+```
+
+The shifts are going to make things wonky, because they were done on the base scale, and so don't directly translate to a shift in x on the log scale. But hopefully we can see whether the shapes are way off. If we want to fit things on the log scale as normals, we should just do it directly (and not sure what we'd do about the shifts, then)- would need a different censoring assessment- maybe we *could* just fit them as truncated in that case, since the distribution won't be bounded. The cdfs shouldn't really tell us much new here- they're just a rescaling.
+
+```{r}
+ggplot() +
+  geom_line(data = hydro_shift_norm, mapping = aes(x = x, y = cdf, 
+                                           color = scenario)) +
+  stat_ecdf(data = test_hydro, mapping = aes(x = log(value)), color = 'black')
+
+```
+
+And the pdfs.
+
+```{r}
+ggplot() +
+  geom_line(data = hydro_shift_norm, mapping = aes(x = x, y = pdf, 
+                                           color = scenario)) +
+  geom_density(data = test_hydro, mapping = aes(x = log(value)), color = 'black')
+```
+
+That's just not normal, and so the fits will always be janky.
+
+# Additional approaches
+
+## Fit dists, but different function
+
+Is there any advantage to trying to manually log the data and then fit? Not sure. Since we're fitting to minimize loglikelihood, the fits should be the same. But it might let us do a better job of the shifts, because we could then treat it as a truncated distribution, rather than a shift and backshift. I think I should try this- once I get everything set up for the lognormal, it should be OK.
+
+Could try other distributions, but Weibull sure was terrible. Not sure what else that's parametric.
+
+## Linearize part of the model-data relationship, not all of it
+
+Could I do the regression method for the bottom 10%, and then the other 90% use q-q (probably, since it's the least parametric) or the distribution fits?
