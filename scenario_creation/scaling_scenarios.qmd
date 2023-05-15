@@ -398,9 +398,7 @@ scale_gauges <- function(gaugedata, gaugename, qc_limit = 150) {
     # get quantiles- make a dummy so NA quantiles exist and get join-crossed with scenarios
     mutate(quantile = get_q(value, q_perc = 0.02)) %>%
     ungroup() %>%
-    # join to correct sdl unit for the scalings If there are NA in the quantile
-    # col (as there will be if there are NA values), this gives them all an NA
-    # in the scenario column too. So I've given them negative quantiles, which we'll turn back to NA.
+    # join to correct sdl unit for the scalings
     left_join(scaled_units[[sdl_name]],
               by = c('Month', 'quantile'),
               multiple = 'all') %>% # Says it's OK to duplicate rows x scenarios
