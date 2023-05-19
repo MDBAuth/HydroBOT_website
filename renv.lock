@@ -103,7 +103,7 @@
       "Package": "RcppTOML",
       "Version": "0.1.7",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Hash": "f8a578aa91321ecec1292f1e2ffadeda",
       "Requirements": [
         "Rcpp"
@@ -118,6 +118,14 @@
       "Requirements": [
         "sys"
       ]
+    },
+    "backports": {
+      "Package": "backports",
+      "Version": "1.4.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c39fbec8a30d23e721980b8afb31984c",
+      "Requirements": []
     },
     "base64enc": {
       "Package": "base64enc",
@@ -160,6 +168,26 @@
       "Repository": "CRAN",
       "Hash": "976cf154dfb043c012d87cddd8bca363",
       "Requirements": []
+    },
+    "broom": {
+      "Package": "broom",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f62b2504021369a2449c54bbda362d30",
+      "Requirements": [
+        "backports",
+        "dplyr",
+        "ellipsis",
+        "generics",
+        "glue",
+        "lifecycle",
+        "purrr",
+        "rlang",
+        "stringr",
+        "tibble",
+        "tidyr"
+      ]
     },
     "bslib": {
       "Package": "bslib",
@@ -215,7 +243,7 @@
       "Package": "classInt",
       "Version": "0.4-8",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Hash": "298fa500d773db0845935cd73bfd9c2e",
       "Requirements": [
         "KernSmooth",
@@ -426,7 +454,7 @@
       "Package": "e1071",
       "Version": "1.7-12",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Hash": "0d776df7577206e100c2c4b508208b10",
       "Requirements": [
         "class",
@@ -474,6 +502,17 @@
       "Repository": "CRAN",
       "Hash": "77bd60a6157420d4ffa93b27cf6a58b8",
       "Requirements": []
+    },
+    "fitdistrplus": {
+      "Package": "fitdistrplus",
+      "Version": "1.1-11",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f40ef9686e85681a1ccbf33d9236aeb9",
+      "Requirements": [
+        "MASS",
+        "survival"
+      ]
     },
     "fontawesome": {
       "Package": "fontawesome",
@@ -726,6 +765,24 @@
         "openssl"
       ]
     },
+    "httr2": {
+      "Package": "httr2",
+      "Version": "0.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5c09fe33064978ede54de42309c8b532",
+      "Requirements": [
+        "R6",
+        "cli",
+        "curl",
+        "glue",
+        "magrittr",
+        "openssl",
+        "rappdirs",
+        "rlang",
+        "withr"
+      ]
+    },
     "igraph": {
       "Package": "igraph",
       "Version": "1.3.5",
@@ -923,6 +980,23 @@
       "Requirements": [
         "htmltools",
         "shiny"
+      ]
+    },
+    "modelr": {
+      "Package": "modelr",
+      "Version": "0.1.11",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "4f50122dc256b1b6996a4703fecea821",
+      "Requirements": [
+        "broom",
+        "magrittr",
+        "purrr",
+        "rlang",
+        "tibble",
+        "tidyr",
+        "tidyselect",
+        "vctrs"
       ]
     },
     "munsell": {
@@ -1178,7 +1252,7 @@
       "Package": "purrr",
       "Version": "1.0.0",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Hash": "1ad491d27989ec6c26a2918ad6df116b",
       "Requirements": [
         "cli",
@@ -1425,7 +1499,7 @@
       "Package": "sf",
       "Version": "1.0-9",
       "Source": "Repository",
-      "Repository": "RSPM",
+      "Repository": "CRAN",
       "Hash": "8a348490fefb623e7935f405230900a7",
       "Requirements": [
         "DBI",
@@ -1495,6 +1569,16 @@
         "rlang",
         "stringi",
         "vctrs"
+      ]
+    },
+    "survival": {
+      "Package": "survival",
+      "Version": "3.4-0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "04411ae66ab4659230c067c32966fc20",
+      "Requirements": [
+        "Matrix"
       ]
     },
     "sys": {
@@ -1705,6 +1789,31 @@
         "rlang"
       ]
     },
+    "vicwater": {
+      "Package": "vicwater",
+      "Version": "0.0.0.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteUsername": "galenholt",
+      "RemoteRepo": "vicwater",
+      "RemoteRef": "main",
+      "RemoteSha": "67b2446942911d5cbcc14ca7211cb9c9fa515880",
+      "RemoteHost": "api.github.com",
+      "Hash": "90284c83deb76c7c9008853b5ad8de72",
+      "Requirements": [
+        "dplyr",
+        "foreach",
+        "ggplot2",
+        "httr2",
+        "lubridate",
+        "purrr",
+        "rlang",
+        "stringr",
+        "tibble",
+        "tidyr",
+        "tidyselect"
+      ]
+    },
     "viridis": {
       "Package": "viridis",
       "Version": "0.6.2",
@@ -1780,21 +1889,29 @@
     "werptoolkitr": {
       "Package": "werptoolkitr",
       "Version": "0.0.0.9000",
-      "Source": "Local",
-      "RemoteType": "local",
-      "RemoteUrl": "C:\\Users\\galen\\Documents\\WERP_toolkit\\werptoolkitr",
-      "Hash": "0dc6717d6c0b89c8154327ce9237ebd1",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "WERP_toolkit",
+      "RemoteUsername": "MDBAuth",
+      "RemoteRef": "master",
+      "RemoteSha": "61c7f845828888f3d3f0cc0ad321010559f5ab5e",
+      "RemoteSubdir": "werptoolkitr",
+      "Hash": "c464027deaa2c736712109b50fee4b55",
       "Requirements": [
         "colorspace",
         "dplyr",
+        "forcats",
         "foreach",
         "ggplot2",
+        "glue",
         "lwgeom",
         "magrittr",
         "paletteer",
         "patchwork",
         "readr",
         "reticulate",
+        "rlang",
         "sf",
         "stringr",
         "tidyr"
