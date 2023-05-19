@@ -14,8 +14,13 @@ We expect that {werptoolkitr} will change frequently since we're simultaneously 
 
 ```         
 ## GITHUB INSTALL
+
+# HTTPS
 credentials::set_github_pat()
 devtools::install_github("MDBAuth/WERP_toolkit", ref = 'BRANCH_NAME', subdir = 'werptoolkitr', force = TRUE)
+
+# SSH
+devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', subdir = 'werptoolkitr', force = TRUE, upgrade = 'ask')
 
 ## LOCAL INSTALL- easier for quick iterations, but need a path.
 devtools::install_local("path/to/WERP_toolkit/werptoolkitr", force = TRUE)
@@ -23,6 +28,10 @@ devtools::install_local("path/to/WERP_toolkit/werptoolkitr", force = TRUE)
 # And for very fast iteration (no building, but exposes too much, often)
 devtools::load_all("path/to/WERP_toolkit/werptoolkitr")
 ```
+
+### Installing this repo
+
+If you're installing this repo and rebuilding the R environment with `renv`, it will fail to install {werptoolkitr} if you don't do either of the methods above to pass credentials to github. If you'e connected with HTTPS, you'll need to setup a github PAT in github, and then use `credentials::set_github_pat()`, and if using SSH, `install_git` passes your ssh key. The catch with using `renv` is it doesn't give you the choice- the `renv.lock` has the address for the repo as either the SSH or HTTPS path, depending on how it was installed. And so if the lock has HTTPS, but you're on a system setup with SSH, it'll still try to get werptoolkitr with HTTPS. That's fine, but we can't create github PATs for repos we don't own (e.g. anything in the MDBA group). So, until werptoolkitr is public, the easiest way to do this is to be on SSH everywhere, so the renv points to the ssh path, which we should be able to access from everywhere. Otherwise we have to bypass `renv` to install werptoolkitr, which then installs its dependencies (and upgrades by default), causing all sorts of issues with werptoolkitr working, and stomps on package management here as well.
 
 ## Python environment
 
