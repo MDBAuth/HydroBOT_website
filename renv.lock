@@ -632,6 +632,14 @@
         "jsonlite"
       ]
     },
+    "git2r": {
+      "Package": "git2r",
+      "Version": "0.32.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "1882d7a76fd8c14b2322865f74c9a348",
+      "Requirements": []
+    },
     "gitcreds": {
       "Package": "gitcreds",
       "Version": "0.1.2",
@@ -1889,15 +1897,13 @@
     "werptoolkitr": {
       "Package": "werptoolkitr",
       "Version": "0.0.0.9000",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "WERP_toolkit",
-      "RemoteUsername": "MDBAuth",
+      "Source": "Git",
+      "RemoteType": "git2r",
+      "RemoteUrl": "git@github.com:MDBAuth/WERP_toolkit.git",
+      "RemoteSubdir": "werptoolkitr",
       "RemoteRef": "master",
       "RemoteSha": "61c7f845828888f3d3f0cc0ad321010559f5ab5e",
-      "RemoteSubdir": "werptoolkitr",
-      "Hash": "c464027deaa2c736712109b50fee4b55",
+      "Hash": "7dd4cfc057895b782304ba82e7e9aa0f",
       "Requirements": [
         "colorspace",
         "dplyr",

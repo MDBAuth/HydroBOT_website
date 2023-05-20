@@ -16,7 +16,15 @@ Without the `force = TRUE` this almost never rebuilds even with changes.
 ```{r}
 # credentials::set_github_pat()
 # devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr')
-devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
+
+# Windows annoyance to deal with ssh
+if (grepl('Windows', Sys.info()['sysname'])) {
+  if (!require('git2r')) {
+    install.packages('git2r')
+  }
+}
+devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', subdir = 'werptoolkitr', force = TRUE, upgrade = 'ask')
 ```
 
 ```{r}
