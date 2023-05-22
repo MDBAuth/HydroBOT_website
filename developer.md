@@ -30,6 +30,8 @@ devtools::install_local("path/to/WERP_toolkit/werptoolkitr", force = TRUE)
 devtools::load_all("path/to/WERP_toolkit/werptoolkitr")
 ```
 
+Please use `install_git` before taking a `renv::snapshot`- that is the only way that captures a version out of github (and so accessible to everyone), and works cross-platform. If there's been a lot of active building using `load_all` or `install_local`, that's fine, but before updating the renv version, push those changes and `install_git`.
+
 ### Installing this repo
 
 If you're installing this repo and rebuilding the R environment with `renv`, it will fail to install {werptoolkitr} if you don't do either of the methods above to pass credentials to github. If you'e connected with HTTPS, you'll need to setup a github PAT in github, and then use `credentials::set_github_pat()`. If using SSH, `install_git` passes your ssh key. This happens automatically on Linux, but Windows is a pain.
@@ -40,9 +42,9 @@ The catch with using `renv` is it doesn't give you the choice- the `renv.lock` h
 
 Windows should connect with SSH so we're using the same system everywhere. This is reasonably straightforward for basic repo use, but needs some work done to then also install packages from protected github repos (e.g. werptoolkitr). The catch comes from using `devtools::install_git` with ssh. This isn't really an issue with cloning the repo, but *is* an issue for installing packages from other repos. On windows, `devtools::install_github` enforces github PATs, which we can't set for MDBA-repos, and `install_git` uses `cmd` instead of git bash, which has been a pain to give the ssh keys to. What seems to be working is to go to Settings \--\> Services (really, search for Services), \--\> openSSH authentication \--\> properties \--\> startup type Automatic. Run `ls-remote git@github.com:MDBAuth/WERP_toolkit.git` in command prompt interactively to add github as a known location. Then create a `~/.profile` and `~/.bashrc` with the same bits as in the linux bashrc in the werptoolkitr dev docs, and are given [at the github instructions for auto-launching](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/working-with-ssh-key-passphrases#auto-launching-ssh-agent-on-git-for-windows). Both profile and bashrc seem to be needed. And it's unclear why, since those are for bash, and `install_git` calls cmd. cmd must be calling git bash internally. Then, we also need to install the `git2r` package, or `install_git` will still fail, but we *cannot* pass the `credentials` argument, even though that seems like what we should do.
 
-*I can install werptoolkitr wiht Install_git on linux, but it's still not working with renv::restore(). do I not have a current lock? Is it not sending to ssh still?*
+This seems to be working now, as long as the `renv.lock` was generated from a location that used `install_git` to install it. 
 
-*and it doesn't actually install- it can't find py-ewr*
+I occasionally get a weird error that `py-ewr` can't be found, which I *think* happens for two reasons- we have a `Config/reticulate` in the `DESCRIPTION` file, which says we need `py-ewr`. But the first terminal that opens in Azure doesn't activate the venv, so it's not there. The solution is to open a new bash terminal, and then try to install again. It is a bit strange that it doesn't try to install py-ewr when it can't find it, but honestly that might be for the best.
 
 ## Python environment
 
@@ -72,9 +74,21 @@ To add a specific version, `poetry add packagename==1.0.1`. This is sometimes ne
 
 To call the python from R, as long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`. *Now that we have nested directories, I set the RETICULATE_PYTHON env variable in* `.Rprofile` . There's more detail about this sort of thing in the developer note in {werptoolkitr}.
 
+**ON AZURE**- when you first start a vscode session, the bash at the bottom does not use the poetry environment, and so if you try to install or use werptoolkitr, it will try to auto-build one with the right dependencies using miniconda (or just fail with cryptic errors). That might work (but usually doesn't). Instead, *start a new bash terminal*, which will activate the venv, and open R from there. At that point, installing werptoolkitr (or `renv::restore()` generally), and using the code should work.
+
 ## Quarto setup
 
 Set a common output dir in the `_quarto.yml`. I have a `_quarto.yaml.local` to control caching, but be aware that caching can cause issues with some of the notebooks. Currently the ones that fail are the controllers, with the chunks running the EWR hanging on render. The solution when that happens is just to put `cache: false` in either the yaml header or chunk comment.
+
+On Azure, I had to [install quarto](https://docs.posit.co/resources/install-quarto/), following instructions for .deb- 
+
+```
+sudo curl -LO https://quarto.org/download/latest/quarto-linux-amd64.deb
+sudo apt-get install gdebi-core
+sudo gdebi quarto-linux-amd64.deb
+```
+
+
 
 ### Rebuilding data
 

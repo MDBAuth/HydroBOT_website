@@ -12,6 +12,7 @@ py-ewr = "1.0.1"
 geopandas = "^0.12.2"
 gitpython = "^3.1.31"
 plotnine = "^0.10.1"
+radian = "^0.6.5"
 
 
 [build-system]

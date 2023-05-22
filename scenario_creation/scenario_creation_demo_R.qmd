@@ -5,6 +5,7 @@ format:
   html:
     df-print: paged
 editor: visual
+engine: knitr
 params:
   REBUILD_DATA: FALSE
 ---
@@ -118,15 +119,31 @@ Error messages:
       AttributeError: module '__main__' has no attribute 'ewrs'
 :::
 
-```{python}
+A simple {python} chunk works fine in Rstudio and for `quarto render` from command line. But in vscode, the default (and unchangeable at present) is to start a whole new engine that doesn't talk to R, rather than using `reticulate::repl_python` as is done in Rstudio and by quarto itself.
+
+```{{python}}
 from py_ewr.data_inputs import get_EWR_table
 ewrs, badewrs = get_EWR_table()
 ```
 
+```{r}
+pdi <- import("py_ewr.data_inputs")
+ewrs_in_pyewr <- pdi$get_EWR_table() 
+names(ewrs_in_pyewr) <- c('ewrs', 'badewrs')
+```
+
 What are those gauges, and which are in both the ewr and the desired catchments?
 
-```{r}
+The way that works everywhere but vscode
+```{{r}}
 ewrgauges = py$ewrs$Gauge
+ewr_demo_gauges = gaugenums[gaugenums %in% ewrgauges]
+length(ewr_demo_gauges)
+```
+
+Seems universal
+```{r}
+ewrgauges = ewrs_in_pyewr$ewr$Gauge
 ewr_demo_gauges = gaugenums[gaugenums %in% ewrgauges]
 length(ewr_demo_gauges)
 ```
@@ -144,7 +161,9 @@ endtime = lubridate::ymd(20191231)
 
 Pull the gauges with `mdba_gauge_getter`. The type-translation that happens in here is because translating from python time to R time is extremely slow for this particular case (though not in general).
 
-```{python gaugepulling}
+This again needs a vscode translation
+
+```{{python gaugepulling}}
 #| message: false
 import mdba_gauge_getter as gg
 demo_levs = gg.gauge_pull(r.ewr_demo_gauges, start_time_user = r.starttime, end_time_user = r.endtime)
@@ -155,9 +174,18 @@ len(demo_ids)
 demo_levs['Date'] = demo_levs['DATETIME'].astype(str)
 ```
 
+```{r}
+gg <- import('mdba_gauge_getter')
+demo_levs <- gg$gauge_pull(ewr_demo_gauges, start_time_user = starttime, end_time_user = endtime)
+demo_ids <- unique(demo_levs$SITEID)
+length(demo_ids)
+```
+
 Do a bit of cleanup- for some reason `demo_levs['VALUE']` is an object and not numeric, and `'DATETIME'` needs to be named `Date` for the EWR tool to read it. I copy the py object to R for this manipulation and visualisation, but we could just proceed in python if we wanted.
 
-```{r datatransfer}
+Again, we need to change things to run on vs.
+
+```{{r datatransfer}}
 demo_levs <- py$demo_levs
 
 demo_levs$VALUE = as.numeric(demo_levs$VALUE)
@@ -175,13 +203,32 @@ demo_levs <- dplyr::select(demo_levs, -DATETIME) %>%
   dplyr::mutate(Date = lubridate::ymd(Date))
 ```
 
+The new version has to use the `reticulate::py_to_r`, because when we're not in the repl, we have an R object to work with for every line of python. 
+```{r}
+demo_levs <- demo_levs |> 
+  dplyr::mutate(VALUE = as.numeric(VALUE))
+demo_levs <- dplyr::mutate(demo_levs, Date = py_to_r(DATETIME[[1]])) |>
+  dplyr::select(-DATETIME)
+
+```
+
 ### Map the gauges
 
 ```{r}
-demo_geo = bom_basin_gauges %>% dplyr::filter(gauge %in% py$demo_ids)
+demo_geo = bom_basin_gauges %>% dplyr::filter(gauge %in% demo_ids)
 ```
 
 Looks reasonable. Probably overkill for testing, but can do a cut down version too.
+
+
+The azure boxes have old GDAL, which can't read WKT2. Need to fix, but in the meantime, [force with the crs number](https://github.com/r-spatial/sf/issues/1419).
+```{r}
+if (grepl('npd-dat', Sys.info()['nodename'])) {
+  st_crs(basin) <- 4283
+  st_crs(catch_demo) <- 4283
+  st_crs(demo_geo) <- 4283
+}
+```
 
 ```{r}
 (ggplot() + 
