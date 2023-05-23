@@ -75,7 +75,7 @@ We need multiple catchments for demos, so let's use the Macquarie, Castlereagh, 
 
 ```{r}
 catch_demo <- sdl_units %>% 
-  dplyr::filter(SWSDLName %in% c('Macquarie–Castlereagh', 'Lachlan', 'Namoi'))
+  dplyr::filter(SWSDLName %in% c("Macquarie–Castlereagh", "Lachlan", "Namoi"))
 ```
 
 ## Get relevant gauges
@@ -113,10 +113,12 @@ Which gauges are actually in the EWR tool? The EWR tool has a function, so use t
 
 Error messages:
 
-    FileNotFoundError: [Errno 2] No such file or directory: 'py_ewr/parameter_metadata/NSWEWR.csv'
+```         
+FileNotFoundError: [Errno 2] No such file or directory: 'py_ewr/parameter_metadata/NSWEWR.csv'
 
-    Error in py_get_attr_impl(x, name, silent) : 
-      AttributeError: module '__main__' has no attribute 'ewrs'
+Error in py_get_attr_impl(x, name, silent) : 
+  AttributeError: module '__main__' has no attribute 'ewrs'
+```
 :::
 
 A simple {python} chunk works fine in Rstudio and for `quarto render` from command line. But in vscode, the default (and unchangeable at present) is to start a whole new engine that doesn't talk to R, rather than using `reticulate::repl_python` as is done in Rstudio and by quarto itself.
@@ -134,17 +136,11 @@ names(ewrs_in_pyewr) <- c('ewrs', 'badewrs')
 
 What are those gauges, and which are in both the ewr and the desired catchments?
 
-The way that works everywhere but vscode
-```{{r}}
-ewrgauges = py$ewrs$Gauge
-ewr_demo_gauges = gaugenums[gaugenums %in% ewrgauges]
-length(ewr_demo_gauges)
-```
+The way that works everywhere but vscode- this seems universal though
 
-Seems universal
 ```{r}
-ewrgauges = ewrs_in_pyewr$ewr$Gauge
-ewr_demo_gauges = gaugenums[gaugenums %in% ewrgauges]
+ewrgauges <- ewrs_in_pyewr$ewr$Gauge
+ewr_demo_gauges <- gaugenums[gaugenums %in% ewrgauges]
 length(ewr_demo_gauges)
 ```
 
@@ -204,6 +200,7 @@ demo_levs <- dplyr::select(demo_levs, -DATETIME) %>%
 ```
 
 The new version has to use the `reticulate::py_to_r`, because when we're not in the repl, we have an R object to work with for every line of python. Should probably just change to {vicwater}, like we do for flow scaling.
+
 ```{r}
 demo_levs <- demo_levs |> 
   dplyr::mutate(VALUE = as.numeric(VALUE))
@@ -235,8 +232,8 @@ demo_geo = bom_basin_gauges %>% dplyr::filter(gauge %in% demo_ids)
 
 Looks reasonable. Probably overkill for testing, but can do a cut down version too.
 
-
 The azure boxes have old GDAL, which can't read WKT2. Need to fix, but in the meantime, [force with the crs number](https://github.com/r-spatial/sf/issues/1419).
+
 ```{r}
 if (grepl('npd-dat', Sys.info()['nodename'])) {
   st_crs(basin) <- 4283

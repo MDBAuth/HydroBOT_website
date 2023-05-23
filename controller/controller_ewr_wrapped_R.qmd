@@ -53,10 +53,10 @@ returnType <- list('summary', 'all')
 
 # We use outputtype to save, so only save outputs if params$REBUILD_DATA is TRUE
 # To make a list in python, need to have unnamed lists in R
-if (!params$REBUILD_DATA) {
+if (!REBUILD_DATA) {
   outputType <- list('none')
 }
-if (params$REBUILD_DATA) {
+if (REBUILD_DATA) {
   outputType <- list('summary', 'all')
 }
 ```
