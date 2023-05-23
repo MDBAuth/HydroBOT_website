@@ -203,12 +203,27 @@ demo_levs <- dplyr::select(demo_levs, -DATETIME) %>%
   dplyr::mutate(Date = lubridate::ymd(Date))
 ```
 
-The new version has to use the `reticulate::py_to_r`, because when we're not in the repl, we have an R object to work with for every line of python. 
+The new version has to use the `reticulate::py_to_r`, because when we're not in the repl, we have an R object to work with for every line of python. Should probably just change to {vicwater}, like we do for flow scaling.
 ```{r}
 demo_levs <- demo_levs |> 
   dplyr::mutate(VALUE = as.numeric(VALUE))
-demo_levs <- dplyr::mutate(demo_levs, Date = py_to_r(DATETIME[[1]])) |>
-  dplyr::select(-DATETIME)
+
+# 47 seconds- doesn't matter if preallocated
+system.time(
+  Date <- purrr::map(demo_levs$DATETIME, reticulate::py_to_r)
+)
+
+# # 50 seconds
+# system.time(
+#   Date <- lapply(demo_levs$DATETIME,FUN = reticulate::py_to_r)
+# )
+
+Date <- tibble::tibble(Date) |>
+  tidyr::unnest(cols = Date)
+
+demo_levs <- demo_levs |>
+  dplyr::select(-DATETIME) |> 
+  dplyr::bind_cols(Date) 
 
 ```
 
