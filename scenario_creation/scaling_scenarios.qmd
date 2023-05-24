@@ -34,6 +34,12 @@ library(lubridate)
 library(ggplot2)
 ```
 
+We do a lot of `purrr`ing with custom functions, I've put them in their own file
+
+```{r}
+source('scenario_creation/scaling_functions.R')
+```
+
 We need to set some paths to relevant directories- where we're going to save the hydrographs `hydro_dir` and where the scaling data is that we need to do the scaling here `scaling_dir`. This follows a more usual setup than [the short demo](scenario_creation_demo_R.qmd), in that we set these paths outside this repo. Typically, the hydrograph data would be in some external share directory (e.g. MDBA blob storage). Here, for simplicity for the demo, I just save it up a level.
 
 ```{r}
@@ -143,22 +149,22 @@ Use 2% bins (e.g. 50 bins) instead of 10 + 10 in final.
 Write functions for finding quantiles and getting their mean that we can apply to each set of runoff scenarios in each SDL unit, as well as historical.
 
 ```{r}
-get_q <- function(vals, q_perc) {
-  qs <- quantile(vals, probs = seq(0,1, q_perc), type = 5, na.rm = TRUE)
-  # cut fails with lots of zeros (well, any duplicate bins)
-  # binvec <- cut(vals, qs, include.lowest = TRUE, labels = FALSE)
-  # findInterval is OK with duplicate bins, but combines them, eg. if there are 10 bins that are all 0, it will call them all q10. 
-  binvec <- findInterval(vals, qs, rightmost.closed = TRUE)
-  return(binvec)
-}
+# get_q <- function(vals, q_perc) {
+#   qs <- quantile(vals, probs = seq(0,1, q_perc), type = 5, na.rm = TRUE)
+#   # cut fails with lots of zeros (well, any duplicate bins)
+#   # binvec <- cut(vals, qs, include.lowest = TRUE, labels = FALSE)
+#   # findInterval is OK with duplicate bins, but combines them, eg. if there are 10 bins that are all 0, it will call them all q10. 
+#   binvec <- findInterval(vals, qs, rightmost.closed = TRUE)
+#   return(binvec)
+# }
 ```
 
 ```{r}
-get_qmean <- function(vals, q_perc = 0.02) {
-  binvec <- get_q(vals, q_perc)
-  qmean <- aggregate(x = vals, by = list(binvec), FUN = mean) %>% 
-    setNames(c('quantile', 'mean'))
-}
+# get_qmean <- function(vals, q_perc = 0.02) {
+#   binvec <- get_q(vals, q_perc)
+#   qmean <- aggregate(x = vals, by = list(binvec), FUN = mean) %>% 
+#     setNames(c('quantile', 'mean'))
+# }
 ```
 
 ## Apply to all SDL units
@@ -166,33 +172,33 @@ get_qmean <- function(vals, q_perc = 0.02) {
 We have `scenario_list`, and we want to find the quantile means and relative changes for each dataframe in it. So write that function and use `purrr::map` over the SDL units.
 
 ```{r}
-get_scalings <- function(unitdf) {
-  # Stack
-  stackdf <- unitdf %>% 
-  mutate(sdl = stringr::str_extract(path, "SS[0-9]+")) %>% 
-  select(sdl, Year, Month, Day, starts_with('Sim')) %>% 
-  pivot_longer(cols = starts_with('Sim'), 
-               names_to = 'scenario', values_to = 'runoff')
-  
-  # Quantile means
-  q_s <- stackdf %>% 
-  group_by(scenario, Month) %>%
-    summarize(qmean = get_qmean(runoff)) %>%
-    # reframe is the new way, but needs dplyr 1.1 which breaks lots of the functions
- # reframe(qmean = get_qmean(runoff)) %>%
-  tidyr::unnest(cols = qmean)
-  
-  # Get the relative change
-  q_s <- q_s %>% 
-  group_by(scenario, Month) %>% 
-  baseline_compare(compare_col = 'scenario', base_lev = 'SimR0', 
-                   values_col = 'mean', 
-                   comp_fun = `/`) %>% 
-  ungroup() %>% 
-  select(scenario = scenario.x, everything(), 
-         relative_change = `/_mean`, 
-         -scenario.y)
-}
+# get_scalings <- function(unitdf) {
+#   # Stack
+#   stackdf <- unitdf %>% 
+#   mutate(sdl = stringr::str_extract(path, "SS[0-9]+")) %>% 
+#   select(sdl, Year, Month, Day, starts_with('Sim')) %>% 
+#   pivot_longer(cols = starts_with('Sim'), 
+#                names_to = 'scenario', values_to = 'runoff')
+#   
+#   # Quantile means
+#   q_s <- stackdf %>% 
+#   group_by(scenario, Month) %>%
+#     summarize(qmean = get_qmean(runoff)) %>%
+#     # reframe is the new way, but needs dplyr 1.1 which breaks lots of the functions
+#  # reframe(qmean = get_qmean(runoff)) %>%
+#   tidyr::unnest(cols = qmean)
+#   
+#   # Get the relative change
+#   q_s <- q_s %>% 
+#   group_by(scenario, Month) %>% 
+#   baseline_compare(compare_col = 'scenario', base_lev = 'SimR0', 
+#                    values_col = 'mean', 
+#                    comp_fun = `/`) %>% 
+#   ungroup() %>% 
+#   select(scenario = scenario.x, everything(), 
+#          relative_change = `/_mean`, 
+#          -scenario.y)
+# }
 
 
 ```
@@ -304,9 +310,9 @@ purrr::map(scenario_meta$scenario_name,
 
 ```{r}
 #| output: false
-savefun <- function(scenario, data) {
-  write_csv(data, file = file.path(hydro_dir, scenario, paste0(names(data)[2], '.csv')))
-}
+# savefun <- function(scenario, data) {
+#   write_csv(data, file = file.path(hydro_dir, scenario, paste0(names(data)[2], '.csv')))
+# }
 
 ```
 
@@ -355,69 +361,69 @@ It looks like they start saying 'Data not available' or similar above 150. So ma
 Define the main function to apply the scaling to each hydrograph in the list of hydrographs.
 
 ```{r}
-scale_gauges <- function(gaugedata, gaugename, qc_limit = 150) {
-
-  # if they are level gauges, return NULL- the scaling doesn't make sense
-  if (gaugename %in% gauge_cats$level) {return(NULL)}
-
-  # Get the sdl name
-  sdl_name <- gauge_units$SWSDLID[gauge_units$gauge == gaugename]
-
-  # If the sdl unit for the gauge isn't in the scaling scenarios, return NULL.
-  # THis only happens for one gauge (422027) in the Barwon-Darling Watercourse (SS19)
-  if (!(sdl_name %in% names(scaled_units))) {
-    return(NULL)
-  }
-
-  # There is one gauge (currently- 412036) that returns duplicated dates from 1990-2004. I've had a long look, and the values differ on each day, with no apparent pattern. They do tend to track together, but the difference can be large. It's not obvious which to keep (if any). I'll just keep the first of each pair, but this should be revisited.
-  gaugedata <- gaugedata[!duplicated(gaugedata$time), ]
-
-  # Set bad data to NA
-  gaugedata[gaugedata$quality_codes_id > qc_limit, 'value'] <- NA
-  
-  # There's one gauge 414209 with ALL bad data. return NULL
-  if (all(is.na(gaugedata$value))) {return(NULL)}
-
-  # make an NA quantile for each scenario so the join works properly
-  if (any(is.na(gaugedata$value))) {
-    nafill <- scaled_units[[sdl_name]] %>%
-      distinct(scenario, Month) %>%
-      mutate(quantile = NA, mean = NA, ref_mean = NA, relative_change = NA)
-
-    scaled_units[[sdl_name]] <- bind_rows(scaled_units[[sdl_name]], nafill)
-  }
-
-
-  # do the transforms
-
-  gaugedata <- gaugedata %>%
-    # get the time units right
-    mutate(Month = lubridate::month(time)) %>%
-    rename(Date = time) %>%  # To match other inputs
-    group_by(Month) %>%
-    # get quantiles- make a dummy so NA quantiles exist and get join-crossed with scenarios
-    mutate(quantile = get_q(value, q_perc = 0.02)) %>%
-    ungroup() %>%
-    # join to correct sdl unit for the scalings
-    left_join(scaled_units[[sdl_name]],
-              by = c('Month', 'quantile'),
-              multiple = 'all') %>% # Says it's OK to duplicate rows x scenarios
-    # get the adjusted levels
-    mutate(adj_val = value*relative_change) %>%
-    # Just the needed cols
-    dplyr::select(scenario, site, Date, adj_val) %>%
-    # pivot so the gauge name is col name
-    tidyr::pivot_wider(names_from = site, values_from = adj_val) %>%
-    # collapse to a list-tibble with one row per scenario
-    tidyr::nest(.by = scenario)
-
-  # Save the csvs
-  if (REBUILD_DATA) { 
-    purrr::pmap(gaugedata, savefun)
-  }
-  # Not sure this is a good idea- might want to return NULL
-  return(gaugedata)
-}
+# scale_gauges <- function(gaugedata, gaugename, qc_limit = 150) {
+# 
+#   # if they are level gauges, return NULL- the scaling doesn't make sense
+#   if (gaugename %in% gauge_cats$level) {return(NULL)}
+# 
+#   # Get the sdl name
+#   sdl_name <- gauge_units$SWSDLID[gauge_units$gauge == gaugename]
+# 
+#   # If the sdl unit for the gauge isn't in the scaling scenarios, return NULL.
+#   # THis only happens for one gauge (422027) in the Barwon-Darling Watercourse (SS19)
+#   if (!(sdl_name %in% names(scaled_units))) {
+#     return(NULL)
+#   }
+# 
+#   # There is one gauge (currently- 412036) that returns duplicated dates from 1990-2004. I've had a long look, and the values differ on each day, with no apparent pattern. They do tend to track together, but the difference can be large. It's not obvious which to keep (if any). I'll just keep the first of each pair, but this should be revisited.
+#   gaugedata <- gaugedata[!duplicated(gaugedata$time), ]
+# 
+#   # Set bad data to NA
+#   gaugedata[gaugedata$quality_codes_id > qc_limit, 'value'] <- NA
+#   
+#   # There's one gauge 414209 with ALL bad data. return NULL
+#   if (all(is.na(gaugedata$value))) {return(NULL)}
+# 
+#   # make an NA quantile for each scenario so the join works properly
+#   if (any(is.na(gaugedata$value))) {
+#     nafill <- scaled_units[[sdl_name]] %>%
+#       distinct(scenario, Month) %>%
+#       mutate(quantile = NA, mean = NA, ref_mean = NA, relative_change = NA)
+# 
+#     scaled_units[[sdl_name]] <- bind_rows(scaled_units[[sdl_name]], nafill)
+#   }
+# 
+# 
+#   # do the transforms
+# 
+#   gaugedata <- gaugedata %>%
+#     # get the time units right
+#     mutate(Month = lubridate::month(time)) %>%
+#     rename(Date = time) %>%  # To match other inputs
+#     group_by(Month) %>%
+#     # get quantiles- make a dummy so NA quantiles exist and get join-crossed with scenarios
+#     mutate(quantile = get_q(value, q_perc = 0.02)) %>%
+#     ungroup() %>%
+#     # join to correct sdl unit for the scalings
+#     left_join(scaled_units[[sdl_name]],
+#               by = c('Month', 'quantile'),
+#               multiple = 'all') %>% # Says it's OK to duplicate rows x scenarios
+#     # get the adjusted levels
+#     mutate(adj_val = value*relative_change) %>%
+#     # Just the needed cols
+#     dplyr::select(scenario, site, Date, adj_val) %>%
+#     # pivot so the gauge name is col name
+#     tidyr::pivot_wider(names_from = site, values_from = adj_val) %>%
+#     # collapse to a list-tibble with one row per scenario
+#     tidyr::nest(.by = scenario)
+# 
+#   # Save the csvs
+#   if (REBUILD_DATA) { 
+#     purrr::pmap(gaugedata, savefun)
+#   }
+#   # Not sure this is a good idea- might want to return NULL
+#   return(gaugedata)
+# }
 ```
 
 ### Do the transforms
@@ -426,9 +432,9 @@ This both saves to disk and returns a list to memory. Takes about 5 minutes.
 
 ```{r}
 #| cache: false
-system.time(scaled_hydro <- purrr::map2(orig_hydro, 
-                                        names(orig_hydro), 
-                                        scale_gauges))
+system.time(scaled_hydro <- purrr::map2(orig_hydro[1:10], 
+                                        names(orig_hydro[1:10]), 
+                                        \(x,y) scale_gauges(x, y, scaled_units = scaled_units)))
 ```
 
 I have tried with `furrr`, it is slower, likely because we have to move two big datasets around.
@@ -440,7 +446,7 @@ Some plots for a gauge to make sure nothing looks wrong.
 The `plot_hydrographs` function works, but sure is hard to see with the overplotting. And taking the log doesn't make it pretty, though the 'pseudo-log' works better than 'log10'. Still, we can see things are working as they should.
 
 ```{r}
-plot_hydrographs(scaled_hydro[['418002']] %>% 
+plot_hydrographs(scaled_hydro[['409003']] %>% 
   # filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
   unnest(cols = data) %>% 
   pivot_longer(cols = 3, names_to = 'gauge', values_to = 'flow'),
@@ -450,7 +456,7 @@ plot_hydrographs(scaled_hydro[['418002']] %>%
 Facet it
 
 ```{r}
-plot_hydrographs(scaled_hydro[['418002']] %>% 
+plot_hydrographs(scaled_hydro[['409003']] %>% 
   # filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
   unnest(cols = data) %>% 
   pivot_longer(cols = 3, names_to = 'gauge', values_to = 'flow'),
