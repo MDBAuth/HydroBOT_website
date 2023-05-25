@@ -95,10 +95,12 @@ get_scalings <- function(unitdf) {
   
   # Get the relative change
   q_s <- q_s %>% 
-  group_by(scenario, Month) %>% 
-  werptoolkitr::baseline_compare(compare_col = 'scenario', base_lev = 'SimR0', 
-                   values_col = 'mean', 
-                   comp_fun = `/`) %>% 
+  # group_by(scenario, Month) %>% 
+  werptoolkitr::baseline_compare(compare_col = 'scenario', 
+                                 base_lev = 'SimR0', 
+                                 group_cols = c('Month', 'quantile'),
+                                 values_col = 'mean',
+                                 comp_fun = `/`) %>% 
   ungroup() %>% 
   select(scenario = scenario.x, everything(), 
          relative_change = `/_mean`, 
@@ -1020,6 +1022,12 @@ We'll build the regression just like before, but only on the lowest x% of values
 ```{r}
 bottom_ranks <- max(rank_log$ranks)*0.05
 
+
+```
+
+There are a few things we could do here for the fit. One is log-log. That will yield some 1s down at the bottom. But the issue with log-log is it will never predict negative numbers, so we need a cutoff.
+
+```{r}
 drop0_bottom <- rank_hydro %>% 
   filter(scenario == 'SimR0' & ranks < bottom_ranks) %>% 
   ggplot(aes(x = log(mod_vals), y = log(hyd_vals))) + 
@@ -1029,18 +1037,85 @@ drop0_bottom <- rank_hydro %>%
 drop0_bottom
 ```
 
-Get the fit
+One is to say anything under 1 is almost certainly bad data, and still log-log
 
 ```{r}
-logregression_bottom <- lm(log_hyd ~ log_mod, data = rank_log[rank_log$ranks < bottom_ranks, ])
+drop1_bottom <- rank_hydro %>% 
+  filter(scenario == 'SimR0' & ranks < bottom_ranks & hyd_vals >= 1) %>% 
+  ggplot(aes(x = log(mod_vals), y = log(hyd_vals))) + 
+  geom_point() +
+  geom_smooth(method = 'lm')
 
+drop1_bottom
+```
+
+We could do a linear fit- it's not clear that the bottom 5% *should* be logged. Still drop 0, since the idea is they are all 0 *or below*.
+
+```{r}
+lin_bottom <- rank_hydro %>% 
+  filter(scenario == 'SimR0' & ranks < bottom_ranks & hyd_vals > 0) %>% 
+  ggplot(aes(x = mod_vals, y = hyd_vals)) + 
+  geom_point() +
+  geom_smooth(method = 'lm')
+
+lin_bottom
+```
+
+And again, we can say we don't trust data \<1
+
+```{r}
+lin1_bottom <- rank_hydro %>% 
+  filter(scenario == 'SimR0' & ranks < bottom_ranks & hyd_vals >= 1 ) %>% 
+  ggplot(aes(x = mod_vals, y = hyd_vals)) + 
+  geom_point() +
+  geom_smooth(method = 'lm')
+
+lin1_bottom
+```
+
+Those linear fits actually seem the best. Clearly it *is* nonlinear, but they do pretty well except right at the very bottom. And we don't need an arbitrary cutoff for the 0.
+
+Before I roll this out with q-q, how should I do month? The ranking should be done within months, and that's not happening here. But can we at least plot it? That doesn't look too bad.
+
+```{r}
+rank_hydro <- rank_hydro %>% 
+  mutate(Month = lubridate::month(time))
+
+lin1_bottom <- rank_hydro %>% 
+  filter(scenario == 'SimR0' & ranks < bottom_ranks & hyd_vals >= 1 ) %>% 
+  ggplot(aes(x = mod_vals, y = hyd_vals)) + 
+  geom_point() +
+  geom_smooth(method = 'lm') + facet_wrap('Month')
+
+lin1_bottom
+```
+
+Get the fit. I'll get fits for both the log and linear, I think. Include Month
+
+```{r}
+rank_log <- rank_log %>% 
+  mutate(Month = lubridate::month(time))
+
+logregression_bottom <- lm(log_hyd ~ log_mod + Month + log_mod*Month, data = rank_log[rank_log$ranks < bottom_ranks, ])
+
+linregression_bottom <- lm(hyd_vals ~ mod_vals + Month + mod_vals*Month, data = rank_log[rank_log$ranks < bottom_ranks & rank_log$hyd_vals > 1, ])
+```
+
+```{r}
+summary(logregression_bottom)
+```
+
+Month doesn't actually do anything in the linear regression, but still include it to match the q-q I think.
+
+```{r}
+summary(linregression_bottom)
 ```
 
 Apply that, but only to values below that rank.
 
 This is a bit roundabout, if we go this way I'll do it when we make the qq so the data's actually there to work with and we don't have to make another df and replace values.
 
-Let's say anything below 1 is a 0, it sure looks like that's where the graph above gets weird.
+Get predictions for both fits, for log, should say anything below 1 is a 0, it sure looks like that's where the graph above gets weird.
 
 ```{r}
 bottom_rank_fit <- rank_hydro %>% 
@@ -1048,9 +1123,11 @@ bottom_rank_fit <- rank_hydro %>%
   mutate(log_mod = log(mod_vals),
          log_hyd = log(hyd_vals)) %>% 
   modelr::add_predictions(logregression_bottom, 'pred_log_hyd') %>% 
-  mutate(pred_hyd = exp(pred_log_hyd)) %>% 
-  # Threshold for 0
-  mutate(pred_hyd = ifelse(pred_hyd > 1, pred_hyd, 0))
+  mutate(pred_hyd_from_log = exp(pred_log_hyd)) %>% 
+  modelr::add_predictions(linregression_bottom, 'pred_hyd') %>% 
+  # Threshold for 0- make it 1 for log, 0 for linear.
+  mutate(pred_hyd_from_log = ifelse(pred_hyd_from_log > 1, pred_hyd_from_log, 0),
+         pred_hyd = ifelse(pred_hyd > 0, pred_hyd, 0)) 
 ```
 
 Now, this is a goofy way to do this, but it avoids rebuilding the qq
@@ -1090,7 +1167,7 @@ hyd_cdf_qq_reg_ln <- qq_reg %>%
 hyd_cdf_qq_reg + hyd_cdf_qq_reg_ln
 ```
 
-PDF. This is yielding weird spikes just above zero, and I'm not a huge fan of introducing nonmonotonicity. Could we fix that with a different cutoff? It *is* shifting the zeros. Will need to think more about it. I've provided a bottom panel to zoom in to the linear scale near zero to see what kind of flows we're talking about.
+PDF. The weird spikes at the bottom are actually not an artifact of the regression, they're in the base q-q (and in fact show up here above the 5% cutoff of \~55). I've provided a bottom panel to zoom in to the linear scale near zero to see what kind of flows we're talking about.
 
 ```{r}
 hyd_pdf_qq_reg <- qq_reg %>%
@@ -1104,9 +1181,17 @@ hyd_pdf_qq_reg_ln <- qq_reg %>%
 (hyd_pdf_qq_reg + hyd_pdf_qq_reg_ln) /  (hyd_pdf_qq_reg + coord_cartesian(xlim = c(0, 500)))
 ```
 
+That weird nonmonotonicity is in the raw qq without the regression adjustment- the regression puts a little kink in near 0, but the spikes are from the q-q. Why? Because lower runoff disproportionately increases really low flows.
+
+```{r}
+
+(hyd_pdf_qq + coord_cartesian(xlim = c(0, 500)) + ggtitle('QQ')) + 
+  (hyd_pdf_qq_reg + coord_cartesian(xlim = c(0, 500)) + ggtitle('QQ + regression'))
+```
+
 ## Zeros
 
-Now we get almost 500 difference in the number of zeros across the distribution. That's on par with the regression method, and the overall distribution looks much more like a hydrograph, even with the weird nonmonotonicity at the bottom..
+Now we get \~1700 difference in the number of zeros across the distribution. That's on par with the regression method, and the overall distribution looks much more like a hydrograph, even with the weird nonmonotonicity at the bottom..
 
 ```{r}
 qq_reg %>% 

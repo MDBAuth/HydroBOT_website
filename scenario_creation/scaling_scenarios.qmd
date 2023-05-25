@@ -16,7 +16,7 @@ params:
 if ("params" %in% ls()) {
   REBUILD_DATA <- params$REBUILD_DATA
 } else {
-  REBUILD_DATA <- FALSE
+  REBUILD_DATA <- TRUE
 }
 ```
 
@@ -97,7 +97,7 @@ The scenario yamls are likely to *not* be lists, but single values, ie each one 
 ```{r}
 
 rain_multiplier <- seq(from = 0.8, to = 1.1, by = 0.05) %>% 
-  setNames(paste0('R', 1:7))
+  setNames(paste0('SimR', 1:7))
 
 scenario_meta <- list(
   PE_multiplier = 1.07,
@@ -432,12 +432,22 @@ This both saves to disk and returns a list to memory. Takes about 5 minutes.
 
 ```{r}
 #| cache: false
-system.time(scaled_hydro <- purrr::map2(orig_hydro[1:10], 
-                                        names(orig_hydro[1:10]), 
-                                        \(x,y) scale_gauges(x, y, scaled_units = scaled_units)))
+#| message: false
+#| warning:false
+system.time(scaled_hydro <- purrr::map2(orig_hydro, 
+                                        names(orig_hydro), 
+                                        \(x,y) scale_gauges(x, y, all_sdl_scenario_list = scenario_list, savedata = REBUILD_DATA)))
 ```
 
 I have tried with `furrr`, it is slower, likely because we have to move two big datasets around.
+
+Let's save the whole list to an rds too, it is likely more useful that way for diagnostics of the actual scenarios and hydrographs.
+
+```{r}
+if (REBUILD_DATA) {
+  saveRDS(scaled_hydro, file = file.path(hydro_dir, 'scaled_hydrographs.rds'))
+}
+```
 
 ## Plots
 
@@ -464,14 +474,14 @@ plot_hydrographs(scaled_hydro[['409003']] %>%
   facet_wrap('scenario')
 ```
 
-And now we can move on to read in to the toolkit proper.
+Zeros
 
-# TODO
+```{r}
+scaled_hydro[['409003']] %>% 
+  # filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
+  unnest(cols = data) %>% 
+  group_by(scenario) %>% 
+  summarise(n_zeros = sum(`409003` == 0, na.rm = TRUE))
+```
 
--   Cease-to-flow
-
-    -   Currently, historical values of 0 remain 0, since 0\*scaled = 0. And no *new* cease-to-flow can happen, since a small number \* a small number is still \> 0.
-
-    -   The latter is likely easier to fix with a threshold, but unclear how to do the former without getting fairly complex.
-
--   Quality cutoff- do we want to discard data with certain quality codes? I've chosen \> 150
+And now we can move on to more rigorous analyses of the data and read in to the toolkit proper.
