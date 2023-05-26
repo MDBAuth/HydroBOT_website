@@ -322,6 +322,8 @@ This both saves to disk and returns a list to memory. Takes about 5 minutes. It 
 
 ```
 
+This makes no sense, but each of these runs if I run them alone, but the for over all of it doesn't. And it still sometimes dies in the middle of one, but killing it and re-running works fine. Sure seems like a strange systemic issue.
+
 ```{r}
 for (i in 1:25) {
   scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
@@ -408,6 +410,15 @@ I have tried with `furrr`, it is slower, likely because we have to move two big 
 
 Let's save the whole list to an rds too, it is likely more useful that way for diagnostics of the actual scenarios and hydrographs.
 
+This expected the purrr to work. Going to read-in and build from the fors, I guess.
+
+```{r}
+rdses <- list.files(file.path(hydro_dir, 'rds_outputs'))
+
+scaled_hydro <- purrr::map(rdses, \(x) readRDS(file.path(hydro_dir, 'rds_outputs', x))) %>% 
+  setNames(stringr::str_remove(rdses, '.rds'))
+```
+
 ```{r}
 if (params$REBUILD_DATA) {
   saveRDS(scaled_hydro, file = file.path(hydro_dir, 'scaled_hydrographs.rds'))
@@ -421,21 +432,28 @@ Some plots for a gauge to make sure nothing looks wrong.
 The `plot_hydrographs` function works, but sure is hard to see with the overplotting. And taking the log doesn't make it pretty, though the 'pseudo-log' works better than 'log10'. Still, we can see things are working as they should.
 
 ```{r}
-plot_hydrographs(scaled_hydro[['409003']] %>% 
+scale_scene_pal <- make_pal(scenario_meta$scenario_name, palette = 'rcartocolor::Teal', refvals = c('Historical', 'SimR0'), refcols = c('black', 'dodgerblue'))
+```
+
+```{r}
+scaled_hydro[['409003']] %>% 
   # filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
   unnest(cols = data) %>% 
-  pivot_longer(cols = 3, names_to = 'gauge', values_to = 'flow'),
-  y_col = 'flow', transy = scales::pseudo_log_trans(sigma = 1, base = 10))
+  pivot_longer(cols = 3, names_to = 'gauge', values_to = 'flow') %>% 
+plot_hydrographs(y_col = 'flow', 
+                 colors = scale_scene_pal,
+                 transy = scales::pseudo_log_trans(sigma = 1, base = 10))
 ```
 
 Facet it
 
 ```{r}
-plot_hydrographs(scaled_hydro[['409003']] %>% 
+scaled_hydro[['409003']] %>% 
   # filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
   unnest(cols = data) %>% 
-  pivot_longer(cols = 3, names_to = 'gauge', values_to = 'flow'),
-  y_col = 'flow') +
+  pivot_longer(cols = 3, names_to = 'gauge', values_to = 'flow') %>% 
+plot_hydrographs(y_col = 'flow',
+                 colors = scale_scene_pal) +
   facet_wrap('scenario')
 ```
 

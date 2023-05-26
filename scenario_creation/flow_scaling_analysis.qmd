@@ -35,7 +35,7 @@ scaled_hydros <- readRDS(file.path(hydro_dir, 'scaled_hydrographs.rds'))
 Get the scenario metadata- format is likely to change, but let's try to at least move towards this sort of file-based recording
 
 ```{r}
-scenario_meta <- yaml::read_yaml(file.path(hydro_dir, 'metadata.yaml'))
+scenario_meta <- yaml::read_yaml(file.path(hydro_dir, 'metadata.yml'))
 ```
 
 # Structure
