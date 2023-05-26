@@ -5,20 +5,10 @@ format:
   html:
     df-print: paged
 editor: visual
+cache: false
 params:
-  REBUILD_DATA: FALSE
+  REBUILD_DATA: TRUE
 ---
-
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- TRUE
-}
-```
 
 I'm using [flow_scaling.qmd](flow_scaling.qmd) to pull the gauges. Actually getting the scaling relationships is independent of the gauge data, and so doesn't need to happen in the same script. We could do this at the bottom of that script, but I've separated it.
 
@@ -100,13 +90,13 @@ rain_multiplier <- seq(from = 0.8, to = 1.1, by = 0.05) %>%
   setNames(paste0('SimR', 1:7))
 
 scenario_meta <- list(
-  PE_multiplier = 1.07,
-  rain_multiplier = rain_multiplier,
-  scenario_name = names(rain_multiplier)
+  PE_multiplier = c(1, 1, 1.07),
+  rain_multiplier = c(1, 1, rain_multiplier),
+  scenario_name = c('Historical', 'SimR0', names(rain_multiplier))
 )
 
-# Don't run yet, since I don't know the format we'll be using, but this works to create yaml metadata
-# yaml::write_yaml(scenario_meta, file = 'path/to/file.yml')
+# I don't know the format we'll be using, but this works to create yaml metadata
+yaml::write_yaml(scenario_meta, file = file.path(hydro_dir, 'metadata.yml'))
 ```
 
 ## Bring in the scenario data
@@ -148,60 +138,9 @@ Use 2% bins (e.g. 50 bins) instead of 10 + 10 in final.
 
 Write functions for finding quantiles and getting their mean that we can apply to each set of runoff scenarios in each SDL unit, as well as historical.
 
-```{r}
-# get_q <- function(vals, q_perc) {
-#   qs <- quantile(vals, probs = seq(0,1, q_perc), type = 5, na.rm = TRUE)
-#   # cut fails with lots of zeros (well, any duplicate bins)
-#   # binvec <- cut(vals, qs, include.lowest = TRUE, labels = FALSE)
-#   # findInterval is OK with duplicate bins, but combines them, eg. if there are 10 bins that are all 0, it will call them all q10. 
-#   binvec <- findInterval(vals, qs, rightmost.closed = TRUE)
-#   return(binvec)
-# }
-```
-
-```{r}
-# get_qmean <- function(vals, q_perc = 0.02) {
-#   binvec <- get_q(vals, q_perc)
-#   qmean <- aggregate(x = vals, by = list(binvec), FUN = mean) %>% 
-#     setNames(c('quantile', 'mean'))
-# }
-```
-
 ## Apply to all SDL units
 
 We have `scenario_list`, and we want to find the quantile means and relative changes for each dataframe in it. So write that function and use `purrr::map` over the SDL units.
-
-```{r}
-# get_scalings <- function(unitdf) {
-#   # Stack
-#   stackdf <- unitdf %>% 
-#   mutate(sdl = stringr::str_extract(path, "SS[0-9]+")) %>% 
-#   select(sdl, Year, Month, Day, starts_with('Sim')) %>% 
-#   pivot_longer(cols = starts_with('Sim'), 
-#                names_to = 'scenario', values_to = 'runoff')
-#   
-#   # Quantile means
-#   q_s <- stackdf %>% 
-#   group_by(scenario, Month) %>%
-#     summarize(qmean = get_qmean(runoff)) %>%
-#     # reframe is the new way, but needs dplyr 1.1 which breaks lots of the functions
-#  # reframe(qmean = get_qmean(runoff)) %>%
-#   tidyr::unnest(cols = qmean)
-#   
-#   # Get the relative change
-#   q_s <- q_s %>% 
-#   group_by(scenario, Month) %>% 
-#   baseline_compare(compare_col = 'scenario', base_lev = 'SimR0', 
-#                    values_col = 'mean', 
-#                    comp_fun = `/`) %>% 
-#   ungroup() %>% 
-#   select(scenario = scenario.x, everything(), 
-#          relative_change = `/_mean`, 
-#          -scenario.y)
-# }
-
-
-```
 
 Now, we need to apply `get_scalings` to every SDL unit in `scenario_list`
 
@@ -308,32 +247,24 @@ purrr::map(scenario_meta$scenario_name,
              })
 ```
 
-```{r}
-#| output: false
-# savefun <- function(scenario, data) {
-#   write_csv(data, file = file.path(hydro_dir, scenario, paste0(names(data)[2], '.csv')))
-# }
-
-```
-
 Some setup is needed to get the gauge types and sdl units. The other option would be to just do all the work in [flow_scaling.qmd](flow_scaling.qmd), or to save `geo_gauges` from there to read back in here.
 
 ```{r}
 thesegauges <- names(orig_hydro)
 ```
 
-```{python}
-from py_ewr.observed_handling import categorise_gauges
-catgauges = categorise_gauges(r.thesegauges)
+Switched to the other way of reticulating to make vs happy
+
+```{r}
+cg <- reticulate::import("py_ewr.observed_handling")
+gauge_cats <- cg$categorise_gauges(thesegauges)
+names(gauge_cats) <- c('flow', 'level', 'stage')
 ```
 
 ```{r}
 gauge_units <- bom_basin_gauges %>% 
   filter(gauge %in% names(orig_hydro)) %>% 
   sf::st_intersection(sdl_units)
-
-gauge_cats <- reticulate::py$catgauges %>% 
-  setNames(c('flow', 'level', 'stage'))
 ```
 
 Before transforming, we need to decide which (if any) quality codes to drop. This is important because bad codes are often filled with 0, and so throw off the calculations.
@@ -360,83 +291,117 @@ It looks like they start saying 'Data not available' or similar above 150. So ma
 
 Define the main function to apply the scaling to each hydrograph in the list of hydrographs.
 
-```{r}
-# scale_gauges <- function(gaugedata, gaugename, qc_limit = 150) {
-# 
-#   # if they are level gauges, return NULL- the scaling doesn't make sense
-#   if (gaugename %in% gauge_cats$level) {return(NULL)}
-# 
-#   # Get the sdl name
-#   sdl_name <- gauge_units$SWSDLID[gauge_units$gauge == gaugename]
-# 
-#   # If the sdl unit for the gauge isn't in the scaling scenarios, return NULL.
-#   # THis only happens for one gauge (422027) in the Barwon-Darling Watercourse (SS19)
-#   if (!(sdl_name %in% names(scaled_units))) {
-#     return(NULL)
-#   }
-# 
-#   # There is one gauge (currently- 412036) that returns duplicated dates from 1990-2004. I've had a long look, and the values differ on each day, with no apparent pattern. They do tend to track together, but the difference can be large. It's not obvious which to keep (if any). I'll just keep the first of each pair, but this should be revisited.
-#   gaugedata <- gaugedata[!duplicated(gaugedata$time), ]
-# 
-#   # Set bad data to NA
-#   gaugedata[gaugedata$quality_codes_id > qc_limit, 'value'] <- NA
-#   
-#   # There's one gauge 414209 with ALL bad data. return NULL
-#   if (all(is.na(gaugedata$value))) {return(NULL)}
-# 
-#   # make an NA quantile for each scenario so the join works properly
-#   if (any(is.na(gaugedata$value))) {
-#     nafill <- scaled_units[[sdl_name]] %>%
-#       distinct(scenario, Month) %>%
-#       mutate(quantile = NA, mean = NA, ref_mean = NA, relative_change = NA)
-# 
-#     scaled_units[[sdl_name]] <- bind_rows(scaled_units[[sdl_name]], nafill)
-#   }
-# 
-# 
-#   # do the transforms
-# 
-#   gaugedata <- gaugedata %>%
-#     # get the time units right
-#     mutate(Month = lubridate::month(time)) %>%
-#     rename(Date = time) %>%  # To match other inputs
-#     group_by(Month) %>%
-#     # get quantiles- make a dummy so NA quantiles exist and get join-crossed with scenarios
-#     mutate(quantile = get_q(value, q_perc = 0.02)) %>%
-#     ungroup() %>%
-#     # join to correct sdl unit for the scalings
-#     left_join(scaled_units[[sdl_name]],
-#               by = c('Month', 'quantile'),
-#               multiple = 'all') %>% # Says it's OK to duplicate rows x scenarios
-#     # get the adjusted levels
-#     mutate(adj_val = value*relative_change) %>%
-#     # Just the needed cols
-#     dplyr::select(scenario, site, Date, adj_val) %>%
-#     # pivot so the gauge name is col name
-#     tidyr::pivot_wider(names_from = site, values_from = adj_val) %>%
-#     # collapse to a list-tibble with one row per scenario
-#     tidyr::nest(.by = scenario)
-# 
-#   # Save the csvs
-#   if (REBUILD_DATA) { 
-#     purrr::pmap(gaugedata, savefun)
-#   }
-#   # Not sure this is a good idea- might want to return NULL
-#   return(gaugedata)
-# }
-```
-
 ### Do the transforms
 
-This both saves to disk and returns a list to memory. Takes about 5 minutes.
+This both saves to disk and returns a list to memory. Takes about 5 minutes. It has a bug that I cannot find when I purrr or foreach, or even for-ing over each gauge separately, where it just hangs on a random gauge (complely non-repeatably). I *think* it has something to do with Rstudio or caching, but `knitr::purl` to output the code to an R, it works better but still fails. Since all gauges run fine individually (and really, up to chunks of 50-130), I'm just going to do a workaround and for over each gauge. Means I need to read the rds outputs and re-combine, which is annoying.
 
 ```{r}
 #| cache: false
-#| message: false
-#| warning:false
-system.time(scaled_hydro <- purrr::map2(orig_hydro, 
-                                        names(orig_hydro), 
-                                        \(x,y) scale_gauges(x, y, all_sdl_scenario_list = scenario_list, savedata = REBUILD_DATA)))
+
+
+# 
+# system.time(scaled_hydro <- 
+#               purrr::map2(orig_hydro,
+#                           names(orig_hydro),
+#                           \(x,y) scale_gauges(x, y, 
+#                                               all_sdl_scenario_list = scenario_list,
+#                                               savedata = params$REBUILD_DATA,
+#                                               saverds = FALSE, returnR = TRUE)))
+
+# library(foreach)
+# system.time(
+#   scaled_hydro <- foreach(i = 1:length(orig_hydro), .inorder = TRUE) %do% {
+#     scale_gauges(orig_hydro[[i]], names(orig_hydro)[i],
+#                  all_sdl_scenario_list = scenario_list,
+#                  savedata = params$REBUILD_DATA)
+#     
+#   }
+# )
+# # Only needed for foreach
+# names(scaled_hydro) <- names(orig_hydro)[1:length(orig_hydro)]
+
+```
+
+```{r}
+for (i in 1:25) {
+  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
+               all_sdl_scenario_list = scenario_list, 
+               savedata = params$REBUILD_DATA,
+               saverds = params$REBUILD_DATA,
+               returnR = FALSE)
+}
+
+gc()
+```
+
+```{r}
+for (i in 26:50) {
+  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
+               all_sdl_scenario_list = scenario_list, 
+               savedata = params$REBUILD_DATA,
+               saverds = params$REBUILD_DATA,
+               returnR = FALSE)
+}
+
+gc()
+
+
+```
+
+```{r}
+for (i in 51:75) {
+  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
+               all_sdl_scenario_list = scenario_list, 
+               savedata = params$REBUILD_DATA,
+               saverds = params$REBUILD_DATA,
+               returnR = FALSE)
+}
+
+gc()
+
+
+```
+
+```{r}
+for (i in 76:100) {
+  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
+               all_sdl_scenario_list = scenario_list, 
+               savedata = params$REBUILD_DATA,
+               saverds = params$REBUILD_DATA,
+               returnR = FALSE)
+}
+
+gc()
+
+
+```
+
+```{r}
+for (i in 101:125) {
+  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
+               all_sdl_scenario_list = scenario_list, 
+               savedata = params$REBUILD_DATA,
+               saverds = params$REBUILD_DATA,
+               returnR = FALSE)
+}
+
+gc()
+
+
+```
+
+```{r}
+for (i in 126:length(orig_hydro)) {
+  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
+               all_sdl_scenario_list = scenario_list, 
+               savedata = params$REBUILD_DATA,
+               saverds = params$REBUILD_DATA,
+               returnR = FALSE)
+}
+
+gc()
+
+
 ```
 
 I have tried with `furrr`, it is slower, likely because we have to move two big datasets around.
@@ -444,7 +409,7 @@ I have tried with `furrr`, it is slower, likely because we have to move two big 
 Let's save the whole list to an rds too, it is likely more useful that way for diagnostics of the actual scenarios and hydrographs.
 
 ```{r}
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   saveRDS(scaled_hydro, file = file.path(hydro_dir, 'scaled_hydrographs.rds'))
 }
 ```

@@ -70,7 +70,7 @@ get_scalings <- function(sdl_runoff_scenarios) {
   # Quantile means
   q_s <- stackdf %>%
     group_by(scenario, Month) %>%
-    summarize(qmean = get_qmean(runoff)) %>%
+    summarize(qmean = get_qmean(runoff), .groups = 'drop') %>%
     # reframe is the new way, but needs dplyr 1.1 which breaks lots of the functions
     # reframe(qmean = get_qmean(runoff)) %>%
     tidyr::unnest(cols = qmean)
@@ -84,9 +84,7 @@ get_scalings <- function(sdl_runoff_scenarios) {
                      group_cols = c('Month', 'quantile'),
                      comp_fun = `/`) %>%
     ungroup() %>%
-    select(scenario = scenario.x, everything(),
-           relative_change = `/_mean`,
-           -scenario.y)
+    rename(relative_change = `/_mean`)
 }
 
 
@@ -113,11 +111,11 @@ get_matched_ranks <- function(hydro, model, monthly = TRUE) {
   uniquemodel <- model %>%
     pivot_longer(cols = starts_with('Sim')) %>%
     group_by(name, across(any_of(monthgroup))) %>%
-    summarise(nunique = n_distinct(value))
+    summarise(nunique = n_distinct(value), .groups = 'drop')
 
   uniquehydro <- hydro %>%
     group_by(across(any_of(monthgroup))) %>%
-    summarise(nunique = n_distinct(value))
+    summarise(nunique = n_distinct(value), .groups = 'drop')
 
   fewest <- min(min(uniquehydro$nunique),
                 min(uniquemodel$nunique))
@@ -125,14 +123,15 @@ get_matched_ranks <- function(hydro, model, monthly = TRUE) {
   # Rank the hydrograph
   hydro <- hydro %>%
     group_by(across(any_of(monthgroup))) %>%
-    mutate(ranks = get_q_unique(value, 1/fewest))
+    mutate(ranks = get_q_unique(value, 1/fewest)) %>%
+    ungroup()
 
   model_rankvals <- model %>%
     pivot_longer(cols = starts_with('Sim'), names_to = 'scenario') %>%
     group_by(scenario, across(any_of(monthgroup))) %>%
     mutate(ranks = get_q_unique(value, 1/fewest)) %>%
     group_by(scenario, across(any_of(monthgroup)), ranks) %>%
-    summarise(mod_vals = median(value))
+    summarise(mod_vals = median(value), .groups = 'drop')
 
   # replace (really, add another column)
   rank_hydro <- left_join(hydro, model_rankvals, by = c('ranks', monthgroup))
@@ -160,7 +159,16 @@ get_matched_ranks <- function(hydro, model, monthly = TRUE) {
 scale_gauges <- function(gaugedata, gaugename, all_sdl_scenario_list, qc_limit = 150,
                          regression = 'linear',
                          reg_rank_prop = 0.05, lower_limit = 1,
-                         savedata = FALSE) {
+                         savedata = FALSE,
+                         saverds = FALSE,
+                         returnR = FALSE) {
+
+
+  if ((!savedata) & (!saverds) & (!returnR)) {
+    rlang::abort('Not returning anything.
+                 Set either `savedata`, `saverds`, or `returnR`')
+    }
+
 
   suppressWarnings(gauge_units <- werptoolkitr::bom_basin_gauges %>%
     dplyr::filter(gauge == gaugename) %>%
@@ -170,7 +178,7 @@ scale_gauges <- function(gaugedata, gaugename, all_sdl_scenario_list, qc_limit =
 
   # catch potential double-matches
   if (length(sdl_name) > 1) {
-    rlang::abort(glue::glue('Gauge {gaugename} matches to multiple sdl units: {sdl_name}\n'))
+    rlang::abort(glue::glue('\n\nGauge {gaugename} matches to multiple sdl units: {sdl_name}\n\n'))
   }
 
   # If the sdl unit for the gauge isn't in the scaling scenarios, return NULL.
@@ -178,6 +186,8 @@ scale_gauges <- function(gaugedata, gaugename, all_sdl_scenario_list, qc_limit =
   if (!(sdl_name %in% names(all_sdl_scenario_list))) {
     return(NULL)
   }
+
+  rlang::inform(glue::glue('starting gauge {gaugename} in SDL {sdl_name}\n'))
 
   # if they are level gauges, return NULL- the scaling doesn't make sense
   if (gaugename %in% gauge_cats$level) {return(NULL)}
@@ -223,10 +233,6 @@ scale_gauges <- function(gaugedata, gaugename, all_sdl_scenario_list, qc_limit =
     # bottom_ranks <- max(rank_data$ranks, na.rm = TRUE)*reg_rank_prop
 
     # Some of the gauges just don't have enough data to fit by month. In that case, re-rank ignoring months
-    # monthdata <- rank_data %>%
-    #   filter(scenario == 'SimR0') %>%
-    #   group_by(Month) %>%
-    #   summarise(ndata = sum(ranks <= bottom_ranks & value >= lower_limit))
 
     # If insufficient data (at least 10 ranks with values above lower_limit and under reg_rank_prop of the total), re-rank overall, and set a monthly flag
     if (min(rank_summary$nrankbottom) < 10) {
@@ -316,10 +322,17 @@ scale_gauges <- function(gaugedata, gaugename, all_sdl_scenario_list, qc_limit =
 
 
   # Format cleanup
+
+  # add the actual gauge data
+  ingauge <- datalist$gaugedata %>%
+    dplyr::select(Date, site, value) %>%
+    dplyr::mutate(scenario = 'Historical')
+
   qq_gauge <-  qq_gauge  %>%
-    dplyr::select(-pred_hyd, -matches('Month')) %>%
+    dplyr::select(-pred_hyd, -matches('Month'), value = adj_val) %>%
+    bind_rows(ingauge) %>%
     # pivot so the gauge name is col name
-    tidyr::pivot_wider(names_from = site, values_from = adj_val) %>%
+    tidyr::pivot_wider(names_from = site, values_from = value) %>%
     # collapse to a list-tibble with one row per scenario This allows pmap-ing
     # over the rows (scenarios) to save each into a different folder
     group_by(scenario) %>%
@@ -330,9 +343,27 @@ scale_gauges <- function(gaugedata, gaugename, all_sdl_scenario_list, qc_limit =
   if (savedata) {
     purrr::pmap(qq_gauge, savefun)
   }
+
+  # Save the csvs
+  if (saverds) {
+    if (!dir.exists(file.path(hydro_dir, 'rds_outputs'))) {
+      dir.create(file.path(hydro_dir, 'rds_outputs'),
+                 recursive = TRUE)
+    }
+
+    saveRDS(qq_gauge, file = file.path(hydro_dir, 'rds_outputs', paste0(gaugename, '.rds')))
+  }
+
+  rlang::inform(glue::glue('\n\nfinished gauge {gaugename} in SDL {sdl_name}\n\n'))
   # Not sure this is a good idea- might want to return NULL
   # It's useful for diagnostics, I think.
-  return(qq_gauge)
+
+  if (returnR) {
+    return(qq_gauge)
+  } else {
+    return(invisible(NULL))
+  }
+
 }
 
 # Scaling helpers ---------------------------------------------------------

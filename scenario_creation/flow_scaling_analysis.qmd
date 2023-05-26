@@ -1,0 +1,73 @@
+---
+title: "Analysis of scaled flows" 
+author: "Galen Holt" 
+---
+
+We've [pulled historical flow data](flow_scaling.qmd), and after a lot of [methods testing](flow_scaling_methods.qmd), have settled on a combination of quantile-quantile scaling and linear regression. This is implemented with functions in `scaling_functions.R`, and the [scaling notebook](scaling_scenarios.qmd) applies these scalings to all gauges in the EWR tool, saves hydrographs as csvs in a standard directory structure, and also saves the scaled hydrographs as an `rds` file to make it easier to pull them back in here to analyse.
+
+The main goal is to run those scaled hydrographs through the toolkit, but we also wan to do some analyses of the scaled hydrographs. There's quite a lot we might want to do to analyse them in terms of calculating hydrometrics, etc. But for now I'll just make some descriptive figures and tables to assess what they look like.
+
+```{r}
+#| message: false 
+library(werptoolkitr) 
+library(dplyr) 
+library(tidyr) 
+library(lubridate) 
+library(ggplot2)
+```
+
+## Setup
+
+Paths
+
+```{r}
+scenario_dir <- '../flow_scaling_data' 
+hydro_dir <- file.path(scenario_dir, 'hydrographs') 
+scaling_dir <- file.path(scenario_dir, 'CC_Scenarios_WRPs')
+```
+
+Read in the data. It's saved as an RDS, and includes the hydrographs themselves in the Historical scenario.
+
+```{r}
+scaled_hydros <- readRDS(file.path(hydro_dir, 'scaled_hydrographs.rds')) 
+```
+
+Get the scenario metadata- format is likely to change, but let's try to at least move towards this sort of file-based recording
+
+```{r}
+scenario_meta <- yaml::read_yaml(file.path(hydro_dir, 'metadata.yaml'))
+```
+
+# Structure
+
+There are a lot of hydrometrics we will want to calculate, but for now we're mostly focused on describing how the distributions change, typically in two ways-
+
+1.  between the true hydrograph and baseline, to capture the effects of the transforms and
+2.  between the different scenarios to capture the impacts of climate
+
+We'll start out by looking at a few fairly obvious comparisons
+
+-   Timeseries
+
+-   probability distribution of values,
+
+-   Number of zeros
+
+-   and add more as we go
+
+The EWR tool and the directory structure are set up to look at all the gauges within scenarios, and then compare, but the rds here is set up do to scenario comparisons within gauges, which is really what we want to do here (and what the Comparer is tuned for as well).
+
+We *do* want to look at these for all the gauges, but that is going to be a TON of output. There's likely a good way to organise it, but I guess for now I'll just `purrr` over the data and return the results and end up with a really long document. Obviously if we didn't want to check each gauge, we'd choose a representative example or two and use that.
+
+# Timeseries
+
+basically, purrr over this
+
+```{r}
+scaled_hydro[['409003']] %>% 
+                   unnest(cols = data) %>%
+                   pivot_longer(cols = 3, names_to = 'gauge', 
+                                values_to = 'flow') %>% 
+plot_hydrographs(y_col = 'flow') +  
+  facet_wrap('scenario')
+```
