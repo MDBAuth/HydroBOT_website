@@ -7,7 +7,7 @@ editor: visual
 
 ## Setting up the scaling functions
 
-I'm using [flow_scaling.qmd](flow_scaling.qmd) to pull the gauges and scale them, but actually getting the scaling relationships is independent, and so doesn't need to happen in the same script. I'll do that here.
+I'm using [pull_gauges_to_scale.qmd](pull_gauges_to_scale.qmd) to pull the gauges and scale them, but actually getting the scaling relationships is independent, and so doesn't need to happen in the same script. I'll do that here.
 
 ```{r}
 library(werptoolkitr)
