@@ -1,16 +1,14 @@
 ---
-title: "Finding and applying flow scaling"
+title: "Clean scaling"
 author: "Galen Holt"
-format:
-  html:
-    df-print: paged
+format: html
 editor: visual
 cache: false
 params:
   REBUILD_DATA: TRUE
 ---
 
-I'm using [flow_scaling.qmd](flow_scaling.qmd) to pull the gauges. Actually getting the scaling relationships is independent of the gauge data, and so doesn't need to happen in the same script. We could do this at the bottom of that script, but I've separated it.
+I'm using [pull_gauges_to_scale.qmd](pull_gauges_to_scale.qmd) to pull the gauges. Actually getting the scaling relationships is independent of the gauge data, and so doesn't need to happen in the same script. We could do this at the bottom of that script, but I've separated it because that notebook takes a while to run and is susceptible to intermittent API errors from the gauge service. Everything will be more stable if we do the transform here on a static set of hydrographs (or at least with control over when those hydrographs update).
 
 I then read the gauge data in, apply the scaling, and save the scaled data to csvs to feed to the toolkit. I could do that in yet another notebook, but it seems to work in this document, and then doesn't rely on linking additional notebooks.
 
@@ -22,9 +20,12 @@ library(readr)
 library(tidyr)
 library(lubridate)
 library(ggplot2)
+# because mapping this causes problems on single processes
+library(furrr)
+plan(multisession)
 ```
 
-We do a lot of `purrr`ing with custom functions, I've put them in their own file
+We do a lot of `purrr`ing with custom functions, I've put them in their own file.
 
 ```{r}
 source('scenario_creation/scaling_functions.R')
@@ -38,21 +39,53 @@ hydro_dir <- file.path(scenario_dir, 'hydrographs')
 scaling_dir <- file.path(scenario_dir, 'CC_Scenarios_WRPs')
 ```
 
+## Bring in data
+
+Get the list of scenarios and read them in (to a list of dfs).
+
+```{r}
+#| message: false
+CCSc_FileList <- list.files(scaling_dir, pattern = '.csv', 
+                            full.names = TRUE)
+
+scenario_list <- purrr::map(CCSc_FileList,
+                            \(x) read_csv(file = x, id = 'path')) %>% 
+  setNames(stringr::str_extract(CCSc_FileList, "SS[0-9]+"))
+```
+
+The [pulled hydrographs](pull_gauges_to_scale.qmd)
+
+```{r}
+orig_hydro <- readRDS(file.path(hydro_dir, 'extracted_flows.rds'))
+```
+
 # Scaling hydrographs
 
-We have a set of runoff scenarios for different climate projections. These are done for 8 scenarios, and give separate results for each SDL unit. We want to create scaled historical hydrographs from these scenarios. To do that, we
+We have a set of runoff scenarios for different climate projections. These are done for 8 scenarios, and give separate results for each SDL unit. We want to create scaled versions of the historical hydrographs from these scenarios. To do that, we
 
 1.  Find the mean quantile values in each scenario in each SDL unit for each month
 
 2.  Find the 'relative change' from the baseline scenario
 
-3.  Pull historical hydrographs for a set of gauges (done in the [gauge pulling notebook](flow_scaling.qmd))
+3.  Pull historical hydrographs for a set of gauges (done in the [gauge pulling notebook](pull_gauges_to_scale.qmd))
 
 4.  Find the quantile for each datapoint in each hydrograph
 
 5.  Adjust each hydrograph using quantile-quantile scaling to represent each of the runoff scenarios.
 
-6.  Save those adjusted hydrographs for use by the EWR tool
+6.  The above does not change the zero-flow events, so we find a linear regression between the bottom 5% ranked historical flows and baseline runoff
+
+    1.  We use this relationship to predict new flows from all runoff scenarios.
+
+    2.  Because this relationship is linear, predictions can be positive or negative
+
+    3.  Negative predictions are set to 0
+
+    4.  Positive predictions applied to 0-flow are necessarily applied to *all* zero-flows. This is unrealistic, and so for this reason we only look at scenarios with reduced runoff.
+
+7.  Save those adjusted hydrographs for use by the EWR tool
+
+We achieve these goals by writing functions to do these operations, and using `purrr::map` or similar to apply them over all gauges (and relevant SDL units).
 
 ## Scenario definitions
 
@@ -90,27 +123,24 @@ rain_multiplier <- seq(from = 0.8, to = 1.1, by = 0.05) %>%
   setNames(paste0('SimR', 1:7))
 
 scenario_meta <- list(
-  PE_multiplier = c(1, 1, 1.07),
+  PE_multiplier = c(1, 1, rep(1.07, length(rain_multiplier))),
   rain_multiplier = c(1, 1, rain_multiplier),
   scenario_name = c('Historical', 'SimR0', names(rain_multiplier))
 )
 
 # I don't know the format we'll be using, but this works to create yaml metadata
-yaml::write_yaml(scenario_meta, file = file.path(hydro_dir, 'metadata.yml'))
+yaml::write_yaml(scenario_meta, file = file.path(hydro_dir, 'scaling_metadata.yml'))
 ```
 
-## Bring in the scenario data
-
-Get the list of files and read them in (to a list of dfs).
+Make sure directories exist for writing out results
 
 ```{r}
-#| message: false
-CCSc_FileList <- list.files(scaling_dir, pattern = '.csv', 
-                            full.names = TRUE)
-
-scenario_list <- purrr::map(CCSc_FileList,
-                            \(x) read_csv(file = x, id = 'path')) %>% 
-  setNames(stringr::str_extract(CCSc_FileList, "SS[0-9]+"))
+#| output: false
+purrr::map(scenario_meta$scenario_name, 
+           \(x) if (!dir.exists(file.path(hydro_dir, x))) {
+             invisible(dir.create(file.path(hydro_dir, x), 
+                        recursive = TRUE))
+             })
 ```
 
 # Find scaling relationships
@@ -132,339 +162,79 @@ Obs(\frac{F}{H}) - Obs + Obs =
 Obs(\frac{F}{H})
 $$
 
-## Break into groups, rank and bin
+## Scaling factors for all SDL units
 
-Use 2% bins (e.g. 50 bins) instead of 10 + 10 in final.
-
-Write functions for finding quantiles and getting their mean that we can apply to each set of runoff scenarios in each SDL unit, as well as historical.
-
-## Apply to all SDL units
-
-We have `scenario_list`, and we want to find the quantile means and relative changes for each dataframe in it. So write that function and use `purrr::map` over the SDL units.
-
-Now, we need to apply `get_scalings` to every SDL unit in `scenario_list`
+We need to apply `get_scalings` to every SDL unit in `scenario_list` to get the scaling factors for each scenario in that unit
 
 ```{r}
 #| message: false
 scaled_units <- purrr::map(scenario_list, get_scalings)
 ```
 
-This `scaled_units` list is a list of dataframes (one for each SDL unit) giving the relative change for each scenario and month that need to be mapped to the observed gauge data. First, let's do a quick plot check.
-
-### Plots
-
-A few plots to check nothing is going wrong. SS20 is Macquarie-Castlereagh.
-
-#### Quantiles
-
-First, check the quantiles themselves
-
-```{r}
-# just look at a couple quantiles
-scaled_units$SS20 %>% 
-  filter(quantile %in% c(1,25,50)) %>% 
-ggplot(mapping = aes(x = scenario, y = mean, fill = as.factor(quantile))) + geom_col(position = position_dodge())
-```
-
-Do the quantiles look smooth?
-
-```{r}
-scaled_units$SS20 %>% 
-ggplot(mapping = aes(x = as.factor(quantile), y = mean, fill = scenario)) + geom_col(position = position_dodge()) + facet_grid(Month ~ scenario)
-```
-
-```{r}
-scaled_units$SS20 %>% 
-  ggplot(mapping = aes(x = quantile, 
-                       y = mean, color = scenario)) + 
-  geom_line() + 
-  facet_wrap('Month')
-```
-
-#### Relative change
-
-For reduced precip, the drops at the highest quantiles are larger than the drops at the lower end. For increased precip, the higher quantiles go up more than the lower. That sort of nonlinearity does make sense.
-
-```{r}
-scaled_units$SS20 %>% 
-  filter(quantile %in% c(1,25,50)) %>% 
-ggplot(mapping = aes(x = scenario, 
-                     y = relative_change, 
-                     fill = as.factor(quantile))) + 
-  geom_col(position = position_dodge())
-```
-
-Perhaps the best way to look at this is the relative change in each quantile for the different scenarios.
-
-```{r}
-scaled_units$SS20 %>% 
-  ggplot(mapping = aes(x = quantile, 
-                       y = relative_change, color = scenario)) + 
-  geom_line() + 
-  facet_wrap('Month')
-```
-
-Nothing there jumps out as horribly misaligned or major step changes between months, so let's move on.
+This `scaled_units` list is a list of dataframes (one for each SDL unit) giving the relative change for each scenario and month that need to be mapped to the observed gauge data.
 
 # Adjust the flows
 
 We now want to adjust the gauges with those relative changes to represent the different scenarios.
 
-We could do this in `flow_scaling.qmd`, where we would read in the `scaled_units` list we just created. That's tempting, because we have the gauges mapped to SDL units there already. However, that script takes a while to run and is susceptible to intermittent API errors from the gauge service, and so everything will be more stable if we do the transform here on a static set of hydrographs (or at least with control over when those hydrographs update).
-
-```{r}
-orig_hydro <- readRDS(file.path(hydro_dir, 'extracted_flows.rds'))
-```
-
 ## Approach
 
-1.  find the quantile of each value in the orig_hydro data for each group-unit (e.g. Month)
-2.  multiply by relative_change for each quantile, month, and scenario
-3.  do that over all the sdl units
+1.  For each gauge in `orig_hydro`, find the quantile of each value for each group-unit (e.g. Month)
+2.  multiply by `relative_change` for each quantile, month, and scenario in the relevant sdl unit in `scaled_units`
+3.  do that over all gauges
 
-## Quantiles for historical data
+## Cleanup
 
-We just want to ID the quantile of each value so we know how much to adjust, so use `get_q`. We also need to group and know the sdl unit for the transforms.
+Some setup is needed to get the gauge types and sdl units.
 
-### Function to use with map
-
-We want to process each of the gauges with each of the scenarios, so write a map function `scale_gauges` to map over the gauges. Because the gauge data comes in gauge-wise, but the scenarios are all together in the scenario definition, each gauge ends up having all the scenarios calculated at once. This leaves the resulting dataframe for each gauge as a nested df of scenarios, each with times and flow values. That needs to be unpacked, named, and saved separately for each scenario. This nested structure requires a little helper saving function `savefun`.
-
-::: {#save_structure_q}
-**Question** do I want to do this differently to save all gauges within scenarios as a single csv? or just do them one at a time? Because the data comes in as single gauges but scenarios all together, that would get convoluted, because we'd have to hold all the gauges and rearrange the data to have gauges inside scenarios instead of vice-versa.
-
-Separate csvs per gauge might be better anyway given the different date ranges. But we can change the organisation steps in `scale_gauges` if we want something different.
-:::
-
-Make sure directories exist for writing out results
+It doesn't make sense to scale level gauges, so remove them.
 
 ```{r}
-#| output: false
-purrr::map(scenario_meta$scenario_name, 
-           \(x) if (!dir.exists(file.path(hydro_dir, x))) {
-             dir.create(file.path(hydro_dir, x), 
-                        recursive = TRUE)
-             })
+cg <- reticulate::import("py_ewr.observed_handling") 
+gauge_cats <- cg$categorise_gauges(names(orig_hydro)) 
+names(gauge_cats) <- c('flow', 'level', 'stage')    
+
+# if they are level gauges, remove- the scaling doesn't make sense 
+orig_hydro[which(names(orig_hydro) %in% gauge_cats$level)] <- NULL
 ```
 
-Some setup is needed to get the gauge types and sdl units. The other option would be to just do all the work in [flow_scaling.qmd](flow_scaling.qmd), or to save `geo_gauges` from there to read back in here.
+In testing (scaling_scenarios_development.qmd), I looked into it and decided to set QC codes \> 150 to NA. That's build-in to the functions, but as an argument so we can change if desired.
+
+## Do the transforms
+
+Loop over the scaling functions to apply them to each gauge and relevant sdl unit, saving the csv results in the format expected by the Controller (and EWR). We also can save individual rds files, which are organised to favour a different dimension (gauge, rather than scenario), and so are easier to [assess the effects of the transforms](flow_scaling_analysis.qmd). Though here, we just return the whole list and save it in the next chunk.
+
+A testing loop for a single or couple gauges
 
 ```{r}
-thesegauges <- names(orig_hydro)
+#| eval: false
+test_list <- purrr::map2(orig_hydro[10:20],
+                         names(orig_hydro[10:20]),
+                         \(x,y) scale_gauges(x, y,
+                                             all_sdl_scenario_list = scenario_list,
+                                              savedata = FALSE,
+                                              saverds = FALSE, 
+                                              returnR = TRUE))
 ```
 
-Switched to the other way of reticulating to make vs happy
-
-```{r}
-cg <- reticulate::import("py_ewr.observed_handling")
-gauge_cats <- cg$categorise_gauges(thesegauges)
-names(gauge_cats) <- c('flow', 'level', 'stage')
-```
-
-```{r}
-gauge_units <- bom_basin_gauges %>% 
-  filter(gauge %in% names(orig_hydro)) %>% 
-  sf::st_intersection(sdl_units)
-```
-
-Before transforming, we need to decide which (if any) quality codes to drop. This is important because bad codes are often filled with 0, and so throw off the calculations.
-
-First, look at the codes that are there to get a sense of what should be included.
-
-```{r}
-#| message: false
-all_codes <- orig_hydro %>% 
-  purrr::map(\(x) x %>% 
-               group_by(quality_codes, 
-                        quality_codes_id) %>% 
-               summarise(n_records = n())) %>% 
-  bind_rows() %>% 
-  group_by(quality_codes,
-           quality_codes_id) %>% 
-  summarise(n_records = sum(n_records)) %>% 
-  arrange(desc(quality_codes_id))
-
-all_codes
-```
-
-It looks like they start saying 'Data not available' or similar above 150. So make everything above that NA. I've made this an argument to `scale_gauges` so we can change easily.
-
-Define the main function to apply the scaling to each hydrograph in the list of hydrographs.
-
-### Do the transforms
-
-This both saves to disk and returns a list to memory. Takes about 5 minutes. It has a bug that I cannot find when I purrr or foreach, or even for-ing over each gauge separately, where it just hangs on a random gauge (complely non-repeatably). I *think* it has something to do with Rstudio or caching, but `knitr::purl` to output the code to an R, it works better but still fails. Since all gauges run fine individually (and really, up to chunks of 50-130), I'm just going to do a workaround and for over each gauge. Means I need to read the rds outputs and re-combine, which is annoying.
+This fails with `for`, `foreach %do%` and `purrr::map2` , with the weird exception of breaking it up into separate `for` loops, each with about 20 interations. After a *lot* of testing, it is not possible to isolate the problem (any particular run dies on a different iterations, and all iterations will run, just not all together). It seems to be an issue with R itself and maybe windows and the management of a single process. Parallelising it works, presumably because now it's running on multiple processes, forcing the sort of manual breakup that got the multiple `for` loops to run.
 
 ```{r}
 #| cache: false
-
-
-# 
-# system.time(scaled_hydro <- 
-#               purrr::map2(orig_hydro,
-#                           names(orig_hydro),
-#                           \(x,y) scale_gauges(x, y, 
-#                                               all_sdl_scenario_list = scenario_list,
-#                                               savedata = params$REBUILD_DATA,
-#                                               saverds = FALSE, returnR = TRUE)))
-
-# library(foreach)
-# system.time(
-#   scaled_hydro <- foreach(i = 1:length(orig_hydro), .inorder = TRUE) %do% {
-#     scale_gauges(orig_hydro[[i]], names(orig_hydro)[i],
-#                  all_sdl_scenario_list = scenario_list,
-#                  savedata = params$REBUILD_DATA)
-#     
-#   }
-# )
-# # Only needed for foreach
-# names(scaled_hydro) <- names(orig_hydro)[1:length(orig_hydro)]
+system.time(scaled_hydro <- furrr::future_map2(orig_hydro, 
+                                               names(orig_hydro),
+                                               \(x,y) scale_gauges(x, y,
+                                                                   all_sdl_scenario_list = scenario_list,
+                                              savedata = params$REBUILD_DATA,
+                                              saverds = FALSE, 
+                                              returnR = TRUE)))
 
 ```
 
-This makes no sense, but each of these runs if I run them alone, but the for over all of it doesn't. And it still sometimes dies in the middle of one, but killing it and re-running works fine. Sure seems like a strange systemic issue.
-
-```{r}
-for (i in 1:25) {
-  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
-               all_sdl_scenario_list = scenario_list, 
-               savedata = params$REBUILD_DATA,
-               saverds = params$REBUILD_DATA,
-               returnR = FALSE)
-}
-
-gc()
-```
-
-```{r}
-for (i in 26:50) {
-  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
-               all_sdl_scenario_list = scenario_list, 
-               savedata = params$REBUILD_DATA,
-               saverds = params$REBUILD_DATA,
-               returnR = FALSE)
-}
-
-gc()
-
-
-```
-
-```{r}
-for (i in 51:75) {
-  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
-               all_sdl_scenario_list = scenario_list, 
-               savedata = params$REBUILD_DATA,
-               saverds = params$REBUILD_DATA,
-               returnR = FALSE)
-}
-
-gc()
-
-
-```
-
-```{r}
-for (i in 76:100) {
-  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
-               all_sdl_scenario_list = scenario_list, 
-               savedata = params$REBUILD_DATA,
-               saverds = params$REBUILD_DATA,
-               returnR = FALSE)
-}
-
-gc()
-
-
-```
-
-```{r}
-for (i in 101:125) {
-  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
-               all_sdl_scenario_list = scenario_list, 
-               savedata = params$REBUILD_DATA,
-               saverds = params$REBUILD_DATA,
-               returnR = FALSE)
-}
-
-gc()
-
-
-```
-
-```{r}
-for (i in 126:length(orig_hydro)) {
-  scale_gauges(orig_hydro[[i]], names(orig_hydro)[i], 
-               all_sdl_scenario_list = scenario_list, 
-               savedata = params$REBUILD_DATA,
-               saverds = params$REBUILD_DATA,
-               returnR = FALSE)
-}
-
-gc()
-
-
-```
-
-I have tried with `furrr`, it is slower, likely because we have to move two big datasets around.
-
-Let's save the whole list to an rds too, it is likely more useful that way for diagnostics of the actual scenarios and hydrographs.
-
-This expected the purrr to work. Going to read-in and build from the fors, I guess.
-
-```{r}
-rdses <- list.files(file.path(hydro_dir, 'rds_outputs'))
-
-scaled_hydro <- purrr::map(rdses, \(x) readRDS(file.path(hydro_dir, 'rds_outputs', x))) %>% 
-  setNames(stringr::str_remove(rdses, '.rds'))
-```
+Save the data all in one go. Useful for [assessing the impacts of the scaling](flow_scaling_analysis.qmd).
 
 ```{r}
 if (params$REBUILD_DATA) {
   saveRDS(scaled_hydro, file = file.path(hydro_dir, 'scaled_hydrographs.rds'))
 }
 ```
-
-## Plots
-
-Some plots for a gauge to make sure nothing looks wrong.
-
-The `plot_hydrographs` function works, but sure is hard to see with the overplotting. And taking the log doesn't make it pretty, though the 'pseudo-log' works better than 'log10'. Still, we can see things are working as they should.
-
-```{r}
-scale_scene_pal <- make_pal(scenario_meta$scenario_name, palette = 'rcartocolor::Teal', refvals = c('Historical', 'SimR0'), refcols = c('black', 'dodgerblue'))
-```
-
-```{r}
-scaled_hydro[['409003']] %>% 
-  # filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
-  unnest(cols = data) %>% 
-  pivot_longer(cols = 3, names_to = 'gauge', values_to = 'flow') %>% 
-plot_hydrographs(y_col = 'flow', 
-                 colors = scale_scene_pal,
-                 transy = scales::pseudo_log_trans(sigma = 1, base = 10))
-```
-
-Facet it
-
-```{r}
-scaled_hydro[['409003']] %>% 
-  # filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
-  unnest(cols = data) %>% 
-  pivot_longer(cols = 3, names_to = 'gauge', values_to = 'flow') %>% 
-plot_hydrographs(y_col = 'flow',
-                 colors = scale_scene_pal) +
-  facet_wrap('scenario')
-```
-
-Zeros
-
-```{r}
-scaled_hydro[['409003']] %>% 
-  # filter(scenario %in% c('SimR1', 'SimR4', 'SimR7')) %>%
-  unnest(cols = data) %>% 
-  group_by(scenario) %>% 
-  summarise(n_zeros = sum(`409003` == 0, na.rm = TRUE))
-```
-
-And now we can move on to more rigorous analyses of the data and read in to the toolkit proper.
