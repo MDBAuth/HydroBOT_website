@@ -14,6 +14,8 @@ library(dplyr)
 library(tidyr) 
 library(lubridate) 
 library(ggplot2)
+
+source('scenario_creation/scaling_functions.R')
 ```
 
 ## Setup
@@ -244,6 +246,110 @@ purrr::map(cdf_plotlist, print)
 # Q-Q relative change
 
 If I were just doing pure q-q, we could make these as we go from the q-q scaling, but I don't for two reasons- I want to incorporate the final data including the regressions, and I want to output clean data from the [scaling notebook](scaling_scenarios.qmd), not clutter it up with plots.
+
+We have the code to do this in the scaling functions. I could spend time generalising, but I think I won't for now.
+
+Split by month (as it was actually done)
+
+```{r}
+
+# month_q <- scaled_hydros[['409003']] %>% 
+#                    unnest(cols = data) %>%
+#                    pivot_longer(cols = 3, names_to = 'gauge', 
+#                                 values_to = 'flow') %>%
+#   dplyr::mutate(Month = lubridate::month(Date)) %>% 
+#     dplyr::group_by(scenario, Month) %>%
+#     dplyr::summarise(qmean = get_qmean(flow, q_perc = 0.02),
+#                      .groups = 'drop') %>%
+#     # reframe is the new way, but needs dplyr 1.1 which breaks lots of the functions
+#     # reframe(qmean = get_qmean(runoff)) %>%
+#     tidyr::unnest(cols = qmean) %>%
+#     # dplyr::group_by(scenario, Month) %>%
+#     baseline_compare(compare_col = 'scenario',
+#                      base_lev = 'SimR0',
+#                      values_col = 'mean',
+#                      group_cols = c('Month', 'quantile'),
+#                      comp_fun = `/`) %>%
+#     dplyr::ungroup() %>%
+#     dplyr::rename(relative_change = `/_mean`)
+  
+qfun <- function(data, gaugename) {
+  
+  if (is.null(data)) {return(NULL)}
+  
+ month_q <- data %>% 
+                   unnest(cols = data) %>%
+                   pivot_longer(cols = 3, names_to = 'gauge', 
+                                values_to = 'flow') %>%
+  dplyr::mutate(Month = lubridate::month(Date, label = TRUE)) %>% 
+    dplyr::group_by(scenario, Month) %>%
+    dplyr::summarise(qmean = get_qmean(flow, q_perc = 0.02),
+                     .groups = 'drop') %>%
+        tidyr::unnest(cols = qmean) %>%
+        baseline_compare(compare_col = 'scenario',
+                     base_lev = 'SimR0',
+                     values_col = 'mean',
+                     group_cols = c('Month', 'quantile'),
+                     comp_fun = `/`) %>%
+    dplyr::ungroup() %>%
+    dplyr::rename(relative_change = `/_mean`)
+ 
+ qplot <- ggplot(month_q, mapping = aes(x = quantile, 
+                       y = relative_change, color = scenario)) + 
+  geom_line() + 
+    scale_color_manual(values = scaling_scene_pal) +
+  facet_wrap('Month') + 
+   coord_cartesian(ylim = c(0.25, 1.5)) + 
+   theme_werp_toolkit()
+  
+  return(qplot)
+}
+```
+
+Make the list
+
+```{r}
+q_plotlist <- purrr::map2(scaled_hydros,
+                             names(scaled_hydros),
+                             \(x,y) qfun(x, y))
+```
+
+Print
+
+```{r}
+purrr::map(q_plotlist, print)
+```
+
+We could not split by month to make it easier to see, but it's not actually what we did, and it loses some of the more striking disproportionate scaling across quantiles.
+
+```{r}
+#| eval: false
+
+all_q <- scaled_hydros[['409003']] %>% 
+                   unnest(cols = data) %>%
+                   pivot_longer(cols = 3, names_to = 'gauge', 
+                                values_to = 'flow') %>%
+    dplyr::group_by(scenario) %>%
+    dplyr::summarise(qmean = get_qmean(flow, q_perc = 0.02),
+                     .groups = 'drop') %>%
+    # reframe is the new way, but needs dplyr 1.1 which breaks lots of the functions
+    # reframe(qmean = get_qmean(runoff)) %>%
+    tidyr::unnest(cols = qmean) %>%
+    # dplyr::group_by(scenario, Month) %>%
+    baseline_compare(compare_col = 'scenario',
+                     base_lev = 'SimR0',
+                     values_col = 'mean',
+                     group_cols = c('quantile'),
+                     comp_fun = `/`) %>%
+    dplyr::ungroup() %>%
+    dplyr::rename(relative_change = `/_mean`)
+
+  ggplot(all_q, mapping = aes(x = quantile, 
+                       y = relative_change, color = scenario)) + 
+  geom_line() + 
+    scale_color_manual(values = scaling_scene_pal) +
+    coord_cartesian(ylim = c(0.25, 1.5))
+```
 
 # notes 
 
