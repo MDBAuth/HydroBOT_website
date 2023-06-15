@@ -7,7 +7,7 @@ format:
     code-link: true # Doesn't do anything without either cran or pkgdown site, btu that's still kind of useful for external (especially {pkgname})
 editor: visual
 params:
-  REBUILD_DATA: FALSE
+  REBUILD_DATA: TRUE
 ---
 
 ```{r}
@@ -17,7 +17,7 @@ params:
 if ("params" %in% ls()) {
   REBUILD_DATA <- params$REBUILD_DATA
 } else {
-  REBUILD_DATA <- FALSE
+  REBUILD_DATA <- TRUE
 }
 ```
 
@@ -41,7 +41,7 @@ For inputs, `multi_aggregate` expects the incoming data to be in memory and geog
 First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](controller/controller_ewr_wrapped_R.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
-project_dir <- file.path('scenario_example')
+project_dir <- file.path('more_scenarios')
 ewr_results <- file.path(project_dir, 'module_output', 'EWR')
 ```
 
@@ -56,7 +56,18 @@ out_path <- file.path(project_dir, 'aggregator_output')
 This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
 
 ```{r}
-scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+
+multipliers <- c(1.1, 1.5, 2, 3, 4)
+
+scenemults <- c(1/rev(multipliers), 1, multipliers)
+
+scenenames <- c(paste0('down', as.character(rev(multipliers))), 
+                'base', 
+                paste0('up', as.character(multipliers))) |> 
+  stringr::str_replace('\\.', '_')
+
+
+scenarios <- tibble::tibble(scenario = scenenames, delta = scenemults)
 
 scene_pal <- make_pal(unique(scenarios$scenario), palette = 'ggsci::nrc_npg', refvals = 'base', refcols = 'black')
 ```

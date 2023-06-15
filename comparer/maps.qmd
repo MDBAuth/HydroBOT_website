@@ -24,7 +24,7 @@ With maps, we can also plot multiple layers in the foreground `overlay` and back
 As usual, we need paths to the data.
 
 ```{r}
-project_dir <- file.path('scenario_example')
+project_dir <- file.path('more_scenarios')
 agg_dir <- file.path(project_dir, 'aggregator_output')
 ```
 
@@ -33,7 +33,17 @@ agg_dir <- file.path(project_dir, 'aggregator_output')
 This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
 
 ```{r}
-scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
+multipliers <- c(1.1, 1.5, 2, 3, 4)
+
+scenemults <- c(1/rev(multipliers), 1, multipliers)
+
+scenenames <- c(paste0('down', as.character(rev(multipliers))), 
+                'base', 
+                paste0('up', as.character(multipliers))) |> 
+  stringr::str_replace('\\.', '_')
+
+
+scenarios <- tibble::tibble(scenario = scenenames, delta = scenemults)
 ```
 
 ## Subset for demo
@@ -92,7 +102,7 @@ obj_sdl_to_plot |>
                           facet_col = 'env_obj',
                           facet_row = 'scenario',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           underlay_list = list(underlay = basin, 
                                                underlay_pal = 'azure'))
 ```
@@ -111,7 +121,7 @@ agged_data$env_obj |> # for readability
                           facet_col = 'scenario',
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           underlay_list = list(underlay = 'basin',
                                                underlay_pal = 'azure')) +
     ggplot2::theme(legend.position = 'bottom')
@@ -131,7 +141,7 @@ agged_data$env_obj |> # for readability
                           facet_col = 'scenario',
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           underlay_list = list(underlay = sdl_units,
                                                underlay_ycol = 'SWSDLName',
                                                underlay_pal = 'ggsci::default_igv')) +
@@ -151,7 +161,7 @@ agged_data$env_obj |> # for readability
                           facet_col = 'scenario',
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           underlay_list = list(list(underlay = 'basin',
                                                     underlay_pal = 'cornsilk'),
                                                list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
@@ -173,7 +183,7 @@ obj_sdl_to_plot |>
                           facet_col = 'scenario',
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           underlay_list = 'basin',
                           overlay_list = list(overlay = 'bom_basin_gauges',
                                               overlay_pal = 'grey40',
@@ -218,7 +228,7 @@ agged_data$mdb |>
                           facet_col = 'scenario',
                           facet_row = 'Objective',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           overlay_list = list(list(overlay = 'sdl_units', overlay_pal = 'black'),
                                               list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'NF1'),
                                                     overlay_pal = 'ggthemes::Orange-Gold',
@@ -239,7 +249,7 @@ obj_sdl_to_plot |>
                           facet_col = 'env_obj',
                           facet_row = 'scenario',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           base_lev = 'base',
                           comp_fun = 'difference',
                           group_cols = c('env_obj', 'polyID'), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
@@ -259,7 +269,7 @@ obj_sdl_to_plot |>
                           facet_col = 'env_obj',
                           facet_row = 'scenario',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           base_lev = 'base',
                           comp_fun = 'relative',
                   add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 

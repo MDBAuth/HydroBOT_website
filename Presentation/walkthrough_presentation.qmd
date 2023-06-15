@@ -182,7 +182,9 @@ obj_sdl_to_plot <- agged_data$sdl_units |>
 #| echo: false
 scenehydros <- read_hydro(hydro_dir, long = TRUE, format = 'csv')
 
-plot_hydrographs(scenehydros, gaugefilter = c('412002', '422028', '421019', '421001'), colors = scene_pal)
+hydros <- plot_hydrographs(scenehydros, gaugefilter = c('412002', '422028', '421019', '421001'), colors = scene_pal)
+
+hydros
 ```
 
 ## Maps and spatial scaling
@@ -221,7 +223,7 @@ SDL unit differences in all environmental objectives
 
 ```{r}
 #| echo: false
-agged_data$sdl_units %>% 
+catchcompare <- agged_data$sdl_units %>% 
   group_by(SWSDLName, scenario) %>% 
   summarise(ewr_achieved = sum(ewr_achieved, na.rm = TRUE)) %>% 
   ungroup() %>% 
@@ -230,6 +232,8 @@ plot_outcomes(y_col = 'ewr_achieved',
               pal_list = list("calecopal::lake"),
               sceneorder = sceneorder,
               position = 'dodge')
+
+catchcompare
 ```
 
 ## Objective and scenario comparisons
@@ -239,13 +243,15 @@ plot_outcomes(y_col = 'ewr_achieved',
 
 ```{r}
 #| echo: false
-plot_outcomes(basin_to_plot, 
+objective_comp <- plot_outcomes(basin_to_plot, 
                  y_col = 'ewr_achieved',
                  x_col = 'Objective',
                  colorset = 'scenario',
                  scene_pal = scene_pal,
                  sceneorder = sceneorder,
               position = 'dodge')
+
+objective_comp
 ```
 
 ### SDL units
