@@ -447,7 +447,9 @@ clean_to_scale <- function(gaugedata, gaugename, sdl_runoff_scenarios, qc_limit)
 
 # simple saver for purrring over
 savefun <- function(scenario, data) {
-  readr::write_csv(data, file = file.path(hydro_dir, scenario, paste0(names(data)[2], '.csv')))
+  data %>%
+    dplyr::mutate(Date = lubridate::as_date(Date)) %>%
+  readr::write_csv(file = file.path(hydro_dir, scenario, paste0(names(data)[2], '.csv')))
   return(invisible(NULL))
 }
 

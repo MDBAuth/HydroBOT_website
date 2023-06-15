@@ -3,8 +3,161 @@ title: "Flow scaling full toolkit"
 author: "Galen Holt"
 format: html
 editor: visual
+params:
+  REBUILD_DATA: TRUE
 ---
 
 ## Goal
 
 This will be the notebook to run the full toolkit in one go with the flow scaling demonstration. We will likely want a notebook version and a parameterized yaml version (but not an in-memory).
+
+Need the libraries
+
+```{r}
+library(werptoolkitr)
+library(sf)
+```
+
+# Parameters
+
+## Directories
+
+### Input and output directories
+
+We've put the scaled flows in `../flow_scaling_data/hydrographs`, [created](../scenario_creation/scaling_sceanrios.qmd).
+
+```{r}
+# Outer directory for scenario
+project_dir = file.path('../flow_scaling_data')
+
+# Preexisting data
+# Hydrographs (expected to exist already)
+hydro_dir = file.path(project_dir, 'hydrographs')
+
+# Generated data
+# EWR outputs (will be created here in controller, read from here in aggregator)
+ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+
+# outputs of aggregator. There may be multiple modules
+agg_results <- file.path(project_dir, 'aggregator_output')
+
+```
+
+## Controller
+
+We use the default IQQM model format and climate categorisations, though those could be passed here as well (see [controller](../controller/controller_ewr_stepthrough_R.qmd)).
+
+### Control output and return
+
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`. For this demonstration I'll just use `summary` and not return anything to memory.
+
+```{r}
+outputType <- list('summary')
+returnType <- list('none') # list('summary', 'all')
+```
+
+## Aggregator
+
+To keep this simple, we use one aggregation list and the `read_and_agg` wrapper to only have to pass paths. See the [more detailed documents](../aggregator/aggregation_overview.qmd) for the different ways to specify those aggregation lists.
+
+### What to aggregate
+
+The aggregator needs to know which set of EWR outputs to use (to navigate the directory or list structure). It *should* accept multiple types, but that's not well tested, so for now just use one.
+
+```{r}
+aggType <- 'summary'
+```
+
+We need to tell it the variable to aggregate, and any grouping variables other than the themes and spatial groups. Typically, `scenario` will be a grouper (unless we're running scenarios in separate processes), but there may be others.
+
+```{r}
+agg_groups <- 'scenario'
+agg_var <- 'ewr_achieved'
+```
+
+Do we want it to return to the active session? For this demo, nothing should return here- we're saving outputs, not returning them to the session.
+
+```{r}
+aggReturn <- FALSE
+```
+
+### How to aggregate
+
+Fundamentally, the aggregator needs paths and two lists
+
+-   sequence of aggregations
+
+-   sequence of aggregation functions (can be multiple per step)
+
+Because the primary purpose here is to assess senstivity of the EWR tool and toolkit (rather than capture ecological relationships, for example), it's likely enough to use simple means.
+
+The order of aggregation here isn't well-thought-through at present though.
+
+Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
+
+```{r}
+
+aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               env_obj =  c('ewr_code', "env_obj"),
+               sdl_units = sdl_units,
+               Specific_goal = c('env_obj', "Specific_goal"),
+               catchment = cewo_valleys,
+               Objective = c('Specific_goal', 'Objective'),
+               mdb = basin,
+               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+
+funseq <- list(c('CompensatingFactor'),
+               c('ArithmeticMean'),
+               c('ArithmeticMean'),
+               c('ArithmeticMean'),
+               list(wm = ~weighted.mean(., w = area, 
+                                        na.rm = TRUE)),
+               c('ArithmeticMean'),
+               
+               list(wm = ~weighted.mean(., w = area, 
+                                    na.rm = TRUE)),
+               c('ArithmeticMean'))
+
+```
+
+# Run the toolkit
+
+## Controller
+
+```{r}
+#| message: false
+
+if (params$REBUILD_DATA) {
+  ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
+                                  output_dir = project_dir, 
+                                  outputType = outputType,
+                                  returnType = returnType)
+}
+
+```
+
+## Aggregator
+
+```{r}
+#| error: true
+
+if (params$REBUILD_DATA) {
+  aggout <- read_and_agg(datpath = ewr_results, 
+             type = aggType,
+             geopath = bom_basin_gauges,
+             causalpath = causal_ewr,
+             groupers = agg_groups,
+             aggCols = agg_var,
+             aggsequence = aggseq,
+             funsequence = funseq,
+             saveintermediate = TRUE,
+             namehistory = FALSE,
+             keepAllPolys = TRUE,
+             returnList = aggReturn,
+             savepath = agg_results)
+}
+
+```
+
+It would be straightforward here to run the comparer as well, but as discussed above, there is not much reason until we settle on a couple canonical outputs.
