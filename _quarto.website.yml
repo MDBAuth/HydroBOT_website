@@ -11,6 +11,9 @@ project:
     - "!full_toolkit/WERP_toolkit_params.qmd"
     - "!scenario_creation/scaling_scenarios.qmd"
     - "!macquarie_gauges.qmd"
+    - "!full_toolkit/flow_scaling_full.qmd"
+    - "!scenario_creation/development_testing/"
+    - "!comparer/plots_embedded_temp.qmd"
 
 website:
   title: "Using the WERP toolkit"
@@ -173,8 +176,7 @@ website:
 
 
 
-format:
-  html:
+format: html
     theme:
       light: flatly
       dark: flatly
