@@ -119,14 +119,6 @@
         "sys"
       ]
     },
-    "backports": {
-      "Package": "backports",
-      "Version": "1.4.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "c39fbec8a30d23e721980b8afb31984c",
-      "Requirements": []
-    },
     "base64enc": {
       "Package": "base64enc",
       "Version": "0.1-3",
@@ -168,26 +160,6 @@
       "Repository": "CRAN",
       "Hash": "976cf154dfb043c012d87cddd8bca363",
       "Requirements": []
-    },
-    "broom": {
-      "Package": "broom",
-      "Version": "1.0.4",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "f62b2504021369a2449c54bbda362d30",
-      "Requirements": [
-        "backports",
-        "dplyr",
-        "ellipsis",
-        "generics",
-        "glue",
-        "lifecycle",
-        "purrr",
-        "rlang",
-        "stringr",
-        "tibble",
-        "tidyr"
-      ]
     },
     "bslib": {
       "Package": "bslib",
@@ -503,17 +475,6 @@
       "Hash": "77bd60a6157420d4ffa93b27cf6a58b8",
       "Requirements": []
     },
-    "fitdistrplus": {
-      "Package": "fitdistrplus",
-      "Version": "1.1-11",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "f40ef9686e85681a1ccbf33d9236aeb9",
-      "Requirements": [
-        "MASS",
-        "survival"
-      ]
-    },
     "fontawesome": {
       "Package": "fontawesome",
       "Version": "0.4.0",
@@ -734,10 +695,10 @@
     },
     "htmlwidgets": {
       "Package": "htmlwidgets",
-      "Version": "1.6.0",
+      "Version": "1.6.2",
       "Source": "Repository",
-      "Repository": "RSPM",
-      "Hash": "f894e7b76e36258a483c602a786d7270",
+      "Repository": "CRAN",
+      "Hash": "a865aa85bcb2697f47505bfd70422471",
       "Requirements": [
         "htmltools",
         "jsonlite",
@@ -771,24 +732,6 @@
         "jsonlite",
         "mime",
         "openssl"
-      ]
-    },
-    "httr2": {
-      "Package": "httr2",
-      "Version": "0.2.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "5c09fe33064978ede54de42309c8b532",
-      "Requirements": [
-        "R6",
-        "cli",
-        "curl",
-        "glue",
-        "magrittr",
-        "openssl",
-        "rappdirs",
-        "rlang",
-        "withr"
       ]
     },
     "igraph": {
@@ -988,23 +931,6 @@
       "Requirements": [
         "htmltools",
         "shiny"
-      ]
-    },
-    "modelr": {
-      "Package": "modelr",
-      "Version": "0.1.11",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "4f50122dc256b1b6996a4703fecea821",
-      "Requirements": [
-        "broom",
-        "magrittr",
-        "purrr",
-        "rlang",
-        "tibble",
-        "tidyr",
-        "tidyselect",
-        "vctrs"
       ]
     },
     "munsell": {
@@ -1440,6 +1366,14 @@
       "Hash": "690bd2acc42a9166ce34845884459320",
       "Requirements": []
     },
+    "rsvg": {
+      "Package": "rsvg",
+      "Version": "2.4.0",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Hash": "2fe4b39fada9c0ac9d7fc3f0daabd350",
+      "Requirements": []
+    },
     "rversions": {
       "Package": "rversions",
       "Version": "2.1.2",
@@ -1577,16 +1511,6 @@
         "rlang",
         "stringi",
         "vctrs"
-      ]
-    },
-    "survival": {
-      "Package": "survival",
-      "Version": "3.4-0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "04411ae66ab4659230c067c32966fc20",
-      "Requirements": [
-        "Matrix"
       ]
     },
     "sys": {
@@ -1797,31 +1721,6 @@
         "rlang"
       ]
     },
-    "vicwater": {
-      "Package": "vicwater",
-      "Version": "0.0.0.9000",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteUsername": "galenholt",
-      "RemoteRepo": "vicwater",
-      "RemoteRef": "main",
-      "RemoteSha": "67b2446942911d5cbcc14ca7211cb9c9fa515880",
-      "RemoteHost": "api.github.com",
-      "Hash": "90284c83deb76c7c9008853b5ad8de72",
-      "Requirements": [
-        "dplyr",
-        "foreach",
-        "ggplot2",
-        "httr2",
-        "lubridate",
-        "purrr",
-        "rlang",
-        "stringr",
-        "tibble",
-        "tidyr",
-        "tidyselect"
-      ]
-    },
     "viridis": {
       "Package": "viridis",
       "Version": "0.6.2",
@@ -1894,6 +1793,18 @@
         "tibble"
       ]
     },
+    "webshot": {
+      "Package": "webshot",
+      "Version": "0.5.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "cfd9342c76693ae53108a474aafa1641",
+      "Requirements": [
+        "callr",
+        "jsonlite",
+        "magrittr"
+      ]
+    },
     "werptoolkitr": {
       "Package": "werptoolkitr",
       "Version": "0.0.0.9000",
@@ -1902,8 +1813,8 @@
       "RemoteUrl": "git@github.com:MDBAuth/WERP_toolkit.git",
       "RemoteSubdir": "werptoolkitr",
       "RemoteRef": "master",
-      "RemoteSha": "61c7f845828888f3d3f0cc0ad321010559f5ab5e",
-      "Hash": "7dd4cfc057895b782304ba82e7e9aa0f",
+      "RemoteSha": "cefc68586e61a5606289cb0a1cf8c2fc13e04a63",
+      "Hash": "32e2a80690c24bc1496d82c317bd5559",
       "Requirements": [
         "colorspace",
         "dplyr",
