@@ -9,10 +9,7 @@ project:
     - "!controller/controller_ewr_testrun_py.qmd"
     - "!scenario_creation/scenario_creation_demo_py.qmd"
     - "!full_toolkit/WERP_toolkit_params.qmd"
-    - "!scenario_creation/scaling_scenarios.qmd"
     - "!macquarie_gauges.qmd"
-    - "!full_toolkit/flow_scaling_full.qmd"
-    - "!scenario_creation/development_testing/"
     - "!comparer/plots_embedded_temp.qmd"
 
 website:
@@ -65,15 +62,6 @@ website:
             - href: scenario_creation/scenario_creation_demo_py.qmd
               text: "Python version (old)"
 
-        - section: "Flow scaling and climate scenarios"
-          contents:
-            - href: scenario_creation/pull_gauges_to_scale.qmd
-              text: "Pulling historical gauges"
-            - href: scenario_creation/scaling_scenarios.qmd
-              text: "Flow scaling to climate models"
-            - href: scenario_creation/flow_scaling_methods.qmd
-              text: "Exploring flow scaling methods"
-
     - title: "Causal networks"
       contents:
         - causal_networks/causal_overview.qmd
@@ -102,12 +90,6 @@ website:
               text: "Python verion (old)"
 
 
-        - section: "Flow scaling and climate scenarios"
-          contents:
-            - href: controller/flow_scaling_control.qmd
-              text: "Controlling flow scaling demonstration"
-
-
     - title: "Aggregation"
       contents:
         - aggregator/aggregation_overview.qmd
@@ -121,12 +103,6 @@ website:
               text: "Theme aggregation capability"
             - href: aggregator/theme_space_agg.qmd
               text: "Multi-axis interleaved aggregation"
-
-
-        - section: "Flow scaling and climate scenarios"
-          contents:
-            - href: aggregator/flow_scaling_aggregation.qmd
-              text: "Aggregating flow scaling demonstration"
 
 
     - title: "Comparer"
@@ -146,11 +122,6 @@ website:
             - href: comparer/causal_plots.qmd
               text: "Outcomes on causal networks"
 
-        - section: "Flow scaling and climate scenarios"
-          contents:
-            - href: comparer/flow_scaling_comparer.qmd
-              text: "Comparer examples for flow scaling demonstration"
-
 
     - title: "Full toolkit"
       contents:
@@ -166,12 +137,6 @@ website:
               text: "Run toolkit from params"
             - href: Presentation/walkthrough_presentation.qmd
               text: "Walkthrough presentation"
-
-
-        - section: "Flow scaling and climate scenarios"
-          contents:
-            - href: full_toolkit/flow_scaling_full.qmd
-              text: "Flow scaling demonstration"
 
 
 
