@@ -20,3 +20,7 @@ more_scenarios/
 *.png
 
 scenario_creation/test_scaling.rdata
+
+# Don't git the html output and css junk with gh-pages
+*.html
+site_libs/

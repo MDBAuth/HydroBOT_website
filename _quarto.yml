@@ -11,6 +11,7 @@ project:
     - "!full_toolkit/WERP_toolkit_params.qmd"
     - "!macquarie_gauges.qmd"
     - "!comparer/plots_embedded_temp.qmd"
+    - "!comparer/plot_creation_development.qmd"
 
 website:
   title: "Using the WERP toolkit"
@@ -138,15 +139,11 @@ website:
             - href: Presentation/walkthrough_presentation.qmd
               text: "Walkthrough presentation"
 
-
-
-
-format: html
-    theme:
-      light: flatly
-      dark: flatly
-    # css: styles.css
-    toc: true
+theme:
+  light: flatly
+  dark: flatly
+# css: styles.css
+toc: true
 
 editor: visual
 

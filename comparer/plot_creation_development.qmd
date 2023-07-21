@@ -1,5 +1,5 @@
 ---
-title: "Plot demonstrations"
+title: "Plot demonstration testing and construction"
 author: "Galen Holt"
 format: html
 editor: visual

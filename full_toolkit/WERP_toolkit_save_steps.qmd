@@ -122,12 +122,12 @@ funseq <- list(c('CompensatingFactor'),
                c('ArithmeticMean'),
                c('ArithmeticMean'),
                c('ArithmeticMean'),
-               list(wm = ~weighted.mean(., w = area, 
-                                        na.rm = TRUE)),
+               rlang::quo(list(wm = ~weighted.mean(., w = area, 
+                                        na.rm = TRUE))),
                c('ArithmeticMean'),
                
-               list(wm = ~weighted.mean(., w = area, 
-                                    na.rm = TRUE)),
+               rlang::quo(list(wm = ~weighted.mean(., w = area, 
+                                    na.rm = TRUE))),
                c('ArithmeticMean'))
 
 ```
