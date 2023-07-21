@@ -31,7 +31,7 @@ hydro_dir = file.path(project_dir, 'hydrographs')
 This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
 
 ```{r}
-multipliers <- c(1.1, 1.5, 2, 3, 4)
+multipliers <- c(1.1, 1.25, 1.5, 2)
 
 scenemults <- c(1/rev(multipliers), 1, multipliers)
 
@@ -83,7 +83,7 @@ The `plot_hydrographs` function has a `scenariofilter` argument if we want to dr
 ```{r}
 plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, 
                  colors = scene_pal,
-                 scenariofilter = c('up4', 'down4'), 
+                 scenariofilter = c('up2', 'down2'), 
                  scales = 'free_y', transy = 'log10')
 ```
 
@@ -103,7 +103,7 @@ dif_flow <- baseline_compare(scenehydros, compare_col = 'scenario',
                              values_col = 'flow', comp_fun = difference)
 ```
 
-Now we can feed the dif_flow dataframe to `plot_hydrographs` directly. We see that, as expected, `base` is now a flat line at 0, while up4 and down4 go up and down, respectively.
+Now we can feed the dif_flow dataframe to `plot_hydrographs` directly. We see that, as expected, `base` is now a flat line at 0, while up2 and down2 go up and down, respectively.
 
 ```{r}
 plot_hydrographs(dif_flow, 
@@ -122,7 +122,7 @@ plot_hydrographs(scenehydros,
                  comp_fun = difference)
 ```
 
-The other default comparison function is `relative` , which has an `add_eps` argument to pull zeros up a bit and avoid divide-by-0 infinities. This is a bit silly to use for this test case, since the test case was created multiplicatively, so all `down4` values are 0.25\*base and `up4` values are 4\*base.
+The other default comparison function is `relative` , which has an `add_eps` argument to pull zeros up a bit and avoid divide-by-0 infinities. This is a bit silly to use for this test case, since the test case was created multiplicatively, so all `down2` values are 0.5\*base and `up2` values are 2\*base.
 
 ```{r}
 plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, 

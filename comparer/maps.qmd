@@ -33,7 +33,7 @@ agg_dir <- file.path(project_dir, 'aggregator_output')
 This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
 
 ```{r}
-multipliers <- c(1.1, 1.5, 2, 3, 4)
+multipliers <- c(1.1, 1.25, 1.5, 2)
 
 scenemults <- c(1/rev(multipliers), 1, multipliers)
 

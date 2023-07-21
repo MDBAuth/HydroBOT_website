@@ -92,6 +92,8 @@ First, we specify a simple interleaved aggregation sequence with only one aggreg
 
 Spatial aggregation should almost always be area-weighted after the data is in polygons (see [spatial notebook](spatial_agg.qmd)), though there are some aggregation functions where it doesn't matter (e.g. `max`). All polygon data has an `area` column [calculated automatically](aggregator/aggregation_syntax.qmd) for this reason. The *first* aggregation into polygons doesn't need to be area-weighted, because the thing being aggregated (typically at the gauge scale) doesn't have area. After that, all data is in polygons and so has area. It is likely safest to always use weighted functions like `weighted.mean` though, since they default to even weights if none are given.
 
+*note the rlang::quo to make this work with dplyr 1.1 and above as in [syntax](aggregation_syntax.qmd).*
+
 ```{r}
 
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
@@ -108,12 +110,12 @@ funseq <- list(c('CompensatingFactor'),
                c('ArithmeticMean'),
                c('ArithmeticMean'),
                c('ArithmeticMean'),
-               list(wm = ~weighted.mean(., w = area, 
-                                        na.rm = TRUE)),
+               rlang::quo(list(wm = ~weighted.mean(., w = area, 
+                                        na.rm = TRUE))),
                c('ArithmeticMean'),
                
-               list(wm = ~weighted.mean(., w = area, 
-                                    na.rm = TRUE)),
+               rlang::quo(list(wm = ~weighted.mean(., w = area, 
+                                    na.rm = TRUE))),
                c('ArithmeticMean'))
 
 ```

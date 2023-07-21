@@ -7,7 +7,7 @@ format:
 editor: visual
 cache: false
 params:
-  REBUILD_DATA: FALSE
+  REBUILD_DATA: TRUE
 ---
 
 ```{r}
@@ -77,7 +77,7 @@ Above, we've been setting variables that should be set by default to expose what
 
 We get the information about the gauges and filepaths `project_dir` as a dict with `make_scenario_info`. The scenarios need to be in separate directories inside `/hydro_dir`, but the files in those directories could come in multiple arrangements. Currently, we allow multiple csvs of single-gauge hydrographs or single csvs of multiple-gauge hydrographs. Once the netcdf format settles down, we will include parsing that. If there are multiple gauges within each csv, they enter the dict as a 'gauge' value. If not, the 'gauge' value is just the filename, so these need to be gauge numbers. For this example, we have single csvs with multiple gauges.
 
-The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so `paths_gauges` just unfolds the dict to give that. There will likely be continued changes to these functions as we settle on standard directory structures and data formats. These functions are currently all python wrapped by R for historical reasons, but as they are just directory creation and querying could be easily re-written in R to tighten up the package.
+The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so `paths_gauges_R` just unfolds the dict to give that. There will likely be continued changes to these functions as we settle on standard directory structures and data formats. These functions are currently all python wrapped by R for historical reasons, but as they are just directory creation and querying could be easily re-written in R to tighten up the package.
 
 ```{r}
 # Gives file locations as a dict- 
@@ -95,7 +95,7 @@ for (i in 1:length(sceneinfodict)) {
 }
 
 # more list-making to work from R-Python
-everyhydro <- as.list(paths_gauges(sceneinfodict)[[1]])
+everyhydro <- as.list(paths_gauges_R(sceneinfodict)[[1]])
 ```
 
 ## Run the ewr tool

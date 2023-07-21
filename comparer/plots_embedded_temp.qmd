@@ -36,7 +36,7 @@ agg_dir <- file.path(project_dir, 'aggregator_output')
 This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
 
 ```{r}
-multipliers <- c(1.1, 1.5, 2, 3, 4)
+multipliers <- c(1.1, 1.25, 1.5, 2)
 
 scenemults <- c(1/rev(multipliers), 1, multipliers)
 
@@ -92,7 +92,6 @@ funseq <- list(c('CompensatingFactor'),
                                     na.rm = TRUE)),
                c('ArithmeticMean'))
 ```
-
 
 # Make bar plots
 
@@ -163,7 +162,7 @@ plot_outcomes(basin_to_plot,
                  facet_wrapper = 'Objective', 
                  colorset = 'scenario',
                  pal_list = scene_pal,
-                 sceneorder = c('down4', 'down3', 'down2', 'down1_5', 'down1_1', 'base', 'up1_1', 'up1_5', 'up2', 'up3', 'up4'))
+                 sceneorder = c('down2', 'down1_5', 'down1_25', 'down1_1', 'base', 'up1_1', 'up1_25', 'up1_5', 'up2'))
 ```
 
 Because these are just ggplot objects, we can also change the labels outside the function, which can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.
@@ -416,7 +415,6 @@ plot_outcomes(obj_sdl_to_plot,
               sceneorder = sceneorder)
 ```
 
-
 # Plotting hydrographs
 
 We first read in the hydrographs, with a bit of standardised data processing. The `read_hydro` function knows about the standard data organisation format, and so pulls hydrographs from all scenarios.
@@ -437,7 +435,7 @@ The `plot_hydrographs` function has a `scenariofilter` argument if we want to dr
 ```{r}
 plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, 
                  colors = scene_pal,
-                 scenariofilter = c('up4', 'down4'), 
+                 scenariofilter = c('up2', 'down2'), 
                  scales = 'free_y', transy = 'log10')
 ```
 
@@ -457,7 +455,7 @@ dif_flow <- baseline_compare(scenehydros, compare_col = 'scenario',
                              values_col = 'flow', comp_fun = difference)
 ```
 
-Now we can feed the dif_flow dataframe to `plot_hydrographs` directly. We see that, as expected, `base` is now a flat line at 0, while up4 and down4 go up and down, respectively.
+Now we can feed the dif_flow dataframe to `plot_hydrographs` directly. We see that, as expected, `base` is now a flat line at 0, while up2 and down2 go up and down, respectively.
 
 ```{r}
 plot_hydrographs(dif_flow, 
@@ -476,7 +474,7 @@ plot_hydrographs(scenehydros,
                  comp_fun = difference)
 ```
 
-The other default comparison function is `relative` , which has an `add_eps` argument to pull zeros up a bit and avoid divide-by-0 infinities. This is a bit silly to use for this test case, since the test case was created multiplicatively, so all `down4` values are 0.25\*base and `up4` values are 4\*base.
+The other default comparison function is `relative` , which has an `add_eps` argument to pull zeros up a bit and avoid divide-by-0 infinities. This is a bit silly to use for this test case, since the test case was created multiplicatively, so all `down2` values are 0.5\*base and `up2` values are 2\*base.
 
 ```{r}
 plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, 
@@ -558,7 +556,7 @@ sdl_line_options <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = '.',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 group_cols = c('env_obj', 'polyID'))
@@ -594,7 +592,7 @@ sdl_line_groups <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = '.',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 group_cols = c('env_obj', 'polyID'))
@@ -622,7 +620,7 @@ sdl_line_groups_facet <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 group_cols = c('env_obj', 'polyID'))
@@ -656,7 +654,7 @@ sdl_line_sdl <- obj_sdl_to_plot |>
                 pal_list = list("ggsci::default_jama"),
                 point_group = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 group_cols = c('env_obj', 'polyID'))
@@ -693,7 +691,7 @@ With unique points, this just fits a single curved line through each `env_obj`. 
                           facet_row = 'env_group',
                           facet_col = '.',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           base_lev = 'base',
                           comp_fun = 'difference',
                           group_cols = c('env_obj', 'polyID'),
@@ -719,7 +717,7 @@ And we can do the same for environmental groupings.
                           facet_row = 'env_group',
                           facet_col = 'SWSDLName',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           base_lev = 'base',
                           comp_fun = 'difference',
                           group_cols = c('env_obj', 'polyID'),
@@ -745,7 +743,7 @@ sdl_lm_groups <- obj_sdl_to_plot |>
                           facet_row = 'env_group',
                           facet_col = 'SWSDLName',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           base_lev = 'base',
                           comp_fun = 'relative',
                           group_cols = c('env_obj', 'polyID'),
@@ -778,7 +776,7 @@ sdl_fit_sdl <- obj_sdl_to_plot |>
                 pal_list = list("ggsci::default_jama"),
                 facet_wrapper = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -808,7 +806,7 @@ sdl_fit_groups <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = '.',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -841,7 +839,7 @@ sdl_lm_sdl <- obj_sdl_to_plot |>
                 pal_list = list("ggsci::default_jama"),
                 facet_wrapper = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -1049,8 +1047,6 @@ obj_sdl_to_plot |>
 
 # From presentation
 
-
-
 ## Input hydrographs
 
 ```{r}
@@ -1184,7 +1180,7 @@ sdl_line_groups_facet <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -1215,7 +1211,7 @@ sdl_fit_sdl <- obj_sdl_to_plot |>
                 pal_list = list("ggsci::default_jama"),
                 facet_wrapper = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -1282,7 +1278,7 @@ nodes_with_vals <- nodes |>
 ```{r}
 #| echo: false
 aggNetworkdown <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
-                                        scenario == 'down4'),
+                                        scenario == 'down2'),
                  edges = ewr_edges,
                  edge_pal = 'black',
                  node_pal = list(value = 'scico::tokyo'),
@@ -1312,7 +1308,7 @@ DiagrammeR::render_graph(aggNetworkbase)
 ```{r}
 #| echo: false
 aggNetworkup <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
-                                        scenario == 'up4'),
+                                        scenario == 'up2'),
                  edges = ewr_edges,
                  edge_pal = 'black',
                  node_pal = list(value = 'scico::tokyo'),
@@ -1322,4 +1318,3 @@ aggNetworkup <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals,
 DiagrammeR::render_graph(aggNetworkup)
 ```
 :::
-

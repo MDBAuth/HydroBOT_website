@@ -87,7 +87,7 @@ Most simply, we can pass character names of functions instead of bare
 doublesimplechar <- spatial_aggregate(dat = simpleThemeAgg, 
                              to_geo = sdl_units,
                              groupers = c('scenario', 'env_obj'),
-                             aggCols = 'ewr_achieved',
+                             aggCols = ends_with('ewr_achieved'),
                              funlist = 'ArithmeticMean',
                              keepAllPolys = TRUE,
                              failmissing = FALSE)
@@ -103,7 +103,7 @@ simplefuns <- c('ArithmeticMean', 'GeometricMean')
 doublesimplec <- spatial_aggregate(dat = simpleThemeAgg, 
                              to_geo = sdl_units,
                              groupers = c('scenario', 'env_obj'),
-                             aggCols = 'ewr_achieved',
+                             aggCols = ends_with('ewr_achieved'),
                              funlist = simplefuns,
                              keepAllPolys = TRUE,
                              failmissing = FALSE)
@@ -121,7 +121,7 @@ There are three primary ways to specify function arguments- using `…`, writing
 singlearg <- spatial_aggregate(dat = simpleThemeAgg, 
                              to_geo = sdl_units,
                              groupers = 'scenario',
-                             aggCols = 'ewr_achieved',
+                             aggCols = ends_with('ewr_achieved'),
                  funlist = c(mean, sd),
                  na.rm = TRUE,
                  keepAllPolys = TRUE,
@@ -139,22 +139,32 @@ simplelamfuns <- list(meanna = ~mean(., na.rm = TRUE),
 doublelam <- spatial_aggregate(dat = simpleThemeAgg, 
                              to_geo = sdl_units,
                              groupers = c('scenario', 'env_obj'),
-                             aggCols = 'ewr_achieved',
+                             aggCols = ends_with('ewr_achieved'),
                              funlist = simplelamfuns,
                              keepAllPolys = TRUE,
                              failmissing = FALSE)
 doublelam
 ```
 
-*Note*: if using anonymous functions in a list this way, they need to use `rlang` `~` syntax, not base `\(x)` or `function(x){}`. That's on the to-do list, but it's not much of a constraint, and anything complex can be written as a standard function and called that way.
+*Note*: if using anonymous functions in a list this way, they need to use `rlang` `~` syntax, not base `\(x)` or `function(x){}`. That's on the to-do list (and has now been implemented but only partially tested, so try but double check the output). It's hopefully not much of a constraint, and anything complex can be written as a standard function and called that way.
 
 It's fairly common that we'll have vector arguments, especially for the spatial aggregations. One primary example is weightings. The most flexible approach requires these vectors to be attached to the data before it enters the function (vs. creating them automatically in-function; though that is possible it gets fragile to handle arbitrary names and maintain the correct groupings). So, here we assume that the vectors will be columns in the dataset, and demonstrate with weighted means on dummy weights.
 
+::: {#dplyr 1.1 issues style="color: gray"}
+*As of {dplyr} 1.1, if we pass a function with a data-variable argument (e.g. the name of a column in the dataframe) we have to wrap the list in* `rlang::quo` . Otherwise it looks for an object with that name instead of a column. We're working on a cleaner way to handle this, but for now this is what we have to do. If we have several layers of aggregation, the *inside* level where the function is defined needs to be wrapped. E.g.
+
+``` R
+funlist <- list(c('ArithmeticMean', 'LimitingFactor'),
+                rlang::quo(list(wm = ~weighted.mean(., area, na.rm = TRUE))),
+                rlang::quo(list(wm = ~weighted.mean(., area, na.rm = TRUE))))
+```
+:::
+
 ```{r}
 #| message: false
-veclamfuns <- list(meanna = ~mean(., na.rm = TRUE), 
+veclamfuns <- rlang::quo(list(meanna = ~mean(., na.rm = TRUE), 
                      sdna = ~sd(., na.rm = TRUE),
-                     wmna = ~weighted.mean(., wt, na.rm = TRUE))
+                     wmna = ~weighted.mean(., wt, na.rm = TRUE)))
 
 # Not really meaningful, but weight by the number of gauges.
 wtgauge <- simpleThemeAgg %>% 
@@ -165,7 +175,7 @@ wtgauge <- simpleThemeAgg %>%
 triplevec <- spatial_aggregate(dat = wtgauge, 
                              to_geo = sdl_units,
                              groupers = c('scenario', 'env_obj'),
-                             aggCols = 'ewr_achieved',
+                             aggCols = ends_with('ewr_achieved'),
                              funlist = veclamfuns,
                              keepAllPolys = TRUE,
                              failmissing = FALSE)
@@ -181,13 +191,13 @@ wt2 <- function(x, wt) {
   2+weighted.mean(x, w = wt, na.rm = TRUE)
 }
 
-wt2list <- list(wt2 = ~wt2(., wt))
+wt2list <- rlang::quo(list(wt2 = ~wt2(., wt)))
 
 
 vecnamedfun <- spatial_aggregate(dat = wtgauge, 
                              to_geo = sdl_units,
                              groupers = c('scenario', 'env_obj'),
-                             aggCols = 'ewr_achieved',
+                             aggCols = ends_with('ewr_achieved'),
                              funlist = wt2list,
                              keepAllPolys = TRUE,
                              failmissing = FALSE)

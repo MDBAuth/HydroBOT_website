@@ -45,6 +45,10 @@ Toolkit flow
 
 **In use, the toolkit expects that scenario hydrographs will be available and the causal networks are defined.**
 
+![Conceptual use of the toolkit. Scenario hydrographs are expected to come from hydrologic modelling, while the toolkit ingests those, runs them through the response modules, and provides the user the ability to aggregate and synthesize in various ways.](images/Presentation1.jpg)
+
+![Toolkit structure, showing the various components where the toolkit performs processing and allows the user to provide settings.](images/architecture.jpg)
+
 ## Dependencies
 
 The {werptoolkitr} package needs to be installed to provide all functions used here. It also provides some necessary data for the causal network relationships, and (at least for now) canonical shapefiles that have been prepped.
@@ -86,3 +90,9 @@ More info will go here.
 # Figures outlining the flow
 
 # Integrate with the readme
+
+## Using notebooks
+
+Most notebooks that generate outputs have a `REBUILD_DATA` parameter in the yaml header that is set to FALSE to avoid overwriting data. To rebuild the data, we can manually change them to TRUE, or on a case-by-case basis at the terminal `quarto render path/to/file.qmd -P REBUILD_DATA:TRUE`, and for all files in the project (dangerous!), `quarto render -P REBUILD_DATA:TRUE`.
+
+If there is unexpected behaviour, e.g. changes not reflected in the output, check the \_cache files and probably throw them out. Caching speeds up by not re-running code and is supposed to notice changes and re-evaluate, but sometimes hangs on when it shouldn't.

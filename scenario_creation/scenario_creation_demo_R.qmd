@@ -159,7 +159,8 @@ Pull the gauges with `mdba_gauge_getter`. The type-translation that happens in h
 
 This again needs a vscode translation
 
-```{{python gaugepulling}}
+``` python
+
 #| message: false
 import mdba_gauge_getter as gg
 demo_levs = gg.gauge_pull(r.ewr_demo_gauges, start_time_user = r.starttime, end_time_user = r.endtime)
@@ -181,7 +182,8 @@ Do a bit of cleanup- for some reason `demo_levs['VALUE']` is an object and not n
 
 Again, we need to change things to run on vs.
 
-```{{r datatransfer}}
+``` R
+
 demo_levs <- py$demo_levs
 
 demo_levs$VALUE = as.numeric(demo_levs$VALUE)

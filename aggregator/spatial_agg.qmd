@@ -246,12 +246,14 @@ We can use `multi_aggregate` to aggregate through a list of polygon sets, here s
 
 First, set up a list of the spatial aggregation steps, defined by the polygon sets and aggregation functions. As usual, multiple aggregation functions can happen at each stage, and they can be characters or named lists with arguments (the weighted mean needs to be a default). Now, we're taking advantage of the auto-calculated area of each polygon chunk for the weighted mean.
 
+*note the rlang::quo to make this work with dplyr 1.1 and above as in [syntax](aggregation_syntax.qmd).*
+
 ```{r}
 glist <- list(sdl_units = sdl_units, catchment = cewo_valleys, mdb = basin)
 
 funlist <- list(c('ArithmeticMean', 'LimitingFactor'),
-                list(wm = ~weighted.mean(., area, na.rm = TRUE)),
-                list(wm = ~weighted.mean(., area, na.rm = TRUE)))
+                rlang::quo(list(wm = ~weighted.mean(., area, na.rm = TRUE))),
+                rlang::quo(list(wm = ~weighted.mean(., area, na.rm = TRUE))))
 ```
 
 ```{r}

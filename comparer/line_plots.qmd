@@ -35,7 +35,7 @@ agg_dir <- file.path(project_dir, 'aggregator_output')
 This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
 
 ```{r}
-multipliers <- c(1.1, 1.5, 2, 3, 4)
+multipliers <- c(1.1, 1.25, 1.5, 2)
 
 scenemults <- c(1/rev(multipliers), 1, multipliers)
 
@@ -110,7 +110,7 @@ A simple plot would be to look at all the outcomes, separated by color. We've gi
                           facet_row = 'SWSDLName',
                           facet_col = '.',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'))
+                          sceneorder = sceneorder)
  
  sdl_line
 ```
@@ -137,7 +137,7 @@ sdl_line_options <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = '.',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 group_cols = c('env_obj', 'polyID'))
@@ -173,7 +173,7 @@ sdl_line_groups <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = '.',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 group_cols = c('env_obj', 'polyID'))
@@ -201,7 +201,7 @@ sdl_line_groups_facet <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 group_cols = c('env_obj', 'polyID'))
@@ -235,7 +235,7 @@ sdl_line_sdl <- obj_sdl_to_plot |>
                 pal_list = list("ggsci::default_jama"),
                 point_group = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 group_cols = c('env_obj', 'polyID'))
@@ -272,7 +272,7 @@ With unique points, this just fits a single curved line through each `env_obj`. 
                           facet_row = 'env_group',
                           facet_col = '.',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           base_lev = 'base',
                           comp_fun = 'difference',
                           group_cols = c('env_obj', 'polyID'),
@@ -298,7 +298,7 @@ And we can do the same for environmental groupings.
                           facet_row = 'env_group',
                           facet_col = 'SWSDLName',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           base_lev = 'base',
                           comp_fun = 'difference',
                           group_cols = c('env_obj', 'polyID'),
@@ -324,7 +324,7 @@ sdl_lm_groups <- obj_sdl_to_plot |>
                           facet_row = 'env_group',
                           facet_col = 'SWSDLName',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = sceneorder,
                           base_lev = 'base',
                           comp_fun = 'relative',
                           group_cols = c('env_obj', 'polyID'),
@@ -357,7 +357,7 @@ sdl_fit_sdl <- obj_sdl_to_plot |>
                 pal_list = list("ggsci::default_jama"),
                 facet_wrapper = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -387,7 +387,7 @@ sdl_fit_groups <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = '.',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -420,7 +420,7 @@ sdl_lm_sdl <- obj_sdl_to_plot |>
                 pal_list = list("ggsci::default_jama"),
                 facet_wrapper = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 

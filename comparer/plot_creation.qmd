@@ -7,27 +7,7 @@ editor: visual
 
 ## Notebook to develop plots
 
-Then send them to the werptoolkitr package. They're just easier to develop here where there's data to plot.
-
-What's the best way to do this though? just `devtools::load_all(path/to/toolkit)` for quick dev, anyway, I think.
-
-Largely the same header junk as the other qmds here to allow me to load the toolkit different ways.
-
-```{r}
-#| warning: false
-#| message: false
-
-## GITHUB INSTALL
-# credentials::set_github_pat()
-# devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
-
-## LOCAL INSTALL- easier for quick iterations, but need a path.
-# devtools::install_local("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr", force = TRUE)
-
-# And for very fast iteration (no building, but exposes too much, often)
-devtools::load_all("C:/Users/galen/Documents/WERP_toolkit/werptoolkitr")
-
-```
+I think this file might be old and outdated.
 
 ```{r}
 # library(werptoolkitr)

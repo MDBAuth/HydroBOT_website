@@ -15,6 +15,8 @@ We want to be able to interleave the dimensions, e.g. aggregate along the Object
 
 To achieve this, we have developed a flexible set of aggregation functions that take a list of aggregation steps, each of which can be along any dimension, and a matching list of aggregation functions to apply to that step in the aggregation. It is possible to ask for multiple functions per step.
 
+![Aggregation can occur along three axes: space, time, and objective. The user can provide the sequence of aggregation steps and the aggregation function(s) to apply at each step.](images/aggregation.jpg)
+
 ## Tracking
 
 In general, aggregation over many steps can get quite complicated to track, particularly if some of the steps have multiple aggregation functions. Tracking the provenance of the final values is therefore critical to understand their meaning. By default, columns of values are named in a way that tracks their provenance, e.g. step_function_step_function_originalName. This is memory-friendly but ugly, and so we can also stack this information into columns (two for each step- one the step, the second the function) with the `agg_names_to_cols` function.
@@ -53,9 +55,11 @@ We show the aggregation happening in multiple notebooks, [spatial_agg.qmd](spati
 
 <!-- -->
 
-    -   Multiple functions are possible per step, and different functions are possible for different steps
+```         
+-   Multiple functions are possible per step, and different functions are possible for different steps
 
-    -   Different functions for different rows *within a step* requires mapping of what those functions should be, and this does not exist. Still, the capability to do this is very high on the priority list, and should not be too difficult.
+-   Different functions for different rows *within a step* requires mapping of what those functions should be, and this does not exist. Still, the capability to do this is very high on the priority list, and should not be too difficult.
+```
 
 ::: {#dev-notes style="border: 2px solid gray; color: gray"}
 ## Development notes
@@ -66,3 +70,4 @@ Typically, aggregating (and some other operations) on \`sf\` dataframes with geo
 
 Spatial aggregation is inherently slow because of the geometric operations (specifically `sf::st_intersection`) but we've optimized the amount of intersecting and unpicked space where possible so nothing is slowed down by being spatial unless absolutely necessary (including the actual aggregation of the spatial data). We're doing the absolute minimum spatially-aware processing, and doing that in a way that early spatial processing does not slow down later non-spatial processing.
 :::
+

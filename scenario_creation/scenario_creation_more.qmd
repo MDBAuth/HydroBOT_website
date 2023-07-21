@@ -159,7 +159,8 @@ Pull the gauges with `mdba_gauge_getter`. The type-translation that happens in h
 
 This again needs a vscode translation
 
-```{{python gaugepulling}}
+``` python
+
 #| message: false
 import mdba_gauge_getter as gg
 demo_levs = gg.gauge_pull(r.ewr_demo_gauges, start_time_user = r.starttime, end_time_user = r.endtime)
@@ -179,9 +180,10 @@ length(demo_ids)
 
 Do a bit of cleanup- for some reason `demo_levs['VALUE']` is an object and not numeric, and `'DATETIME'` needs to be named `Date` for the EWR tool to read it. I copy the py object to R for this manipulation and visualisation, but we could just proceed in python if we wanted.
 
-Again, we need to change things to run on vs.
+Again, we need to change things to run on R
 
-```{{r datatransfer}}
+``` R
+
 demo_levs <- py$demo_levs
 
 demo_levs$VALUE = as.numeric(demo_levs$VALUE)
@@ -273,7 +275,7 @@ Telling EWR the data is IQQM allows using `scenario_handling`. This requries hav
 This structure is useful, but it also may change once we have actual scenarios. And will almost certainly look different for netcdfs. Retaining the dir/file structure even with one file allows easier changes and more flexibility.
 
 ```{r}
-multipliers <- c(1.1, 1.5, 2, 3, 4)
+multipliers <- c(1.1, 1.25, 1.5, 2)
 
 scenemults <- c(1/rev(multipliers), 1, multipliers)
 

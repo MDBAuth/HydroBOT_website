@@ -31,7 +31,7 @@ agg_dir <- file.path(project_dir, 'aggregator_output')
 This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
 
 ```{r}
-multipliers <- c(1.1, 1.5, 2, 3, 4)
+multipliers <- c(1.1, 1.25, 1.5, 2)
 
 scenemults <- c(1/rev(multipliers), 1, multipliers)
 
@@ -129,7 +129,7 @@ plot_outcomes(basin_to_plot,
                  facet_wrapper = 'Objective', 
                  colorset = 'scenario',
                  pal_list = scene_pal,
-                 sceneorder = c('down4', 'down3', 'down2', 'down1_5', 'down1_1', 'base', 'up1_1', 'up1_5', 'up2', 'up3', 'up4'))
+                 sceneorder = c('down2', 'down1_5', 'down1_25', 'down1_1', 'base', 'up1_1', 'up1_25', 'up1_5', 'up2'))
 ```
 
 Because these are just ggplot objects, we can also change the labels outside the function, which can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.
