@@ -182,7 +182,7 @@ Do a bit of cleanup- for some reason `demo_levs['VALUE']` is an object and not n
 
 Again, we need to change things to run on R
 
-``` R
+``` r
 
 demo_levs <- py$demo_levs
 
@@ -297,6 +297,8 @@ for (x in scenenames) {
 
 Create clean dataframes to save. Could be fancy with a function and a purr, but I'm just saving, so a simple loop should be fine.
 
+I'm not providing a toolkit function to *write* scenario metadata, since the scenarios will come from elsewhere. But we need it, so make some here (both inside and outside the directories, since we're not sure what the final form is yet).
+
 ```{r}
 
 if (REBUILD_DATA) {
@@ -307,10 +309,28 @@ if (REBUILD_DATA) {
       tidyr::pivot_wider(id_cols = Date, 
                          names_from = SITEID, 
                          values_from = VALUE) %>% 
-      readr::write_csv(file.path(hydro_dir, scenenames[i], paste0(scenenames[i], '.csv')))
+      readr::write_csv(file.path(hydro_dir, scenenames[i], 
+                                 paste0(scenenames[i], '.csv')))
+    # make JSON metadata
+    jsonlite::write_json(list(scenario_name = scenenames[i], 
+                            flow_multiplier = scenemults[i]), 
+                       path = file.path(hydro_dir, scenenames[i], 'metadata.json'))
   }
 }
 
 ```
 
 That set of hydrographs can now be used as starting data for a demonstration of the toolkit proper.
+
+Make some metadata for all scenarios too (both yaml and json for now).
+
+```{r}
+scenario_meta <- list(scenario_name = scenenames,
+                      flow_multiplier = scenemults)
+# I don't know the format we'll be using, but this works to create yaml metadata
+yaml::write_yaml(scenario_meta, 
+                 file = file.path(hydro_dir, 'scenario_metadata.yml'))
+# and this does the same with JSON
+jsonlite::write_json(scenario_meta, 
+                     path = file.path(hydro_dir, 'scenario_metadata.json'))
+```

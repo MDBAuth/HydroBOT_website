@@ -2,7 +2,7 @@
 title: "Run full toolkit (saving)"
 editor: visual
 params:
-  REBUILD_DATA: FALSE
+  REBUILD_DATA: TRUE
 ---
 
 ```{r}

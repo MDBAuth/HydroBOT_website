@@ -28,20 +28,13 @@ hydro_dir = file.path(project_dir, 'hydrographs')
 
 ## Scenario information
 
-This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
+Get scenario metadata. This will be auto-found later, but leaving here until it firms up.
 
 ```{r}
-multipliers <- c(1.1, 1.25, 1.5, 2)
-
-scenemults <- c(1/rev(multipliers), 1, multipliers)
-
-scenenames <- c(paste0('down', as.character(rev(multipliers))), 
-                'base', 
-                paste0('up', as.character(multipliers))) |> 
-  stringr::str_replace('\\.', '_')
-
-
-scenarios <- tibble::tibble(scenario = scenenames, delta = scenemults)
+scenarios <- jsonlite::read_json(file.path(hydro_dir, 
+                                           'scenario_metadata.json')) |> 
+  tibble::as_tibble() |> 
+  tidyr::unnest(cols = everything())
 ```
 
 ## Subset for demo

@@ -182,7 +182,7 @@ Do a bit of cleanup- for some reason `demo_levs['VALUE']` is an object and not n
 
 Again, we need to change things to run on vs.
 
-``` R
+``` r
 
 demo_levs <- py$demo_levs
 
@@ -275,7 +275,7 @@ Telling EWR the data is IQQM allows using `scenario_handling`. This requries hav
 This structure is useful, but it also may change once we have actual scenarios. And will almost certainly look different for netcdfs. Retaining the dir/file structure even with one file allows easier changes and more flexibility.
 
 ```{r}
-scenenames = c('base', 'up4', 'down4')
+scenenames <- c('base', 'up4', 'down4')
 
 # the full scenarios
 for (x in scenenames) {
@@ -317,3 +317,32 @@ if (REBUILD_DATA) {
 ```
 
 That set of hydrographs can now be used as starting data for a demonstration of the toolkit proper.
+
+And, let's assume we would receive scenarios with metadata, or we could create metadata about them. This is very simple for now, but it gives us something to improve on.
+
+```{r}
+flowmults <- c(0.25, 1, 4)
+  
+scenario_meta <- list(
+  scenario_name = scenenames,
+  flow_multiplier = flowmults
+)
+
+# I don't know the format we'll be using, but this works to create yaml metadata
+yaml::write_yaml(scenario_meta, file = file.path(hydro_dir, 'scenario_metadata.yml'))
+# and this does the same with JSON
+jsonlite::write_json(scenario_meta, path = file.path(hydro_dir, 'scenario_metadata.json'))
+```
+
+Will there be one scenario metadata file? Or will there be separate ones assigned to each scenario, which then get brought together- e.g. it could be that when we get data from `base/` we read a `base/metadata.json` file that only has `{"scenario_name":["base"],"flow_multiplier":[1]}` in it, and then when they get compared, they get concatenated in a way the data can be used.
+
+Depends on the user and use-case, really, so I'll set up an example of that too.
+
+```{r}
+
+for (i in 1:length(scenenames)) {
+  jsonlite::write_json(list(scenario_name = scenenames[i], 
+                            flow_multiplier = flowmults[i]), 
+                       path = file.path(hydro_dir, scenenames[i], 'metadata.json'))
+}
+```
