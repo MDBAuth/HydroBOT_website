@@ -13,7 +13,7 @@ Toolkit flow
 
     -   [in detail](controller/controller_ewr_stepthrough.qmd)
 
-    -   [simplified](controller/controller_ewr_wrapped_R.qmd)
+    -   [simplified](controller/controller_ewr_wrapped.qmd)
 
     -   Python notebooks exist, but are not maintained. Contact authors if needed.
 
@@ -37,7 +37,7 @@ Toolkit flow
 
     -   Causal networks are needed for aggregation and some plotting, but are not part of the flow per-se. Much of this will be integrated into the *Comparer* module
 
--   [Scenario creation](scenario_creation/scenario_creation_demo_R.qmd)
+-   [Scenario creation](scenario_creation/scenario_creation_demo.qmd)
 
     -   Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit
 

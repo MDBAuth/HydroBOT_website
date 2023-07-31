@@ -38,7 +38,7 @@ For this demonstration, we start with gauge-referenced data at the `env_obj` the
 
 ## Demonstration setup
 
-First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped_R.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
+First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
 project_dir <- file.path('scenario_example')

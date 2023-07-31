@@ -6,16 +6,14 @@ project:
   render:
     - "*.qmd"
     - "!TESTING_PACKAGE_INSTALL.qmd"
-    - "!controller/controller_ewr_testrun_py.qmd"
-    - "!scenario_creation/scenario_creation_demo_py.qmd"
     - "!full_toolkit/WERP_toolkit_params.qmd"
     - "!macquarie_gauges.qmd"
-    - "!comparer/_old.*"
+    - "!.*_old.*"
 
 website:
   title: "Using the WERP toolkit"
   page-footer:
-    left: "Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO"
+    left: "Website, documentation, and toolkit work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in the toolkit, please use its [github issues](https://github.com/MDBAuth/WERP_toolkit/issues)"
     background: secondary
   navbar:
     backgroud: primary
@@ -57,10 +55,10 @@ website:
 
         - section: "Simple"
           contents:
-            - href: scenario_creation/scenario_creation_demo_R.qmd
+            - href: scenario_creation/scenario_creation_demo.qmd
               text: "Simple scenarios for demonstration"
-            - href: scenario_creation/scenario_creation_demo_py.qmd
-              text: "Python version (old)"
+            - href: scenario_creation/scenario_creation_more.qmd
+              text: "More scenarios"
 
     - title: "Causal networks"
       contents:
@@ -82,12 +80,10 @@ website:
 
         - section: "Simple demonstration"
           contents:
-            - href: controller/controller_ewr_wrapped_R.qmd
+            - href: controller/controller_ewr_wrapped.qmd
               text: "Clean simple controller"
-            - href: controller/controller_ewr_stepthrough_R.qmd
+            - href: controller/controller_ewr_stepthrough.qmd
               text: "Detailed step through"
-            - href: controller/controller_ewr_testrun_py.qmd
-              text: "Python verion (old)"
 
 
     - title: "Aggregation"

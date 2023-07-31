@@ -36,7 +36,7 @@ library(reticulate) # Not strictly necessary but allows easier referencing of ob
 
 The creation of flow scenarios is not part of the toolkit proper. Instead, the toolkit expects to ingest hydrographs and then handles the ongoing response models, aggregation, and analyses. Thus, hydrographs are an essential input to the toolkit. The point of this code is to generate those hydrographs.
 
-This notebook creates is nearly identical to the [minimal scenario creation notebook](scenario_creation_demo_R.qmd), but generates 11 scenarios instead of 3. This lets us look at a wider range of changes. The primary needs are multiple guages in multiple catchments (or other spatial units), and scenarios defined by different hydrographs for the same gauge.
+This notebook creates is nearly identical to the [minimal scenario creation notebook](scenario_creation_demo.qmd), but generates 11 scenarios instead of 3. This lets us look at a wider range of changes. The primary needs are multiple guages in multiple catchments (or other spatial units), and scenarios defined by different hydrographs for the same gauge.
 
 ## Process
 
