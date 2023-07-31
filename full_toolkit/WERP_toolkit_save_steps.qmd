@@ -37,9 +37,9 @@ The other option is to have this *be* the parameterising file, so we can have a 
 
 ### Input and output directories
 
-Use the `scenario_example/` directory [created](scenario_creation_demo_R.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
+Use the `scenario_example/` directory [created](../scenario_creation/scenario_creation_demo_R.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
 
-*Normally* `project_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.The [flow scaling example](flow_scaling_full.qmd) takes the more typical approach of pointing to data external to the repo.
+*Normally* `project_dir` should point somewhere external (though keeping it outside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.The [flow scaling example](https://github.com/MDBAuth/toolkit-flow-scaling) takes the more typical approach of pointing to data external to the repo.
 
 ```{r}
 # Outer directory for scenario

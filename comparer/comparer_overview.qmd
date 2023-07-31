@@ -24,27 +24,29 @@ There is clear opportunity for reactivity with nearly all plots, allowing a user
 
 Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes. It can also calculate comparison values and plot these. There are a few primary sorts of plots,
 
--   Input descriptions (e.g. [hydrographs](comparer/hydrographs.qmd))
+-   Input descriptions (e.g. [hydrographs](hydrographs.qmd))
 
 -   Scaling descriptions (e.g. tiles showing how the aggregation proceeded)
 
 -   Quantitative outcome plots (values on y - 1d)
 
-    -   [Bar](comparer/bar_plots.qmd)
-
-    -   Line
+    -   [Bar](bar_plots.qmd)
+    
+    -   [Line](line_plots.qmd)
 
     -   Timeseries
+    
+        -   currently only [hydrographs](hydrographs.qmd), ongoing development for other variables
 
 -   Quantitative outcome plots (values in color - 2d)
 
-    -   Maps
+    -   [Maps](maps.qmd)
 
-    -   Causal networks
+    -   [Causal networks](../causal_networks/causal_plots.qmd)
 
-    -   Heatmaps
+    -   [Heatmaps](heatmap.qmd)
 
-Most but not all of these plots are currently implemented. Those that aren't (tiles, heatmaps) are high priority, but waiting for data formats and inputs to shape up a bit more. They will use the same underlying plot scaffolding and data preparation functions, and so be quick to implement.
+Most but not all of these plots are currently implemented. Those that aren't (timeseries, better heatmaps) are high priority, but waiting for data formats and inputs to shape up a bit more. They will use the same underlying plot scaffolding and data preparation functions, and so be quick to implement.
 
 # Standardization
 
@@ -56,11 +58,11 @@ I have developed a `theme_werp_toolkit()` ggplot theme that we use to get a cons
 
 ## Colour
 
-At present, I do not enforce a standard set of colors- they'll change between scenarios/projects and there are too many possibilities of what we might plot. I do provide default palettes for the plotting functions, but we will likely want to change them depending on what we plot. We could enforce palettes within projects, however, once the plots firm up. In general, colors can either be specified manually (usually with the help of `make_pal`) or with {paletteer} palettes because of the wide range of options with standard interface and ability to choose based on names. A good reference for the available palettes is [here](https://pmassicotte.github.io/paletteer_gallery), and demonstrations of both ways of specifying colors are throughout the examples, but specifically [bar plots](comparer/bar_plots.qmd).
+At present, I do not enforce a standard set of colors- they'll change between scenarios/projects and there are too many possibilities of what we might plot. I do provide default palettes for the plotting functions, but we will likely want to change them depending on what we plot. We could enforce palettes within projects, however, once the plots firm up. In general, colors can either be specified manually (usually with the help of `make_pal`) or with {paletteer} palettes because of the wide range of options with standard interface and ability to choose based on names. A good reference for the available palettes is [here](https://pmassicotte.github.io/paletteer_gallery), and demonstrations of both ways of specifying colors are throughout the examples, but specifically [bar plots](bar_plots.qmd).
 
 Though we do not enforce standard colors, we have established the infrastructure to set consistent colors within a project by using named color objects. This is particularly useful for scenarios, but also can be used for other qualitative categories. Quantitative outcomes (e.g. matching different palettes to outcome x vs y) is not handled automatically at present, but is left to the user. I expect that as a project proceeds and settles on desired outcomes, we will standardize color palettes for different outcome variables, scenarios, etc.
 
-There is some interesting ability to set colors within a single column based on different palettes, which can be a useful way to indicate grouping variables. This is available everywhere, but is best demonstrated in the [bar plots](comparer/bar_plots.qmd) and [causal plots](causal_networks/causal_plots.qmd).
+There is some interesting ability to set colors within a single column based on different palettes, which can be a useful way to indicate grouping variables. This is available everywhere, but is best demonstrated in the [bar plots](bar_plots.qmd) and [causal plots](causal_plots.qmd).
 
 ## Internal calculations and structure
 
@@ -68,6 +70,6 @@ While the plots are the typical outputs of the Comparer, it has a set of useful 
 
 There is an internal function `plot_prep` that does all the data prep, including applying `baseline_compare`, finding colors, and setting established scenario orders. This keeps plots and the data processing consistent, and dramatically reduces the error-prone copy-pasting of data processing with minor changes for different plots. Instead, we can almost always feed the plotting functions the same set of clean data straight out of the aggregator, and just change the arguments to the plot functions.
 
-Baselining is available as a standalone function (`baseline_compare`) and can be done automatically in the `plot_*` functions. This capacity is demonstrated in all the plot examples, but in most detail in the [hydrographs notebook](comparer/hydrographs.qmd).
+Baselining is available as a standalone function (`baseline_compare`) and can be done automatically in the `plot_*` functions. This capacity is demonstrated in all the plot examples, but in most detail in the [hydrographs notebook](hydrographs.qmd).
 
 One critical issue, particularly with complex data, is being unaware of overplotting values. The `plot_*` functions have internal checks that the number of rows of data matches the number of axes on which the data is plotted (including facets, colors, linetype, etc). This prevents things like plotting a map of `env_obj` data facetted only by `scenario`, and so each fill represents outcomes for all `env_obj`, which is meaningless but very easy to do. The exception is that points are allowed to overplot, though we can use the `position = 'position_jitter'` to avoid even that.

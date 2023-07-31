@@ -23,14 +23,14 @@ In practice, we expect to interleave spatial, temporal, and thematic aggregation
 
 # Inputs
 
-The theme relationships in the causal network `causal_ewr` provide the links and structure of the theme scaling, while the values to be scaled come out of the modules. For this demonstration, we provide a set of paths to point to the input data, in this case the outputs from the EWR tool, created by [a controller notebook](controller/controller_ewr_wrapped_R.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit).
+The theme relationships in the causal network `causal_ewr` provide the links and structure of the theme scaling, while the values to be scaled come out of the modules. For this demonstration, we provide a set of paths to point to the input data, in this case the outputs from the EWR tool, created by [a controller notebook](../controller/controller_ewr_wrapped_R.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit).
 
 ```{r}
 project_dir <- file.path('scenario_example')
 ewr_results <- file.path(project_dir, 'module_output', 'EWR')
 ```
 
-Input data to `multi_aggregate` should be a dataframe (e.g. a dataframe of EWR outputs, `sf` of spatial outcomes). If we want to pass a path instead of a dataframe (as we might for large runs), we would use `read_and_agg`, which wraps `multi_aggregate`, demonstrated in the [interleaved notebook](theme_space_agg.qmd). Thus, for the demonstration, we pull in the data produced by the [demonstration controller](controller_ewr_wrapped_R.qmd) and contained in-repo at the `ewr_results` path using `get_ewr_output` below.
+Input data to `multi_aggregate` should be a dataframe (e.g. a dataframe of EWR outputs, `sf` of spatial outcomes). If we want to pass a path instead of a dataframe (as we might for large runs), we would use `read_and_agg`, which wraps `multi_aggregate`, demonstrated in the [interleaved notebook](theme_space_agg.qmd). Thus, for the demonstration, we pull in the data produced by the [demonstration controller](../controller/controller_ewr_wrapped_R.qmd) and contained in-repo at the `ewr_results` path using `get_ewr_output` below.
 
 ## Setting aggregation parameters
 
@@ -285,7 +285,7 @@ DiagrammeR::render_graph(aggNetwork)
 
 ## User-set functions
 
-We have established a simple set of default aggregation functions (`ArithmeticMean`, `GeometricMean`, `LimitingFactor`, and `CompensatingFactor`), available in `default_agg_functions.R`. I expect that list to grow, but it is also [possible to supply user-defined functions](aggregation/aggregation_syntax.qmd) to include in `funsequence`. Previously, we have used this sort of approach for things like threshold functions. For example, we might want to know the mean event length, but only for events longer than 2 days for the ewr to objective aggregation, and thereafter scale up with `ArithmeticMean`. We can do this by specifying a new function and including it in the list given to `funsequence` .
+We have established a simple set of default aggregation functions (`ArithmeticMean`, `GeometricMean`, `LimitingFactor`, and `CompensatingFactor`), available in `default_agg_functions.R`. I expect that list to grow, but it is also [possible to supply user-defined functions](aggregation_syntax.qmd) to include in `funsequence`. Previously, we have used this sort of approach for things like threshold functions. For example, we might want to know the mean event length, but only for events longer than 2 days for the ewr to objective aggregation, and thereafter scale up with `ArithmeticMean`. We can do this by specifying a new function and including it in the list given to `funsequence` .
 
 ```{r}
 event2 <- function(x) {

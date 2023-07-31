@@ -3,7 +3,7 @@ title: "WERP_toolkit_demo"
 editor: visual
 ---
 
-This document provides a template for running through the toolkit in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_save_steps.qmd). See the [repo readme](WERP_toolkit_demo.qmd) for overall structure of the repo and package installation.
+This document provides a template for running through the toolkit in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_save_steps.qmd). 
 
 Load the package
 
@@ -25,7 +25,7 @@ The other option is to have this *be* the parameterising file, so we can have a 
 
 ### Input and output directories
 
-Use the `scenario_example/` directory [created](scenario_creation_demo_R.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
+Use the `scenario_example/` directory [created](../scenario_creation/scenario_creation_demo_R.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
 
 *Normally* `scenario_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo. *I will probably change that when I move to Azure*.
 
@@ -125,7 +125,7 @@ Fundamentally, the aggregator needs paths and two lists
 
 -   sequence of aggregation functions (can be multiple per step)
 
-Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the [spatial](spatial_agg.qmd) and [theme](theme_agg.qmd) docs for more examples.
+Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
 
 ```{r}
 
@@ -185,7 +185,7 @@ aggout <- read_and_agg(datpath = ewr_results,
 
 # Quick check
 
-Plotting will be developed in the comparer, this is just a quick check to see that there is data. Code borrowed from [theme x space demo](theme_space_agg.qmd).
+Plotting will be developed in the comparer, this is just a quick check to see that there is data. Code borrowed from [theme x space demo](../aggregator/theme_space_agg.qmd).
 
 But only if we returned the output.
 

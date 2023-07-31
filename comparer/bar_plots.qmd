@@ -15,7 +15,7 @@ library(sf)
 
 This notebook provides examples of creating bar plots, e.g. plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, scenario. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit and type of response.
 
-For a quantitative x-axis, we would typically use [line plots](comparer/line_plots.qmd).
+For a quantitative x-axis, we would typically use [line plots](../comparer/line_plots.qmd).
 
 # Demonstration setup
 
@@ -61,7 +61,7 @@ scene_pal <- make_pal(unique(scenarios$scenario),
 
 ## Choosing example data
 
-First, we read in the aggregated data and make a simple demonstration bar plot. There is example data provided by the toolkit (`agg_theme_space` and `agg_theme_space_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](aggregator/theme_space_agg.qmd).
+First, we read in the aggregated data and make a simple demonstration bar plot. There is example data provided by the toolkit (`agg_theme_space` and `agg_theme_space_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/theme_space_agg.qmd).
 
 *Note*- to `readRDS` `sf` objects, we need to have `sf` loaded.
 
@@ -258,7 +258,7 @@ plot_outcomes(obj_sdl_to_plot,
 
 ## Grouped colors
 
-We have the ability to assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](causal_networks/causal_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
+We have the ability to assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](../causal_networks/causal_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
 
 Achieving this requires specifying two columns- the `colorset`, as above, is the column that determines color. The `colorgroups` column specifies the groupings of those `colorset` values, and so what palette to use. Thus, the `pal_list` needs to be either length 1 (everything gets the same palette) or `length(unique(data$colorgroups))`. Note also that the `colorset` values must be unique to `colorgroups`- this cannot be a one-to-many mapping because each `colorset` value must get a color from a single palette defined by the `colorgroup` it is in.
 

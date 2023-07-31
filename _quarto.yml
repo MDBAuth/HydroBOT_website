@@ -10,8 +10,7 @@ project:
     - "!scenario_creation/scenario_creation_demo_py.qmd"
     - "!full_toolkit/WERP_toolkit_params.qmd"
     - "!macquarie_gauges.qmd"
-    - "!comparer/plots_embedded_temp.qmd"
-    - "!comparer/plot_creation_development.qmd"
+    - "!comparer/_old.*"
 
 website:
   title: "Using the WERP toolkit"

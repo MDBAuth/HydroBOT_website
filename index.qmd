@@ -3,7 +3,9 @@ title: "WERP toolkit demonstration"
 editor: visual
 ---
 
-This repo provides a templates and documentation for using the toolkit in various ways. The `full_toolkit` directory provides notebooks for running the full toolkit in single files, either [in memory](WERP_toolkit_in_memory) or [saving each step and reading back in](WERP_toolkit_save_steps.qmd). Within this repo there are also documents providing templates for each step separately (in `controller` and `aggregation` directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (`scenario_creation` and `causal_networks`).
+This repo provides a templates and documentation for using the toolkit in various ways. In use, we would expect a user to consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters (at least through the aggregator step), similar to what is shown in the [full toolkit pages](full_toolkit/full_toolkit_overview.qmd) and implement that in an analysis repo for that particular set of analyses/scenarios.
+
+The `full_toolkit` directory provides notebooks for running the full toolkit in single files, either [in memory](full_toolkit/WERP_toolkit_in_memory) or [saving each step and reading back in](full_toolkit/WERP_toolkit_save_steps.qmd). Within this repo there are also documents providing templates for each step separately (in `controller` and `aggregation` directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (`scenario_creation` and `causal_networks`).
 
 Toolkit flow
 
@@ -13,7 +15,7 @@ Toolkit flow
 
     -   [simplified](controller/controller_ewr_wrapped_R.qmd)
 
-    -   [in python *NOT UPDATED*](controller/controller_ewr_testrun_py.qmd)
+    -   Python notebooks exist, but are not maintained. Contact authors if needed.
 
 -   [Aggregator](aggregator/aggregator_overview.qmd)
 
@@ -27,7 +29,7 @@ Toolkit flow
 
     -   [hydrographs](comparer/hydrographs.qmd)
 
-    -   [bar](comparer/bar_plots.qmd), [line](line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from the toolkit
+    -   [bar](comparer/bar_plots.qmd), [line](comparer/line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from the toolkit
 
 -   Necessary pieces but not part of the data flow in the toolkit
 
@@ -41,7 +43,7 @@ Toolkit flow
 
     -   These are simple demo scenarios, but useful for seeing expected formats, and to let the rest of the kit work.
 
-    -   [python version *NOT UPDATED*](scenario_creation/scenario_creation_demo_py.qmd)
+    -   Python notebooks exist, but are not maintained. Contact authors if needed.
 
 **In use, the toolkit expects that scenario hydrographs will be available and the causal networks are defined.**
 
@@ -87,9 +89,9 @@ library(werptoolkitr)
 
 More info will go here.
 
-# Figures outlining the flow
+# Github and development
 
-# Integrate with the readme
+See the [repo readme](https://github.com/MDBAuth/WERP_toolkit_demo) for overall structure of the repo and additional dev info for package installation issues and development, and the [{werptoolkitr} repo](https://github.com/MDBAuth/WERP_toolkit) for the package itself.
 
 ## Using notebooks
 

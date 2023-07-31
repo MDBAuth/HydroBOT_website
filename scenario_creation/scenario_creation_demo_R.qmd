@@ -42,13 +42,13 @@ This notebook creates a minimal set of hydrographs to test and demonstrate the t
 
 We pull a limited set of gauges for a limited time period to keep this dataset small. Primarily, we identify a set of gauges in two catchments, pull them for a short time period, and adjust them to create two simple modified scenarios, with the original data serving as the baseline scenario. Along the way, we examine the data in various ways to visualise what we're doing and where.
 
-A larger and more complex set of scenarios is created in [the flow scaling demonstration](pull_gauges_to_scale.qmd), without as much visualisation.
+A larger and more complex set of scenarios is created in [the flow scaling demonstration](https://github.com/MDBAuth/toolkit-flow-scaling), without as much visualisation.
 
 ## Paths and other data
 
 The shapefiles used to see what we're doing and do the selecting were produced with within the WERP_toolkit package to keep consistency. It's possible we'll add more shapefile creation and move all the canonical versions and their creation to their own data package or repo.
 
-Set the data directory to make that easy to change. These should usually point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The [larger example](scaling_scenarios.qmd) sends them externally, which would be more typical.
+Set the data directory to make that easy to change. These should usually point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The [larger example](https://github.com/MDBAuth/toolkit-flow-scaling) sends them externally, which would be more typical.
 
 ```{r}
 scenario_dir <- 'scenario_example'
@@ -58,7 +58,7 @@ hydro_dir <- file.path(scenario_dir, 'hydrographs')
 ::: {#language style="color: gray"}
 ## Language note
 
-This notebook was originally built using only python, and there is still [a python-only version](scenario_creation_demo_py.qmd), though it is maintained less frequently. Using Python makes a lot of sense because the underlying data here uses python packages. I've moved the active version of this notebook to R, however, when the toolkit became an R package and the [flow scaling demonstration](pull_gauges_to_scale.qmd) ended up using R gauge pullers. There is still some remaining python in here (pulling gauges and some minor EWR functions). This notebook provides an example of how to mix R and python code chunks, which we do fairly frequently.
+This notebook was originally built using only python, and there is still [a python-only version](scenario_creation_demo_py.qmd), though it is maintained less frequently. Using Python makes a lot of sense because the underlying data here uses python packages. I've moved the active version of this notebook to R, however, when the toolkit became an R package and the [flow scaling demonstration](https://github.com/MDBAuth/toolkit-flow-scaling) ended up using R gauge pullers. There is still some remaining python in here (pulling gauges and some minor EWR functions). This notebook provides an example of how to mix R and python code chunks, which we do fairly frequently.
 
 We can access python objects in R with `py$objectname`and access R objects in python with `r.objectname` .
 
@@ -254,7 +254,7 @@ scale_fill_brewer(type = 'qual', palette = 8))
 
 # Make test scenarios
 
-To generate simple and striking scenarios, we multiply the baseline gauge data by 4 or 0.25. This section could easily be modified for other simple scenarios. More complex scenarios are created in [scaling_scenarios](scaling_scenarios.qmd).
+To generate simple and striking scenarios, we multiply the baseline gauge data by 4 or 0.25. This section could easily be modified for other simple scenarios. More complex scenarios are created in [flow-scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling).
 
 ```{r}
 down4 = demo_levs
@@ -268,7 +268,7 @@ up4$VALUE = up4$VALUE * 4
 
 The EWR tool has the capacity to pull gauge data directly, but because we have modified these data, they need to enter the EWR tool through `scenario_handling`, and so need to have a format the EWR tool can parse as output from one of the scenario generating tools it uses (IQQM, Source, etc). This could be avoided by splitting up `process_scenarios` into a read-in bit and a bit that calls `evaluate_EWRs.calc_sorter`. In the meantime, we modify this data to work if we tell the EWR tool it is IQQM.
 
-Telling EWR the data is IQQM allows using `scenario_handling`. This requries having a date column `Date` and other columns with gauge numbers for names. The EWR tool can have multiple gauges, with each having its own column. Werptoolkitr expects directories for each scenario, with any number of csvs of hydrographs inside, (e.g. it could be one csv with columns for each gauge, or each csv could have a single gauge), which is handled by `paths_gauges` internally to the "Scenario controller" part of werptoolkitr. Here, we save a single csv with many gauges for each scenario. The [flow scaling example](scaling_scenarios.qmd) takes the opposite approach, with one gauge per csv due to different time periods.
+Telling EWR the data is IQQM allows using `scenario_handling`. This requries having a date column `Date` and other columns with gauge numbers for names. The EWR tool can have multiple gauges, with each having its own column. Werptoolkitr expects directories for each scenario, with any number of csvs of hydrographs inside, (e.g. it could be one csv with columns for each gauge, or each csv could have a single gauge), which is handled by `paths_gauges` internally to the "Scenario controller" part of werptoolkitr. Here, we save a single csv with many gauges for each scenario. The [flow scaling example](https://github.com/MDBAuth/toolkit-flow-scaling) takes the opposite approach, with one gauge per csv due to different time periods.
 
 ### Save the output
 

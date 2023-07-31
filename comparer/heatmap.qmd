@@ -17,7 +17,7 @@ library(dplyr)
 
 This notebook provides examples of creating heatmaps to plot outcomes as colors with two driver axes (e.g. temperature and rainfall changes). At present, we only have one axis of change in both the simple 4x demonstration and the flow scaling. Once we have two axes, these heatmaps should come together quickly, including the ability to overplot points and fit kernel densities.
 
-For a 1-d version, with variation in a single driver axis and outcomes on the y (instead of color), see the [bar plots](comparer/bar_plots.qmd) and [line plots](comparer/line_plots.qmd)
+For a 1-d version, with variation in a single driver axis and outcomes on the y (instead of color), see the [bar plots](bar_plots.qmd) and [line plots](line_plots.qmd)
 
 ## Demonstration setup
 
