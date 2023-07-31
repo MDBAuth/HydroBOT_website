@@ -36,7 +36,7 @@ The controller primarily sets the paths to scenarios, calls the modules, and sav
 We need to set the path to this demonstration. This should all be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`. These would typically point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The saved data goes to `project_dir/module_output` automatically. The `/hydrographs` subdirectory could be made automatic as well, but I'm waiting for the input data format to firm up.
 
 ```{r}
-project_dir = file.path('scenario_example')
+project_dir = file.path('more_scenarios')
 hydro_dir = file.path(project_dir, 'hydrographs')
 ```
 

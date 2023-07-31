@@ -50,8 +50,8 @@ gauges_to_plot <- c('412002', '419001', '422028', '421001')
 We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.
 
 ```{r}
-sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
-scene_pal <- make_pal(unique(scenarios$scenario), 
+sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
+scene_pal <- make_pal(unique(scenarios$scenario_name), 
                       palette = 'ggsci::nrc_npg', 
                       refvals = 'base', refcols = 'black')
 ```
@@ -67,7 +67,10 @@ scenehydros <- read_hydro(hydro_dir, long = TRUE, format = 'csv')
 Now, we can make a simple plot using the standard format and colors
 
 ```{r}
-plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, colors = scene_pal)
+plot_hydrographs(scenehydros, 
+                 gaugefilter = gauges_to_plot, 
+                 colors = scene_pal,
+                 sceneorder = sceneorder)
 
 ```
 
@@ -76,8 +79,9 @@ The `plot_hydrographs` function has a `scenariofilter` argument if we want to dr
 ```{r}
 plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, 
                  colors = scene_pal,
-                 scenariofilter = c('up2', 'down2'), 
-                 scales = 'free_y', transy = 'log10')
+                 scenariofilter = c('up2', 'base', 'down2'), 
+                 scales = 'free_y', transy = 'log10',
+                 sceneorder = sceneorder)
 ```
 
 # Baselining
@@ -93,7 +97,9 @@ For example, we might want to calculate the difference between the modified scen
 ```{r}
 dif_flow <- baseline_compare(scenehydros, compare_col = 'scenario', 
                              base_lev = 'base', 
-                             values_col = 'flow', comp_fun = difference)
+                             values_col = 'flow', 
+                             comp_fun = difference,
+                             group_cols = c('Date', 'gauge'))
 ```
 
 Now we can feed the dif_flow dataframe to `plot_hydrographs` directly. We see that, as expected, `base` is now a flat line at 0, while up2 and down2 go up and down, respectively.
@@ -102,26 +108,32 @@ Now we can feed the dif_flow dataframe to `plot_hydrographs` directly. We see th
 plot_hydrographs(dif_flow, 
                  gaugefilter = gauges_to_plot, 
                  y_col = 'difference_flow', 
-                 colors = scene_pal)
+                 colors = scene_pal,
+                 sceneorder = sceneorder)
 ```
 
 In practice, we would typically let the baselining happen internally to the `plot_*` functions so we aren't carrying around and keeping track of a bunch of altered dataframes. To replicate the above plot, we only have to feed `plot_hydrographs` the `base_lev` and `comp_fun` arguments- it automatically uses the `scenario` column as the groupings. This is also true for `plot_outcomes`. If we want to do something more unusual with the baselining, we will need to do it external to the `plot_*` functions, at least until it becomes common enough for us to decide to incorporate the additional parsing.
+
+We get a warning here about not being explicit about the `group_cols` argument to the baselining function, which just groups by everything non-numeric if that argument is not given. We can pass it since there are dots `…`, which we do in subsequent examples.
 
 ```{r}
 plot_hydrographs(scenehydros, 
                  gaugefilter = gauges_to_plot,
                  colors = scene_pal, 
                  base_lev = 'base', 
-                 comp_fun = difference)
+                 comp_fun = difference,
+                 sceneorder = sceneorder)
 ```
 
-The other default comparison function is `relative` , which has an `add_eps` argument to pull zeros up a bit and avoid divide-by-0 infinities. This is a bit silly to use for this test case, since the test case was created multiplicatively, so all `down2` values are 0.5\*base and `up2` values are 2\*base.
+The other default comparison function is `relative` , which has an `add_eps` argument to pull zeros up a bit and avoid divide-by-0 infinities. This is a bit silly to use for this test case, since the test case was created multiplicatively, so all `down2` values are 0.5\*base and `up2` values are 2\*base, for example. Now we give the `group_cols` argument to the baseline function through the dots, just as we pass the `add_eps` argument.
 
 ```{r}
 plot_hydrographs(scenehydros, gaugefilter = gauges_to_plot, 
                  y_col = 'flow', colors = scene_pal, 
                  base_lev = 'base', comp_fun = relative, 
-                 add_eps = min(scenehydros$flow[scenehydros$flow > 0])/10)
+                 add_eps = min(scenehydros$flow[scenehydros$flow > 0])/10,
+                 group_cols = c('Date', 'gauge'),
+                 sceneorder = sceneorder)
 ```
 
 Finally, as with other situations where we can pass functions, we can create a custom comparison function. The ability to pass anonymous functions in a list a la the aggregator is not yet implemented here. The two above are the logical functions to use, but for demonstration purposes, let's create a function that finds the square root of the absolute value of the difference.
@@ -135,7 +147,9 @@ plot_hydrographs(scenehydros,
                  gaugefilter = gauges_to_plot,
                  colors = scene_pal, 
                  base_lev = 'base', 
-                 comp_fun = sqrtdif)
+                 comp_fun = sqrtdif,
+                 group_cols = c('Date', 'gauge'),
+                 sceneorder = sceneorder)
 ```
 
 One way this could be very useful is for lagged or windowed operations, which we do here very simply by getting the difference to the baseline one day previous. The use in practice would need to be developed carefully to address specific questions.
@@ -149,5 +163,7 @@ plot_hydrographs(scenehydros,
                  gaugefilter = gauges_to_plot,
                  colors = scene_pal, 
                  base_lev = 'base', 
-                 comp_fun = lagdif)
+                 comp_fun = lagdif,
+                 group_cols = c('Date', 'gauge'),
+                 sceneorder = sceneorder)
 ```

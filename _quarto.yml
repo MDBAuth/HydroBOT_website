@@ -6,7 +6,6 @@ project:
   render:
     - "*.qmd"
     - "!TESTING_PACKAGE_INSTALL.qmd"
-    - "!full_toolkit/WERP_toolkit_params.qmd"
     - "!macquarie_gauges.qmd"
     - "!.*_old.*"
 
@@ -56,13 +55,8 @@ website:
     - title: "Scenario creation"
       contents:
         - scenario_creation/scenario_creation_overview.qmd
-
-        - section: "Simple"
-          contents:
-            - href: scenario_creation/scenario_creation_demo.qmd
-              text: "Simple scenarios for demonstration"
-            - href: scenario_creation/scenario_creation_more.qmd
-              text: "More scenarios"
+        - href: scenario_creation/scenario_creation_more.qmd
+          text: "Creating demonstration scenarios"
 
     - title: "Causal networks"
       contents:

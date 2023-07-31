@@ -202,7 +202,7 @@ allagg$ewr_code |>
                           facet_col = 'scenario',
                           facet_row = 'ewr_code',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'cornsilk'))
 ```
@@ -230,7 +230,7 @@ allagg$env_obj |>
                           facet_col = 'scenario',
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'cornsilk'))
 ```
@@ -258,7 +258,7 @@ allagg$sdl_units |>
                           facet_col = 'scenario',
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'grey90'))
 ```
@@ -288,7 +288,7 @@ allagg$Specific_goal |>
                           facet_col = 'scenario',
                           facet_row = 'Specific_goal',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'grey90'))
 ```
@@ -318,7 +318,7 @@ allagg$catchment |>
                           facet_col = 'scenario',
                           facet_row = 'Specific_goal',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = cewo_valleys, 
                                                underlay_pal = 'grey90'))
 ```
@@ -348,7 +348,7 @@ allagg$Objective |>
                           facet_col = 'scenario',
                           facet_row = 'Objective',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'grey90'))
 ```
@@ -378,7 +378,7 @@ allagg$mdb |>
                           facet_col = 'scenario',
                           facet_row = 'Objective',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'))
+                          sceneorder = c('down2', 'base', 'up2'))
 ```
 
 #### Sheet 9- 5-year targets
@@ -406,7 +406,7 @@ allagg$target_5_year_2024 |>
                           facet_col = 'scenario',
                           facet_row = 'target_5_year_2024',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'))
+                          sceneorder = c('down2', 'base', 'up2'))
 ```
 
 ## Simple inputs and saving

@@ -40,12 +40,12 @@ scenarios <- jsonlite::read_json(file.path(hydro_dir,
   tidyr::unnest(cols = everything())
 ```
 
-## Subset for demo
+### Subset for easier demonstration
 
-We have a lot of hydrographs, so for this demonstration, we will often use a subset.
+In many cases there are too many scenarios for clear examples, so we use the `scenariofilter` argument to reduce them to a subset. For this demonstration, we will use
 
 ```{r}
-gauges_to_plot <- c('412002', '419001', '422028', '421001')
+scenario_subset <- c('down2', 'down1_25', 'base', 'up1_25', 'up2')
 ```
 
 # Standard scenario appearance
@@ -53,8 +53,8 @@ gauges_to_plot <- c('412002', '419001', '422028', '421001')
 We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.
 
 ```{r}
-sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
-scene_pal <- make_pal(unique(scenarios$scenario), 
+sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
+scene_pal <- make_pal(unique(scenarios$scenario_name), 
                       palette = 'ggsci::nrc_npg', 
                       refvals = 'base', refcols = 'black')
 ```
@@ -74,7 +74,7 @@ As with [line plots](line_plots.qmd), we'll make a grouping variable in the SDL-
 ```{r}
 # Create a grouping variable
 obj_sdl_to_plot <- agged_data$sdl_units |>
-  left_join(scenarios) |>
+  left_join(scenarios, by = c('scenario' = 'scenario_name')) |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
   dplyr::filter(!is.na(env_group)) |>
   dplyr::arrange(env_group, env_obj)
@@ -97,6 +97,7 @@ obj_sdl_to_plot |>
                           facet_row = 'scenario',
                           scene_pal = scene_pal,
                           sceneorder = sceneorder,
+                  scenariofilter = scenario_subset,
                           underlay_list = list(underlay = basin, 
                                                underlay_pal = 'azure'))
 ```
@@ -116,6 +117,7 @@ agged_data$env_obj |> # for readability
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
                           sceneorder = sceneorder,
+                  scenariofilter = scenario_subset,
                           underlay_list = list(underlay = 'basin',
                                                underlay_pal = 'azure')) +
     ggplot2::theme(legend.position = 'bottom')
@@ -136,6 +138,7 @@ agged_data$env_obj |> # for readability
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
                           sceneorder = sceneorder,
+                  scenariofilter = scenario_subset,
                           underlay_list = list(underlay = sdl_units,
                                                underlay_ycol = 'SWSDLName',
                                                underlay_pal = 'ggsci::default_igv')) +
@@ -146,22 +149,23 @@ We can use a continuous variable on the underlay fill, but have to be careful to
 
 ```{r}
 agged_data$env_obj |> # for readability
-    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('ggthemes::Orange-Gold'),
-                          facet_col = 'scenario',
-                          facet_row = 'env_obj',
-                          scene_pal = scene_pal,
-                          sceneorder = sceneorder,
-                          underlay_list = list(list(underlay = 'basin',
-                                                    underlay_pal = 'cornsilk'),
-                                               list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
-                                                    underlay_ycol = 'ewr_achieved',
-                                                    underlay_pal = 'scico::oslo'))) +
-    ggplot2::theme(legend.position = 'bottom')
+  dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('ggthemes::Orange-Gold'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = sceneorder,
+                scenariofilter = scenario_subset,
+                underlay_list = list(list(underlay = 'basin',
+                                          underlay_pal = 'cornsilk'),
+                                     list(underlay = dplyr::filter(obj_sdl_to_plot, env_obj == 'NF1'),
+                                          underlay_ycol = 'ewr_achieved',
+                                          underlay_pal = 'scico::oslo'))) +
+  ggplot2::theme(legend.position = 'bottom')
 ```
 
 We can also overlay, here with the sdl layer as 'primary', here with a single color to show where gauges are.
@@ -178,6 +182,7 @@ obj_sdl_to_plot |>
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
                           sceneorder = sceneorder,
+                scenariofilter = scenario_subset,
                           underlay_list = 'basin',
                           overlay_list = list(overlay = 'bom_basin_gauges',
                                               overlay_pal = 'grey40',
@@ -189,45 +194,47 @@ We can also give the overlay informative colors- this outcome is similar to what
 
 ```{r}
 obj_sdl_to_plot |>
-    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'env_obj',
-                          scene_pal = scene_pal,
-                          sceneorder = sceneorder,
-                          underlay_list = 'basin',
-                          overlay_list = list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'NF1'),
-                                              overlay_pal = 'scico::oslo',
-                                              overlay_ycol = 'ewr_achieved',
-                                              clip = TRUE)) +
-    ggplot2::theme(legend.position = 'bottom')
+  dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = sceneorder,
+                scenariofilter = scenario_subset,
+                underlay_list = 'basin',
+                overlay_list = list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'NF1'),
+                                    overlay_pal = 'scico::oslo',
+                                    overlay_ycol = 'ewr_achieved',
+                                    clip = TRUE)) +
+  ggplot2::theme(legend.position = 'bottom')
 ```
 
 Here, we have a primary layer at the basin scale, overlay the sdl units with empty fill, and then put gauges on with informative values. There's clearly a lot we can do here with the layering, most of which has been tested, but isn't particularly interesting for a demonstration without a particular goal in mind.
 
 ```{r}
 agged_data$mdb |>
-    dplyr::filter(Objective %in% c("Maintain water-dependent species richness",
-                                   "Increase opportunities for colonial waterbird breeding*",
-                                   "Support instream & floodplain productivity")) |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::oslo'),
-                          facet_col = 'scenario',
-                          facet_row = 'Objective',
-                          scene_pal = scene_pal,
-                          sceneorder = sceneorder,
-                          overlay_list = list(list(overlay = 'sdl_units', overlay_pal = 'black'),
-                                              list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'NF1'),
-                                                    overlay_pal = 'ggthemes::Orange-Gold',
-                                                    overlay_ycol = 'ewr_achieved')))+
-    ggplot2::theme(legend.position = 'bottom')
+  dplyr::filter(Objective %in% c("Maintain water-dependent species richness",
+                                 "Increase opportunities for colonial waterbird breeding*",
+                                 "Support instream & floodplain productivity")) |> # Need to reduce dimensionality
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::oslo'),
+                facet_col = 'scenario',
+                facet_row = 'Objective',
+                scene_pal = scene_pal,
+                sceneorder = sceneorder,
+                scenariofilter = scenario_subset,
+                overlay_list = list(list(overlay = 'sdl_units', overlay_pal = 'black'),
+                                    list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'NF1'),
+                                         overlay_pal = 'ggthemes::Orange-Gold',
+                                         overlay_ycol = 'ewr_achieved')))+
+  ggplot2::theme(legend.position = 'bottom')
 ```
 
 As with the other plotting functions, we can compare to baseline using arbitrary functions, here `difference` to get the arithmetic change in outcomes. In both cases, the scale is fixed to be centered on the reference value (0 for difference, 1 for relative), and so using a diverging palette will make that centering clear.
@@ -244,6 +251,7 @@ obj_sdl_to_plot |>
                           facet_row = 'scenario',
                           scene_pal = scene_pal,
                           sceneorder = sceneorder,
+                scenariofilter = scenario_subset,
                           base_lev = 'base',
                           comp_fun = 'difference',
                           group_cols = c('env_obj', 'polyID'), # Do I need to group_by polyID for the maps? Yes. should probably automate that.
@@ -264,6 +272,7 @@ obj_sdl_to_plot |>
                           facet_row = 'scenario',
                           scene_pal = scene_pal,
                           sceneorder = sceneorder,
+                scenariofilter = scenario_subset,
                           base_lev = 'base',
                           comp_fun = 'relative',
                   add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 

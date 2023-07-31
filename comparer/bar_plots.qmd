@@ -51,8 +51,8 @@ gauges_to_plot <- c('412002', '419001', '422028', '421001')
 We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.
 
 ```{r}
-sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
-scene_pal <- make_pal(unique(scenarios$scenario), 
+sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
+scene_pal <- make_pal(unique(scenarios$scenario_name), 
                       palette = 'ggsci::nrc_npg', 
                       refvals = 'base', refcols = 'black')
 ```
@@ -108,7 +108,8 @@ plot_outcomes(basin_to_plot,
                  facet_wrapper = 'Objective', 
                  colorset = 'scenario',
                  pal_list = scene_pal,
-                 sceneorder = sceneorder)
+                 sceneorder = sceneorder) +
+  theme(axis.text.x = element_blank())
 ```
 
 We retain the axis names as-is from the incoming dataframe, as they provide the true meaning of each value. But we can change them, either inside the `plot_outcomes` function or post-hoc. We can also set the `sceneorder` with a character vector if that's easier than setting up a Factor.
@@ -123,7 +124,8 @@ plot_outcomes(basin_to_plot,
                  facet_wrapper = 'Objective', 
                  colorset = 'scenario',
                  pal_list = scene_pal,
-                 sceneorder = c('down2', 'down1_5', 'down1_25', 'down1_1', 'base', 'up1_1', 'up1_25', 'up1_5', 'up2'))
+                 sceneorder = c('down2', 'down1_5', 'down1_25', 'down1_1', 'base', 'up1_1', 'up1_25', 'up1_5', 'up2'))+
+  theme(axis.text.x = element_blank())
 ```
 
 Because these are just ggplot objects, we can also change the labels outside the function, which can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.
@@ -137,7 +139,9 @@ scenebar <- plot_outcomes(basin_to_plot,
                  pal_list = scene_pal,
                  sceneorder = sceneorder)
 
-scenebar + labs(x = NULL, y = 'Proportion\nObjectives Achieved')
+scenebar + 
+  labs(x = NULL, y = 'Proportion\nObjectives Achieved') +
+  theme(axis.text.x = element_blank())
 ```
 
 Another approach is to put the outcomes on the x-axis, and color by scenario. This requires using the special `scene_pal` argument currently instead of `pal_list`. This is a bit of a historical holdover and will be made more general.
@@ -180,7 +184,8 @@ obj_sdl_to_plot %>%
                 facet_row = "SWSDLName",
                 colorset = 'scenario',
                 pal_list = scene_pal,
-                sceneorder = sceneorder)
+                sceneorder = sceneorder)+
+  theme(axis.text.x = element_blank())
 ```
 
 We address a few ways to handle groups of outcome variables, one of the simplest is to simply facet these plots by those groups, with all the outcomes in the group getting their own bars. This puts the objectives on x and colors by scenario, with the groups accentuated by facets. These can be stacked (`position = 'stack'`- the default) or dodged (demonstrated here).
@@ -212,7 +217,8 @@ plot_outcomes(basin_to_plot,
               colorset = 'Objective',
               pal_list = list("scico::oslo"),
               sceneorder = sceneorder) + 
-  guides(fill = guide_legend(ncol = 2))
+  guides(fill = guide_legend(ncol = 2)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
 In another example of colors from other information in the data, when we have multiple spatial units we might color by them instead of coloring by outcome category. Here, we show how to color by SDL unit (SWSDLName) instead of `env_obj`. That still stacks the `env_obj` outcomes in each catchment, but coloring them all the same, and so is itself a sort of simple aggregation.
@@ -253,7 +259,8 @@ plot_outcomes(obj_sdl_to_plot,
               pal_list = list("scico::berlin"),
                 facet_col = 'SWSDLName',
               facet_row = '.',
-              sceneorder = sceneorder)
+              sceneorder = sceneorder) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
 ## Grouped colors
@@ -283,7 +290,8 @@ sdl_stack <- obj_sdl_to_plot |>
                 facet_col = 'SWSDLName',
                 facet_row = '.',
                 sceneorder = sceneorder)
-sdl_stack
+sdl_stack +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
 Adding facetting by those groups can make that easier to read if the goal is to focus on changes within groups, but more plots.
@@ -298,10 +306,11 @@ obj_sdl_to_plot |>
                 pal_list = env_pals,
                 facet_col = 'SWSDLName',
                 facet_row = 'env_group',
-                sceneorder = sceneorder)
+                sceneorder = sceneorder)+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
-We could also split those bars sideways instead of stack them, but that likely makes more sense if there are fewer categories than here. We again use `position = 'dodge'`, but now we don't need to sum because we're stacking each row already. I've flipped the facetting and taken advantage of the fact that these are just ggplot objects to remove the legend, making it very slightly easier to read (but harder to interpret).
+We could also split those bars sideways instead of stack them, but that likely makes more sense if there are fewer categories than here. We again use `position = 'dodge'`, but now we don't need to sum because we're stacking each row already. I've flipped the facetting and taken advantage of the fact that these are just ggplot objects to remove the legend, making it very slightly easier to read (but harder to interpret). This gets very crowded with the full set of scenarios, so we can use the `scenariofilter` argument to cut it to just a few (here, base and multiply and divide by 1.5).
 
 ```{r}
 #| message: false
@@ -314,8 +323,10 @@ obj_sdl_to_plot |>
                 facet_col = 'env_group',
                 facet_row = 'SWSDLName',
                 sceneorder = sceneorder,
+                scenariofilter = c('down1_5', 'base', 'up1_5'),
                 position = 'dodge') +
-  theme(legend.position = 'none')
+  theme(legend.position = 'none')+
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
 Another approach to groups of outcomes without the colors explicitly grouped is to not use `colorgroup`, but instead just facet by the group and give every `colorset` value a color from the same palette. Depending on the palette chosen and the breaks, this can be quicker, but will not accentuate groups as well.
@@ -323,16 +334,18 @@ Another approach to groups of outcomes without the colors explicitly grouped is 
 ```{r}
 #| message: false
 obj_sdl_to_plot |>
-    plot_outcomes(y_col = 'ewr_achieved',
-                          colorgroups = NULL,
-                          colorset = 'env_obj',
-                          pal_list = list('scico::berlin'),
-                          facet_row = 'SWSDLName',
-                          facet_col = 'env_group',
-                          scales = 'free_x',
-                          scene_x = FALSE,
-                          scene_pal = scene_pal,
-                          sceneorder = sceneorder) 
+  plot_outcomes(y_col = 'ewr_achieved',
+                colorgroups = NULL,
+                colorset = 'env_obj',
+                pal_list = list('scico::berlin'),
+                facet_row = 'SWSDLName',
+                facet_col = 'env_group',
+                scales = 'free_x',
+                scene_x = FALSE,
+                scene_pal = scene_pal,
+                sceneorder = sceneorder,
+                scenariofilter = c('down1_5', 'base', 'up1_5')) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
 These plots are interesting, but in typical use, the plots above using facets for the groups or coloring by the groups themselves are likely to be easier to read, unless we really are interested in this level of granularity. Whatever approach we choose for a given plot, accentuating the differences between outcome groups can be a powerful interpretation tool.
@@ -360,7 +373,8 @@ plot_outcomes(obj_sdl_to_plot,
               pal_list = obj_pal$refcols,
                 facet_col = 'SWSDLName',
               facet_row = '.',
-              sceneorder = sceneorder)
+              sceneorder = sceneorder) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
 But for other plots maybe we don't want that accentuation and we can use the `unrefcols` to retain the standard coloring- note that 'NF', 'OS', and 'WB' colors are unchanged.
@@ -373,5 +387,6 @@ plot_outcomes(obj_sdl_to_plot,
               pal_list = obj_pal$unrefcols,
                 facet_col = 'SWSDLName',
               facet_row = '.',
-              sceneorder = sceneorder)
+              sceneorder = sceneorder) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```

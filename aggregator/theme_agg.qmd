@@ -26,7 +26,7 @@ In practice, we expect to interleave spatial, temporal, and thematic aggregation
 The theme relationships in the causal network `causal_ewr` provide the links and structure of the theme scaling, while the values to be scaled come out of the modules. For this demonstration, we provide a set of paths to point to the input data, in this case the outputs from the EWR tool, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit).
 
 ```{r}
-project_dir <- file.path('scenario_example')
+project_dir <- file.path('more_scenarios')
 ewr_results <- file.path(project_dir, 'module_output', 'EWR')
 ```
 
@@ -273,7 +273,7 @@ DiagrammeR::render_graph(aggNetwork)
 #| label: fig-causal-up4
 #| fig-cap: Causal network for 4x scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 1, dark purple is 0.
 aggNetwork <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
-                                        scenario == 'up4'),
+                                        scenario == 'up2'),
                  edges = edges,
                  edge_pal = 'black',
                  node_pal = list(value = 'scico::tokyo'),

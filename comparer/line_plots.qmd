@@ -55,8 +55,8 @@ gauges_to_plot <- c('412002', '419001', '422028', '421001')
 We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.
 
 ```{r}
-sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
-scene_pal <- make_pal(unique(scenarios$scenario), 
+sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
+scene_pal <- make_pal(unique(scenarios$scenario_name), 
                       palette = 'ggsci::nrc_npg', 
                       refvals = 'base', refcols = 'black')
 ```
@@ -80,7 +80,7 @@ If we had used multiple aggregation functions at any step, we should filter down
 ```{r}
 # Create a grouping variable
 obj_sdl_to_plot <- agged_data$sdl_units |>
-  left_join(scenarios) |>
+  left_join(scenarios, by = c('scenario' = 'scenario_name')) |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
   dplyr::filter(!is.na(env_group)) |>
   dplyr::arrange(env_group, env_obj)
@@ -97,7 +97,7 @@ A simple plot would be to look at all the outcomes, separated by color. We've gi
 ```{r}
  sdl_line <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'delta',
+                          x_col = 'flow_multiplier',
                           colorgroups = NULL,
                           colorset = 'env_obj',
                           pal_list = list('scico::berlin'),
@@ -119,7 +119,7 @@ Scientifically, one important thing to note here is that the range on y (0-10) i
 #| warning: false
 sdl_line_options <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',
@@ -155,7 +155,7 @@ grouplist = list(EF = 'grDevices::Purp',
 
 sdl_line_groups <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',
@@ -183,7 +183,7 @@ That's fairly complex, so we can facet it, as we did with the [bars](bar_plots.q
 #| warning: false
 sdl_line_groups_facet <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',
@@ -219,7 +219,7 @@ As with the [bar plots](bar_plots.qmd), we can color by any column we want, and 
 sdl_line_sdl <- obj_sdl_to_plot |>
   filter(env_group == 'EF') |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',
@@ -254,7 +254,7 @@ With unique points, this just fits a single curved line through each `env_obj`. 
 #| message: false
   sdl_smooth_sdl <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'delta',
+                          x_col = 'flow_multiplier',
                           y_lab = 'Proportion met',
                           x_lab = 'Change in flow',
                           transx = 'log10',
@@ -280,7 +280,7 @@ And we can do the same for environmental groupings.
 ```{r}
   sdl_smooth_groups <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'delta',
+                          x_col = 'flow_multiplier',
                           y_lab = 'Proportion met',
                           x_lab = 'Change in flow',
                           transx = 'log10',
@@ -300,13 +300,13 @@ And we can do the same for environmental groupings.
 suppressWarnings(print(sdl_smooth_groups))
 ```
 
-Using `smooth_method = 'lm'` is a linear fit. It does not recapitulates the simple lines above, however, because it fits the line through all the scenario data points, rather than simply joining them together. I have turned `smooth_se = FALSE` here because with unique groups the standard errors are enormous.
+Using `smooth_method = 'lm'` is a linear fit. It does not recapitulate the simple lines above, however, because it fits the line through all the scenario data points, rather than simply joining them together. I have turned `smooth_se = FALSE` here because with unique groups the standard errors are enormous.
 
 ```{r}
 #| message: false
 sdl_lm_groups <- obj_sdl_to_plot |>
     plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'delta',
+                          x_col = 'flow_multiplier',
                           y_lab = 'Proportion met',
                           x_lab = 'Change in flow',
                           transx = 'log10',
@@ -341,7 +341,7 @@ We use a small `add_eps` to avoid zeros and allow all data to be relativised and
 #| warning: false
 sdl_fit_sdl <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',
@@ -370,7 +370,7 @@ We can make a very similar plot, looking at the environmental groups, a smooth f
 #| warning: false
 sdl_fit_groups <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',
@@ -404,7 +404,7 @@ A linear fit of the SDL units ( @fig-sdl-colors-lm ) is one example of how this 
 #| message: false
 sdl_lm_sdl <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',

@@ -31,11 +31,11 @@ Nearly all analyses will be comparisons of some kind, and so the Comparer provid
 -   Quantitative outcome plots (values on y - 1d)
 
     -   [Bar](bar_plots.qmd)
-    
+
     -   [Line](line_plots.qmd)
 
     -   Timeseries
-    
+
         -   currently only [hydrographs](hydrographs.qmd), ongoing development for other variables
 
 -   Quantitative outcome plots (values in color - 2d)

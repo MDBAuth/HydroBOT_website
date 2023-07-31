@@ -39,7 +39,7 @@ Necessary pieces but not part of the data flow in the toolkit
 
     -   Causal networks are needed for aggregation and some plotting, but are not part of the flow per-se. Much of this will be integrated into the *Comparer* module
 
--   [Scenario creation](scenario_creation/scenario_creation_demo.qmd)
+-   [Scenario creation](scenario_creation/scenario_creation_more.qmd)
 
     -   Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit
 
@@ -75,10 +75,10 @@ The package allowing SSH install is broken in R 4.3, so in that case and for rap
 ```{r}
 #| eval: false
 # LOCAL INSTALL- easier for quick iterations, but need a path.
-devtools::install_local("C:/path/to/WERP_toolkit/werptoolkitr", force = TRUE)
+devtools::install_local("C:/path/to/WERP_toolkit", force = TRUE)
 
 # And for very fast iteration (no building, but exposes too much, often)
-devtools::load_all("C:/path/to/WERP_toolkit/werptoolkitr")
+devtools::load_all("C:/path/to/WERP_toolkit")
 ```
 
 Load the package
