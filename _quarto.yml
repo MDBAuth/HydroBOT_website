@@ -12,8 +12,12 @@ project:
 
 website:
   title: "Using the WERP toolkit"
+  repo-url: https://github.com/MDBAuth/WERP_toolkit_demo
   page-footer:
     left: "Website, documentation, and toolkit work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in the toolkit, please use its [github issues](https://github.com/MDBAuth/WERP_toolkit/issues)"
+    center:
+      - text: "License"
+        href: LICENSE.md
     background: secondary
   navbar:
     backgroud: primary

@@ -1,16 +1,22 @@
 # Developing
 
-This repo is intended to contain demonstration/template examples of using the toolkit. It contains an R project for the work and a Quarto project, intended to provide the capacity for not only writing notebooks but presenting them as documentation. Users would typically re-create the structure by creating the R project from Rstudio and may or may not use a Quarto project with `quarto create-project` in terminal. Development proceeding in this repo itself should not need to do either of these tasks.
+This repo is intended to contain demonstration/template examples of using the toolkit. It contains an R project for the work and a Quarto project, enabling the provision of quarto notebooks and their display as the documentation website. Users may want to re-create the structure by creating the R project from Rstudio and may or may not use a Quarto project with `quarto create-project` in terminal, or if only some components are needed for a particular set of analysis (e.g. the full explorations of capacity are not needed), single notebooks can be copied. Development proceeding in this repo itself should not need to do either of these tasks.
 
 ## Github
 
-This is just a straightforward git clone, but due to issues with installing the same way across this and {werptoolkitr} itself, things will work best if we use the ssh from git, at least while the repo is private.
+Obtaining the repo for dev should be a straightforward git clone. However, maintaining robust environment management requires we all install the same way, and while the {werptoolkitr} package is private, that means [ssh from github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/).
 
-The instructions for that are in the {werptoolkitr} developer page for both Linux and Windows.
+::: {#Local install note}
+The current version of `git2R`, which is used by `devtools::install_git()` to install over ssh is broken in R 4.3. So, in the interim, if doing development work here that needs to be pushed back, we'll need to clone the {werptoolkitr} repo and use `devtools::install_local(path/to/repo)`. This will end up causing some pain with `renv`.
+:::
+
+Some pitfalls with cloning encountered in working across local and MDBA systems are covered in more detail in the \[{werptoolkitr}\](https://github.com/MDBAuth/WERP_toolkit) developer page for both Linux and Windows.
 
 ## Python environment
 
-The python actually needs to come first, or the renv dies on install because it looks for `py-ewr` to get werptoolkitr installed.
+On first use, the {werptoolkitr} package will auto-install a python environment and necessary packages if it does not find them already.
+
+If you would like to set up your own development environment for python, there is a `pyproject.toml` and a `poetry.lock` file in the repo that should allow you to build an environment with [poetry](https://python-poetry.org/docs/).
 
 Use `pyenv` [to manage python versions](https://github.com/pyenv/pyenv). Follow instructions there. On Windows, that means using [pyenv-win](https://github.com/pyenv-win/pyenv-win) and following instructions there. On Linux, install with `curl https://pyenv.run | bash`. That tells you to add somethign to `.bashrc`, do that.
 
@@ -20,48 +26,24 @@ At present, we do most of the work in R, but {werptoolkitr} wraps some python, a
 
 To install poetry, follow the [docs](https://python-poetry.org/docs/), with some more step-by-step and issue-solving [in my notes](https://galenholt.github.io/RpyEnvs/python_setup.html)
 
-Once poetry is installed, cd to the repo and:
-
-To ensure we have the venv in the project, set `poetry config virtualenvs.in-project true`
-
-`poetry config virtualenvs.prefer-active-python true`, which doesn't seem to work, so then run
-
-`poetry env use 3.11` or whatever version is in the lock
-
-then `poetry install`.
-
-To create the python environment from the `pyproject.toml` and `poetry.lock` files, run `poetry install`.
-
-To add python packages, use `poetry add packagename`. Then, committing the `toml`and `lock`files will let others rebuild the environment.
-
-To add a specific version, `poetry add packagename==1.0.1`. This is sometimes necessary with things like py-ewr that change frequently.
-
-To call the python from R, as long as the venv is in the base project directory, {reticulate} seems to find it. Otherwise, need to tell it where it is with `reticulate::use_virtualenv`. There's more detail about this sort of thing in the developer note in {werptoolkitr}- here, the venv is in the outer directory and just works.
-
-**ON AZURE**- when you first start a vscode session, the bash at the bottom does not use the poetry environment, and so if you try to install or use werptoolkitr, it will try to auto-build one with the right dependencies using miniconda (or just fail with cryptic errors). That might work (but usually doesn't). Instead, *start a new bash terminal*, which will activate the venv, and open R from there. At that point, installing werptoolkitr (or `renv::restore()` generally), and using the code should work.
-
 ## R
 
-Use `rig` to manage R versions. See developer note for {werptoolkitr} and [my notes](https://galenholt.github.io/RpyEnvs/rig.html)
+Use `rig` to manage R versions. See developer note for [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) and [my notes](https://galenholt.github.io/RpyEnvs/rig.html)
 
-Use `renv` to manage R environments. See the developer note for {werptoolkitr}.
+Use `renv` to manage R environments. See the developer note for [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit).
 
 The EWR tool is written in python, and so while we have wrapped the necessary functions in the [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) R package, we need to be careful about data type translations. To have an R object that works as a dict in python, for example, use a named list (see a few more translation options at [my github](https://galenholt.github.io/RpyEnvs/R_py_type_passing.html)). The names can be quoted or unquoted; keep quoted to be most like python specs.
 
-### werptoolkitr
+### werptoolkitr updates
 
-We expect that {werptoolkitr} will change frequently since we're simultaneously developing it. To reload and rebuild, there are several options, ranging from more structured (github) to local package install, to just loading the scripts into memory for rapid changes. Note that while the `load_all` option is tempting and very useful, it often works differently than a real package install and so all code should be tested with one of the other two methods. By default, this loads from `master`, include `ref = BRANCH_NAME` to install from a branch.
+We expect that [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) will change frequently since we're simultaneously developing it. To reload and rebuild, there are several options, ranging from more structured (github) to local package install, to just loading the scripts into memory for rapid changes. Note that while the `load_all` option is tempting and very useful, it often works differently than a real package install and so all code should be tested with one of the other two methods. By default, this loads from `master`, include the argument `ref = BRANCH_NAME` to install from a branch. For `devtools::install_git()` to work with SSH, first install the {git2r} package (though even this doesn't work in R 4.3).
 
 ```         
 ## GITHUB INSTALL
 
-# HTTPS
-credentials::set_github_pat()
-devtools::install_github("MDBAuth/WERP_toolkit", ref = 'BRANCH_NAME', subdir = 'werptoolkitr', force = TRUE)
+# SSH- preferred
 
-# SSH
-
-devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', subdir = 'werptoolkitr', force = TRUE, upgrade = 'ask')
+devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
 
 ## LOCAL INSTALL- easier for quick iterations, but need a path.
 devtools::install_local("path/to/WERP_toolkit/werptoolkitr", force = TRUE)
@@ -70,15 +52,15 @@ devtools::install_local("path/to/WERP_toolkit/werptoolkitr", force = TRUE)
 devtools::load_all("path/to/WERP_toolkit/werptoolkitr")
 ```
 
-If you're installing this repo and rebuilding the R environment with `renv`, it will fail to install {werptoolkitr} if you don't do either of the methods above to pass credentials to github. If you'e connected with HTTPS, you'll need to setup a github PAT in github, and then use `credentials::set_github_pat()`. If using SSH, `install_git` passes your ssh key. This happens automatically on Linux, but Windows is a pain.
+If you're installing this repo and rebuilding the R environment with `renv`, it will fail to install {werptoolkitr} if you haven't set up SSH for github.
 
-The catch with using `renv` is it doesn't give you the choice- the `renv.lock` has the address for the repo as either the SSH or HTTPS path, depending on how it was installed. And so if the lock has HTTPS, but you're on a system setup with SSH, it'll still try to get werptoolkitr with HTTPS. That's fine, but we can't create github PATs for repos we don't own (e.g. anything in the MDBA group). So, until werptoolkitr is public, the easiest way to do this is to be on SSH everywhere, so the renv points to the ssh path, which we should be able to access from everywhere. Otherwise we have to bypass `renv` to install werptoolkitr, which then installs its dependencies (and upgrades by default), causing all sorts of issues with werptoolkitr working, and stomps on package management here as well.
+Using `renv` to manage installations enforces the same install of [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) when the environment is rebuilt. The `renv.lock` has the address for the repo as either the SSH or HTTPS path, and the hash. And so if trying to `renv::restore` the package locally or with HTTPS instead of SSH, it will get mad. That's fine, we can still `install` it, but keeping environments synced gets annoying. Until werptoolkitr is public, the easiest way to do this is to be on SSH everywhere, but this is not currently possible with R 4.3.
 
-SO: **Please use `install_git` with the ssh path before taking a `renv::snapshot`- that is the only way that captures a version out of github (and so accessible to everyone), and works cross-platform. If there's been a lot of active building using `load_all` or `install_local`, that's fine, but before updating the renv version, push those changes and `install_git`.**
+**If possible, please use `install_git` with the ssh path before taking a `renv::snapshot`- that is the only way that captures a version out of github (and so accessible to everyone), and works cross-platform. If there's been a lot of active building using `load_all` or `install_local`, that's fine, but before updating the renv version, push those changes and `install_git`.**
 
 #### Windows note
 
-This seems to be working now, as long as the `renv.lock` was generated from a location that used `install_git` to install it. Make sure to create both the profile and bashrc as in the {werptoolkitr} notes- they both seem to be needed to install. And it's unclear why, since those are for bash, and `install_git` calls cmd. cmd must be calling git bash internally. Then, we also need to install the `git2r` package, or `install_git` will still fail, but we *cannot* pass the `credentials` argument, even though that seems like what we should do.
+This seems to be working now, as long as the `renv.lock` was generated from a location that used `install_git` to install it. Make sure to create both the profile and bashrc as in the [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) dev notes- they both seem to be needed to install. Then, we also need to install the `git2r` package, or `install_git` will still fail, but we *cannot* pass the `credentials` argument, even though that seems like what we should do.
 
 #### Azure note
 
@@ -86,7 +68,7 @@ I occasionally get a weird error that `py-ewr` can't be found, which I *think* h
 
 ## Quarto setup
 
-This has mostly been done- but here's what I did. Set a common output dir in the `_quarto.yml`. I have a `_quarto.yaml.local` to control caching, but be aware that caching can cause issues with some of the notebooks. Currently the ones that fail are some of the scenario creaters and the controllers, with the chunks running the EWR hanging on render. The solution when that happens is just to put `cache: false` in either the yaml header or chunk comment.
+Setting up the quarto project should be done, but here's what I did. Set a common output dir in the `_quarto.yml`. I have a `_quarto.yaml.local` to control caching, but be aware that caching can cause issues with some of the notebooks. Currently the ones that fail are some of the scenario creaters and the controllers, with the chunks running the EWR hanging on render. The solution when that happens is just to put `cache: false` in either the yaml header or chunk comment.
 
 On Azure, I had to [install quarto](https://docs.posit.co/resources/install-quarto/), following instructions for .deb-
 
@@ -96,8 +78,11 @@ sudo apt-get install gdebi-core
 sudo gdebi quarto-linux-amd64.deb
 ```
 
-### Rebuilding data
+Strange render errors could be due to out-of-date quarto versions, currently using 1.3.
+
+## Rebuilding data
 
 Rebuilding data across the notebooks is done with params to avoid overwriting data unless we mean to. To rebuild, at the terminal in WERP_toolkit_demo run `quarto render path/to/notebook_to_rebuild.qmd -P REBUILD_DATA:TRUE`. To rebuild *everything* in the project, run `quarto render -P REBUILD_DATA:TRUE`. Running these commands without the parameters will re-render but not rebuild.
 
-**TODO** - Use {targets} to manage this workflow. - put the params in a yaml file, and then have a read-in chunk with {yaml}. - this end-runs quarto though, so depends on use-case.
+## Building website
+The `quarto.yml` project structure is set up to [build a website](https://quarto.org/docs/publishing/github-pages.html) using the `gh-pages` branch. The branch exists already, so publishing happens with `quarto publish gh-pages --no-browser` (because the site is private). Once public, `quarto publish gh-pages` should work.
