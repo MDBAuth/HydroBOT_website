@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -18,9 +18,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -47,43 +48,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -121,7 +92,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -139,116 +111,110 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <span class="navbar-title">Using the WERP toolkit</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../scenario_creation/scenario_creation_overview.html">
+    <a class="nav-link" href="../scenario_creation/scenario_creation_overview.html" rel="" target="">
  <span class="menu-text">Scenario creation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../causal_networks/causal_overview.html">
+    <a class="nav-link" href="../causal_networks/causal_overview.html" rel="" target="">
  <span class="menu-text">Causal networks</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../controller/controller_overview.html">
+    <a class="nav-link" href="../controller/controller_overview.html" rel="" target="">
  <span class="menu-text">Controller</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../aggregator/aggregation_overview.html">
+    <a class="nav-link" href="../aggregator/aggregation_overview.html" rel="" target="">
  <span class="menu-text">Aggregator</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../comparer/comparer_overview.html" aria-current="page">
+    <a class="nav-link active" href="../comparer/comparer_overview.html" rel="" target="" aria-current="page">
  <span class="menu-text">Comparer</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../full_toolkit/full_toolkit_overview.html">
+    <a class="nav-link" href="../full_toolkit/full_toolkit_overview.html" rel="" target="">
  <span class="menu-text">Full toolkit</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo"><i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div class="quarto-toggle-container">
-                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
-              </div>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Bar plots</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../comparer/hydrographs.html">Simple demonstration</a></li><li class="breadcrumb-item"><a href="../comparer/bar_plots.html">Bar plots (qual x)</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../comparer/comparer_overview.html" class="sidebar-item-text sidebar-link">Comparer overview</a>
+  <a href="../comparer/comparer_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Comparer overview</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Simple demonstration</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Simple demonstration</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../comparer/hydrographs.html" class="sidebar-item-text sidebar-link">Hydrographs and baselining</a>
+  <a href="../comparer/hydrographs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Hydrographs and baselining</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../comparer/bar_plots.html" class="sidebar-item-text sidebar-link active">Bar plots (qual x)</a>
+  <a href="../comparer/bar_plots.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Bar plots (qual x)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../comparer/line_plots.html" class="sidebar-item-text sidebar-link">Line plots (quant x)</a>
+  <a href="../comparer/line_plots.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Line plots (quant x)</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../comparer/maps.html" class="sidebar-item-text sidebar-link">Maps</a>
+  <a href="../comparer/maps.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Maps</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../comparer/causal_plots.html" class="sidebar-item-text sidebar-link">Outcomes on causal networks</a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Flow scaling and climate scenarios</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../comparer/flow_scaling_comparer.html" class="sidebar-item-text sidebar-link">Comparer examples for flow scaling demonstration</a>
+  <a href="../comparer/causal_plots.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Outcomes on causal networks</span></a>
   </div>
 </li>
       </ul>
@@ -256,6 +222,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -291,7 +258,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Bar plots</h1>
+<h1 class="title">Bar plots</h1>
 </div>
 
 
@@ -321,20 +288,24 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="overview" class="level1">
 <h1>Overview</h1>
 <p>This notebook provides examples of creating bar plots, e.g.&nbsp;plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, scenario. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit and type of response.</p>
-<p>For a quantitative x-axis, we would typically use <a href="comparer/line_plots.qmd">line plots</a>.</p>
+<p>For a quantitative x-axis, we would typically use <a href="../comparer/line_plots.html">line plots</a>.</p>
 </section>
 <section id="demonstration-setup" class="level1">
 <h1>Demonstration setup</h1>
 <p>As usual, we need paths to the data.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-2_7438083c9301e661acf615bd90e9c0af">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'scenario_example'</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>agg_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(project_dir, <span class="st">'aggregator_output'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-2_a8d80612c0c4f7d0a764d5d2d7185f6d">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'more_scenarios'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hydro_dir <span class="ot">=</span> <span class="fu">file.path</span>(project_dir, <span class="st">'hydrographs'</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>agg_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(project_dir, <span class="st">'aggregator_output'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="scenario-information" class="level2">
 <h2 class="anchored" data-anchor-id="scenario-information">Scenario information</h2>
-<p>This will be attached to metadata, typically. For now, I’m just using it for diagnostic plots and the demonstration data is simple, so make it here.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-3_72b7c5d7b83269985260ee3de547a5f1">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(<span class="at">scenario =</span> <span class="fu">c</span>(<span class="st">'base'</span>, <span class="st">'down4'</span>, <span class="st">'up4'</span>), <span class="at">delta =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.25</span>, <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This should be auto-acquired from the dirs above. But while its format is still up in the air, I’m leaving it a bit more user-editable.</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-3_b941079cf00e8163f201715e2e3ba2a2">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(hydro_dir, </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                                           <span class="st">'scenario_metadata.json'</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">everything</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="subset-for-demo" class="level2">
@@ -348,9 +319,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="standard-scenario-appearance" class="level1">
 <h1>Standard scenario appearance</h1>
 <p>We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-5_5f10defc6890bc1c9bfb0465906f727a">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sceneorder <span class="ot">&lt;-</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(scenarios<span class="sc">$</span>scenario, scenarios<span class="sc">$</span>delta)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scene_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="fu">unique</span>(scenarios<span class="sc">$</span>scenario), </span>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-5_f8d74a097dd084021c0897dad4976043">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sceneorder <span class="ot">&lt;-</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(scenarios<span class="sc">$</span>scenario_name, scenarios<span class="sc">$</span>flow_multiplier)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scene_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="fu">unique</span>(scenarios<span class="sc">$</span>scenario_name), </span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">palette =</span> <span class="st">'ggsci::nrc_npg'</span>, </span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">refvals =</span> <span class="st">'base'</span>, <span class="at">refcols =</span> <span class="st">'black'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -359,7 +330,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Make bar plots</h1>
 <section id="choosing-example-data" class="level2">
 <h2 class="anchored" data-anchor-id="choosing-example-data">Choosing example data</h2>
-<p>First, we read in the aggregated data and make a simple demonstration bar plot. There is example data provided by the toolkit (<code>agg_theme_space</code> and <code>agg_theme_space_colsequence</code>), but to continue with the demonstration, we will use the aggregations created here in the <a href="aggregator/theme_space_agg.qmd">interleaved aggregation notebook</a>.</p>
+<p>First, we read in the aggregated data and make a simple demonstration bar plot. There is example data provided by the toolkit (<code>agg_theme_space</code> and <code>agg_theme_space_colsequence</code>), but to continue with the demonstration, we will use the aggregations created here in the <a href="../aggregator/theme_space_agg.html">interleaved aggregation notebook</a>.</p>
 <p><em>Note</em>- to <code>readRDS</code> <code>sf</code> objects, we need to have <code>sf</code> loaded.</p>
 <div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-6_8ef67c2a819d45eb0a641633d38fbf28">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>agged_data <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="fu">file.path</span>(agg_dir, <span class="st">'summary_aggregated.rds'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -391,19 +362,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 class="anchored" data-anchor-id="basin-scale">Basin scale</h3>
 <p>We can make plots looking at how scenarios differ for each of the outcome categories. This uses <code>facet_wrapper</code> to just wrap the single facet axis, looking at the basin scale and Objectives first. If we had more than one spatial unit, we would need to either filter to a target unit or facet by them. As with {ggplot2} itself, we tend to use <code>facet_wrap</code> for single-variable facetting and <code>facet_row</code> and <code>facet_grid</code> for specifying rows and columns, though here we use <code>facet_row</code> and <code>facet_col</code> to feed <code>facet_grid</code>. Plots at the basin scale are the simplest because we don’t have to worry about different bars for different spatial units.</p>
 <p>The <code>colorset</code> argument is the column that determines color, while the <code>pal_list</code> defines those colors, here as a named <code>colors</code> object, but as we see below it can also be palette names. The <code>sceneorder</code> argument lets us explicitly set the order of the scenarios. This is typically easiest to have a <code>Factor</code> object with the scenarios and their orders, as here. But we can also just use a character vector (demonstrated later).</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-8_9e57f9a33e5c3de0e3d025d8298ed060">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-8_0b87471af2c376f24a17362f4f057ab6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(basin_to_plot, </span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>, </span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">facet_wrapper =</span> <span class="st">'Objective'</span>, </span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pal_list =</span> scene_pal,</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>We retain the axis names as-is from the incoming dataframe, as they provide the true meaning of each value. But we can change them, either inside the <code>plot_outcomes</code> function or post-hoc. We can also set the <code>sceneorder</code> with a character vector if that’s easier than setting up a Factor.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-9_fca5efbed6c49eea7c91b64fa49f4d5e">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-9_c7352c77bf75a0b45193cf3344463c47">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(basin_to_plot, </span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>, </span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_lab =</span> <span class="st">'Proportion Objectives</span><span class="sc">\n</span><span class="st">Achieved'</span>,</span>
@@ -412,13 +384,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">facet_wrapper =</span> <span class="st">'Objective'</span>, </span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
 <span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pal_list =</span> scene_pal,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down4'</span>, <span class="st">'base'</span>, <span class="st">'up4'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> <span class="fu">c</span>(<span class="st">'down2'</span>, <span class="st">'down1_5'</span>, <span class="st">'down1_25'</span>, <span class="st">'down1_1'</span>, <span class="st">'base'</span>, <span class="st">'up1_1'</span>, <span class="st">'up1_25'</span>, <span class="st">'up1_5'</span>, <span class="st">'up2'</span>))<span class="sc">+</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Because these are just ggplot objects, we can also change the labels outside the function, which can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-10_3a904d743f5ae9f26040c7d0d9760398">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-10_57287fcb5c0304b0318881911eba9842">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>scenebar <span class="ot">&lt;-</span> <span class="fu">plot_outcomes</span>(basin_to_plot, </span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">facet_wrapper =</span> <span class="st">'Objective'</span>, </span>
@@ -426,7 +399,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">pal_list =</span> scene_pal,</span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span>
 <span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>scenebar <span class="sc">+</span> <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">'Proportion</span><span class="sc">\n</span><span class="st">Objectives Achieved'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>scenebar <span class="sc">+</span> </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="cn">NULL</span>, <span class="at">y =</span> <span class="st">'Proportion</span><span class="sc">\n</span><span class="st">Objectives Achieved'</span>) <span class="sc">+</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -461,7 +436,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3 class="anchored" data-anchor-id="sdl-units">SDL units</h3>
 <p>We can use the aggregation step of <code>env_obj</code> and SDL units to demonstrate plotting that not only addresses the outcomes for scenarios, but how they differ across space. I’ll often use subsets of the <code>env_obj</code> codes here to keep the number of plots visible.</p>
 <p>First, we look at how the different scenarios perform for the Ecosystem Function objectives in each SDL unit</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-13_e122faefc095bd5bbb63ae3eddb0eef8">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-13_900295f11698ebc75ae9629ea5e7554b">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">%&gt;%</span> </span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">grepl</span>(<span class="st">'^EF'</span>, env_obj)) <span class="sc">%&gt;%</span> </span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>, </span>
@@ -469,7 +444,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">"SWSDLName"</span>,</span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorset =</span> <span class="st">'scenario'</span>,</span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">pal_list =</span> scene_pal,</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder)<span class="sc">+</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -499,13 +475,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="colors-from-outcomes" class="level1">
 <h1>Colors from outcomes</h1>
 <p>Rather than facetting, we can stack each of the outcome categories (here, Objectives). To do this, we simply change the <code>colorset</code> to “Objective” instead of ‘scenario’ (the default <code>x_col</code> is scenario, so it remains on x). We also change the <code>pal_list</code> to a {paletteer} name, providing the palette from which to choose colors for each Objective. This yields a more compact plot that shows overall outcomes at the expense of making it harder to see what any particular objective is doing, particularly with many outcomes and long names. But with careful selection of a color palette and cleaner naming (or just far fewer categories), this could be a very useful approach.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-15_566f9fc6b18840cc3c2add557e6d4193">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-15_d2d089d06cf7e68e8a378b585b55db95">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(basin_to_plot,</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'Objective'</span>,</span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">"scico::oslo"</span>),</span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder) <span class="sc">+</span> </span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">ncol =</span> <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">fill =</span> <span class="fu">guide_legend</span>(<span class="at">ncol =</span> <span class="dv">2</span>)) <span class="sc">+</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -538,17 +515,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <p>We are about to consider grouped colors as a way to assign different palettes to different groups. But a simpler way to show outcomes groups is to color by the groups directly if we don’t care what the individual <code>env_obj</code>s are doing between them. This is very similar to the plots coloring by SDL unit above.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-18_45d23c0dd2e46d67934a33ae429e0616">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-18_b6e2742d07db6d163df5a72f6561de93">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(obj_sdl_to_plot,</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'env_group'</span>,</span>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">"scico::berlin"</span>),</span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">facet_row =</span> <span class="st">'.'</span>,</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder) <span class="sc">+</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>colors not specified per level. Trying to use the 'colors' argument as a palette
-name</code></pre>
+<pre><code>colors not specified per level. Trying to use the 'colors' argument as a
+palette name</code></pre>
 </div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-18-1.png" class="img-fluid" width="672"></p>
@@ -556,10 +534,10 @@ name</code></pre>
 </div>
 <section id="grouped-colors" class="level2">
 <h2 class="anchored" data-anchor-id="grouped-colors">Grouped colors</h2>
-<p>We have the ability to assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly <a href="causal_networks/causal_plots.qmd">causal networks</a>. For example, we might categorize the <code>env_obj</code> outcomes into the larger scale groups (e.g.&nbsp;‘NF’, ‘EF’, etc). We can then assign each of these a separate palette, and so the individual <code>env_obj</code>s get different colors chosen from different palettes.</p>
+<p>We have the ability to assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly <a href="../causal_networks/causal_plots.html">causal networks</a>. For example, we might categorize the <code>env_obj</code> outcomes into the larger scale groups (e.g.&nbsp;‘NF’, ‘EF’, etc). We can then assign each of these a separate palette, and so the individual <code>env_obj</code>s get different colors chosen from different palettes.</p>
 <p>Achieving this requires specifying two columns- the <code>colorset</code>, as above, is the column that determines color. The <code>colorgroups</code> column specifies the groupings of those <code>colorset</code> values, and so what palette to use. Thus, the <code>pal_list</code> needs to be either length 1 (everything gets the same palette) or <code>length(unique(data$colorgroups))</code>. Note also that the <code>colorset</code> values must be unique to <code>colorgroups</code>- this cannot be a one-to-many mapping because each <code>colorset</code> value must get a color from a single palette defined by the <code>colorgroup</code> it is in.</p>
 <p>We demonstrate with <code>env_obj</code> variables mapped to larger environmental groups, making it easier to see at a glance the sorts of environmental objectives that are more or less affected, while also allowing views of the individual environmental objectives. Here we use <code>facet_col</code> and <code>facet_row</code> to ensure the SDL units don’t wrap around. We made the <code>env_groups</code> column when we chose the data initially.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-19_44d5e89fd6a81836b9f12a209bfc0681">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-19_b4b39c6036684bdbfccf6bb3b7c3ab8f">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a palette list</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>env_pals <span class="ot">=</span> <span class="fu">list</span>(<span class="at">EF =</span> <span class="st">'grDevices::Purp'</span>,</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">NF =</span> <span class="st">'grDevices::Mint'</span>,</span>
@@ -576,13 +554,14 @@ name</code></pre>
 <span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
 <span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">'.'</span>,</span>
 <span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder)</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>sdl_stack</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>sdl_stack <span class="sc">+</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Adding facetting by those groups can make that easier to read if the goal is to focus on changes within groups, but more plots.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-20_3ccb1982dbca64bbadeb368422d02133">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-20_0e8b9c8b55ef8f568029be8e21d9df7e">
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorgroups =</span> <span class="st">'env_group'</span>,</span>
@@ -590,13 +569,14 @@ name</code></pre>
 <span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">pal_list =</span> env_pals,</span>
 <span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
 <span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">'env_group'</span>,</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder)<span class="sc">+</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>We could also split those bars sideways instead of stack them, but that likely makes more sense if there are fewer categories than here. We again use <code>position = 'dodge'</code>, but now we don’t need to sum because we’re stacking each row already. I’ve flipped the facetting and taken advantage of the fact that these are just ggplot objects to remove the legend, making it very slightly easier to read (but harder to interpret).</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-21_0967e6710a9b3af4a513359284e3c0a3">
+<p>We could also split those bars sideways instead of stack them, but that likely makes more sense if there are fewer categories than here. We again use <code>position = 'dodge'</code>, but now we don’t need to sum because we’re stacking each row already. I’ve flipped the facetting and taken advantage of the fact that these are just ggplot objects to remove the legend, making it very slightly easier to read (but harder to interpret). This gets very crowded with the full set of scenarios, so we can use the <code>scenariofilter</code> argument to cut it to just a few (here, base and multiply and divide by 1.5).</p>
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-21_48948e35c5c77837f20ac4eafee38f1e">
 <div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorgroups =</span> <span class="st">'env_group'</span>,</span>
@@ -605,25 +585,29 @@ name</code></pre>
 <span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'env_group'</span>,</span>
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">'SWSDLName'</span>,</span>
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder,</span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">position =</span> <span class="st">'dodge'</span>) <span class="sc">+</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">scenariofilter =</span> <span class="fu">c</span>(<span class="st">'down1_5'</span>, <span class="st">'base'</span>, <span class="st">'up1_5'</span>),</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">position =</span> <span class="st">'dodge'</span>) <span class="sc">+</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">'none'</span>)<span class="sc">+</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Another approach to groups of outcomes without the colors explicitly grouped is to not use <code>colorgroup</code>, but instead just facet by the group and give every <code>colorset</code> value a color from the same palette. Depending on the palette chosen and the breaks, this can be quicker, but will not accentuate groups as well.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-22_6c748028aafb1b35d23e6d15004d9fc8">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-22_f5c27453453a9e4b610403f1cf84c7a6">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>obj_sdl_to_plot <span class="sc">|&gt;</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">colorset =</span> <span class="st">'env_obj'</span>,</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::berlin'</span>),</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_row =</span> <span class="st">'SWSDLName'</span>,</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                          <span class="at">facet_col =</span> <span class="st">'env_group'</span>,</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scales =</span> <span class="st">'free_x'</span>,</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_x =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                          <span class="at">scene_pal =</span> scene_pal,</span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                          <span class="at">sceneorder =</span> sceneorder) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot_outcomes</span>(<span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorgroups =</span> <span class="cn">NULL</span>,</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">colorset =</span> <span class="st">'env_obj'</span>,</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">pal_list =</span> <span class="fu">list</span>(<span class="st">'scico::berlin'</span>),</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_row =</span> <span class="st">'SWSDLName'</span>,</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'env_group'</span>,</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">scales =</span> <span class="st">'free_x'</span>,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">scene_x =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>                <span class="at">scene_pal =</span> scene_pal,</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>                <span class="at">sceneorder =</span> sceneorder,</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>                <span class="at">scenariofilter =</span> <span class="fu">c</span>(<span class="st">'down1_5'</span>, <span class="st">'base'</span>, <span class="st">'up1_5'</span>)) <span class="sc">+</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -640,27 +624,29 @@ name</code></pre>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">refvals =</span> <span class="fu">c</span>(<span class="st">'EF'</span>, <span class="st">'NV'</span>), <span class="at">refcols =</span> <span class="fu">c</span>(<span class="st">'purple'</span>, <span class="st">'orange'</span>), <span class="at">includeRef =</span> <span class="cn">TRUE</span>, <span class="at">returnUnref =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then we can create an accentuated plot sometimes, if, perhaps, we want to highlight how EF performed.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-24_2fc97800fe321061211a7fa493a10f39">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-24_b6ae67487ad6ed62ab77242a47fbcbe8">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(obj_sdl_to_plot,</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'env_group'</span>,</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> obj_pal<span class="sc">$</span>refcols,</span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
 <span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">facet_row =</span> <span class="st">'.'</span>,</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder) <span class="sc">+</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>But for other plots maybe we don’t want that accentuation and we can use the <code>unrefcols</code> to retain the standard coloring- note that ‘NF’, ‘OS’, and ‘WB’ colors are unchanged.</p>
-<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-25_bf0465b2b519f05f5eddd5347b06a38c">
+<div class="cell" data-hash="bar_plots_cache/html/unnamed-chunk-25_d5e23245fdc41d46ea3569a397808eb9">
 <div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_outcomes</span>(obj_sdl_to_plot,</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">y_col =</span> <span class="st">'ewr_achieved'</span>,</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">colorset =</span> <span class="st">'env_group'</span>,</span>
 <span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>              <span class="at">pal_list =</span> obj_pal<span class="sc">$</span>unrefcols,</span>
 <span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">facet_col =</span> <span class="st">'SWSDLName'</span>,</span>
 <span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>              <span class="at">facet_row =</span> <span class="st">'.'</span>,</span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">sceneorder =</span> sceneorder) <span class="sc">+</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="bar_plots_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -813,9 +799,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -880,6 +880,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -922,7 +1008,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO</div>   
+    <div class="nav-footer-left">Website, documentation, and toolkit work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in the toolkit, please use its <a href="https://github.com/MDBAuth/WERP_toolkit/issues">github issues</a></div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../LICENSE.md">License</a>
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

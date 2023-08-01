@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -17,9 +17,10 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -46,43 +47,13 @@ pre.numberSource code > span > a:first-child::before
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
     padding: 0 4px; width: 4em;
-    color: #aaaaaa;
   }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
 div.sourceCode
   {   }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -120,7 +91,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -138,81 +110,86 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <span class="navbar-title">Using the WERP toolkit</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./scenario_creation/scenario_creation_overview.html">
+    <a class="nav-link" href="./scenario_creation/scenario_creation_overview.html" rel="" target="">
  <span class="menu-text">Scenario creation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./causal_networks/causal_overview.html">
+    <a class="nav-link" href="./causal_networks/causal_overview.html" rel="" target="">
  <span class="menu-text">Causal networks</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./controller/controller_overview.html">
+    <a class="nav-link" href="./controller/controller_overview.html" rel="" target="">
  <span class="menu-text">Controller</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./aggregator/aggregation_overview.html">
+    <a class="nav-link" href="./aggregator/aggregation_overview.html" rel="" target="">
  <span class="menu-text">Aggregator</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./comparer/comparer_overview.html">
+    <a class="nav-link" href="./comparer/comparer_overview.html" rel="" target="">
  <span class="menu-text">Comparer</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./full_toolkit/full_toolkit_overview.html">
+    <a class="nav-link" href="./full_toolkit/full_toolkit_overview.html" rel="" target="">
  <span class="menu-text">Full toolkit</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo"><i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div class="quarto-toggle-container">
-                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
-              </div>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">WERP toolkit demonstration</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">WERP toolkit demonstration</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./index.html" class="sidebar-item-text sidebar-link active">WERP toolkit demonstration</a>
+  <a href="./index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">WERP toolkit demonstration</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Toolkit description</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Toolkit description</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./overview/spatial_data.html" class="sidebar-item-text sidebar-link">Spatial data with toolkit</a>
+  <a href="./overview/spatial_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Spatial data with toolkit</span></a>
   </div>
 </li>
       </ul>
@@ -220,16 +197,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#dependencies" id="toc-dependencies" class="nav-link active" data-scroll-target="#dependencies">Dependencies</a></li>
-  <li><a href="#additional-info" id="toc-additional-info" class="nav-link" data-scroll-target="#additional-info">Additional info</a></li>
-  <li><a href="#figures-outlining-the-flow" id="toc-figures-outlining-the-flow" class="nav-link" data-scroll-target="#figures-outlining-the-flow">Figures outlining the flow</a></li>
-  <li><a href="#integrate-with-the-readme" id="toc-integrate-with-the-readme" class="nav-link" data-scroll-target="#integrate-with-the-readme">Integrate with the readme</a></li>
+  <li><a href="#installing-werptoolkitr" id="toc-installing-werptoolkitr" class="nav-link active" data-scroll-target="#installing-werptoolkitr">Installing werptoolkitr</a></li>
+  <li><a href="#github-and-development" id="toc-github-and-development" class="nav-link" data-scroll-target="#github-and-development">Github and development</a></li>
+  <li><a href="#using-notebooks" id="toc-using-notebooks" class="nav-link" data-scroll-target="#using-notebooks">Using notebooks</a></li>
   </ul>
 </nav>
     </div>
@@ -238,7 +215,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">WERP toolkit demonstration</h1>
+<h1 class="title">WERP toolkit demonstration</h1>
 </div>
 
 
@@ -253,16 +230,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 </header>
 
-<p>This repo provides a templates and documentation for using the toolkit in various ways. The <code>full_toolkit</code> directory provides notebooks for running the full toolkit in single files, either <a href="WERP_toolkit_in_memory">in memory</a> or <a href="WERP_toolkit_save_steps.qmd">saving each step and reading back in</a>. Within this repo there are also documents providing templates for each step separately (in <code>controller</code> and <code>aggregation</code> directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (<code>scenario_creation</code> and <code>causal_networks</code>).</p>
+<p>This repo provides a templates and documentation for using the toolkit in various ways. In use, we would expect a user to consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters (at least through the aggregator step), similar to what is shown in the <a href="./full_toolkit/full_toolkit_overview.html">full toolkit pages</a> and implement that in an analysis repo for that particular set of analyses/scenarios.</p>
+<p>The <code>full_toolkit</code> directory provides notebooks for running the full toolkit in single files, either <a href="full_toolkit/WERP_toolkit_in_memory">in memory</a> or <a href="./full_toolkit/WERP_toolkit_save_steps.html">saving each step and reading back in</a>.</p>
+<p>Within this repo there are also documents providing templates for each step separately (in <code>controller</code> and <code>aggregation</code> directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (<code>scenario_creation</code> and <code>causal_networks</code>).</p>
 <p>Toolkit flow</p>
 <ul>
 <li><p><a href="./controller/controller_overview.html">Controller</a></p>
 <ul>
-<li><p><a href="controller/controller_ewr_stepthrough.qmd">in detail</a></p></li>
-<li><p><a href="./controller/controller_ewr_wrapped_R.html">simplified</a></p></li>
-<li><p><a href="controller/controller_ewr_testrun_py.qmd">in python <em>NOT UPDATED</em></a></p></li>
+<li><p><a href="./controller/controller_ewr_stepthrough.html">in detail</a></p></li>
+<li><p><a href="./controller/controller_ewr_wrapped.html">simplified</a></p></li>
+<li><p>Python notebooks exist, but are not maintained. Contact authors if needed.</p></li>
 </ul></li>
-<li><p><a href="aggregator/aggregator_overview.qmd">Aggregator</a></p>
+<li><p><a href="./aggregator/aggregation_overview.html">Aggregator</a></p>
 <ul>
 <li><p><a href="./aggregator/theme_space_agg.html">Theme and Space</a></p></li>
 <li><p><a href="./aggregator/theme_agg.html">Theme alone with more options and plot examples</a></p></li>
@@ -271,52 +250,66 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p><a href="./comparer/comparer_overview.html">Comparer</a></p>
 <ul>
 <li><p><a href="./comparer/hydrographs.html">hydrographs</a></p></li>
-<li><p><a href="./comparer/bar_plots.html">bar</a>, <a href="line_plots.qmd">line</a>, <a href="./comparer/maps.html">maps</a>, and <a href="./comparer/causal_plots.html">causal networks</a> all provide plotting of outcomes from the toolkit</p></li>
+<li><p><a href="./comparer/bar_plots.html">bar</a>, <a href="./comparer/line_plots.html">line</a>, <a href="./comparer/maps.html">maps</a>, and <a href="./comparer/causal_plots.html">causal networks</a> all provide plotting of outcomes from the toolkit</p></li>
 </ul></li>
-<li><p>Necessary pieces but not part of the data flow in the toolkit</p></li>
+</ul>
+<p>Necessary pieces but not part of the data flow in the toolkit</p>
+<ul>
 <li><p><a href="./causal_networks/causal_plots.html">Causal networks</a></p>
 <ul>
 <li>Causal networks are needed for aggregation and some plotting, but are not part of the flow per-se. Much of this will be integrated into the <em>Comparer</em> module</li>
 </ul></li>
-<li><p><a href="./scenario_creation/scenario_creation_demo_R.html">Scenario creation</a></p>
+<li><p><a href="./scenario_creation/scenario_creation_more.html">Scenario creation</a></p>
 <ul>
 <li><p>Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit</p></li>
 <li><p>These are simple demo scenarios, but useful for seeing expected formats, and to let the rest of the kit work.</p></li>
-<li><p><a href="scenario_creation/scenario_creation_demo_py.qmd">python version <em>NOT UPDATED</em></a></p></li>
+<li><p>Python notebooks exist, but are not maintained. Contact authors if needed.</p></li>
 </ul></li>
 </ul>
 <p><strong>In use, the toolkit expects that scenario hydrographs will be available and the causal networks are defined.</strong></p>
-<section id="dependencies" class="level2">
-<h2 class="anchored" data-anchor-id="dependencies">Dependencies</h2>
-<p>The {werptoolkitr} package needs to be installed to provide all functions used here. It also provides some necessary data for the causal network relationships, and (at least for now) canonical shapefiles that have been prepped.</p>
-<p>Typically install it from github, which requires a github PAT because it’s private (acquired with <code>set_github_pat</code>), and a <code>subdir</code> argument because the R package is nested. It may also need a <code>ref</code> argument to load a branch or commit other than main.</p>
-<div class="cell" data-hash="index_cache/html/unnamed-chunk-1_22dbb5d4b726197d417072874326c3e0">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GITHUB INSTALL</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>credentials<span class="sc">::</span><span class="fu">set_github_pat</span>()</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"MDBAuth/WERP_toolkit"</span>, <span class="at">ref =</span> <span class="st">'packaging'</span>, <span class="at">subdir =</span> <span class="st">'werptoolkitr'</span>, <span class="at">force =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/Presentation1.jpg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Conceptual use of the toolkit. Scenario hydrographs are expected to come from hydrologic modelling, while the toolkit ingests those, runs them through the response modules, and provides the user the ability to aggregate and synthesize in various ways.</figcaption>
+</figure>
 </div>
-<p>For rapid development, it can be much easier to install from local (or even just to <code>load_all</code>), but these rely on paths that aren’t portable.</p>
-<div class="cell" data-hash="index_cache/html/unnamed-chunk-2_c708aca415a210052c49619752a0c086">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/architecture.jpg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Toolkit structure, showing the various components where the toolkit performs processing and allows the user to provide settings.</figcaption>
+</figure>
+</div>
+<section id="installing-werptoolkitr" class="level2">
+<h2 class="anchored" data-anchor-id="installing-werptoolkitr">Installing werptoolkitr</h2>
+<p>The {werptoolkitr} package needs to be installed to provide all functions used here. It also provides some necessary data for the causal network relationships, and (at least for now) canonical shapefiles that have been prepped.</p>
+<p>Typically install it from github over SSH while the package is private.</p>
+<div class="cell" data-hash="index_cache/html/unnamed-chunk-1_bbc4e6f25375f977f6c19a5ed263ec76">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GITHUB INSTALL</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># SSH- preferred</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_git</span>(<span class="st">"git@github.com:MDBAuth/WERP_toolkit.git"</span>, <span class="at">ref =</span> <span class="st">'master'</span>, <span class="at">force =</span> <span class="cn">TRUE</span>, <span class="at">upgrade =</span> <span class="st">'ask'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The package allowing SSH install is broken in R 4.3, so in that case and for rapid development, clone the repo and use <code>devtools::install_local</code> (or even just to <code>load_all</code>), but these rely on paths that aren’t portable and are more manual to keep up with updates.</p>
+<div class="cell" data-hash="index_cache/html/unnamed-chunk-2_5bfa2270f778ecc4281283ee67f07645">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># LOCAL INSTALL- easier for quick iterations, but need a path.</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_local</span>(<span class="st">"C:/path/to/WERP_toolkit/werptoolkitr"</span>, <span class="at">force =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_local</span>(<span class="st">"C:/path/to/WERP_toolkit"</span>, <span class="at">force =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># And for very fast iteration (no building, but exposes too much, often)</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">load_all</span>(<span class="st">"C:/path/to/WERP_toolkit/werptoolkitr"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">load_all</span>(<span class="st">"C:/path/to/WERP_toolkit"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Load the package</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-3_098a27833d03e50a03093e71a808c4c8">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(werptoolkitr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="additional-info" class="level1">
-<h1>Additional info</h1>
-<p>More info will go here.</p>
+<section id="github-and-development" class="level2">
+<h2 class="anchored" data-anchor-id="github-and-development">Github and development</h2>
+<p>See the <a href="https://github.com/MDBAuth/WERP_toolkit_demo">repo readme</a> for overall structure of the repo and additional dev info for package installation issues and development, and the <a href="https://github.com/MDBAuth/WERP_toolkit">{werptoolkitr} repo</a> for the package itself.</p>
 </section>
-<section id="figures-outlining-the-flow" class="level1">
-<h1>Figures outlining the flow</h1>
-</section>
-<section id="integrate-with-the-readme" class="level1">
-<h1>Integrate with the readme</h1>
+<section id="using-notebooks" class="level2">
+<h2 class="anchored" data-anchor-id="using-notebooks">Using notebooks</h2>
+<p>Most notebooks that generate outputs have a <code>REBUILD_DATA</code> parameter in the yaml header that is set to FALSE to avoid overwriting data. To rebuild the data, we can manually change them to TRUE, or on a case-by-case basis at the terminal <code>quarto render path/to/file.qmd -P REBUILD_DATA:TRUE</code>, and for all files in the project (dangerous!), <code>quarto render -P REBUILD_DATA:TRUE</code>.</p>
+<p>If there is unexpected behaviour, e.g.&nbsp;changes not reflected in the output, check the _cache files and probably throw them out. Caching speeds up by not re-running code and is supposed to notice changes and re-evaluate, but sometimes hangs on when it shouldn’t.</p>
 
 
 </section>
@@ -464,9 +457,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -531,6 +538,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -573,7 +666,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO</div>   
+    <div class="nav-footer-left">Website, documentation, and toolkit work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in the toolkit, please use its <a href="https://github.com/MDBAuth/WERP_toolkit/issues">github issues</a></div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="./LICENSE.md">License</a>
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 

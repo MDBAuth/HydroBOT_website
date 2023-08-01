@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.2.269">
+<meta name="generator" content="quarto-1.3.433">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -18,7 +18,7 @@ div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
   width: 0.8em;
-  margin: 0 0.8em 0.2em -1.6em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
 </style>
@@ -58,7 +58,8 @@ ul.task-list li input[type="checkbox"] {
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
     "search-detached-cancel-button-title": "Cancel",
-    "search-submit-button-title": "Submit"
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
   }
 }</script>
 
@@ -76,111 +77,104 @@ ul.task-list li input[type="checkbox"] {
     <span class="navbar-title">Using the WERP toolkit</span>
     </a>
   </div>
+            <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../scenario_creation/scenario_creation_overview.html">
+    <a class="nav-link" href="../scenario_creation/scenario_creation_overview.html" rel="" target="">
  <span class="menu-text">Scenario creation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../causal_networks/causal_overview.html">
+    <a class="nav-link" href="../causal_networks/causal_overview.html" rel="" target="">
  <span class="menu-text">Causal networks</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../controller/controller_overview.html">
+    <a class="nav-link" href="../controller/controller_overview.html" rel="" target="">
  <span class="menu-text">Controller</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="../aggregator/aggregation_overview.html" aria-current="page">
+    <a class="nav-link active" href="../aggregator/aggregation_overview.html" rel="" target="" aria-current="page">
  <span class="menu-text">Aggregator</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../comparer/comparer_overview.html">
+    <a class="nav-link" href="../comparer/comparer_overview.html" rel="" target="">
  <span class="menu-text">Comparer</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../full_toolkit/full_toolkit_overview.html">
+    <a class="nav-link" href="../full_toolkit/full_toolkit_overview.html" rel="" target="">
  <span class="menu-text">Full toolkit</span></a>
   </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo"><i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/WERP_toolkit_demo" rel="" target=""><i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
  <span class="menu-text"></span></a>
   </li>  
 </ul>
-              <div class="quarto-toggle-container">
-                  <a href="" class="quarto-color-scheme-toggle nav-link" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
-              </div>
-              <div id="quarto-search" class="" title="Search"></div>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
           </div> <!-- /navcollapse -->
       </div> <!-- /container-fluid -->
     </nav>
-  <nav class="quarto-secondary-nav" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
-    <div class="container-fluid d-flex justify-content-between">
-      <h1 class="quarto-secondary-nav-title">Aggregation overview</h1>
-      <button type="button" class="quarto-btn-toggle btn" aria-label="Show secondary navigation">
-        <i class="bi bi-chevron-right"></i>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
+      <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../aggregator/aggregation_overview.html">Aggregation overview</a></li></ol></nav>
+      <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+      </a>
     </div>
   </nav>
 </header>
 <!-- content -->
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
-  <nav id="quarto-sidebar" class="sidebar collapse sidebar-navigation floating overflow-auto">
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal sidebar-navigation floating overflow-auto">
     <div class="sidebar-menu-container"> 
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../aggregator/aggregation_overview.html" class="sidebar-item-text sidebar-link active">Aggregation overview</a>
+  <a href="../aggregator/aggregation_overview.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Aggregation overview</span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../aggregator/aggregation_syntax.html" class="sidebar-item-text sidebar-link">Aggregation syntax</a>
+  <a href="../aggregator/aggregation_syntax.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Aggregation syntax</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">Simple demonstration</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+ <span class="menu-text">Simple demonstration</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../aggregator/spatial_agg.html" class="sidebar-item-text sidebar-link">Spatial aggregation capability</a>
+  <a href="../aggregator/spatial_agg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Spatial aggregation capability</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../aggregator/theme_agg.html" class="sidebar-item-text sidebar-link">Theme aggregation capability</a>
+  <a href="../aggregator/theme_agg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Theme aggregation capability</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../aggregator/theme_space_agg.html" class="sidebar-item-text sidebar-link">Multi-axis interleaved aggregation</a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">Flow scaling and climate scenarios</a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" aria-expanded="true">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../aggregator/flow_scaling_aggregation.html" class="sidebar-item-text sidebar-link">Aggregating flow scaling demonstration</a>
+  <a href="../aggregator/theme_space_agg.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multi-axis interleaved aggregation</span></a>
   </div>
 </li>
       </ul>
@@ -188,6 +182,7 @@ ul.task-list li input[type="checkbox"] {
     </ul>
     </div>
 </nav>
+<div id="quarto-sidebar-glass" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar,#quarto-sidebar-glass"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -199,6 +194,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#user-inputs" id="toc-user-inputs" class="nav-link" data-scroll-target="#user-inputs">User inputs</a></li>
   <li><a href="#arguments-and-use-cases" id="toc-arguments-and-use-cases" class="nav-link" data-scroll-target="#arguments-and-use-cases">Arguments and use-cases</a></li>
   <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  <li><a href="#development-notes" id="toc-development-notes" class="nav-link" data-scroll-target="#development-notes">Development notes</a></li>
   </ul>
 </nav>
     </div>
@@ -207,7 +203,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title d-none d-lg-block">Aggregation overview</h1>
+<h1 class="title">Aggregation overview</h1>
 </div>
 
 
@@ -234,6 +230,12 @@ ul.task-list li input[type="checkbox"] {
 <p>We want to be able to aggregate along each of these dimensions with any number of aggregation functions (e.g.&nbsp;mean, min, max, more complex) to reflect the processes being aggregated. These should be factorial- if we aggregate with min and max at step 2 (generating two columns of aggregated data), then each of those columns should be aggregated according to the step-3 aggregation, and so on.</p>
 <p>We want to be able to interleave the dimensions, e.g.&nbsp;aggregate along the Objective dimension to some intermediate level, then aggregate in space, then time, then more Objective levels, then more time and more space.</p>
 <p>To achieve this, we have developed a flexible set of aggregation functions that take a list of aggregation steps, each of which can be along any dimension, and a matching list of aggregation functions to apply to that step in the aggregation. It is possible to ask for multiple functions per step.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="images/aggregation.jpg" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Aggregation can occur along three axes: space, time, and objective. The user can provide the sequence of aggregation steps and the aggregation function(s) to apply at each step.</figcaption>
+</figure>
+</div>
 </section>
 <section id="tracking" class="level2">
 <h2 class="anchored" data-anchor-id="tracking">Tracking</h2>
@@ -250,7 +252,7 @@ ul.task-list li input[type="checkbox"] {
 <li><p>Any desired groupings to retain</p></li>
 <li><p>Various others related primarily to data format (tracking format, saving each aggregation step, retention of NA spatial units, etc)</p></li>
 </ul>
-<p>Many of these can be specified in a number of ways. I have tried to demonstrate a number of these capabilities and options in the <a href="../aggregator/spatial_agg.html">spatial</a> and <a href="../aggregator/theme_agg.html">theme</a> notebooks, while keeping to simpler, more typical uses in the <a href="../aggregator/theme_space_agg.html">interleaved example</a> and the <a href="full_toolkit/full_toolkit_overview.qmd">full toolkit</a>. Some of the most useful, but also trickiest, capabilities revolve around being able to format the groupers and aggregation columns as bare names, character vectors, or <code>tidyselect</code> syntax, and the functions as single or multiple at each step, defined as bare names, characters, or lists with arguments. These approaches make the functions highly general and flexible to new datasets (and sequential aggregation) and custom aggregation functions.</p>
+<p>Many of these can be specified in a number of ways. I have tried to demonstrate a number of these capabilities and options in the <a href="../aggregator/spatial_agg.html">spatial</a> and <a href="../aggregator/theme_agg.html">theme</a> notebooks, while keeping to simpler, more typical uses in the <a href="../aggregator/theme_space_agg.html">interleaved example</a> and the <a href="../full_toolkit/full_toolkit_overview.html">full toolkit</a>. Some of the most useful, but also trickiest, capabilities revolve around being able to format the groupers and aggregation columns as bare names, character vectors, or <code>tidyselect</code> syntax, and the functions as single or multiple at each step, defined as bare names, characters, or lists with arguments. These approaches make the functions highly general and flexible to new datasets (and sequential aggregation) and custom aggregation functions.</p>
 <p>The other powerful user input is the foundation of the multidimensional aggregator- the sequencing lists. These are demonstrated in all the notebooks, but are perhaps most interesting in the <a href="../aggregator/theme_space_agg.html">interleaved version</a>. By default, only the final output is retained, but <code>saveintermediate = TRUE</code> saves a list of each step, which can be very useful.</p>
 <p>The data itself and output data are also controlled by the user (by necessity). For inputs, <code>multi_aggregate</code> expects the incoming data to be in memory. There is also a wrapper <code>read_and_agg</code> that takes paths as arguments and does the read-in of the data internally and then runs <code>multi_aggregate</code>. This is often a useful approach, allowing parallelisation, better memory management, and it is far easier to use paths in a config file of arguments. Outputs from <code>multi_aggregate</code> are R objects- a dataframe or a list- and are returned back to the calling environment. The <code>read_and_agg</code> wrapper, however, can both return R objects to the session <code>returnList = TRUE</code> and save to a file if <code>savepath = "path/to/outfile"</code> .</p>
 </section>
@@ -423,9 +425,23 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     icon: icon
   };
   anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
   const clipboard = new window.ClipboardJS('.code-copy-button', {
-    target: function(trigger) {
-      return trigger.previousElementSibling;
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
     }
   });
   clipboard.on('success', function(e) {
@@ -490,6 +506,92 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return note.innerHTML;
     });
   }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
   const findCites = (el) => {
     const parentEl = el.parentElement;
     if (parentEl) {
@@ -532,7 +634,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">Website, documentation, and toolkit work in progress. Not to be distributed outside QAEL, MDBA, CSIRO</div>   
+    <div class="nav-footer-left">Website, documentation, and toolkit work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in the toolkit, please use its <a href="https://github.com/MDBAuth/WERP_toolkit/issues">github issues</a></div>   
+    <div class="nav-footer-center">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item">
+    <a class="nav-link" href="../LICENSE.md">License</a>
+  </li>  
+</ul>
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
   </div>
 </footer>
 
