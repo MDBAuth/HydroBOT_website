@@ -25,6 +25,7 @@ As usual, we need paths to the data.
 
 ```{r}
 project_dir <- file.path('more_scenarios')
+hydro_dir = file.path(project_dir, 'hydrographs')
 agg_dir <- file.path(project_dir, 'aggregator_output')
 ```
 

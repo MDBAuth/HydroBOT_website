@@ -19,7 +19,7 @@ Toolkit flow
 
     -   Python notebooks exist, but are not maintained. Contact authors if needed.
 
--   [Aggregator](aggregator/aggregator_overview.qmd)
+-   [Aggregator](aggregator/aggregation_overview.qmd)
 
     -   [Theme and Space](aggregator/theme_space_agg.qmd)
 

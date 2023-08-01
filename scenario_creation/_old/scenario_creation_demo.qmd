@@ -11,17 +11,6 @@ params:
 ---
 
 ```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- FALSE
-}
-```
-
-```{r}
 #| warning: false
 #| message: false
 library(werptoolkitr)
@@ -307,7 +296,7 @@ down4 <- down4 %>%
 Save. could do this above easily enough, but getting lots of dots and hard to read.
 
 ```{r}
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
       readr::write_csv(base, file.path(hydro_dir, 'base', 'base.csv'))
   
       readr::write_csv(up4, file.path(hydro_dir, 'up4', 'up4.csv'))

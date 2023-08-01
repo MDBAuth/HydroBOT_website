@@ -7,19 +7,8 @@ format:
 editor: visual
 cache: false
 params:
-  REBUILD_DATA: TRUE
+  REBUILD_DATA: FALSE
 ---
-
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- TRUE
-}
-```
 
 Load the package
 
@@ -53,31 +42,39 @@ returnType <- list('summary', 'all')
 
 # We use outputtype to save, so only save outputs if params$REBUILD_DATA is TRUE
 # To make a list in python, need to have unnamed lists in R
-if (!REBUILD_DATA) {
+if (!params$REBUILD_DATA) {
   outputType <- list('none')
 }
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   outputType <- list('summary', 'all')
 }
 ```
 
 ## Run and save
 
-The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent.
+The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent. This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd). 
 
 ```{r}
-ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, output_dir = project_dir, outputType = outputType, returnType = returnType)
+#| eval: false
+ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
+                                output_dir = project_dir, 
+                                outputType = outputType, 
+                                returnType = returnType)
 ```
 
-Now we have a `summary` and `all`.
+Now we have a `summary` and `all`. Because the chunk above is not run (`#| eval: false`), these dataframes are not available here, but would be.
 
 ```{r}
-#| rows.print = 20
+#| eval: false
+#| rows.print: 20
+
 ewr_out$summary
 ```
 
 ```{r}
-#| rows.print = 20
+#| eval: false
+#| rows.print: 20
+
 ewr_out$all
 ```
 

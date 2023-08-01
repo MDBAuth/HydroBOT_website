@@ -6,9 +6,7 @@ This repo is intended to contain demonstration/template examples of using the to
 
 Obtaining the repo for dev should be a straightforward git clone. However, maintaining robust environment management requires we all install the same way, and while the {werptoolkitr} package is private, that means [ssh from github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/).
 
-::: {#Local install note}
-The current version of `git2R`, which is used by `devtools::install_git()` to install over ssh is broken in R 4.3. So, in the interim, if doing development work here that needs to be pushed back, we'll need to clone the {werptoolkitr} repo and use `devtools::install_local(path/to/repo)`. This will end up causing some pain with `renv`.
-:::
+::: {#Local install note} The current version of `git2R`, which is used by `devtools::install_git()` to install over ssh is broken in R 4.3. So, in the interim, if doing development work here that needs to be pushed back, we'll need to clone the {werptoolkitr} repo and use `devtools::install_local(path/to/repo)`. This will end up causing some pain with `renv`. :::
 
 Some pitfalls with cloning encountered in working across local and MDBA systems are covered in more detail in the \[{werptoolkitr}\](https://github.com/MDBAuth/WERP_toolkit) developer page for both Linux and Windows.
 
@@ -84,5 +82,8 @@ Strange render errors could be due to out-of-date quarto versions, currently usi
 
 Rebuilding data across the notebooks is done with params to avoid overwriting data unless we mean to. To rebuild, at the terminal in WERP_toolkit_demo run `quarto render path/to/notebook_to_rebuild.qmd -P REBUILD_DATA:TRUE`. To rebuild *everything* in the project, run `quarto render -P REBUILD_DATA:TRUE`. Running these commands without the parameters will re-render but not rebuild.
 
+The only documents with `REBUILD_DATA: TRUE` by default are the `scenario_creation/scenario_creation_more.qmd` notebook and the `full_toolkit/WERP_toolkit_save_steps.qmd`, to avoid having multiple notebooks rebuild the same data when we render the site. Because `quarto render` runs in alphabetical order, it is usually best to run those two files first manually so the data exists for all downstream uses.
+
 ## Building website
+
 The `quarto.yml` project structure is set up to [build a website](https://quarto.org/docs/publishing/github-pages.html) using the `gh-pages` branch. The branch exists already, so publishing happens with `quarto publish gh-pages --no-browser` (because the site is private). Once public, `quarto publish gh-pages` should work.

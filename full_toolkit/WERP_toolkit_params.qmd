@@ -119,7 +119,7 @@ keepAllPolys: TRUE
 
 # Run the toolkit
 
-These actually run the toolkit, so they are set not to evaluate in normal use.
+These actually run the toolkit, so they are set not to evaluate in normal use- only one of the notebooks for this website actually runs the controller- the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd) with saving steps.
 
 ```{r}
 #| eval: false

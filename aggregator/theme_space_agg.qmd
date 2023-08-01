@@ -7,19 +7,8 @@ format:
     code-link: true # Doesn't do anything without either cran or pkgdown site, btu that's still kind of useful for external (especially {pkgname})
 editor: visual
 params:
-  REBUILD_DATA: TRUE
+  REBUILD_DATA: FALSE
 ---
-
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- TRUE
-}
-```
 
 ```{r}
 library(werptoolkitr)
@@ -130,7 +119,7 @@ ewr_edges <- make_edges(dflist = causal_ewr,
 
 ## Aggregate
 
-Now we do the aggregation. Note that we have been very [aggressive in handling spatial processing](aggregator_overview.qmd) and so while spatial processing is slow, we minimize it as much as possible internally.
+Now we do the aggregation. Note that we have been very [aggressive in handling spatial processing](aggregation_overview.qmd) and so while spatial processing is slow, we minimize it as much as possible internally.
 
 ### Return only final
 
@@ -419,7 +408,7 @@ In practice, we often won't call `multi_aggregate` directly, but will use `read_
 #| lst-label: lst-save-out
 #| lst-cap: Path inputs and saving outputs with run_and_agg
 #| message: false
-if (REBUILD_DATA) {savep <- file.path(out_path)} else {savep <- NULL}
+if (params$REBUILD_DATA) {savep <- file.path(out_path)} else {savep <- NULL}
 
 ts_from_raa <- read_and_agg(datpath = ewr_results, 
                             type = 'summary',

@@ -1,6 +1,7 @@
 ---
 title: Creating simple scenarios
 author: Galen Holt
+cache: false
 format:
   html:
     df-print: paged
@@ -9,17 +10,6 @@ engine: knitr
 params:
   REBUILD_DATA: TRUE
 ---
-
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- TRUE
-}
-```
 
 ```{r}
 #| warning: false
@@ -58,7 +48,7 @@ hydro_dir <- file.path(scenario_dir, 'hydrographs')
 ::: {#language style="color: gray"}
 ## Language note
 
-This notebook was originally built using only python, and there is an unmaintained python-only version available by contacting the authors. Using Python makes a lot of sense because the underlying data here uses python packages. I've moved the active version of this notebook to R, however, when the toolkit became an R package and the [flow scaling demonstration](pull_gauges_to_scale.qmd) ended up using R gauge pullers. There is still some remaining python in here (pulling gauges and some minor EWR functions). This notebook provides an example of how to mix R and python code chunks, which we do fairly frequently.
+This notebook was originally built using only python, and there is an unmaintained python-only version available by contacting the authors. Using Python makes a lot of sense because the underlying data here uses python packages. I've moved the active version of this notebook to R, however, when the toolkit became an R package and the [flow scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling) ended up using R gauge pullers. There is still some remaining python in here (pulling gauges and some minor EWR functions). This notebook provides an example of how to mix R and python code chunks, which we do fairly frequently.
 
 We can access python objects in R with `py$objectname`and access R objects in python with `r.objectname` .
 
@@ -260,7 +250,7 @@ To generate simple scenarios that cover a range of flow conditions, we multiply 
 
 The EWR tool has the capacity to pull gauge data directly, but because we have modified these data, they need to enter the EWR tool through `scenario_handling`, and so need to have a format the EWR tool can parse as output from one of the scenario generating tools it uses (IQQM, Source, etc). This could be avoided by splitting up `process_scenarios` into a read-in bit and a bit that calls `evaluate_EWRs.calc_sorter`. In the meantime, we modify this data to work if we tell the EWR tool it is IQQM.
 
-Telling EWR the data is IQQM allows using `scenario_handling`. This requries having a date column `Date` and other columns with gauge numbers for names. The EWR tool can have multiple gauges, with each having its own column. Werptoolkitr expects directories for each scenario, with any number of csvs of hydrographs inside, (e.g. it could be one csv with columns for each gauge, or each csv could have a single gauge), which is handled by `paths_gauges` internally to the "Scenario controller" part of werptoolkitr. Here, we save a single csv with many gauges for each scenario. The [flow scaling example](scaling_scenarios.qmd) takes the opposite approach, with one gauge per csv due to different time periods.
+Telling EWR the data is IQQM allows using `scenario_handling`. This requries having a date column `Date` and other columns with gauge numbers for names. The EWR tool can have multiple gauges, with each having its own column. Werptoolkitr expects directories for each scenario, with any number of csvs of hydrographs inside, (e.g. it could be one csv with columns for each gauge, or each csv could have a single gauge), which is handled by `paths_gauges` internally to the "Scenario controller" part of werptoolkitr. Here, we save a single csv with many gauges for each scenario. The [flow scaling example](https://github.com/MDBAuth/toolkit-flow-scaling) takes the opposite approach, with one gauge per csv due to different time periods.
 
 ### Save the output
 
@@ -293,7 +283,7 @@ I'm not providing a toolkit function to *write* scenario metadata, since the sce
 
 ```{r}
 
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   for (i in 1:length(scenenames)) {
     demo_levs %>% 
       dplyr::mutate(VALUE = VALUE * scenemults[i]) %>% 

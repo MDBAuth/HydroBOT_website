@@ -7,19 +7,8 @@ format:
 editor: visual
 cache: false
 params:
-  REBUILD_DATA: TRUE
+  REBUILD_DATA: FALSE
 ---
-
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- FALSE
-}
-```
 
 Load the package
 
@@ -104,7 +93,10 @@ Now we run the ewr tool with the parameters given and save the output.
 
 There's an issue with `outputType = 'annual'` in the version of the EWR tool this was built with. Until I update and test the new EWR tool, skip the annual data. There are still a number of messages printed by the EWR code, about pulling the data and gauge dependencies. Those are useful when using the code, but I'll suppress printing them here since there are so many.
 
+This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd). 
+
 ```{r}
+#| eval: false
 #| message: false
 
 # To make a list in python, need to have unnamed lists in R
@@ -120,9 +112,10 @@ ewr_out <- run_save_ewrs_R(everyhydro, outpath, model_format = model_format, all
 
 ```
 
-Briefly, we can see that that has returned dataframes from the EWR (with some leftover pandas datetime environments that we could clean up if we wanted to use this in-memory). Typically, though, we just save this out.
+Briefly, we can see that that has returned dataframes from the EWR (with some leftover pandas datetime environments that we could clean up if we wanted to use this in-memory). Typically, though, we just save this out. Because we do not actually run the chunk above for rendering this site, these dataframes are not available here.
 
 ```{r}
+#| eval: false
 names(ewr_out)
 str(ewr_out$summary)
 str(ewr_out$all)

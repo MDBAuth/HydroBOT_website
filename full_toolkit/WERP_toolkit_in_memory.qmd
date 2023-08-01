@@ -1,9 +1,11 @@
 ---
-title: "WERP_toolkit_demo"
+title: "Run full toolkit in memory"
 editor: visual
+params:
+  REBUILD_DATA: FALSE
 ---
 
-This document provides a template for running through the toolkit in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_save_steps.qmd). 
+This document provides a template for running through the toolkit in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_save_steps.qmd).
 
 Load the package
 
@@ -123,8 +125,10 @@ funseq <- list(c('CompensatingFactor'),
 # Run the toolkit
 
 ## Controller
+This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit saving steps](../full_toolkit/WERP_toolkit_save_steps.qmd). 
 
 ```{r}
+#| eval: false
 #| message: false
   ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
                                   output_dir = project_dir, 
@@ -133,8 +137,10 @@ funseq <- list(c('CompensatingFactor'),
 ```
 
 ## Aggregator
+Because the chunk above is not run, the needed EWR outputs are not available, but would be if it were run.
 
 ```{r}
+#| eval: false
 aggout <- read_and_agg(datpath = ewr_results, 
              type = aggType,
              geopath = bom_basin_gauges,
@@ -154,18 +160,23 @@ aggout <- read_and_agg(datpath = ewr_results,
 
 Plotting will be developed in the comparer, this is just a quick check to see that there is data. Code borrowed from [theme x space demo](../aggregator/theme_space_agg.qmd).
 
-But only if we returned the output.
+But only if we returned the output- since the chunks above are not run, we skip this as well.
 
 ```{r}
+#| eval: false
 #| message: false
 if (aggReturn) {
-  # dummy scenario metadata
-  scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), 
-                              delta = c(1, 0.25, 4))
+
+  # Scenario data
+scenarios <- jsonlite::read_json(file.path(hydro_dir, 
+                                           'scenario_metadata.json')) |> 
+  tibble::as_tibble() |> 
+  tidyr::unnest(cols = everything())
+
   # plot
 aggout$catchment %>% 
   dplyr::filter(Specific_goal == 'All recorded fish species') %>%
-  dplyr::left_join(scenarios) %>% 
+  left_join(scenarios, by = c('scenario' = 'scenario_name')) %>% 
   ggplot2::ggplot() +
   ggplot2::geom_sf(data = basin) +
   ggplot2::geom_sf(ggplot2::aes(fill = ewr_achieved)) +

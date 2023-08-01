@@ -5,18 +5,7 @@ params:
   REBUILD_DATA: TRUE
 ---
 
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- FALSE
-}
-```
-
-This document provides a template for running through the toolkit, saving the output of each step along the way in a single document (e.g. not running the Controller, Aggregator, and Comparer as separate notebooks). Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_in_memory).
+This document provides a template for running through the toolkit, saving the output of each step along the way in a single document (e.g. not running the Controller, Aggregator, and Comparer as separate notebooks). Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_in_memory.qmd).
 
 ```{r}
 library(werptoolkitr)
@@ -139,7 +128,7 @@ funseq <- list(c('CompensatingFactor'),
 ```{r}
 #| message: false
 
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
                                   output_dir = project_dir, 
                                   outputType = outputType,
@@ -153,7 +142,7 @@ if (REBUILD_DATA) {
 ```{r}
 #| error: true
 
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   aggout <- read_and_agg(datpath = ewr_results, 
              type = aggType,
              geopath = bom_basin_gauges,
@@ -164,7 +153,7 @@ if (REBUILD_DATA) {
              funsequence = funseq,
              saveintermediate = TRUE,
              namehistory = FALSE,
-             keepAllPolys = TRUE,
+             keepAllPolys = FALSE,
              returnList = aggReturn,
              savepath = agg_results)
 }

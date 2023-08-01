@@ -133,7 +133,7 @@ agged_data <- read_and_agg(datpath = ewr_results,
            namehistory = FALSE,
            keepAllPolys = FALSE,
            returnList = TRUE,
-           savepath = 'none')
+           savepath = NULL)
 ```
 
 # Outputs
