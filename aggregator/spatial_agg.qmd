@@ -24,7 +24,7 @@ There is a standalone spatial aggregator `spatial_aggregate`, which I demonstrat
 
 We often will want to only perform a single spatial aggregation (e.g. from gauges to sdl units), but there are instances where that isn't true- perhaps we want to aggregate from sdl units to states or the basin. Thus, I demonstrate multi-step spatial aggregation, including the situation where aggregation units (polygons) are not nested, as would be the case for sdl units and states, for example. Even if some of the steps in this demonstration aren't particularly interesting now, they allow us to develop the general process that can accept any set of polygons we want to aggregate into from any other spatial data.
 
-This document delves fairly in-depth into *capabilities*, including things like argument types and how they relate to other functions and permit certain tricks. Not all of these will be used or needed to understand by most users- typically there will be a set of aggregation steps fed to `multi_aggregate` and that will be that. This sort of simpler setup is shown in the [combined aggregation notebook](theme_space_agg.qmd) and the [full-toolkit runs](full_toolkit/full_toolkit_overview.qmd). But it is helpful to document them for when they are needed. See the [syntax notebook](aggregation_syntax.qmd) for a detailed look at argument construction for various purposes. Here, we use that syntax to demonstrate how the spatial aggregation works and the different ways it can be done.
+This document delves fairly in-depth into *capabilities*, including things like argument types and how they relate to other functions and permit certain tricks. Not all of these will be used or needed to understand by most users- typically there will be a set of aggregation steps fed to `multi_aggregate` and that will be that. This sort of simpler setup is shown in the [combined aggregation notebook](theme_space_agg.qmd) and the [full-toolkit runs](../full_toolkit/full_toolkit_overview.qmd). But it is helpful to document them for when they are needed. See the [syntax notebook](aggregation_syntax.qmd) for a detailed look at argument construction for various purposes. Here, we use that syntax to demonstrate how the spatial aggregation works and the different ways it can be done.
 
 ## Inputs
 
@@ -38,10 +38,10 @@ For this demonstration, we start with gauge-referenced data at the `env_obj` the
 
 ## Demonstration setup
 
-First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](controller/controller_ewr_wrapped_R.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
+First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
-project_dir <- file.path('scenario_example')
+project_dir <- file.path('more_scenarios')
 ewr_results <- file.path(project_dir, 'module_output', 'EWR')
 ```
 
@@ -157,7 +157,7 @@ plot_outcomes(y_col = 'ewr_achieved',
                           facet_col = 'env_obj',
                           facet_row = 'scenario',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'))
+                          sceneorder = c('down2', 'base', 'up2'))
 ```
 
 ## Multiple spatial levels
@@ -324,7 +324,7 @@ l1 <- multispatb$simpleclean %>%
                 facet_col = 'scenario',
                 facet_row = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = c('down2', 'base', 'up2'),
                 underlay_list = 'basin',
                 setLimits = c(0,1))
 
@@ -339,7 +339,7 @@ l2 <- multispatb$sdl_units %>%
                 facet_col = 'scenario',
                 facet_row = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = c('down2', 'base', 'up2'),
                 underlay_list = 'basin',
                 setLimits = c(0,1))
 
@@ -354,7 +354,7 @@ l3 <- multispatb$catchment %>%
                 facet_col = 'scenario',
                 facet_row = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = c('down2', 'base', 'up2'),
                 underlay_list = 'basin',
                 setLimits = c(0,1))
 
@@ -369,7 +369,7 @@ l4 <- multispatb$mdb %>%
                 facet_col = 'scenario',
                 facet_row = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = c('down2', 'base', 'up2'),
                 underlay_list = 'basin',
                 setLimits = c(0,1))
 
@@ -415,7 +415,7 @@ keepfalse <- multispatb$catchment %>%
                 facet_col = 'scenario',
                 facet_row = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = c('down2', 'base', 'up2'),
                 setLimits = c(0,1))
 
 keeptrue <- multispatextra$catchment %>% 
@@ -429,7 +429,7 @@ keeptrue <- multispatextra$catchment %>%
                 facet_col = 'scenario',
                 facet_row = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = c('down2', 'base', 'up2'),
                 setLimits = c(0,1))
 ```
 
@@ -451,7 +451,7 @@ keepfalse_underlay <- multispatb$catchment %>%
                 facet_col = 'scenario',
                 facet_row = 'env_obj',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = c('down2', 'base', 'up2'),
                 underlay_list = list(underlay = 'cewo_valleys', 
                                      underlay_pal = 'cornsilk'),
                 setLimits = c(0,1))

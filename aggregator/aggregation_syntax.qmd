@@ -18,7 +18,7 @@ The aggregation functions have flexible syntax in some of their arguments, parti
 I'll create test data as in the [spatial notebook](spatial_agg.qmd).
 
 ```{r}
-project_dir <- file.path('scenario_example')
+project_dir <- file.path('more_scenarios')
 ewr_results <- file.path(project_dir, 'module_output', 'EWR')
 sumdat <- prep_ewr_agg(ewr_results, type = 'summary', geopath = bom_basin_gauges)
 

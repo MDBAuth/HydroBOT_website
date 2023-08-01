@@ -34,7 +34,7 @@ library(dplyr)
 
 ```{r}
 # Outer directory for scenario
-project_dir = file.path('scenario_example')
+project_dir = file.path('more_scenarios')
 
 # Hydrographs (expected to exist already)
 hydro_dir = file.path(project_dir, 'hydrographs')
@@ -133,7 +133,7 @@ agged_data <- read_and_agg(datpath = ewr_results,
            namehistory = FALSE,
            keepAllPolys = FALSE,
            returnList = TRUE,
-           savepath = 'none')
+           savepath = NULL)
 ```
 
 # Outputs
@@ -148,9 +148,14 @@ agged_data <- read_and_agg(datpath = ewr_results,
 #| echo: false
 #| message: false
 # Scenario data
-scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
-sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
-scene_pal <- make_pal(unique(scenarios$scenario), 
+scenarios <- jsonlite::read_json(file.path(hydro_dir, 
+                                           'scenario_metadata.json')) |> 
+  tibble::as_tibble() |> 
+  tidyr::unnest(cols = everything())
+
+sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
+
+scene_pal <- make_pal(unique(scenarios$scenario_name), 
                       palette = 'ggsci::nrc_npg', 
                       refvals = 'base', refcols = 'black')
 
@@ -170,7 +175,7 @@ basin_to_plot <- agged_data$mdb %>%
 
 # Create a grouping variable
 obj_sdl_to_plot <- agged_data$sdl_units |>
-  left_join(scenarios) |>
+  left_join(scenarios, by = c('scenario' = 'scenario_name')) |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
   dplyr::filter(!is.na(env_group)) |>
   dplyr::arrange(env_group, env_obj)
@@ -195,24 +200,25 @@ hydros
 
 # Quick plot
 map_example <- agged_data$sdl_units |>
-    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'env_obj',
-                          scene_pal = scene_pal,
-                          sceneorder = sceneorder,
-                          underlay_list = 'basin',
-                          overlay_list = list(overlay = dplyr::filter(
-                            agged_data$env_obj,
-                            env_obj == 'NF1'),
-                            overlay_pal = 'scico::oslo',
-                            overlay_ycol = 'ewr_achieved',
-                            clip = TRUE)) +
-    ggplot2::theme(legend.position = 'bottom')
+  dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+  plot_outcomes(y_col = 'ewr_achieved',
+                x_col = 'map',
+                colorgroups = NULL,
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                scene_pal = scene_pal,
+                sceneorder = sceneorder,
+                scenariofilter = c('down2', 'down1_25', 'base', 'up1_25', 'up2'),
+                underlay_list = 'basin',
+                overlay_list = list(overlay = dplyr::filter(
+                  agged_data$env_obj,
+                  env_obj == 'NF1'),
+                  overlay_pal = 'scico::oslo',
+                  overlay_ycol = 'ewr_achieved',
+                  clip = TRUE)) +
+  ggplot2::theme(legend.position = 'bottom')
 
 map_example
 ```
@@ -275,7 +281,8 @@ sdl_stack <- obj_sdl_to_plot |>
                 facet_col = 'SWSDLName',
                 facet_row = '.',
                 sceneorder = sceneorder)
-sdl_stack
+sdl_stack +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 0.5))
 ```
 :::
 
@@ -297,7 +304,7 @@ line_pals = list(EF = 'scico::acton',
 
 sdl_line_groups_facet <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',
@@ -309,7 +316,7 @@ sdl_line_groups_facet <- obj_sdl_to_plot |>
                 facet_row = 'SWSDLName',
                 facet_col = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -330,7 +337,7 @@ Smoothed fit of all environmental objectives in each group
 #| message: false
 sdl_fit_sdl <- obj_sdl_to_plot |>
   plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta',
+                x_col = 'flow_multiplier',
                 y_lab = 'Proportion met',
                 x_lab = 'Change in flow',
                 transx = 'log10',
@@ -340,7 +347,7 @@ sdl_fit_sdl <- obj_sdl_to_plot |>
                 pal_list = list("ggsci::default_jama"),
                 facet_wrapper = 'env_group',
                 scene_pal = scene_pal,
-                sceneorder = c('down4', 'base', 'up4'),
+                sceneorder = sceneorder,
                 base_lev = 'base',
                 comp_fun = 'relative',
                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
@@ -402,12 +409,12 @@ nodes_with_vals <- nodes |>
   dplyr::filter(!is.na(scenario))
 ```
 
-### Down 4
+### Down 2
 
 ```{r}
 #| echo: false
 aggNetworkdown <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
-                                        scenario == 'down4'),
+                                        scenario == 'down2'),
                  edges = ewr_edges,
                  edge_pal = 'black',
                  node_pal = list(value = 'scico::tokyo'),
@@ -432,12 +439,12 @@ aggNetworkbase <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals,
 DiagrammeR::render_graph(aggNetworkbase)
 ```
 
-### Up 4
+### Up 2
 
 ```{r}
 #| echo: false
 aggNetworkup <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
-                                        scenario == 'up4'),
+                                        scenario == 'up2'),
                  edges = ewr_edges,
                  edge_pal = 'black',
                  node_pal = list(value = 'scico::tokyo'),

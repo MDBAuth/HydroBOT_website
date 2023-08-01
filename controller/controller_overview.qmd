@@ -9,4 +9,4 @@ editor: visual
 
 The toolkit takes hydrographs as input data and then processes it through downstream modules, performs aggregation and analyses, and produces outputs. The 'Controller' component of the toolkit points to that input data, and sends it off to the modules with arguments controlling how that happens. It may also determine how ongoing processing occurs.
 
-In typical use, the controller simply points to the input data and initiates processing steps according to the user. Examples of this for [the controller alone](controller_ewr_wrapped_R.qmd) and [the whole toolkit](full_toolkit/full_toolkit_overview.qmd) are available to illustrate this, as well as a [stepthrough](controller_ewr_stepthrough_R.qmd) to better understand what the controller is doing.
+In typical use, the controller simply points to the input data and initiates processing steps according to the user. Examples of this for [the controller alone](controller_ewr_wrapped.qmd) and [the whole toolkit](../full_toolkit/full_toolkit_overview.qmd) are available to illustrate this, as well as a [stepthrough](controller_ewr_stepthrough.qmd) to better understand what the controller is doing.

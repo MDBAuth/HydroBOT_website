@@ -5,18 +5,7 @@ params:
   REBUILD_DATA: TRUE
 ---
 
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- FALSE
-}
-```
-
-This document provides a template for running through the toolkit, saving the output of each step along the way in a single document (e.g. not running the Controller, Aggregator, and Comparer as separate notebooks). Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_in_memory).
+This document provides a template for running through the toolkit, saving the output of each step along the way in a single document (e.g. not running the Controller, Aggregator, and Comparer as separate notebooks). Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_in_memory.qmd).
 
 ```{r}
 library(werptoolkitr)
@@ -37,13 +26,13 @@ The other option is to have this *be* the parameterising file, so we can have a 
 
 ### Input and output directories
 
-Use the `scenario_example/` directory [created](scenario_creation_demo_R.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
+Use the `scenario_example/` directory [created](../scenario_creation/scenario_creation_more.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
 
-*Normally* `project_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.The [flow scaling example](flow_scaling_full.qmd) takes the more typical approach of pointing to data external to the repo.
+*Normally* `project_dir` should point somewhere external (though keeping it outside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.The [flow scaling example](https://github.com/MDBAuth/toolkit-flow-scaling) takes the more typical approach of pointing to data external to the repo.
 
 ```{r}
 # Outer directory for scenario
-project_dir = file.path('scenario_example')
+project_dir = file.path('more_scenarios')
 
 # Preexisting data
 # Hydrographs (expected to exist already)
@@ -60,7 +49,7 @@ agg_results <- file.path(project_dir, 'aggregator_output')
 
 ## Controller
 
-We use the default IQQM model format and climate categorisations, though those could be passed here as well (see [controller](../controller/controller_ewr_stepthrough_R.qmd)).
+We use the default IQQM model format and climate categorisations, though those could be passed here as well (see [controller](../controller/controller_ewr_stepthrough.qmd)).
 
 ### Control output and return
 
@@ -139,7 +128,7 @@ funseq <- list(c('CompensatingFactor'),
 ```{r}
 #| message: false
 
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
                                   output_dir = project_dir, 
                                   outputType = outputType,
@@ -153,7 +142,7 @@ if (REBUILD_DATA) {
 ```{r}
 #| error: true
 
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   aggout <- read_and_agg(datpath = ewr_results, 
              type = aggType,
              geopath = bom_basin_gauges,
@@ -164,7 +153,7 @@ if (REBUILD_DATA) {
              funsequence = funseq,
              saveintermediate = TRUE,
              namehistory = FALSE,
-             keepAllPolys = TRUE,
+             keepAllPolys = FALSE,
              returnList = aggReturn,
              savepath = agg_results)
 }
@@ -182,9 +171,14 @@ To check here that we did in fact run the toolkit, we read in the data and make 
 agged_data <- readRDS(file.path(agg_results, 'summary_aggregated.rds'))
 
 # Scenario data
-scenarios <- tibble::tibble(scenario = c('base', 'down4', 'up4'), delta = c(1, 0.25, 4))
-sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$delta)
-scene_pal <- make_pal(unique(scenarios$scenario), 
+scenarios <- jsonlite::read_json(file.path(hydro_dir, 
+                                           'scenario_metadata.json')) |> 
+  tibble::as_tibble() |> 
+  tidyr::unnest(cols = everything())
+
+
+sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
+scene_pal <- make_pal(unique(scenarios$scenario_name), 
                       palette = 'ggsci::nrc_npg', 
                       refvals = 'base', refcols = 'black')
 

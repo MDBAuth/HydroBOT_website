@@ -3,7 +3,11 @@ title: "WERP toolkit demonstration"
 editor: visual
 ---
 
-This repo provides a templates and documentation for using the toolkit in various ways. The `full_toolkit` directory provides notebooks for running the full toolkit in single files, either [in memory](WERP_toolkit_in_memory) or [saving each step and reading back in](WERP_toolkit_save_steps.qmd). Within this repo there are also documents providing templates for each step separately (in `controller` and `aggregation` directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (`scenario_creation` and `causal_networks`).
+This repo provides a templates and documentation for using the toolkit in various ways. In use, we would expect a user to consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters (at least through the aggregator step), similar to what is shown in the [full toolkit pages](full_toolkit/full_toolkit_overview.qmd) and implement that in an analysis repo for that particular set of analyses/scenarios.
+
+The `full_toolkit` directory provides notebooks for running the full toolkit in single files, either [in memory](full_toolkit/WERP_toolkit_in_memory) or [saving each step and reading back in](full_toolkit/WERP_toolkit_save_steps.qmd).
+
+Within this repo there are also documents providing templates for each step separately (in `controller` and `aggregation` directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (`scenario_creation` and `causal_networks`).
 
 Toolkit flow
 
@@ -11,11 +15,11 @@ Toolkit flow
 
     -   [in detail](controller/controller_ewr_stepthrough.qmd)
 
-    -   [simplified](controller/controller_ewr_wrapped_R.qmd)
+    -   [simplified](controller/controller_ewr_wrapped.qmd)
 
-    -   [in python *NOT UPDATED*](controller/controller_ewr_testrun_py.qmd)
+    -   Python notebooks exist, but are not maintained. Contact authors if needed.
 
--   [Aggregator](aggregator/aggregator_overview.qmd)
+-   [Aggregator](aggregator/aggregation_overview.qmd)
 
     -   [Theme and Space](aggregator/theme_space_agg.qmd)
 
@@ -27,21 +31,21 @@ Toolkit flow
 
     -   [hydrographs](comparer/hydrographs.qmd)
 
-    -   [bar](comparer/bar_plots.qmd), [line](line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from the toolkit
+    -   [bar](comparer/bar_plots.qmd), [line](comparer/line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from the toolkit
 
--   Necessary pieces but not part of the data flow in the toolkit
+Necessary pieces but not part of the data flow in the toolkit
 
 -   [Causal networks](causal_networks/causal_plots.qmd)
 
     -   Causal networks are needed for aggregation and some plotting, but are not part of the flow per-se. Much of this will be integrated into the *Comparer* module
 
--   [Scenario creation](scenario_creation/scenario_creation_demo_R.qmd)
+-   [Scenario creation](scenario_creation/scenario_creation_more.qmd)
 
     -   Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit
 
     -   These are simple demo scenarios, but useful for seeing expected formats, and to let the rest of the kit work.
 
-    -   [python version *NOT UPDATED*](scenario_creation/scenario_creation_demo_py.qmd)
+    -   Python notebooks exist, but are not maintained. Contact authors if needed.
 
 **In use, the toolkit expects that scenario hydrographs will be available and the causal networks are defined.**
 
@@ -49,11 +53,11 @@ Toolkit flow
 
 ![Toolkit structure, showing the various components where the toolkit performs processing and allows the user to provide settings.](images/architecture.jpg)
 
-## Dependencies
+## Installing werptoolkitr
 
 The {werptoolkitr} package needs to be installed to provide all functions used here. It also provides some necessary data for the causal network relationships, and (at least for now) canonical shapefiles that have been prepped.
 
-Typically install it from github, which requires a github PAT because it's private (acquired with `set_github_pat`), and a `subdir` argument because the R package is nested. It may also need a `ref` argument to load a branch or commit other than main.
+Typically install it from github over SSH while the package is private.
 
 ```{r}
 #| warning: false
@@ -61,19 +65,20 @@ Typically install it from github, which requires a github PAT because it's priva
 #| eval: false
 
 # GITHUB INSTALL
-credentials::set_github_pat()
-devtools::install_github("MDBAuth/WERP_toolkit", ref = 'packaging', subdir = 'werptoolkitr', force = TRUE)
+# SSH- preferred
+
+devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
 ```
 
-For rapid development, it can be much easier to install from local (or even just to `load_all`), but these rely on paths that aren't portable.
+The package allowing SSH install is broken in R 4.3, so in that case and for rapid development, clone the repo and use `devtools::install_local` (or even just to `load_all`), but these rely on paths that aren't portable and are more manual to keep up with updates.
 
 ```{r}
 #| eval: false
 # LOCAL INSTALL- easier for quick iterations, but need a path.
-devtools::install_local("C:/path/to/WERP_toolkit/werptoolkitr", force = TRUE)
+devtools::install_local("C:/path/to/WERP_toolkit", force = TRUE)
 
 # And for very fast iteration (no building, but exposes too much, often)
-devtools::load_all("C:/path/to/WERP_toolkit/werptoolkitr")
+devtools::load_all("C:/path/to/WERP_toolkit")
 ```
 
 Load the package
@@ -83,13 +88,9 @@ Load the package
 library(werptoolkitr)
 ```
 
-# Additional info
+## Github and development
 
-More info will go here.
-
-# Figures outlining the flow
-
-# Integrate with the readme
+See the [repo readme](https://github.com/MDBAuth/WERP_toolkit_demo) for overall structure of the repo and additional dev info for package installation issues and development, and the [{werptoolkitr} repo](https://github.com/MDBAuth/WERP_toolkit) for the package itself.
 
 ## Using notebooks
 

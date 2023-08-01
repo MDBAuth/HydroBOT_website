@@ -1,58 +1,8 @@
-## DOES NOT QUITE WORK YET- SEE NOTES IN DOC
+# For this demonstration, we just modify the scenario_dir and aggregation_def
 
 # Outer directory for scenario
-scenario_dir: file.path('scenario_example')
+scenario_dir: 'more_scenarios'
 
-# Preexisting data
-# Hydrographs (expected to exist already)
-hydro_dir: file.path(scenario_dir, 'hydrographs')
-# Geographic data (relevant polygons and gauge locations- use canonical in pkg)
-geo_data_dir: system.file("extdata", package = 'werptoolkitr')
+# aggregation sequences (need to be defined in R)
+aggregation_def: 'full_toolkit/params.R'
 
-# Generated data
-# EWR outputs (will be created here in controller, read from here in aggregator)
-ewr_results: file.path(scenario_dir, 'module_output', 'EWR')
-# outputs of aggregator. There may be multiple modules
-# NULL doesn't save it, but holds in memory.
-agg_results: NULL # file.path(scenario_dir, 'agg_output', 'EWR')
-
-# Model type
-model_format: 'IQQM - NSW 10,000 years'
-
-# Climate
-climate: 'Standard - 1911 to 2018 climate categorisation'
-
-# output and return
-outputType: list('summary')
-returnType: list('summary') # list('summary', 'all')
-
-# What to aggregate
-aggType: 'summary'
-
-# Aggregation settings
-agg_groups: 'scenario'
-agg_var: 'ewr_achieved'
-aggReturn: TRUE
-
-# Aggregation control lists
-aggseq: list(ewr_code = c('ewr_code_timing', 'ewr_code'),
-               env_obj =  c('ewr_code', "env_obj"),
-               resource_plan = resource_plan_areas,
-               Specific_goal = c('env_obj', "Specific_goal"),
-               catchment = cewo_valleys,
-               Objective = c('Specific_goal', 'Objective'),
-               mdb = basin,
-               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
-
-
-funseq: list(c('CompensatingFactor'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               list(wm = ~weighted.mean(., w = area,
-                                        na.rm = TRUE)),
-               c('ArithmeticMean'),
-
-               list(wm = ~weighted.mean(., w = area,
-                                    na.rm = TRUE)),
-               c('ArithmeticMean'))

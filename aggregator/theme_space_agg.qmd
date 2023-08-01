@@ -7,19 +7,8 @@ format:
     code-link: true # Doesn't do anything without either cran or pkgdown site, btu that's still kind of useful for external (especially {pkgname})
 editor: visual
 params:
-  REBUILD_DATA: TRUE
+  REBUILD_DATA: FALSE
 ---
-
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- TRUE
-}
-```
 
 ```{r}
 library(werptoolkitr)
@@ -38,7 +27,7 @@ For inputs, `multi_aggregate` expects the incoming data to be in memory and geog
 
 ## Demonstration setup
 
-First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](controller/controller_ewr_wrapped_R.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
+First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
 project_dir <- file.path('more_scenarios')
@@ -86,11 +75,11 @@ We use `causal_ewrs` for causal relationships and spatial layers provided by {we
 
 ## Setup
 
-First, we specify a simple interleaved aggregation sequence with only one aggregation function applied per step for simplicity. Note that theme-axis aggregation steps are specified with a character vector `c('level_from', 'level_to')`, while spatial aggregation steps are specified with an `sf` object (polygons). Allowing specification of spatial steps by character instead of object is high on the priority list. Here, we specify the aggregation function sequence with a mixture of character names for functions and list-defined anonymous functions, as discussed in the [syntax notebook](aggregator/aggregation_syntax.qmd).
+First, we specify a simple interleaved aggregation sequence with only one aggregation function applied per step for simplicity. Note that theme-axis aggregation steps are specified with a character vector `c('level_from', 'level_to')`, while spatial aggregation steps are specified with an `sf` object (polygons). Allowing specification of spatial steps by character instead of object is high on the priority list. Here, we specify the aggregation function sequence with a mixture of character names for functions and list-defined anonymous functions, as discussed in the [syntax notebook](aggregation_syntax.qmd).
 
 *Naming the list by target makes tracking and interpretation much easier, and is highly recommended.*
 
-Spatial aggregation should almost always be area-weighted after the data is in polygons (see [spatial notebook](spatial_agg.qmd)), though there are some aggregation functions where it doesn't matter (e.g. `max`). All polygon data has an `area` column [calculated automatically](aggregator/aggregation_syntax.qmd) for this reason. The *first* aggregation into polygons doesn't need to be area-weighted, because the thing being aggregated (typically at the gauge scale) doesn't have area. After that, all data is in polygons and so has area. It is likely safest to always use weighted functions like `weighted.mean` though, since they default to even weights if none are given.
+Spatial aggregation should almost always be area-weighted after the data is in polygons (see [spatial notebook](spatial_agg.qmd)), though there are some aggregation functions where it doesn't matter (e.g. `max`). All polygon data has an `area` column [calculated automatically](aggregation_syntax.qmd) for this reason. The *first* aggregation into polygons doesn't need to be area-weighted, because the thing being aggregated (typically at the gauge scale) doesn't have area. After that, all data is in polygons and so has area. It is likely safest to always use weighted functions like `weighted.mean` though, since they default to even weights if none are given.
 
 *note the rlang::quo to make this work with dplyr 1.1 and above as in [syntax](aggregation_syntax.qmd).*
 
@@ -130,7 +119,7 @@ ewr_edges <- make_edges(dflist = causal_ewr,
 
 ## Aggregate
 
-Now we do the aggregation. Note that we have been very [aggressive in handling spatial processing](aggregator/aggregator_overview.qmd) and so while spatial processing is slow, we minimize it as much as possible internally.
+Now we do the aggregation. Note that we have been very [aggressive in handling spatial processing](aggregation_overview.qmd) and so while spatial processing is slow, we minimize it as much as possible internally.
 
 ### Return only final
 
@@ -153,7 +142,7 @@ tsagg
 
 ### Return all steps
 
-Most often, we'll want to save the list of outcomes at each step- it allows us to see how we got the final outcome, and it's likely we're interested in the outcomes at more than one step anyway. As in the [theme notebook](aggregator/theme_agg.qmd), we do this with `saveintermediate = TRUE`. We also set `namehistory = FALSE` to put the aggregation tracking in columns instead of names for ease of handling the output.
+Most often, we'll want to save the list of outcomes at each step- it allows us to see how we got the final outcome, and it's likely we're interested in the outcomes at more than one step anyway. As in the [theme notebook](theme_agg.qmd), we do this with `saveintermediate = TRUE`. We also set `namehistory = FALSE` to put the aggregation tracking in columns instead of names for ease of handling the output.
 
 ```{r}
 #| message: false
@@ -202,7 +191,7 @@ allagg$ewr_code |>
                           facet_col = 'scenario',
                           facet_row = 'ewr_code',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'cornsilk'))
 ```
@@ -230,7 +219,7 @@ allagg$env_obj |>
                           facet_col = 'scenario',
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'cornsilk'))
 ```
@@ -258,7 +247,7 @@ allagg$sdl_units |>
                           facet_col = 'scenario',
                           facet_row = 'env_obj',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'grey90'))
 ```
@@ -288,14 +277,14 @@ allagg$Specific_goal |>
                           facet_col = 'scenario',
                           facet_row = 'Specific_goal',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'grey90'))
 ```
 
 #### Sheet 6- Catchment
 
-Sheet 6 (aggregation step 5) remains at the `Specific goal` theme scale, and aggregates spatially from SDL unit into catchment (`cewo_valleys`). This is a bit of a contrived aggregation, since these are at similar spatial scales but represent different spatial groupings, but it is a good test of spatial aggregation of nonnested spatial units. This is explored in more detail in the [spatial notebook](aggregator/spatial_agg.qmd).
+Sheet 6 (aggregation step 5) remains at the `Specific goal` theme scale, and aggregates spatially from SDL unit into catchment (`cewo_valleys`). This is a bit of a contrived aggregation, since these are at similar spatial scales but represent different spatial groupings, but it is a good test of spatial aggregation of nonnested spatial units. This is explored in more detail in the [spatial notebook](spatial_agg.qmd).
 
 ```{r}
 allagg$catchment
@@ -318,7 +307,7 @@ allagg$catchment |>
                           facet_col = 'scenario',
                           facet_row = 'Specific_goal',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = cewo_valleys, 
                                                underlay_pal = 'grey90'))
 ```
@@ -348,7 +337,7 @@ allagg$Objective |>
                           facet_col = 'scenario',
                           facet_row = 'Objective',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'),
+                          sceneorder = c('down2', 'base', 'up2'),
                           underlay_list = list(underlay = sdl_units, 
                                                underlay_pal = 'grey90'))
 ```
@@ -378,7 +367,7 @@ allagg$mdb |>
                           facet_col = 'scenario',
                           facet_row = 'Objective',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'))
+                          sceneorder = c('down2', 'base', 'up2'))
 ```
 
 #### Sheet 9- 5-year targets
@@ -406,7 +395,7 @@ allagg$target_5_year_2024 |>
                           facet_col = 'scenario',
                           facet_row = 'target_5_year_2024',
                           scene_pal = scene_pal,
-                          sceneorder = c('down4', 'base', 'up4'))
+                          sceneorder = c('down2', 'base', 'up2'))
 ```
 
 ## Simple inputs and saving
@@ -419,7 +408,7 @@ In practice, we often won't call `multi_aggregate` directly, but will use `read_
 #| lst-label: lst-save-out
 #| lst-cap: Path inputs and saving outputs with run_and_agg
 #| message: false
-if (REBUILD_DATA) {savep <- file.path(out_path)} else {savep <- NULL}
+if (params$REBUILD_DATA) {savep <- file.path(out_path)} else {savep <- NULL}
 
 ts_from_raa <- read_and_agg(datpath = ewr_results, 
                             type = 'summary',
@@ -446,7 +435,7 @@ names(ts_from_raa)
 
 ## Parallelization
 
-The [theme notebook](aggregator/theme_agg.qmd), demonstrates potential parallelisation over gauges and scenarios from read-in onwards, which will likely be very useful once we're dealing with real scenarios. Once spatial aggregation occurs, parallelisation over gauges doesn't work, since their outcomes need to be aggregated together. That means in general, we are likely to run parallelisation over just scenarios, although there is certainly scope for clever chunking to allow parallelisation over space and time as well if that becomes necessary.
+The [theme notebook](theme_agg.qmd), demonstrates potential parallelisation over gauges and scenarios from read-in onwards, which will likely be very useful once we're dealing with real scenarios. Once spatial aggregation occurs, parallelisation over gauges doesn't work, since their outcomes need to be aggregated together. That means in general, we are likely to run parallelisation over just scenarios, although there is certainly scope for clever chunking to allow parallelisation over space and time as well if that becomes necessary.
 
 ::: {#par-combine-list style="border: 2px solid gray; color: gray"}
 Note: if we want to `saveintermediate = TRUE`, which we often do, we can't `.combine = bind_rows`, but would need to save a list of lists and then `bind_rows` at each list-level post-hoc with `purrr`. I have not established that as a function yet, but it is high priority as we settle on data formats and batching workflows.
@@ -491,7 +480,7 @@ parAgg <- foreach(s = allscenes,
 parAgg
 ```
 
-That output is the same as `tsagg`, but now it's been read-in and processed in parallel over scenarios. As in the [theme situation](aggregator/theme_agg.qmd), this toy example is slower, but should yield large speedups for larger jobs.
+That output is the same as `tsagg`, but now it's been read-in and processed in parallel over scenarios. As in the [theme situation](theme_agg.qmd), this toy example is slower, but should yield large speedups for larger jobs.
 
 ## Next steps
 

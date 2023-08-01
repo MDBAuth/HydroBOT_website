@@ -7,17 +7,6 @@ params:
   REBUILD_DATA: FALSE
 ---
 
-```{r}
-#| echo: false
-
-# params don't get seen in interactive running, so handle that.
-if ("params" %in% ls()) {
-  REBUILD_DATA <- params$REBUILD_DATA
-} else {
-  REBUILD_DATA <- FALSE
-}
-```
-
 ## Gauges in Macquarie
 
 For the case study, we need a list of gauges.
@@ -68,7 +57,7 @@ mac_gauges <- mac_gauges %>%
   cbind(st_coordinates(.)) %>% 
   dplyr::rename(lon = X, lat = Y)
 
-if (REBUILD_DATA) {
+if (params$REBUILD_DATA) {
   mac_gauges %>% 
   st_drop_geometry() %>% 
   readr::write_csv(file.path(scenario_dir, 'Macquarie_gauges.csv'))

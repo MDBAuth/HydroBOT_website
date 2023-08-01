@@ -19,7 +19,7 @@ library(sf)
 
 This notebook provides examples of creating bar plots, e.g. plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, scenario. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit and type of response.
 
-For a quantitative x-axis, we would typically use [line plots](comparer/line_plots.qmd).
+For a quantitative x-axis, we would typically use [line plots](../comparer/line_plots.qmd).
 
 # Demonstration setup
 
@@ -97,7 +97,7 @@ funseq <- list(c('CompensatingFactor'),
 
 ## Choosing example data
 
-First, we read in the aggregated data and make a simple demonstration bar plot. There is example data provided by the toolkit (`agg_theme_space` and `agg_theme_space_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](aggregator/theme_space_agg.qmd).
+First, we read in the aggregated data and make a simple demonstration bar plot. There is example data provided by the toolkit (`agg_theme_space` and `agg_theme_space_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/theme_space_agg.qmd).
 
 *Note*- to `readRDS` `sf` objects, we need to have `sf` loaded.
 
@@ -297,7 +297,7 @@ plot_outcomes(obj_sdl_to_plot,
 
 ## Grouped colors
 
-We have the ability to assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](causal_networks/causal_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
+We have the ability to assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](../causal_networks/causal_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
 
 Achieving this requires specifying two columns- the `colorset`, as above, is the column that determines color. The `colorgroups` column specifies the groupings of those `colorset` values, and so what palette to use. Thus, the `pal_list` needs to be either length 1 (everything gets the same palette) or `length(unique(data$colorgroups))`. Note also that the `colorset` values must be unique to `colorgroups`- this cannot be a one-to-many mapping because each `colorset` value must get a color from a single palette defined by the `colorgroup` it is in.
 
@@ -600,7 +600,7 @@ sdl_line_groups <- obj_sdl_to_plot |>
 sdl_line_groups
 ```
 
-That's fairly complex, so we can facet it, as we did with the [bars](bar_plots.qmd) to make the individual `env_obj`s easier to see.
+That's fairly complex, so we can facet it, as we did with the [bars](../comparer/bar_plots.qmd) to make the individual `env_obj`s easier to see.
 
 ```{r}
 #| label: fig-env-group-facet
@@ -635,7 +635,7 @@ The above is typically how we would go about this facetting, but it is worth rei
 sdl_line_groups + facet_grid(SWSDLName ~ env_group)
 ```
 
-As with the [bar plots](bar_plots.qmd), we can color by any column we want, and the spatial units is a logical choice. We again use `point_group`, since multiple `env_obj` rows are mapped to each color. The overplotting gets unreadable here and so I've retained the facetting, but if we were looking at a subset, the line colors could be enough (or if we are summarising the data with a smoother- see below).
+As with the [bar plots](../comparer/bar_plots.qmd), we can color by any column we want, and the spatial units is a logical choice. We again use `point_group`, since multiple `env_obj` rows are mapped to each color. The overplotting gets unreadable here and so I've retained the facetting, but if we were looking at a subset, the line colors could be enough (or if we are summarising the data with a smoother- see below).
 
 ```{r}
 #| label: fig-sdl-colors
