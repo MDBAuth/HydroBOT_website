@@ -3,24 +3,42 @@ title: "Causal networks"
 author: "Galen Holt"
 format: html
 editor: visual
+bibliography: references.bib
 ---
 
 ## Overview
 
-This needs to be fleshed out
+### What are causal networks?
 
--   What are causal networks
+Causal networks are models that describe the relationships between climate, adaptation options and outcomes for environmental, cultural, social, and economic values and assets (that is, the elements of the quadruple bottom line) (adapted from [@peeters2022]). They include the links which form the basis of the Driver-indicator-response models (e.g. EWR tool: hydrology to indicators), in addition to the links that connect indicators to objectives that are defined for key values.
 
--   Where do we get them
+Causal networks can [show many relationships and outcomes](causal_plots.qmd). To illustrate here, we show the links between EWRs (hydrologic indicators), proximate environmental objectives, larger-scale objectives, and finally broad-based ecological groupings.
 
--   What are they for
+```{r}
+#| echo: false 
+#| message: false
+library(werptoolkitr)
+library(dplyr)
+edges <- make_edges(dflist = causal_ewr,
+                    fromtos = list(c('ewr_code', 'env_obj'),
+                                   c('env_obj', 'Specific_goal'),
+                                   c('Specific_goal', 'Target'),
+                                   c('env_obj', 'target_5_year_2024')),
+                    gaugefilter = '409025') 
+nodes <- make_nodes(edges)  
+make_causal_plot(filter(nodes, NodeType != 'target_5_year_2024'), 
+                 edges, render = FALSE) %>%
+  DiagrammeR::render_graph()
+```
 
-    -   Used in comms
+### Where do they come from?
 
-    -   un-black-boxing
+The causal networks for environmental, cultural, social, or economic values are derived from specific documents detailing the relationships between indicators and objectives for those bottom-line elements. For the present example, we focus on environmental values in two catchments of the Murray-Darling Basin and so we draw the causal relationships from the Long Term Water Plan (LTWP). The LTWP reports the environmental water requirements (EWRs) for spatially explicit objectives to be achieved. These objectives are aimed to support the completion of all elements of a lifecycle of an organism or group of organisms (taxonomic or spatial) (LTWP doc). Objectives are described for five target groups and are associated with long-term targets (5, 10, and 20 year) of the LTWP\'s management strategies. The links from EWRs to environmental objectives to long-term targets are captured in the causal networks to enable assessment of outcomes in direct equivalence to the LTWP\'s management strategies. 
 
-    -   They are the theme-scaling axis
+### How are they useful?
 
--   An example figure or two
+The causal networks enables 1) visual representation of the complex inter-relationships between scenario inputs (hydrographs) and river-related outcomes and 2) assessment of outcomes aggregated along the thematic dimension \[theme-scaling axis\] (see section 2.4 Aggregator). The former, aids transparency, elucidating the targets and causal relationships behind the Driver-indicator-response models and is a useful device for communication about the toolkit and its outputs. The latter, allows outcomes to be assessed for individual (or sets of) environmental objectives, target groups, long-term targets, or at the level of the quadruple bottom line to identify synergies and trade-offs among values. 
 
-This links to the notebooks for [creation and manipulation](causal_manipulation.qmd) and [causal plots](causal_plots.qmd).
+### In the toolkit
+
+The toolkit provides various functions for [creation and manipulation](causal_manipulation.qmd) of causal networks, depending on what needs to be plotted or investigated, and the [causal plots](causal_plots.qmd) page provides some examples of various ways they can be visualised with the toolkit.

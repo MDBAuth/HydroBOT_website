@@ -13,6 +13,7 @@ params:
 Load the package
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 ```
 
@@ -93,7 +94,7 @@ Now we run the ewr tool with the parameters given and save the output.
 
 There's an issue with `outputType = 'annual'` in the version of the EWR tool this was built with. Until I update and test the new EWR tool, skip the annual data. There are still a number of messages printed by the EWR code, about pulling the data and gauge dependencies. Those are useful when using the code, but I'll suppress printing them here since there are so many.
 
-This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd). 
+This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd).
 
 ```{r}
 #| eval: false

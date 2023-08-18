@@ -13,6 +13,7 @@ params:
 Load the package
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 ```
 

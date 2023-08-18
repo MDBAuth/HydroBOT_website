@@ -9,6 +9,7 @@ echo: true
 ## Full toolkit run
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 library(sf)
 library(dplyr)

@@ -8,6 +8,7 @@ params:
 This document provides a template for running through the toolkit, saving the output of each step along the way in a single document (e.g. not running the Controller, Aggregator, and Comparer as separate notebooks). Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_in_memory.qmd).
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 library(sf)
 ```

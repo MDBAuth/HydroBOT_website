@@ -11,6 +11,7 @@ params:
 ---
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 library(ggplot2)
 ```

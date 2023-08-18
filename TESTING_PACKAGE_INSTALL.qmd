@@ -28,6 +28,7 @@ devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master',
 ```
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 ```
 

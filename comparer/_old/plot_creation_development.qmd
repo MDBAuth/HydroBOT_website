@@ -10,7 +10,7 @@ editor: visual
 I think this file might be old and outdated.
 
 ```{r}
-# library(werptoolkitr)
+#| message: false
 library(ggplot2)
 library(dplyr) # make my life easier
 ```

@@ -10,6 +10,7 @@ This document provides a template for running through the toolkit in a single do
 Load the package
 
 ```{r}
+#| message: false
 library(werptoolkitr)
 library(sf)
 ```
