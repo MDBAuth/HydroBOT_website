@@ -205,24 +205,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-1_d931f8204ae07d791f05c4e6674f7fce">
+<div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-1_d6684d08cd0f0b6193624529f782b2c4">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(werptoolkitr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
 </div>
 <section id="overview" class="level1">
 <h1>Overview</h1>
@@ -232,26 +218,26 @@ Attaching package: 'dplyr'</code></pre>
 <h2 class="anchored" data-anchor-id="demonstration-setup">Demonstration setup</h2>
 <p>As usual, we need paths to the data.</p>
 <div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-2_00a3b0388f09808c37d00844f3c81f36">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'more_scenarios'</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hydro_dir <span class="ot">=</span> <span class="fu">file.path</span>(project_dir, <span class="st">'hydrographs'</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>agg_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(project_dir, <span class="st">'aggregator_output'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'more_scenarios'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hydro_dir <span class="ot">=</span> <span class="fu">file.path</span>(project_dir, <span class="st">'hydrographs'</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>agg_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(project_dir, <span class="st">'aggregator_output'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="scenario-information" class="level2">
 <h2 class="anchored" data-anchor-id="scenario-information">Scenario information</h2>
 <p>This should be auto-acquired from the dirs above. But while its format is still up in the air, I’m leaving it a bit more user-editable.</p>
 <div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-3_c61be8764d6a1cd69a54abe5289af56a">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(hydro_dir,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                                           <span class="st">'scenario_metadata.json'</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">everything</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(hydro_dir,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                                           <span class="st">'scenario_metadata.json'</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">everything</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="subset-for-demo" class="level2">
 <h2 class="anchored" data-anchor-id="subset-for-demo">Subset for demo</h2>
 <p>We have a lot of hydrographs, so for this demonstration, we will often use a subset.</p>
 <div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-4_d197fa9407224efe5771a680516845a8">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>gauges_to_plot <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'412002'</span>, <span class="st">'419001'</span>, <span class="st">'422028'</span>, <span class="st">'421001'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gauges_to_plot <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'412002'</span>, <span class="st">'419001'</span>, <span class="st">'422028'</span>, <span class="st">'421001'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -259,10 +245,10 @@ Attaching package: 'dplyr'</code></pre>
 <h1>Standard scenario appearance</h1>
 <p>We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.</p>
 <div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-5_c7d7a05eb2144009d97ec65328f080c3">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sceneorder <span class="ot">&lt;-</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(scenarios<span class="sc">$</span>scenario_name, scenarios<span class="sc">$</span>flow_multiplier)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>scene_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="fu">unique</span>(scenarios<span class="sc">$</span>scenario_name), </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">palette =</span> <span class="st">'ggsci::nrc_npg'</span>, </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">refvals =</span> <span class="st">'base'</span>, <span class="at">refcols =</span> <span class="st">'black'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sceneorder <span class="ot">&lt;-</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(scenarios<span class="sc">$</span>scenario_name, scenarios<span class="sc">$</span>flow_multiplier)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scene_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="fu">unique</span>(scenarios<span class="sc">$</span>scenario_name), </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">palette =</span> <span class="st">'ggsci::nrc_npg'</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">refvals =</span> <span class="st">'base'</span>, <span class="at">refcols =</span> <span class="st">'black'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="plot-heatmaps" class="level1">
@@ -270,36 +256,36 @@ Attaching package: 'dplyr'</code></pre>
 <p>Once we have data that needs heatmaps, we’d read in those aggregated outcome lists and make the demo plots here.</p>
 <p>As an example</p>
 <div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-6_51bf3e854e798d772aa92485c9de0ee9">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>variables <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">expand_grid</span>(<span class="at">Env_var1 =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">4</span>, <span class="fl">0.25</span>), <span class="at">Env_var2 =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">10</span>, <span class="dv">2</span>))</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>variables <span class="ot">&lt;-</span> variables <span class="sc">%&gt;%</span> </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">Metric =</span> Env_var1<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> Env_var2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>variables <span class="ot">&lt;-</span> tidyr<span class="sc">::</span><span class="fu">expand_grid</span>(<span class="at">Env_var1 =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">4</span>, <span class="fl">0.25</span>), <span class="at">Env_var2 =</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">10</span>, <span class="dv">2</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>variables <span class="ot">&lt;-</span> variables <span class="sc">%&gt;%</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">Metric =</span> Env_var1<span class="sc">^</span><span class="dv">2</span> <span class="sc">+</span> Env_var2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-7_55aedf8a400b0aedc747603f6b69edf9">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(variables) <span class="sc">+</span> <span class="fu">geom_raster</span>(<span class="fu">aes</span>(<span class="at">x =</span> Env_var1, <span class="at">y =</span> Env_var2, <span class="at">fill =</span> Metric)) <span class="sc">+</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  viridis<span class="sc">::</span><span class="fu">scale_fill_viridis</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(variables) <span class="sc">+</span> <span class="fu">geom_raster</span>(<span class="fu">aes</span>(<span class="at">x =</span> Env_var1, <span class="at">y =</span> Env_var2, <span class="at">fill =</span> Metric)) <span class="sc">+</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  viridis<span class="sc">::</span><span class="fu">scale_fill_viridis</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="heatmap_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-8_071afd605203ec0fec0dbbbd275c3494">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Env_var1 =</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">4</span>, <span class="fl">0.25</span>), <span class="dv">15</span>), <span class="at">Env_var2 =</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">10</span>, <span class="dv">2</span>), <span class="dv">15</span>), <span class="at">scenario =</span> <span class="fu">as.character</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>), <span class="at">isscenario =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>scenariotib <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Env_var1 =</span> <span class="fu">rnorm</span>(<span class="dv">26</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span>), <span class="at">Env_var2 =</span> <span class="fu">rnorm</span>(<span class="dv">26</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">scenario =</span> letters, <span class="at">isscenario =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>scenariosamples <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(samples, scenariotib)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>samples <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Env_var1 =</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">4</span>, <span class="fl">0.25</span>), <span class="dv">15</span>), <span class="at">Env_var2 =</span> <span class="fu">sample</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="dv">30</span>, <span class="dv">10</span>, <span class="dv">2</span>), <span class="dv">15</span>), <span class="at">scenario =</span> <span class="fu">as.character</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>), <span class="at">isscenario =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>scenariotib <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">Env_var1 =</span> <span class="fu">rnorm</span>(<span class="dv">26</span>, <span class="fl">0.5</span>, <span class="fl">0.1</span>), <span class="at">Env_var2 =</span> <span class="fu">rnorm</span>(<span class="dv">26</span>, <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">scenario =</span> letters, <span class="at">isscenario =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>scenariosamples <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(samples, scenariotib)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="heatmap_cache/html/unnamed-chunk-9_14297849d85967607cf0e340c87ca509">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>heatexample <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_raster</span>(<span class="at">data =</span> variables,</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">x =</span> Env_var1, <span class="at">y =</span> Env_var2, <span class="at">fill =</span> Metric)) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  viridis<span class="sc">::</span><span class="fu">scale_fill_viridis</span>() <span class="sc">+</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> scenariosamples, </span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">x =</span> Env_var1, <span class="at">y =</span> Env_var2, <span class="at">color =</span> isscenario)) <span class="sc">+</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">'firebrick'</span>, <span class="st">'magenta4'</span>)) <span class="sc">+</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">'none'</span>) <span class="sc">+</span> </span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_werp_toolkit</span>()</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>heatexample</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>heatexample <span class="ot">&lt;-</span> <span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_raster</span>(<span class="at">data =</span> variables,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">aes</span>(<span class="at">x =</span> Env_var1, <span class="at">y =</span> Env_var2, <span class="at">fill =</span> Metric)) <span class="sc">+</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  viridis<span class="sc">::</span><span class="fu">scale_fill_viridis</span>() <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">data =</span> scenariosamples, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">x =</span> Env_var1, <span class="at">y =</span> Env_var2, <span class="at">color =</span> isscenario)) <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">'firebrick'</span>, <span class="st">'magenta4'</span>)) <span class="sc">+</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">guides</span>(<span class="at">color =</span> <span class="st">'none'</span>) <span class="sc">+</span> </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_werp_toolkit</span>()</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>heatexample</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="heatmap_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>

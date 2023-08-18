@@ -307,21 +307,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>The output directory and subdirs for scenarios is created by <code>make_output_dir</code>, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so <code>paths_gauges_R</code> just unfolds the dict to give that. There will likely be continued changes to these functions as we settle on standard directory structures and data formats. These functions are currently all python wrapped by R for historical reasons, but as they are just directory creation and querying could be easily re-written in R to tighten up the package.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Gives file locations as a dict- </span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sceneinfodict <span class="ot">&lt;-</span> <span class="fu">make_scenario_info_R</span>(hydro_dir)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># make the output directory structure</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>outpath <span class="ot">&lt;-</span> <span class="fu">make_output_dir_R</span>(project_dir, sceneinfodict)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># unfold the sceneinfodict to make it easy to get the lists of paths and gauges</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># everyhydro = paths_gauges(sceneinfodict)[0]</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># The inner level turned into characters in R and needs to stay as a list. This is annoying but needed *only in R*</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(sceneinfodict)) {</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    sceneinfodict[[i]][[j]] <span class="ot">&lt;-</span> <span class="fu">as.list</span>(sceneinfodict[[i]][[j]])</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># more list-making to work from R-Python</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>everyhydro <span class="ot">&lt;-</span> <span class="fu">as.list</span>(<span class="fu">paths_gauges_R</span>(sceneinfodict)[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sceneinfodict <span class="ot">&lt;-</span> <span class="fu">make_scenario_info_R</span>(hydro_dir)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in normalizePath(path.expand(path), winslash, mustWork):
+path[1]="C:/Users/galen/Documents/code/WERP/demo_pkg_updates/.venv/Scripts":
+The system cannot find the path specified</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># make the output directory structure</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>outpath <span class="ot">&lt;-</span> <span class="fu">make_output_dir_R</span>(project_dir, sceneinfodict)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># unfold the sceneinfodict to make it easy to get the lists of paths and gauges</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># everyhydro = paths_gauges(sceneinfodict)[0]</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># The inner level turned into characters in R and needs to stay as a list. This is annoying but needed *only in R*</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(sceneinfodict)) {</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    sceneinfodict[[i]][[j]] <span class="ot">&lt;-</span> <span class="fu">as.list</span>(sceneinfodict[[i]][[j]])</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="co"># more list-making to work from R-Python</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>everyhydro <span class="ot">&lt;-</span> <span class="fu">as.list</span>(<span class="fu">paths_gauges_R</span>(sceneinfodict)[[<span class="dv">1</span>]])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="run-the-ewr-tool" class="level2">
@@ -330,22 +335,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>There’s an issue with <code>outputType = 'annual'</code> in the version of the EWR tool this was built with. Until I update and test the new EWR tool, skip the annual data. There are still a number of messages printed by the EWR code, about pulling the data and gauge dependencies. Those are useful when using the code, but I’ll suppress printing them here since there are so many.</p>
 <p>This is not actually run here for speed- the same thing is done in a notebook for the <a href="../full_toolkit/WERP_toolkit_save_steps.html">full toolkit</a>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To make a list in python, need to have unnamed lists in R</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>params<span class="sc">$</span>REBUILD_DATA) {</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  outputType <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'none'</span>)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (params<span class="sc">$</span>REBUILD_DATA) {</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  outputType <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'summary'</span>, <span class="st">'all'</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>ewr_out <span class="ot">&lt;-</span> <span class="fu">run_save_ewrs_R</span>(everyhydro, outpath, <span class="at">model_format =</span> model_format, <span class="at">allowance =</span> allowance, <span class="at">climate =</span> climate, <span class="at">outputType =</span> outputType, <span class="at">datesuffix =</span> <span class="cn">FALSE</span>, <span class="at">returnType =</span> <span class="fu">list</span>(<span class="st">'summary'</span>, <span class="st">'all'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To make a list in python, need to have unnamed lists in R</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span>params<span class="sc">$</span>REBUILD_DATA) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  outputType <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'none'</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (params<span class="sc">$</span>REBUILD_DATA) {</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  outputType <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="st">'summary'</span>, <span class="st">'all'</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>ewr_out <span class="ot">&lt;-</span> <span class="fu">run_save_ewrs_R</span>(everyhydro, outpath, <span class="at">model_format =</span> model_format, <span class="at">allowance =</span> allowance, <span class="at">climate =</span> climate, <span class="at">outputType =</span> outputType, <span class="at">datesuffix =</span> <span class="cn">FALSE</span>, <span class="at">returnType =</span> <span class="fu">list</span>(<span class="st">'summary'</span>, <span class="st">'all'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Briefly, we can see that that has returned dataframes from the EWR (with some leftover pandas datetime environments that we could clean up if we wanted to use this in-memory). Typically, though, we just save this out. Because we do not actually run the chunk above for rendering this site, these dataframes are not available here.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ewr_out)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(ewr_out<span class="sc">$</span>summary)</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(ewr_out<span class="sc">$</span>all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ewr_out)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(ewr_out<span class="sc">$</span>summary)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(ewr_out<span class="sc">$</span>all)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>

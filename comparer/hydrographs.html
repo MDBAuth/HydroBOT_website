@@ -270,24 +270,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </header>
 
-<div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-1_989a06ef92f75ee99b78599522ca1387">
+<div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-1_be0f00f09ed717dfaff2836ddd3128cd">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(werptoolkitr)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
 </div>
 <section id="overview" class="level1">
 <h1>Overview</h1>
@@ -296,25 +282,25 @@ Attaching package: 'dplyr'</code></pre>
 <h2 class="anchored" data-anchor-id="demonstration-setup">Demonstration setup</h2>
 <p>As usual, we need paths to the data, in this case the hydrographs.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-2_fe8a6dbe0b98b4da7368a08e8692233f">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'more_scenarios'</span>)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hydro_dir <span class="ot">=</span> <span class="fu">file.path</span>(project_dir, <span class="st">'hydrographs'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>project_dir <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">'more_scenarios'</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>hydro_dir <span class="ot">=</span> <span class="fu">file.path</span>(project_dir, <span class="st">'hydrographs'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="scenario-information" class="level2">
 <h2 class="anchored" data-anchor-id="scenario-information">Scenario information</h2>
 <p>Get scenario metadata. This will be auto-found later, but leaving here until it firms up.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-3_786f7a6c725e76c89a77c186c1e5b5a2">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(hydro_dir, </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                                           <span class="st">'scenario_metadata.json'</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">everything</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>scenarios <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">read_json</span>(<span class="fu">file.path</span>(hydro_dir, </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                                           <span class="st">'scenario_metadata.json'</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  tibble<span class="sc">::</span><span class="fu">as_tibble</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">everything</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="subset-for-demo" class="level2">
 <h2 class="anchored" data-anchor-id="subset-for-demo">Subset for demo</h2>
 <p>We have a lot of hydrographs, so for this demonstration, we will often use a subset.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-4_6b47e7b23ef6af578e7b33461df20099">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>gauges_to_plot <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'412002'</span>, <span class="st">'419001'</span>, <span class="st">'422028'</span>, <span class="st">'421001'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gauges_to_plot <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'412002'</span>, <span class="st">'419001'</span>, <span class="st">'422028'</span>, <span class="st">'421001'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -322,35 +308,35 @@ Attaching package: 'dplyr'</code></pre>
 <h1>Standard scenario appearance</h1>
 <p>We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-5_13b4ed9d33a7538fee0bcad20d4c2103">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>sceneorder <span class="ot">&lt;-</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(scenarios<span class="sc">$</span>scenario_name, scenarios<span class="sc">$</span>flow_multiplier)</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>scene_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="fu">unique</span>(scenarios<span class="sc">$</span>scenario_name), </span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">palette =</span> <span class="st">'ggsci::nrc_npg'</span>, </span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">refvals =</span> <span class="st">'base'</span>, <span class="at">refcols =</span> <span class="st">'black'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>sceneorder <span class="ot">&lt;-</span> forcats<span class="sc">::</span><span class="fu">fct_reorder</span>(scenarios<span class="sc">$</span>scenario_name, scenarios<span class="sc">$</span>flow_multiplier)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>scene_pal <span class="ot">&lt;-</span> <span class="fu">make_pal</span>(<span class="fu">unique</span>(scenarios<span class="sc">$</span>scenario_name), </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">palette =</span> <span class="st">'ggsci::nrc_npg'</span>, </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                      <span class="at">refvals =</span> <span class="st">'base'</span>, <span class="at">refcols =</span> <span class="st">'black'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="plotting-hydrographs" class="level1">
 <h1>Plotting hydrographs</h1>
 <p>We first read in the hydrographs, with a bit of standardised data processing. The <code>read_hydro</code> function knows about the standard data organisation format, and so pulls hydrographs from all scenarios.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-6_5f2f696b87f8f9ffa5e506498486092d">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>scenehydros <span class="ot">&lt;-</span> <span class="fu">read_hydro</span>(hydro_dir, <span class="at">long =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">'csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>scenehydros <span class="ot">&lt;-</span> <span class="fu">read_hydro</span>(hydro_dir, <span class="at">long =</span> <span class="cn">TRUE</span>, <span class="at">format =</span> <span class="st">'csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now, we can make a simple plot using the standard format and colors</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-7_6721cecbd7ebbc068309e571b07495f2">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot, </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal,</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot, </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="hydrographs_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>The <code>plot_hydrographs</code> function has a <code>scenariofilter</code> argument if we want to drop some scenarios, which also shows that the scenario colors stay consistent, even if some are missing. Further, we can access the <code>scales</code> argument from <code>ggplot2::facet_*</code> and <code>trans</code> arguments of of <code>ggplot2::cale_y_continuous</code> (though just for the y-axis).</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-8_06ffd388adf343e8a5553b2b07058207">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, <span class="at">gaugefilter =</span> gauges_to_plot, </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scenariofilter =</span> <span class="fu">c</span>(<span class="st">'up2'</span>, <span class="st">'base'</span>, <span class="st">'down2'</span>), </span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scales =</span> <span class="st">'free_y'</span>, <span class="at">transy =</span> <span class="st">'log10'</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, <span class="at">gaugefilter =</span> gauges_to_plot, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scenariofilter =</span> <span class="fu">c</span>(<span class="st">'up2'</span>, <span class="st">'base'</span>, <span class="st">'down2'</span>), </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">scales =</span> <span class="st">'free_y'</span>, <span class="at">transy =</span> <span class="st">'log10'</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Transformation introduced infinite values in continuous y-axis</code></pre>
 </div>
@@ -366,19 +352,19 @@ Attaching package: 'dplyr'</code></pre>
 <p>Internally, the <code>plot_*</code> functions call <code>baseline_compare</code>, but <code>baseline_compare</code> can be used externally as well (and is actually quite useful in a number of places to baseline long data).</p>
 <p>For example, we might want to calculate the difference between the modified scenarios and the <code>base</code> scenario. To do this, we simply pass in the data, the columns defining the groups <code>compare_col</code>, and the <code>base_lev</code>, that is, the value in <code>compare_col</code> that is the baseline situation. We also need to tell it which column contains the values, and the function <code>comp_fun</code> we want to use for the comparison. Here, we ask for the <code>difference</code> to the baseline provided by the base scenario.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-9_7b4a338e2f6678f5c8b361b1bfc47c5d">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dif_flow <span class="ot">&lt;-</span> <span class="fu">baseline_compare</span>(scenehydros, <span class="at">compare_col =</span> <span class="st">'scenario'</span>, </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">base_lev =</span> <span class="st">'base'</span>, </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">values_col =</span> <span class="st">'flow'</span>, </span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">comp_fun =</span> difference,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'Date'</span>, <span class="st">'gauge'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>dif_flow <span class="ot">&lt;-</span> <span class="fu">baseline_compare</span>(scenehydros, <span class="at">compare_col =</span> <span class="st">'scenario'</span>, </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>                             <span class="at">base_lev =</span> <span class="st">'base'</span>, </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                             <span class="at">values_col =</span> <span class="st">'flow'</span>, </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>                             <span class="at">comp_fun =</span> difference,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>                             <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'Date'</span>, <span class="st">'gauge'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we can feed the dif_flow dataframe to <code>plot_hydrographs</code> directly. We see that, as expected, <code>base</code> is now a flat line at 0, while up2 and down2 go up and down, respectively.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-10_16f07068661fb340949a0ea466efab0b">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(dif_flow, </span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot, </span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'difference_flow'</span>, </span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal,</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(dif_flow, </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot, </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'difference_flow'</span>, </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="hydrographs_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -386,12 +372,12 @@ Attaching package: 'dplyr'</code></pre>
 <p>In practice, we would typically let the baselining happen internally to the <code>plot_*</code> functions so we aren’t carrying around and keeping track of a bunch of altered dataframes. To replicate the above plot, we only have to feed <code>plot_hydrographs</code> the <code>base_lev</code> and <code>comp_fun</code> arguments- it automatically uses the <code>scenario</code> column as the groupings. This is also true for <code>plot_outcomes</code>. If we want to do something more unusual with the baselining, we will need to do it external to the <code>plot_*</code> functions, at least until it becomes common enough for us to decide to incorporate the additional parsing.</p>
 <p>We get a warning here about not being explicit about the <code>group_cols</code> argument to the baselining function, which just groups by everything non-numeric if that argument is not given. We can pass it since there are dots <code>…</code>, which we do in subsequent examples.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-11_bd9a9149ff182f090822445f18c604fc">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, </span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot,</span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal, </span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">base_lev =</span> <span class="st">'base'</span>, </span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">comp_fun =</span> difference,</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal, </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">base_lev =</span> <span class="st">'base'</span>, </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">comp_fun =</span> difference,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: `group_cols` argument not passed, but multiple
 data points in scenario.
@@ -404,44 +390,44 @@ but FAR better to be explicit.</code></pre>
 </div>
 <p>The other default comparison function is <code>relative</code> , which has an <code>add_eps</code> argument to pull zeros up a bit and avoid divide-by-0 infinities. This is a bit silly to use for this test case, since the test case was created multiplicatively, so all <code>down2</code> values are 0.5*base and <code>up2</code> values are 2*base, for example. Now we give the <code>group_cols</code> argument to the baseline function through the dots, just as we pass the <code>add_eps</code> argument.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-12_2a0b9bb9f189f9a54dfe26d892638163">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, <span class="at">gaugefilter =</span> gauges_to_plot, </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'flow'</span>, <span class="at">colors =</span> scene_pal, </span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">base_lev =</span> <span class="st">'base'</span>, <span class="at">comp_fun =</span> relative, </span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">add_eps =</span> <span class="fu">min</span>(scenehydros<span class="sc">$</span>flow[scenehydros<span class="sc">$</span>flow <span class="sc">&gt;</span> <span class="dv">0</span>])<span class="sc">/</span><span class="dv">10</span>,</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'Date'</span>, <span class="st">'gauge'</span>),</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, <span class="at">gaugefilter =</span> gauges_to_plot, </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">y_col =</span> <span class="st">'flow'</span>, <span class="at">colors =</span> scene_pal, </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">base_lev =</span> <span class="st">'base'</span>, <span class="at">comp_fun =</span> relative, </span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">add_eps =</span> <span class="fu">min</span>(scenehydros<span class="sc">$</span>flow[scenehydros<span class="sc">$</span>flow <span class="sc">&gt;</span> <span class="dv">0</span>])<span class="sc">/</span><span class="dv">10</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'Date'</span>, <span class="st">'gauge'</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="hydrographs_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Finally, as with other situations where we can pass functions, we can create a custom comparison function. The ability to pass anonymous functions in a list a la the aggregator is not yet implemented here. The two above are the logical functions to use, but for demonstration purposes, let’s create a function that finds the square root of the absolute value of the difference.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-13_5d7b67b0879b1f49ca93075385ee5d49">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sqrtdif <span class="ot">&lt;-</span> <span class="cf">function</span>(x,y) {<span class="fu">sqrt</span>(<span class="fu">abs</span>(x<span class="sc">-</span>y))}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sqrtdif <span class="ot">&lt;-</span> <span class="cf">function</span>(x,y) {<span class="fu">sqrt</span>(<span class="fu">abs</span>(x<span class="sc">-</span>y))}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-14_b042c8a73f367e046b78d406295f7c15">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal, </span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">base_lev =</span> <span class="st">'base'</span>, </span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">comp_fun =</span> sqrtdif,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'Date'</span>, <span class="st">'gauge'</span>),</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal, </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">base_lev =</span> <span class="st">'base'</span>, </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">comp_fun =</span> sqrtdif,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'Date'</span>, <span class="st">'gauge'</span>),</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="hydrographs_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>One way this could be very useful is for lagged or windowed operations, which we do here very simply by getting the difference to the baseline one day previous. The use in practice would need to be developed carefully to address specific questions.</p>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-15_9a4d0116babd9347ac53aa0dbf966fd8">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>lagdif <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {x <span class="sc">-</span> <span class="fu">lag</span>(y)}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>lagdif <span class="ot">&lt;-</span> <span class="cf">function</span>(x, y) {x <span class="sc">-</span> <span class="fu">lag</span>(y)}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell" data-hash="hydrographs_cache/html/unnamed-chunk-16_b38ba9436ddf9e1118b6dd829306fd22">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot,</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal, </span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">base_lev =</span> <span class="st">'base'</span>, </span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">comp_fun =</span> lagdif,</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'Date'</span>, <span class="st">'gauge'</span>),</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_hydrographs</span>(scenehydros, </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                 <span class="at">gaugefilter =</span> gauges_to_plot,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                 <span class="at">colors =</span> scene_pal, </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                 <span class="at">base_lev =</span> <span class="st">'base'</span>, </span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">comp_fun =</span> lagdif,</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">group_cols =</span> <span class="fu">c</span>(<span class="st">'Date'</span>, <span class="st">'gauge'</span>),</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sceneorder =</span> sceneorder)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="hydrographs_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
 </div>

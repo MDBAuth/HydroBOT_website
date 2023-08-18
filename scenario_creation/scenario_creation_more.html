@@ -339,16 +339,21 @@ Error in py_get_attr_impl(x, name, silent) :
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>ewrs, badewrs <span class="op">=</span> get_EWR_table()</span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pdi <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"py_ewr.data_inputs"</span>)</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ewrs_in_pyewr <span class="ot">&lt;-</span> pdi<span class="sc">$</span><span class="fu">get_EWR_table</span>() </span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ewrs_in_pyewr) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'ewrs'</span>, <span class="st">'badewrs'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pdi <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">"py_ewr.data_inputs"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in normalizePath(path.expand(path), winslash, mustWork):
+path[1]="C:/Users/galen/Documents/code/WERP/demo_pkg_updates/.venv/Scripts":
+The system cannot find the path specified</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>ewrs_in_pyewr <span class="ot">&lt;-</span> pdi<span class="sc">$</span><span class="fu">get_EWR_table</span>() </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(ewrs_in_pyewr) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">'ewrs'</span>, <span class="st">'badewrs'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>What are those gauges, and which are in both the ewr and the desired catchments?</p>
 <p>The way that works everywhere but vscode- this seems universal though</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ewrgauges <span class="ot">&lt;-</span> ewrs_in_pyewr<span class="sc">$</span>ewr<span class="sc">$</span>Gauge</span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>ewr_demo_gauges <span class="ot">&lt;-</span> gaugenums[gaugenums <span class="sc">%in%</span> ewrgauges]</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(ewr_demo_gauges)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ewrgauges <span class="ot">&lt;-</span> ewrs_in_pyewr<span class="sc">$</span>ewr<span class="sc">$</span>Gauge</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>ewr_demo_gauges <span class="ot">&lt;-</span> gaugenums[gaugenums <span class="sc">%in%</span> ewrgauges]</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(ewr_demo_gauges)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 47</code></pre>
 </div>
@@ -359,93 +364,93 @@ Error in py_get_attr_impl(x, name, silent) :
 <h3 class="anchored" data-anchor-id="get-all-the-gauge-data">Get all the gauge data</h3>
 <p>Now we have a list of gauges, we need their hydrographs. We need a reasonable time span to account for temporal variation, but not too long- this is a simple case. Let’s choose 10 years.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>starttime <span class="ot">=</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(<span class="dv">20100101</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>endtime <span class="ot">=</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(<span class="dv">20191231</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>starttime <span class="ot">=</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(<span class="dv">20100101</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>endtime <span class="ot">=</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(<span class="dv">20191231</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Pull the gauges with <code>mdba_gauge_getter</code>. The type-translation that happens in here is because translating from python time to R time is extremely slow for this particular case (though not in general).</p>
 <p>This again needs a vscode translation</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mdba_gauge_getter <span class="im">as</span> gg</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="op">=</span> gg.gauge_pull(r.ewr_demo_gauges, start_time_user <span class="op">=</span> r.starttime, end_time_user <span class="op">=</span> r.endtime)</span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>demo_ids <span class="op">=</span> demo_levs.SITEID.unique()</span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(demo_ids)</span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># I think this will work, the above is running</span></span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>demo_levs[<span class="st">'Date'</span>] <span class="op">=</span> demo_levs[<span class="st">'DATETIME'</span>].astype(<span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mdba_gauge_getter <span class="im">as</span> gg</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="op">=</span> gg.gauge_pull(r.ewr_demo_gauges, start_time_user <span class="op">=</span> r.starttime, end_time_user <span class="op">=</span> r.endtime)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>demo_ids <span class="op">=</span> demo_levs.SITEID.unique()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="bu">len</span>(demo_ids)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="co"># I think this will work, the above is running</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>demo_levs[<span class="st">'Date'</span>] <span class="op">=</span> demo_levs[<span class="st">'DATETIME'</span>].astype(<span class="bu">str</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>gg <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">'mdba_gauge_getter'</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> gg<span class="sc">$</span><span class="fu">gauge_pull</span>(ewr_demo_gauges, <span class="at">start_time_user =</span> starttime, <span class="at">end_time_user =</span> endtime)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>demo_ids <span class="ot">&lt;-</span> <span class="fu">unique</span>(demo_levs<span class="sc">$</span>SITEID)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(demo_ids)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>gg <span class="ot">&lt;-</span> <span class="fu">import</span>(<span class="st">'mdba_gauge_getter'</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> gg<span class="sc">$</span><span class="fu">gauge_pull</span>(ewr_demo_gauges, <span class="at">start_time_user =</span> starttime, <span class="at">end_time_user =</span> endtime)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>demo_ids <span class="ot">&lt;-</span> <span class="fu">unique</span>(demo_levs<span class="sc">$</span>SITEID)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(demo_ids)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 46</code></pre>
 </div>
 </div>
 <p>Do a bit of cleanup- for some reason <code>demo_levs['VALUE']</code> is an object and not numeric, and <code>'DATETIME'</code> needs to be named <code>Date</code> for the EWR tool to read it. I copy the py object to R for this manipulation and visualisation, but we could just proceed in python if we wanted.</p>
 <p>Again, we need to change things to run on R</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> py<span class="sc">$</span>demo_levs</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>demo_levs<span class="sc">$</span>VALUE <span class="ot">=</span> <span class="fu">as.numeric</span>(demo_levs<span class="sc">$</span>VALUE)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># # In python, we just need to change the name of the date column. Here, we need to change the python datetime.date objects to R dates</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co"># # Really slow</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co"># # MUCH faster to just make the dates characters in python, and back to dates here.</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># rdates &lt;- purrr::map(demodates, py_to_r) %&gt;% </span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   tibble(.name_repair = ~'Date') %&gt;%  </span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   unnest(cols = Date)</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="co"># demo_levs &lt;- bind_cols(rdates, demo_levs)</span></span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(demo_levs, <span class="sc">-</span>DATETIME) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">Date =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(Date))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> py<span class="sc">$</span>demo_levs</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>demo_levs<span class="sc">$</span>VALUE <span class="ot">=</span> <span class="fu">as.numeric</span>(demo_levs<span class="sc">$</span>VALUE)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># # In python, we just need to change the name of the date column. Here, we need to change the python datetime.date objects to R dates</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="co"># # Really slow</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="co"># # MUCH faster to just make the dates characters in python, and back to dates here.</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co"># rdates &lt;- purrr::map(demodates, py_to_r) %&gt;% </span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="co">#   tibble(.name_repair = ~'Date') %&gt;%  </span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="co">#   unnest(cols = Date)</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="co"># demo_levs &lt;- bind_cols(rdates, demo_levs)</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">select</span>(demo_levs, <span class="sc">-</span>DATETIME) <span class="sc">%&gt;%</span> </span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">Date =</span> lubridate<span class="sc">::</span><span class="fu">ymd</span>(Date))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>The new version has to use the <code>reticulate::py_to_r</code>, because when we’re not in the repl, we have an R object to work with for every line of python. Should probably just change to {vicwater}, like we do for flow scaling.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> demo_levs <span class="sc">|&gt;</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">VALUE =</span> <span class="fu">as.numeric</span>(VALUE))</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 47 seconds- doesn't matter if preallocated</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>  Date <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(demo_levs<span class="sc">$</span>DATETIME, reticulate<span class="sc">::</span>py_to_r)</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> demo_levs <span class="sc">|&gt;</span> </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">VALUE =</span> <span class="fu">as.numeric</span>(VALUE))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 47 seconds- doesn't matter if preallocated</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  Date <span class="ot">&lt;-</span> purrr<span class="sc">::</span><span class="fu">map</span>(demo_levs<span class="sc">$</span>DATETIME, reticulate<span class="sc">::</span>py_to_r)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-   1.44    0.02   25.74 </code></pre>
+  11.31    0.10   24.70 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # 50 seconds</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co"># system.time(</span></span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   Date &lt;- lapply(demo_levs$DATETIME,FUN = reticulate::py_to_r)</span></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>Date <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(Date) <span class="sc">|&gt;</span></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> Date)</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> demo_levs <span class="sc">|&gt;</span></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>DATETIME) <span class="sc">|&gt;</span> </span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">bind_cols</span>(Date) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># # 50 seconds</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="co"># system.time(</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   Date &lt;- lapply(demo_levs$DATETIME,FUN = reticulate::py_to_r)</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>Date <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(Date) <span class="sc">|&gt;</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> Date)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>demo_levs <span class="ot">&lt;-</span> demo_levs <span class="sc">|&gt;</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(<span class="sc">-</span>DATETIME) <span class="sc">|&gt;</span> </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">bind_cols</span>(Date) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="map-the-gauges" class="level3">
 <h3 class="anchored" data-anchor-id="map-the-gauges">Map the gauges</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>demo_geo <span class="ot">=</span> bom_basin_gauges <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(gauge <span class="sc">%in%</span> demo_ids)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>demo_geo <span class="ot">=</span> bom_basin_gauges <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(gauge <span class="sc">%in%</span> demo_ids)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Looks reasonable. Probably overkill for testing, but can do a cut down version too.</p>
 <p>The azure boxes have old GDAL, which can’t read WKT2. Need to fix, but in the meantime, <a href="https://github.com/r-spatial/sf/issues/1419">force with the crs number</a>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">grepl</span>(<span class="st">'npd-dat'</span>, <span class="fu">Sys.info</span>()[<span class="st">'nodename'</span>])) {</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_crs</span>(basin) <span class="ot">&lt;-</span> <span class="dv">4283</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_crs</span>(catch_demo) <span class="ot">&lt;-</span> <span class="dv">4283</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_crs</span>(demo_geo) <span class="ot">&lt;-</span> <span class="dv">4283</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">grepl</span>(<span class="st">'npd-dat'</span>, <span class="fu">Sys.info</span>()[<span class="st">'nodename'</span>])) {</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_crs</span>(basin) <span class="ot">&lt;-</span> <span class="dv">4283</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_crs</span>(catch_demo) <span class="ot">&lt;-</span> <span class="dv">4283</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_crs</span>(demo_geo) <span class="ot">&lt;-</span> <span class="dv">4283</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>(<span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> basin, <span class="at">fill =</span> <span class="st">'lightsteelblue'</span>) <span class="sc">+</span></span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> catch_demo, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">fill =</span> SWSDLID)) <span class="sc">+</span></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> demo_geo, <span class="at">color =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">scale_fill_brewer</span>(<span class="at">type =</span> <span class="st">'qual'</span>, <span class="at">palette =</span> <span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>(<span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> basin, <span class="at">fill =</span> <span class="st">'lightsteelblue'</span>) <span class="sc">+</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> catch_demo, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">fill =</span> SWSDLID)) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="fu">geom_sf</span>(<span class="at">data =</span> demo_geo, <span class="at">color =</span> <span class="st">'black'</span>) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">scale_fill_brewer</span>(<span class="at">type =</span> <span class="st">'qual'</span>, <span class="at">palette =</span> <span class="dv">8</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="scenario_creation_more_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -465,55 +470,55 @@ Error in py_get_attr_impl(x, name, silent) :
 <h3 class="anchored" data-anchor-id="save-the-output">Save the output</h3>
 <p>This structure is useful, but it also may change once we have actual scenarios. And will almost certainly look different for netcdfs. Retaining the dir/file structure even with one file allows easier changes and more flexibility.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>multipliers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">1.1</span>, <span class="fl">1.25</span>, <span class="fl">1.5</span>, <span class="dv">2</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>scenemults <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">rev</span>(multipliers), <span class="dv">1</span>, multipliers)</span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>scenenames <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">'down'</span>, <span class="fu">as.character</span>(<span class="fu">rev</span>(multipliers))), </span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">'base'</span>, </span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste0</span>(<span class="st">'up'</span>, <span class="fu">as.character</span>(multipliers))) <span class="sc">|&gt;</span> </span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  stringr<span class="sc">::</span><span class="fu">str_replace</span>(<span class="st">'</span><span class="sc">\\</span><span class="st">.'</span>, <span class="st">'_'</span>)</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co"># the full scenarios</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (x <span class="cf">in</span> scenenames) {</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>      scenedir <span class="ot">=</span> <span class="fu">file.path</span>(hydro_dir, x)</span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(scenedir)) {</span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">dir.create</span>(scenedir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>multipliers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">1.1</span>, <span class="fl">1.25</span>, <span class="fl">1.5</span>, <span class="dv">2</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>scenemults <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span><span class="sc">/</span><span class="fu">rev</span>(multipliers), <span class="dv">1</span>, multipliers)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>scenenames <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">paste0</span>(<span class="st">'down'</span>, <span class="fu">as.character</span>(<span class="fu">rev</span>(multipliers))), </span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">'base'</span>, </span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>                <span class="fu">paste0</span>(<span class="st">'up'</span>, <span class="fu">as.character</span>(multipliers))) <span class="sc">|&gt;</span> </span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  stringr<span class="sc">::</span><span class="fu">str_replace</span>(<span class="st">'</span><span class="sc">\\</span><span class="st">.'</span>, <span class="st">'_'</span>)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="co"># the full scenarios</span></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (x <span class="cf">in</span> scenenames) {</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>      scenedir <span class="ot">=</span> <span class="fu">file.path</span>(hydro_dir, x)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="sc">!</span><span class="fu">dir.exists</span>(scenedir)) {</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>      <span class="fu">dir.create</span>(scenedir, <span class="at">recursive =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Create clean dataframes to save. Could be fancy with a function and a purr, but I’m just saving, so a simple loop should be fine.</p>
 <p>I’m not providing a toolkit function to <em>write</em> scenario metadata, since the scenarios will come from elsewhere. But we need it, so make some here (both inside and outside the directories, since we’re not sure what the final form is yet).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (params<span class="sc">$</span>REBUILD_DATA) {</span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(scenenames)) {</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    demo_levs <span class="sc">%&gt;%</span> </span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">VALUE =</span> VALUE <span class="sc">*</span> scenemults[i]) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(Date, VALUE, SITEID) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>      tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> Date, </span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">names_from =</span> SITEID, </span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">values_from =</span> VALUE) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>      readr<span class="sc">::</span><span class="fu">write_csv</span>(<span class="fu">file.path</span>(hydro_dir, scenenames[i], </span>
-<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">paste0</span>(scenenames[i], <span class="st">'.csv'</span>)))</span>
-<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># make JSON metadata</span></span>
-<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>    jsonlite<span class="sc">::</span><span class="fu">write_json</span>(<span class="fu">list</span>(<span class="at">scenario_name =</span> scenenames[i], </span>
-<span id="cb26-13"><a href="#cb26-13" aria-hidden="true" tabindex="-1"></a>                            <span class="at">flow_multiplier =</span> scenemults[i]), </span>
-<span id="cb26-14"><a href="#cb26-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">path =</span> <span class="fu">file.path</span>(hydro_dir, scenenames[i], <span class="st">'metadata.json'</span>))</span>
-<span id="cb26-15"><a href="#cb26-15" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb26-16"><a href="#cb26-16" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (params<span class="sc">$</span>REBUILD_DATA) {</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(scenenames)) {</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    demo_levs <span class="sc">%&gt;%</span> </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">VALUE =</span> VALUE <span class="sc">*</span> scenemults[i]) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(Date, VALUE, SITEID) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>      tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(<span class="at">id_cols =</span> Date, </span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>                         <span class="at">names_from =</span> SITEID, </span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                         <span class="at">values_from =</span> VALUE) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>      readr<span class="sc">::</span><span class="fu">write_csv</span>(<span class="fu">file.path</span>(hydro_dir, scenenames[i], </span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>                                 <span class="fu">paste0</span>(scenenames[i], <span class="st">'.csv'</span>)))</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># make JSON metadata</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>    jsonlite<span class="sc">::</span><span class="fu">write_json</span>(<span class="fu">list</span>(<span class="at">scenario_name =</span> scenenames[i], </span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>                            <span class="at">flow_multiplier =</span> scenemults[i]), </span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>                       <span class="at">path =</span> <span class="fu">file.path</span>(hydro_dir, scenenames[i], <span class="st">'metadata.json'</span>))</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>That set of hydrographs can now be used as starting data for a demonstration of the toolkit proper.</p>
 <p>Make some metadata for all scenarios too (both yaml and json for now).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>scenario_meta <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">scenario_name =</span> scenenames,</span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">flow_multiplier =</span> scenemults)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="co"># I don't know the format we'll be using, but this works to create yaml metadata</span></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>yaml<span class="sc">::</span><span class="fu">write_yaml</span>(scenario_meta, </span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">file =</span> <span class="fu">file.path</span>(hydro_dir, <span class="st">'scenario_metadata.yml'</span>))</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co"># and this does the same with JSON</span></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>jsonlite<span class="sc">::</span><span class="fu">write_json</span>(scenario_meta, </span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">path =</span> <span class="fu">file.path</span>(hydro_dir, <span class="st">'scenario_metadata.json'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>scenario_meta <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">scenario_name =</span> scenenames,</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">flow_multiplier =</span> scenemults)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># I don't know the format we'll be using, but this works to create yaml metadata</span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>yaml<span class="sc">::</span><span class="fu">write_yaml</span>(scenario_meta, </span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">file =</span> <span class="fu">file.path</span>(hydro_dir, <span class="st">'scenario_metadata.yml'</span>))</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co"># and this does the same with JSON</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>jsonlite<span class="sc">::</span><span class="fu">write_json</span>(scenario_meta, </span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">path =</span> <span class="fu">file.path</span>(hydro_dir, <span class="st">'scenario_metadata.json'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
