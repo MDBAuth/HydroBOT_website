@@ -151,14 +151,14 @@ doublelam
 
 It's fairly common that we'll have vector arguments, especially for the spatial aggregations. One primary example is weightings. The most flexible approach requires these vectors to be attached to the data before it enters the function (vs. creating them automatically in-function; though that is possible it gets fragile to handle arbitrary names and maintain the correct groupings). So, here we assume that the vectors will be columns in the dataset, and demonstrate with weighted means on dummy weights.
 
-::: {#dplyr 1.1 issues style="color: gray"}
-*As of {dplyr} 1.1, if we pass a function with a data-variable argument (e.g. the name of a column in the dataframe) we have to wrap the list in* `rlang::quo` . Otherwise it looks for an object with that name instead of a column. We're working on a cleaner way to handle this, but for now this is what we have to do. If we have several layers of aggregation, the *inside* level where the function is defined needs to be wrapped. E.g.
+::: {#dplyr 1.1 issues style="color: gray"} *As of {dplyr} 1.1, if we pass a function with a data-variable argument (e.g. the name of a column in the dataframe) we have to wrap the list in* `rlang::quo` . Otherwise it looks for an object with that name instead of a column. We're working on a cleaner way to handle this, but for now this is what we have to do. If we have several layers of aggregation, the *inside* level where the function is defined needs to be wrapped. E.g.
 
-``` R
+``` r
 funlist <- list(c('ArithmeticMean', 'LimitingFactor'),
                 rlang::quo(list(wm = ~weighted.mean(., area, na.rm = TRUE))),
                 rlang::quo(list(wm = ~weighted.mean(., area, na.rm = TRUE))))
 ```
+
 :::
 
 ```{r}

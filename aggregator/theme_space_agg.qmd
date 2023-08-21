@@ -76,7 +76,7 @@ We use `causal_ewrs` for causal relationships and spatial layers provided by {we
 
 ## Setup
 
-First, we specify a simple interleaved aggregation sequence with only one aggregation function applied per step for simplicity. Note that theme-axis aggregation steps are specified with a character vector `c('level_from', 'level_to')`, while spatial aggregation steps are specified with an `sf` object (polygons). Allowing specification of spatial steps by character instead of object is high on the priority list. Here, we specify the aggregation function sequence with a mixture of character names for functions and list-defined anonymous functions, as discussed in the [syntax notebook](aggregation_syntax.qmd).
+First, we specify a simple interleaved aggregation sequence with only one aggregation function applied per step for simplicity. Note that theme-axis aggregation steps are specified with a character vector `c('level_from', 'level_to')`, while spatial aggregation steps are specified with an `sf` object (polygons) or the name of the sf object, e.g. `sdl_units` or `"sdl_units"`. Allowing specification of spatial steps by character instead of object is a bit more fragile because it relies on `get("name_of_object")`, but allows the list to be wholly specified with characters. Here, we specify the aggregation function sequence with a mixture of character names for functions and list-defined anonymous functions, as discussed in the [syntax notebook](aggregation_syntax.qmd).
 
 *Naming the list by target makes tracking and interpretation much easier, and is highly recommended.*
 
@@ -139,6 +139,28 @@ That saves only the final outcome, which is far cheaper for memory, but doesn't 
 
 ```{r}
 tsagg
+```
+
+We can do the exact same thing with characters instead of objects for the spatial units:
+
+```{r}
+aggseq_c <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               env_obj =  c('ewr_code', "env_obj"),
+               sdl_units = "sdl_units",
+               Specific_goal = c('env_obj', "Specific_goal"),
+               catchment = "cewo_valleys",
+               Objective = c('Specific_goal', 'Objective'),
+               mdb = "basin",
+               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+
+tsagg_c <- multi_aggregate(dat = ewrdata,
+                         causal_edges = ewr_edges,
+                         groupers = 'scenario',
+                         aggCols = 'ewr_achieved',
+                         aggsequence = aggseq,
+                         funsequence = funseq)
+
+tsagg_c
 ```
 
 ### Return all steps
