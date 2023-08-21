@@ -1,7 +1,7 @@
-# For this demonstration, we just modify the scenario_dir and aggregation_def
+# For this demonstration, we just modify the output_parent_dir and aggregation_def
 
 # Outer directory for scenario
-scenario_dir: 'more_scenarios'
+output_parent_dir: 'more_scenarios'
 
 # aggregation sequences (need to be defined in R)
 aggregation_def: 'full_toolkit/params.R'

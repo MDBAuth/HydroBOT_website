@@ -4,7 +4,7 @@ editor: visual
 params:
   REBUILD_DATA: FALSE
   # Outer directory for scenario
-  scenario_dir: 'more_scenarios'
+  output_parent_dir: 'more_scenarios'
   
   # aggregation sequences (need to be defined in R)
   aggregation_def: 'full_toolkit/params.R'
@@ -65,7 +65,7 @@ aggregation_def: 'toolkit_project/agg_params.R'
 
 ``` yaml
 # Outer directory for scenario
-scenario_dir: 'toolkit_project'
+output_parent_dir: 'toolkit_project'
 
 # Preexisting data
 # Hydrographs (expected to exist already)
@@ -80,9 +80,9 @@ ewr_results: NULL
 agg_results: NULL
 ```
 
-*Normally* `scenario_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.
+*Normally* `output_parent_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.
 
-Setting the output directories to `NULL` builds a standard toolkit directory structure, with `scenario_dir` as the outer directory, holding `hydrographs`, `aggregator_output`, and `module_output` subdirectories.
+Setting the output directories to `NULL` builds a standard toolkit directory structure, with `output_parent_dir` as the outer directory, holding `hydrographs`, `aggregator_output`, and `module_output` subdirectories.
 
 ## Module arguments
 
