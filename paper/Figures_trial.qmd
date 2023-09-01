@@ -1,0 +1,282 @@
+---
+title: "Demo paper Figures"
+format: docx
+output-file: DemoPaper_Figures_V1.docx
+
+metadata-file: "C:/Users/georgiad/Documents/WERP_toolkit_demo/more_scenarios/comparer_output/project_metadata.yml"
+---
+
+```{r}
+#| echo: false
+#| include: false
+
+library(werptoolkitr) 
+library(ggplot2) 
+library(dplyr)
+library(sf)
+#library(reticulate) # Not strictly necessary but allows easier referencing of objects #needed for gauge locations?
+library(patchwork)
+
+## Input and output directories
+
+# Outer directory for scenario 
+project_dir = file.path('more_scenarios')  
+
+# Preexisting data # Hydrographs (expected to exist already) 
+hydro_dir = file.path(project_dir, 'hydrographs')  
+
+# Generated data # EWR outputs (will be created here in controller, read from here in aggregator) 
+ewr_results <- file.path(project_dir, 'module_output', 'EWR')  
+
+# outputs of aggregator. There may be multiple modules 
+agg_results <- file.path(project_dir, 'aggregator_output') 
+
+# outputs of comparer. 
+comp_results <- file.path(project_dir, 'comparer_output') 
+
+```
+
+# Study system
+
+```{r}
+#| echo: false
+system_plot<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "system_plot.Rdata")) #
+
+system_plot<- readRDS(file.path(comp_results, "system_plot.Rdata")) #
+system_plot
+
+
+
+```
+
+Figure 1. Map of the Murray-Darling basin, in eastern Australia, illustrating gauge locations (points) within {{< meta n_Plannning_units >}} water resource plan areas (Planning units: {{< meta Plannning_units >}}).
+
+EDITS:
+
+1\) ADD inset of Australia 2) Cut down gauges \[need r version of gauge getter from flow scaling\]
+
+# Scenarios
+
+Table 1. Climate scenarios included in this demonstration were produced by applying a flow multiplier to historical flows.
+
+```{r}
+#| echo: false
+unique_Climates<- readRDS(file.path(comp_results, "unique_Climates.Rdata")) #
+unique_Climates <- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "unique_Climates.Rdata")) #
+
+knitr::kable(unique_Climates)
+
+```
+
+Table 2. Adaptation options were applied to each climate scenario with additional flows added throughout September to December.
+
+```{r}
+#| echo: false
+unique_AdaptOpt<- readRDS(file.path(comp_results, "unique_AdaptOpt.Rdata")) #
+unique_AdaptOpt <- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "unique_AdaptOpt.Rdata")) #
+
+knitr::kable(unique_AdaptOpt)
+
+```
+
+# Hydrographs
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 6
+hydro_plot<- readRDS(file.path(comp_results, "hydro_plot.Rdata")) #
+
+hydro_plot<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "hydro_plot.Rdata")) #
+hydro_plot
+
+```
+
+Figure 2. Scenarios: The toolkit ingests flow-time series at specific locations, which can include multiple climate scenarios. These can be in the form of hydrographs at specific gauges. Hypothetical climate and adaptation scenarios are represented by different hydrographs at {{< meta n_gauges_to_plot >}} example gauges ({{< meta gauges_to_plot >}}) out of the total ({{< meta n_gauges >}}) gauges; these were developed for demonstration purposes only. Climate scenarios illustrated include the historical base level (E), 0.5 times the base level (A), and 2 times the base level (I). Adaptation options illustrated include no additional flow (1; no adaptation), addition of 201 ML/day throughout September to December (2), and addition of 6001 ML/day throughout September to December (3).
+
+# Baselining
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 6
+
+dif_plot<- readRDS(file.path(comp_results, "hydro_dif_plot.Rdata")) #
+dif_plot<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "hydro_dif_plot.Rdata")) #
+dif_plot
+```
+
+Figure 3. Baselining: Scenarios can be compared by determining the amount of change in flow (delta) from a set base level. Here, the difference from the historical base level (E1) is illustrated at {{< meta n_gauges_to_plot >}} example gauges ({{< meta gauges_to_plot >}}) under three climate scenarios: A (0.5x), E (no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+201), and 3 (+6001).
+
+# Causal networks
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 6
+#Fig_4
+```
+
+Figure 4. The toolkit incorporates causal networks that describe the environmental objectives for a system. In the current example these causal networks are extracted from the Murray-Darling Basin Long Term Watering Plans (LTWPs), which sets environmental watering requirements (EWRs), objectives, and long-term targets for key water-dependent plants, waterbirds, fish and ecosystem functions. A measure of the Pass/fail outcomes for each EWR pertaining to particular objectives, targets, or groups can be illustrated on the causal network. Colours indicate the proportion of EWRs passed for each objective at one gauge in the Macquarie--Castlereagh?
+
+# Comparisons
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 4
+
+Fig_5<- readRDS(file.path(comp_results, "Fig_5.Rdata")) #
+Fig_5<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_5.Rdata")) #
+Fig_5
+```
+
+Figure 5. Scenario comparison for different planning unit areas. A broad-scale measure comparison can be estimated from the proportion of environmental watering requirements (EWRs) that are achieved under each scenario for each planning unit. This illustrates simply that all planning units are likely to be affected by the changes in the flow, however, the Lachlan may be least sensitive to such changes. This does not illuminate which EWRs may be more important to particular environmental assets or which assets are more sensitive to particular scenarios. This illustration includes three climate scenarios: A (0.5x), E (no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+201), and 3 (+6001). Panels a and b illustrate the same data with a emphasizing the amount of difference between scenarios and b emphasizing spatial patterns.
+
+*EDITS: 1) currently using a work around to label the scenarios (its the x axis label); 2) Need A and B tags*
+
+Table 3. Aggregation \[and visualization\] corresponding to figure 5.
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+
+Fig_5_table<- readRDS(file.path(comp_results, "Fig_5_table.Rdata")) #
+Fig_5_table<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_5_table.Rdata")) #
+knitr::kable(Fig_5_table)
+```
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 5
+
+Fig_6<- readRDS(file.path(comp_results, "Fig_6.Rdata")) #
+Fig_6<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_6.Rdata")) #
+Fig_6
+
+```
+
+Figure 6. Fine-scale scenario comparison for different planning unit areas. Drawing the links from the causal network allows illustration of the number of EWR achieved that pertain to particular environmental objectives in each planning unit area. Thus, we can see which individual environmental objectives or target groups may be most sensitive. The MAX column illustrates a bestcase scenario (all EWRs pass) for reference. Where the max column does not exist, those objectives are not relevant to that particular planning unit. This demonstration suggests that waterbirds may be most sensitive in the Macquarie--Castlereagh planning area, owing to failure to meet the EWRs for waterbird objectives WB1 (Maintain the number and type of waterbird species) and WB2 (Increase total waterbird abundance across all functional groups). This illustration includes three climate scenarios: A (0.5x), E (no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+201), and 3 (+6001).
+
+Table 4. Aggregation \[and visualization\] corresponding to figure 6.
+
+```{r}
+#| echo: false
+
+Fig_6_table<- readRDS(file.path(comp_results, "Fig_6_table.Rdata")) #
+Fig_6_table<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_6_table.Rdata")) #
+knitr::kable(Fig_6_table)
+```
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 6
+
+Fig_7<- readRDS(file.path(comp_results, "Fig_7.Rdata")) #
+Fig_7 <- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_7.Rdata")) #
+Fig_7
+```
+
+Figure 7. Maps allow large-scale visualization of environmental objectives under various scenarios. Evaluation may be best achieved at a large-scale for some environmental objectives where some locations or areas can compensate for losses in other areas. For example, waterbird breeding in one or a few planning unit areas may be sufficient to meet basin targets for fledgling recruitment (WB? And WB?). In these situations, specific locations are likely important and hence a spatially explicit visualization is necessary. Polygon colors indicate the proportion of EWR passed for each objective in each planning unit area. In panel B, we highlight one enviornmental objective (WB1) under one scenario (A1) to illustrate the proportion of EWR passed for that objective (point colour) at each gauge location (points). This illustration includes three climate scenarios: A (0.5x), E (no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+201), and 3 (+6001).
+
+*EDITS: Cannot currently change scenario labels; need to collect guide properly, currently they are all different scales; points are only in on planning unit???*
+
+Table 5. Aggregation \[and visualization\] corresponding to figure 7.
+
+```{r}
+#| echo: false 
+
+Fig_7_table<- readRDS(file.path(comp_results, "Fig_7_table.Rdata")) #
+Fig_7_table<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_7_table.Rdata")) # 
+knitr::kable(Fig_7_table)
+```
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 5
+
+Fig_8<- readRDS(file.path(comp_results, "Fig_8.Rdata")) #
+Fig_8 <- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_8.Rdata")) #
+Fig_8
+```
+
+Figure 8. Quantitative scenario comparison for different planning unit areas. Scenarios can be compared on an axis that defines the amount of change from a set base level (x-axis; see baselining fig 3). Here, the change in flow for each scenario is relativized to the historical baseline. *The outcomes can also be relativised as the change in proportion of environmental objectives met in each scenario, relative to the historical baseline (y-axis).* These plots highlight disproportionate steps in the responses in relation to flow shifts for particular environmental objectives. For example, where points are connected with a steeper angle a small increase in flow gives a relatively great increase in the proportion of EWRs that are met. These could be highly economical points to add water to the system. Colous indicate different target groups; shading indicates different environmental objectives within those groups. This illustration includes three climate scenarios: A (0.5x), E (no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+201), and 3 (+6001).
+
+*EDITS: Cannot work out how to order legend*
+
+Table 6. Aggregation \[and visualization\] corresponding to figure 8.
+
+```{r}
+#| echo: false  
+
+Fig_8_table<- readRDS(file.path(comp_results, "Fig_8_table.Rdata")) #
+Fig_8_table<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_8_table.Rdata")) #  
+knitr::kable(Fig_8_table)
+```
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 5
+
+Fig_9<- readRDS(file.path(comp_results, "Fig_9.Rdata")) #
+Fig_9 <- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_9.Rdata")) #
+Fig_9
+```
+
+Figure 9. Direct comparison of outcomes from adaptation option scenarios relativized to the historical baseline. Smoothed fits for all environmental targets in each target group highlights which planning units are most sensitive for each target group and the thresholds at which target groups may be particularly sensitive. For example when flow are reduced by 20 %, waterbirds may be most at risk in the Namoi, whereas at that same threshold native fish may be at most risk in the Lachlan area. Error ribbons.... Colours indicate planning unit areas; shapes indicate different scenarios. This illustration includes all climate scenarios shown in table 1 and all adaptation options: 1 (no adaptation), 2 (+201), 3 (+6001) and 4 (+12001).
+
+*EDITS: making this manually. cant work out how to fit lines to adaptation option - i think smoothed fits for all environmental objectives isnt quite right because some targets have more than others so doing it this way*
+
+Table 7. Aggregation \[and visualization\] corresponding to figure 9.
+
+```{r}
+#| echo: false   
+
+Fig_9_table<- readRDS(file.path(comp_results, "Fig_9_table.Rdata")) #
+Fig_9_table<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_9_table.Rdata")) #   
+knitr::kable(Fig_9_table)
+```
+
+```{r}
+#| echo: false
+#| out-width: "120%" 
+#| fig-align: center
+#| fig-width: 6
+#| fig-height: 3
+
+Fig_10<- readRDS(file.path(comp_results, "Fig_10.Rdata")) #
+Fig_10 <- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_10.Rdata")) #
+Fig_10
+```
+
+Figure 10. Scenario comparison for a whole catchment. A broad-scale measure for comparison can be estimated from the mean proportion of environmental watering requirements (EWRs) across planning units. This illustrates an overall environmental outcome for each climate and adaptation option scenario, potentially highlighting where thresholds in changing flows associated with climate sceanrios occur and where adapatation options are effective or ineffective to modify environmental outcomes. The MAX cell illustrates a best-case scenario (all EWR pass) for reference. This illustration includes all climate scenarios shown in table 1 and all adaptation options: 1 (no adaptation), 2 (+201), 3 (+6001) and 4 (+12001).
+
+Table 7. Aggregation \[and visualization\] corresponding to figure 10.
+
+```{r}
+#| echo: false    
+
+Fig_10_table<- readRDS(file.path(comp_results, "Fig_10_table.Rdata")) #
+Fig_10_table<- readRDS(file.path("C:/Users/georgiad/Documents/WERP_toolkit_demo", comp_results, "Fig_10_table.Rdata")) #    
+knitr::kable(Fig_10_table)
+```
