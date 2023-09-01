@@ -113,7 +113,7 @@ Error in py_get_attr_impl(x, name, silent) :
 
 A simple {python} chunk works fine in Rstudio and for `quarto render` from command line. But in vscode, the default (and unchangeable at present) is to start a whole new engine that doesn't talk to R, rather than using `reticulate::repl_python` as is done in Rstudio and by quarto itself.
 
-```{{python}}
+``` {{python}}
 from py_ewr.data_inputs import get_EWR_table
 ewrs, badewrs = get_EWR_table()
 ```
@@ -142,7 +142,7 @@ Now we have a list of gauges, we need their hydrographs. We need a reasonable ti
 
 ```{r}
 starttime = lubridate::ymd(20100101)
-endtime = lubridate::ymd(20191231)
+endtime = lubridate::ymd(20211231)
 ```
 
 Pull the gauges with `mdba_gauge_getter`. The type-translation that happens in here is because translating from python time to R time is extremely slow for this particular case (though not in general).
@@ -261,10 +261,34 @@ multipliers <- c(1.1, 1.25, 1.5, 2)
 
 scenemults <- c(1/rev(multipliers), 1, multipliers)
 
-scenenames <- c(paste0('down', as.character(rev(multipliers))), 
-                'base', 
-                paste0('up', as.character(multipliers))) |> 
+scenenames <- c(paste0('climatedown', as.character(rev(multipliers))), 
+                'climatebase', 
+                paste0('climateup', as.character(multipliers))) |> 
+                stringr::str_replace('\\.', '_')
+
+adaptadds <- c(0, 201, 6001, 12001)
+
+adapttime <- 8 #months = Sep,Oct,Nov,Dec
+
+sceneaddsnames <- c(paste0('adapt', as.character(adaptadds))) |> 
   stringr::str_replace('\\.', '_')
+
+library(stringr)
+scenenames <- paste0(rep(scenenames, times = length(unique(adaptadds))), str_sort(rep(sceneaddsnames, times = length(unique(scenemults))), numeric = TRUE))
+scenemults <- rep(scenemults, times = length(unique(sceneaddsnames)))
+sceneadds <- sort(rep(adaptadds, times = length(unique(scenemults))))
+sceneadapttimes <- rep(adapttime, times = length(scenenames))
+
+# Add in the MAX scenario 
+scenenames <- c(scenenames, "MAX")
+scenemults <- c(scenemults, 0)
+sceneadds <- c(sceneadds, 500000)
+sceneadapttimes <- c(sceneadapttimes, 0)
+
+check <- data.frame(scenenames = scenenames)
+check$scenemults <- scenemults
+check$sceneadds <- sceneadds
+check$sceneadapttimes <- sceneadapttimes
 
 # the full scenarios
 for (x in scenenames) {
@@ -287,6 +311,8 @@ if (params$REBUILD_DATA) {
   for (i in 1:length(scenenames)) {
     demo_levs %>% 
       dplyr::mutate(VALUE = VALUE * scenemults[i]) %>% 
+      dplyr::mutate(VALUE = ifelse(lubridate::month(Date) > sceneadapttimes[i],
+                                   VALUE + sceneadds[i], VALUE)) %>% 
     dplyr::select(Date, VALUE, SITEID) %>% 
       tidyr::pivot_wider(id_cols = Date, 
                          names_from = SITEID, 
@@ -295,7 +321,9 @@ if (params$REBUILD_DATA) {
                                  paste0(scenenames[i], '.csv')))
     # make JSON metadata
     jsonlite::write_json(list(scenario_name = scenenames[i], 
-                            flow_multiplier = scenemults[i]), 
+                            flow_multiplier = scenemults[i],
+                            flow_addition = sceneadds[i],
+                            flow_addition_time = sceneadapttimes[i]),
                        path = file.path(hydro_dir, scenenames[i], 'metadata.json'))
   }
 }
@@ -308,7 +336,9 @@ Make some metadata for all scenarios too (both yaml and json for now).
 
 ```{r}
 scenario_meta <- list(scenario_name = scenenames,
-                      flow_multiplier = scenemults)
+                      flow_multiplier = scenemults,
+                      flow_addition = sceneadds,
+                      flow_addition_time = sceneadapttimes)
 # I don't know the format we'll be using, but this works to create yaml metadata
 yaml::write_yaml(scenario_meta, 
                  file = file.path(hydro_dir, 'scenario_metadata.yml'))
