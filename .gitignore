@@ -26,3 +26,6 @@ scenario_creation/test_scaling.rdata
 site_libs/
 
 /_*.local
+
+#python junk
+*.whl
