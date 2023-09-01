@@ -14,7 +14,7 @@ library(werptoolkitr)
 
 ## Argument options and syntax
 
-The aggregation functions have flexible syntax in some of their arguments, particulary for selecting grouping columns, the column(s) of values to aggregate, and the specification of aggregation functions. In general, these apply across the functions, though `multi_aggregate` has a bit less flexibility than the internal `spatial_aggregate`, `theme_aggregate`, and `general_aggregate`, largely as a consequence of passing through the call stack. Here, I use primarily the example of `spatial_aggregate` to illustrate the different arguments, their syntax, and why we might use it.
+The aggregation functions have flexible syntax in some of their arguments, particulary for selecting grouping columns, the column(s) of values to aggregate, specification of aggregation functions, and the specification of spatial aggregation units. In general, these apply across the functions, though `multi_aggregate` has a bit less flexibility than the internal `spatial_aggregate`, `theme_aggregate`, and `general_aggregate`, largely as a consequence of passing through the call stack. Here, I use primarily the example of `spatial_aggregate` to illustrate the different arguments, their syntax, and why we might use it.
 
 I'll create test data as in the [spatial notebook](spatial_agg.qmd).
 

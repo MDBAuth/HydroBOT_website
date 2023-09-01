@@ -5,7 +5,7 @@ editor: visual
 
 This repo provides a templates and documentation for using the toolkit in various ways. In use, we would expect a user to consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters (at least through the aggregator step), similar to what is shown in the [full toolkit pages](full_toolkit/full_toolkit_overview.qmd) and implement that in an analysis repo for that particular set of analyses/scenarios.
 
-The `full_toolkit` directory provides notebooks for running the full toolkit in single files, either [in memory](full_toolkit/WERP_toolkit_in_memory) or [saving each step and reading back in](full_toolkit/WERP_toolkit_save_steps.qmd).
+The `full_toolkit` directory provides notebooks for running the full toolkit in single files, either [in memory](full_toolkit/WERP_toolkit_in_memory) or [saving each step and reading back in](full_toolkit/WERP_toolkit_save_steps.qmd). It can also be run [from parameters files](full_toolkit/WERP_toolkit_params.qmd). These parameters files can be generated manually, but also allow replication since the toolkit auto-documents itself when run, saving metadatafiles that are fully-specified params files.
 
 Within this repo there are also documents providing templates for each step separately (in `controller` and `aggregation` directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (`scenario_creation` and `causal_networks`).
 

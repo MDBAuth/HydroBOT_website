@@ -5,9 +5,11 @@ project:
   execute-dir: project
   render:
     - "*.qmd"
-    - "!TESTING_PACKAGE_INSTALL.qmd"
-    - "!macquarie_gauges.qmd"
     - "!.*_old.*"
+
+format:
+  html:
+    embed-resources: true
 
 website:
   title: "Using the WERP toolkit"
@@ -115,6 +117,8 @@ website:
               text: "Maps"
             - href: comparer/causal_plots.qmd
               text: "Outcomes on causal networks"
+            - href: comparer/heatmap.qmd
+              text: "Heatmaps"
 
 
     - title: "Full toolkit"

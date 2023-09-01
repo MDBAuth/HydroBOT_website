@@ -7,6 +7,14 @@ editor: visual
 
 ## Purpose
 
-The toolkit may be used stepwise, that is calling the Controller, Aggregator, and Comparer. But it can also be called in one go, feeding all necessary parameters in at once. In this case, we can think of the Controller as simply having larger scope, passing arguments all the way through instead of just to the modules. This can be done [in-memory](WERP_toolkit_in_memory.qmd), or [saving outputs at each step](WERP_toolkit_save_steps.qmd). In either case, it can be controlled interactively in notebooks, or with a `params.yml` file, which currently operates a [parameterised notebook](WERP_toolkit_params.qmd), but could be made to simply be ingested by `Rscript` at the command line.
+The toolkit may be used stepwise, that is calling the Controller, Aggregator, and Comparer. But it can also be called in one go, feeding all necessary parameters in at once. In this case, we can think of the Controller as simply having larger scope, passing arguments all the way through instead of just to the modules. This can be done [in-memory](WERP_toolkit_in_memory.qmd), or [saving outputs at each step](WERP_toolkit_save_steps.qmd). In either case, it can be controlled interactively in notebooks, or with parameters, which might be passed from a `params.yml` file, parameters in a [parameterised notebook](WERP_toolkit_params.qmd), or arguments passed to `Rscript` at the command line.
+
+::: {#params_metadata style="color:gray"}
+### Parameters and metadata
+
+The toolkit auto-documents itself, saving the settings from runs to `prep_run_save_ewrs` and `read_and_agg` into `*.yml` files. These files also attempt to find the metadata for the scenarios if it exists.
+
+These yaml files are fully-specified parameters files for running the toolkit, along with some additional run information such as the time of the run and git hash. As such, runs can be replicated by re-running the toolkit with `run_toolkit_params(yamlpath = 'path/to/generated/metadata.yml')`.
+:::
 
 In typical use, we will likely this full-toolkit approach, but making sure we save the output of at least the aggregator. It is very likely that we will want to make different plots for different purposes, and will not necessarily know what they are a-priori. So we'll want the ability to run additional Comparer notebooks.

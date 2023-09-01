@@ -146,3 +146,12 @@ if (params$REBUILD_DATA) {
   run_toolkit_params(list_args = params)
 }
 ```
+
+## Replication
+
+The `prep_run_save_ewrs` and `read_and_agg` functions save metadata yaml files that are fully-specified parameters files. Thus, to replicate runs, we can run
+
+```{r}
+#| eval: false
+run_toolkit_params(yamlpath = 'path/to/generated/metadata.yml')
+```

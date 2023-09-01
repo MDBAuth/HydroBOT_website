@@ -17,13 +17,13 @@ Load the package
 library(werptoolkitr)
 ```
 
-The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, the series of steps below is wrapped. Once we have the directory and set any other needed parameters (e.g. point at a config file), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I'm stepping through that here so we can see what's happening and where we need to tweak as formats change; this document is intended to expose some of the inner workings of the black box. Wrapped versions of [the controller alone](controller_ewr_wrapped.qmd) and [the whole toolkit](../full_toolkit/full_toolkit_overview.qmd) are available to illustrate this more normal use.
+The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, the series of steps below is wrapped with `prep_run_save_ewrs`. Once we have the directory and set any other needed parameters (e.g. point at a config file), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I'm stepping through that here so we can see what's happening and where we need to tweak as formats change; this document is intended to expose some of the inner workings of the black box. Wrapped versions of [the controller alone](controller_ewr_wrapped.qmd) and [the whole toolkit](../full_toolkit/full_toolkit_overview.qmd) are available to illustrate this more normal use.
 
 # Setup
 
 ## Set paths
 
-We need to set the path to this demonstration. This should all be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`. These would typically point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The saved data goes to `project_dir/module_output` automatically. The `/hydrographs` subdirectory could be made automatic as well, but I'm waiting for the input data format to firm up.
+We need to set the path to this demonstration. This should all be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`. These would typically point to external shared directories. It also works to point to a single scenario, as if run off the end of a hydrology model for one scenario, e.g. `/hydrographs/scenario1`. For this simple example though, we put the data inside the repo to make it self contained. The saved data goes to `project_dir/module_output` automatically. The `/hydrographs` subdirectory could be made automatic as well, but I'm waiting for the input data format to firm up.
 
 ```{r}
 project_dir = file.path('more_scenarios')
@@ -32,7 +32,7 @@ hydro_dir = file.path(project_dir, 'hydrographs')
 
 ## Format
 
-We need to pass the data format to the downstream modules so they can parse the data. Currently the demo csvs are created in a format that parses like IQQM, and the netcdf will be. The EWR tool (the only current module) has three options currently 1) `'Bigmod - MDBA'`, 2) `'IQQM - NSW 10,000 years'`, and 3) `'Source - NSW (res.csv)'`. I'm exposing this for the example, but we can auto-set this to the IQQM default in normal use.
+We need to pass the data format to the downstream modules so they can parse the data. Currently the demo csvs are created in a format that parses like IQQM, and the netcdf will be. The EWR tool (the only current module) has three options currently 1) `'Bigmod - MDBA'`, 2) `'IQQM - NSW 10,000 years'`, and 3) `'Source - NSW (res.csv)'`. I'm exposing this for the example, but we can auto-set this to the IQQM default in normal use, or set it in a params file.
 
 ```{r}
 # Options
@@ -45,7 +45,7 @@ model_format = 'IQQM - NSW 10,000 years'
 
 ## Climate info
 
-Like the format, `allowance` and `climate` are arguments to the EWR tool, so I set them here to be clear what we're doing, but in general they would be set by default.
+Like the format, `allowance` and `climate` are arguments to the EWR tool, so I set them here to be clear what we're doing, but in general they would be set by default. The `climate` does need to use the other option (`'NSW 10,000 year climate sequence'`) for dates outside the range 1890-2100, (which are categorised from 1911-2018). The EWR tool provides those files, and any year considered has to have a row in them, even if it is blank.
 
 ```{r}
 MINT <- (100 - 0)/100
@@ -65,27 +65,24 @@ Above, we've been setting variables that should be set by default to expose what
 
 ## Set up output directories
 
-We get the information about the gauges and filepaths `project_dir` as a dict with `make_scenario_info`. The scenarios need to be in separate directories inside `/hydro_dir`, but the files in those directories could come in multiple arrangements. Currently, we allow multiple csvs of single-gauge hydrographs or single csvs of multiple-gauge hydrographs. Once the netcdf format settles down, we will include parsing that. If there are multiple gauges within each csv, they enter the dict as a 'gauge' value. If not, the 'gauge' value is just the filename, so these need to be gauge numbers. For this example, we have single csvs with multiple gauges.
+We get the information about the gauges and filepaths `project_dir` with `find_scenario_paths` and `scenario_names_from_hydro`. The scenarios need to be in separate directories inside `/hydro_dir`, but the files in those directories could come in multiple arrangements. Currently, we allow multiple csvs of single-gauge hydrographs or single csvs of multiple-gauge hydrographs. Once the netcdf format settles down, we will include parsing that. If there are multiple gauges within each csv. For this example, we have single csvs with multiple gauges.
 
-The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location. The EWR tool needs the paths to the gauge data as a list, so `paths_gauges_R` just unfolds the dict to give that. There will likely be continued changes to these functions as we settle on standard directory structures and data formats. These functions are currently all python wrapped by R for historical reasons, but as they are just directory creation and querying could be easily re-written in R to tighten up the package.
+The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location.
 
 ```{r}
-# Gives file locations as a dict- 
-sceneinfodict <- make_scenario_info_R(hydro_dir)
-# make the output directory structure
-outpath <- make_output_dir_R(project_dir, sceneinfodict)
-# unfold the sceneinfodict to make it easy to get the lists of paths and gauges
-# everyhydro = paths_gauges(sceneinfodict)[0]
+# get the paths to all the hydrographs. python needs a list, not a vector
+# have to triple ::: because this isn't exported
+  hydro_paths <- as.list(werptoolkitr:::find_scenario_paths(hydro_dir))
+  
+  # There's a bit more error catching etc in `prep_run_save_ewrs`, but ignoring that here.
 
-# The inner level turned into characters in R and needs to stay as a list. This is annoying but needed *only in R*
-for (i in 1:length(sceneinfodict)) {
-  for (j in 1:2) {
-    sceneinfodict[[i]][[j]] <- as.list(sceneinfodict[[i]][[j]])
-  }
-}
-
-# more list-making to work from R-Python
-everyhydro <- as.list(paths_gauges_R(sceneinfodict)[[1]])
+  # extract scenarios if not given
+  scenarios <- werptoolkitr:::scenario_names_from_hydro(hydro_dir)
+  
+  # set up the output directory
+  output_path <- werptoolkitr:::make_output_dir(project_dir, 
+                                                scenarios = scenarios, 
+                                                module_name = 'EWR')
 ```
 
 ## Run the ewr tool
@@ -109,7 +106,10 @@ if (params$REBUILD_DATA) {
 }
 
 
-ewr_out <- run_save_ewrs_R(everyhydro, outpath, model_format = model_format, allowance = allowance, climate = climate, outputType = outputType, datesuffix = FALSE, returnType = list('summary', 'all'))
+ewr_out <- controller_functions$run_save_ewrs(hydro_paths, output_path,
+                                                model_format, allowance, climate,
+                                                outputType = outputType,
+                                                returnType = list('summary'))
 
 ```
 

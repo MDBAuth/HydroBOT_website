@@ -163,6 +163,8 @@ tsagg_c <- multi_aggregate(dat = ewrdata,
 tsagg_c
 ```
 
+*Note that the ability to pass characters is only available in* `multi_aggregate` *and* `read_and_agg`*, not the internal* `spatial_aggregate` *function.*
+
 ### Return all steps
 
 Most often, we'll want to save the list of outcomes at each step- it allows us to see how we got the final outcome, and it's likely we're interested in the outcomes at more than one step anyway. As in the [theme notebook](theme_agg.qmd), we do this with `saveintermediate = TRUE`. We also set `namehistory = FALSE` to put the aggregation tracking in columns instead of names for ease of handling the output.
@@ -423,7 +425,9 @@ allagg$target_5_year_2024 |>
 
 ## Simple inputs and saving
 
-In practice, we often won't call `multi_aggregate` directly, but will use `read_and_agg` to run `multi_aggregate`, since it automates data read-in and processing and saving. To do the same analysis as above but using `read_and_agg`, we give it the path to the data instead of the data itself. Note also that the `geopath` and `causalpath` arguments can be objects or paths; we use objects here because they are provided with the {werptoolkitr} package. We use `returnList` to return the output to the active session, and `savepath` to save an .rds file to `out_path` (but only if we're rebuilding data).
+In practice, we often won't call `multi_aggregate` directly, but will use `read_and_agg` to run `multi_aggregate`, since it automates data read-in and processing and saving. To do the same analysis as above but using `read_and_agg`, we give it the path to the data instead of the data itself. Note also that the `geopath` and `causalpath` arguments can be objects or paths; we use objects here because they are provided with the {werptoolkitr} package. We use `returnList` to return the output to the active session, and `savepath` to save an .rds file to `out_path` (but only if we're rebuilding data). The `aggsequence` here can use character specification for the spatial units, since this wraps `multi_aggregate`.
+
+The `read_and_agg` function also saves metadata files (yaml and json) that allows replication of this step with `run_toolkit_params`. These files build on earlier steps if possible, including any available metadata from the modules.
 
 *Note*- to `readRDS` `sf` objects produced here, we need to have `sf` loaded in the reading script.
 

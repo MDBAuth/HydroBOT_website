@@ -131,8 +131,8 @@ This is not actually run here for speed- the same thing is done in a notebook fo
 ```{r}
 #| eval: false
 #| message: false
-  ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
-                                  output_dir = project_dir, 
+  ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                                  output_parent_dir = project_dir, 
                                   outputType = outputType,
                                   returnType = returnType)
 ```

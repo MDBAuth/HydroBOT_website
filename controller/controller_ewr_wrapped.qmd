@@ -25,7 +25,7 @@ There are a few bits of info the user needs to set for a particular run. These c
 
 ## Set paths
 
-We need to set the path to this demonstration. This should all be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`. These would typically point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The saved data goes to `project_dir/module_output` automatically. The `/hydrographs` subdirectory could be made automatic as well, but I'm waiting for the input data format to firm up.
+We need to set the path to this demonstration. This should all be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`. It also works to point to a single scenario, as if run off the end of a hydrology model for one scenario, e.g. `/hydrographs/scenario1`. These would typically point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The saved data goes to `project_dir/module_output` automatically. The `/hydrographs` subdirectory could be made automatic as well, but I'm waiting for the input data format to firm up.
 
 ```{r}
 project_dir = file.path('more_scenarios')
@@ -53,12 +53,16 @@ if (params$REBUILD_DATA) {
 
 ## Run and save
 
-The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent. This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd). 
+The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent. This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd).
+
+The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allows replication of this step with `run_toolkit_params`. These files build on earlier steps if possible, including any available metadata from scenarios.
+
+*Note*: the `prep_run_save_ewrs` uses the default climate categorisation from the EWR, but for dates outside the range provided (1890-2100, categorised from 1911-2018), `climate = 'NSW 10,000 year climate sequence'` needs to be used. The EWR tool provides those files, and any year considered has to have a row in them, even if it is blank.
 
 ```{r}
 #| eval: false
-ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
-                                output_dir = project_dir, 
+ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                                output_parent_dir = project_dir, 
                                 outputType = outputType, 
                                 returnType = returnType)
 ```

@@ -107,8 +107,8 @@ Typically automatically
 
 ```{r}
 #| eval: false
-ewr_out <- prep_run_save_ewrs_R(scenario_dir = hydro_dir, 
-                                  output_dir = project_dir, 
+ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                                  output_parent_dir = project_dir, 
                                   outputType = outputType,
                                   returnType = returnType)
 ```
