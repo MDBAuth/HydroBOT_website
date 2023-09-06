@@ -2,7 +2,7 @@
 
 This is a simple demonstration of capacity and use of the [WERP toolkit](https://github.com/MDBAuth/WERP_toolkit) R package. It is primarily a collection of Quarto notebooks that demonstrate the use of the package and are available to clone or copy to develop other analyses using the package.
 
-See the [github pages site](https://special-disco-eyonrvy.pages.github.io/) built from these notebooks.
+See the [github pages site](https://mdbauth.github.io/WERP_toolkit_demo/) built from these notebooks.
 
 ## Developers/users
 
