@@ -6,9 +6,22 @@ This repo is intended to contain demonstration/template examples of using the to
 
 Obtaining the repo for dev should be a straightforward git clone. However, maintaining robust environment management requires we all install the same way, and while the {werptoolkitr} package is private, that means [ssh from github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/).
 
-::: {#Local install note} The current version of `git2R`, which is used by `devtools::install_git()` to install over ssh is broken in R 4.3. So, in the interim, if doing development work here that needs to be pushed back, we'll need to clone the {werptoolkitr} repo and use `devtools::install_local(path/to/repo)`. This will end up causing some pain with `renv`. :::
+::: {#Local install note}
 
-Some pitfalls with cloning encountered in working across local and MDBA systems are covered in more detail in the \[{werptoolkitr}\](https://github.com/MDBAuth/WERP_toolkit) developer page for both Linux and Windows.
+The current version of `git2R`, which is used by `devtools::install_git()` to install over ssh is broken in R 4.3.
+
+There are two solutions. One is clone the toolkit repo and use `devtools::install_local()`. The other is to use external (system) git, which is cleaner, but might mean setting up new SSH keys. R uses a different Home directory than standard (typically `~/Documents`), and so for this to work, you need to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well (e.g. in `~/Documents/.ssh/`) and [connect them to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Then this should work:
+
+``` r
+
+# install.packages("devtools")
+
+devtools::install_git("git\@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
+```
+
+:::
+
+Some pitfalls with cloning encountered in working across local and MDBA systems are covered in more detail in the [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) developer page for both Linux and Windows.
 
 ## Python environment
 
