@@ -141,8 +141,8 @@ length(ewr_demo_gauges)
 Now we have a list of gauges, we need their hydrographs. We need a reasonable time span to account for temporal variation, but not too long- this is a simple case. Let's choose 10 years.
 
 ```{r}
-starttime = lubridate::ymd(20100101)
-endtime = lubridate::ymd(20211231)
+starttime = lubridate::ymd(20000701)
+endtime = lubridate::ymd(20210630)
 ```
 
 Pull the gauges with `mdba_gauge_getter`. The type-translation that happens in here is because translating from python time to R time is extremely slow for this particular case (though not in general).
@@ -266,7 +266,7 @@ scenenames <- c(paste0('climatedown', as.character(rev(multipliers))),
                 paste0('climateup', as.character(multipliers))) |> 
                 stringr::str_replace('\\.', '_')
 
-adaptadds <- c(0, 201, 6001, 12001)
+adaptadds <- c(0, 250, 6500, 12000)
 
 adapttime <- 8 #months = Sep,Oct,Nov,Dec
 
