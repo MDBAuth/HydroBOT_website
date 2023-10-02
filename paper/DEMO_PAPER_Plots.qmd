@@ -106,6 +106,10 @@ scenehydros <- left_join(scenehydros, scenarios, by = join_by(scenario))
 scenehydros$difference_flow <- dif_flow$difference_flow
 scenehydros$relative_flow <- rel_flow$relative_flow
 
+
+#EWR Tool parameter file
+NSWEWR <- read.csv("temporary_files/NSWEWR.csv")
+
 #ORdering
 sceneorder <- forcats::fct_reorder(scenarios$scenario, (scenarios$flow_multiplier + scenarios$flow_addition/100000))
 sceneorder_label <- forcats::fct_reorder(scenarios$Climate_AdapOpt, (scenarios$flow_multiplier + scenarios$flow_addition/100000))
@@ -119,6 +123,7 @@ saveRDS(unique_Climates, file = file.path(comp_results, "unique_Climates.Rdata")
 unique_AdaptOpt<- select(unique_AdaptOpt, c(AdapOpt, flow_addition))
 colnames(unique_AdaptOpt) <- c("Adaptation Option code","Flow addition")
 saveRDS(unique_AdaptOpt, file = file.path(comp_results, "unique_AdaptOpt.Rdata"))
+
 ```
 
 ```{r}
@@ -161,8 +166,8 @@ catch_demo <- sdl_units %>%
 # ewrgauges <- ewrs_in_pyewr$ewr$Gauge
 # ewr_demo_gauges <- gaugenums[gaugenums %in% ewrgauges]
 # 
-# # starttime = lubridate::ymd(20100101)
-# # endtime = lubridate::ymd(20191231)
+
+
 # # 
 # # gg <- import('mdba_gauge_getter')
 # # demo_levs <- gg$gauge_pull(ewr_demo_gauges, start_time_user = starttime, end_time_user = endtime)
@@ -254,6 +259,40 @@ hydro_plot
 ```
 
 ```{r}
+#interested to see where threshold water levels are on hydrograph
+NSWEWR_gauge <- filter(NSWEWR, Gauge %in% gauges_to_plot) |>
+  tidyr::separate(col = Code, into = c("Code", "Timing")) |>
+  rename(gauge = Gauge) |>
+  group_by(gauge) %>%
+  distinct(Code, .keep_all = TRUE) |>
+  mutate(FlowThresholdMin = as.numeric(FlowThresholdMin)) |>
+  arrange(FlowThresholdMin) %>%
+  mutate(Date = seq(from = max(scenehydros$Date), 
+                    to = min(scenehydros$Date), 
+                    length.out = n())) %>%
+  ungroup()
+
+hydro_plot_EWRs <- scenehydros |>
+    dplyr::filter(scenario %in% c(scenario_to_plot[4]) & gauge %in% gauges_to_plot) |>
+    ggplot2::ggplot(ggplot2::aes(x = Date, y = flow/1000+1)) +
+    ggplot2::geom_hline(data = NSWEWR_gauge, mapping = aes(yintercept = FlowThresholdMin/1000+1),colour = "red")+ #
+    ggplot2::geom_line() +
+    ggplot2::facet_grid(gauge ~ . , scales = 'free') +
+    ggplot2::labs(y = paste0("Flow (GL/day +1)")) +
+    theme_werp_toolkit(legend.position = "bottom")+
+      guides(colour=guide_legend(nrow=2,byrow=TRUE))+
+    ggplot2::geom_label(data = NSWEWR_gauge, mapping = aes(x = Date, y = FlowThresholdMin/1000+1, label = Code), size = 3, colour = "black") +
+  ggplot2::scale_y_continuous(trans = 'log10',
+                              sec.axis = sec_axis(~ . , name = "Gauge ID", breaks = NULL, labels = NULL))
+
+saveRDS(hydro_plot_EWRs, file = file.path(comp_results, "hydro_plot_EWRs.Rdata"))
+hydro_plot_EWRs
+
+
+write.csv(NSWEWR_gauge, file = file.path(comp_results, "EWRs_2_gauges.csv"))
+```
+
+```{r}
 #| echo: false
 #| include: false
 
@@ -298,6 +337,15 @@ dif_plot
 ```
 
 ```{r}
+#get Aus geometry
+library(ozmaps)
+g <- ozmap()
+Australia <- g$geometry[-9]
+
+```
+
+
+```{r}
 #| echo: false
 #| include: false
 
@@ -306,20 +354,32 @@ dif_plot
 # Fig 1
 #CAN WE ADD inset of australia?
 # where do i find R version of gauge getter?
+Aus_plot <- (ggplot() + 
+geom_sf(data = Australia, fill = 'black', colour = 'black') +              
+geom_sf(data = basin, fill = 'azure')) +
+theme_werp_toolkit(axis.ticks = element_blank(), 
+                         axis.text=element_blank(),
+                         legend.position="bottom") +
+guides(fill=guide_legend(nrow=3,byrow=TRUE)) 
+  
 
 system_plot <- (ggplot() + 
+#geom_sf(data = Australia) +              
 geom_sf(data = basin, fill = 'azure') +
 geom_sf(data = catch_demo, mapping = aes(fill = SWSDLName)) +
 scale_fill_manual(values = SWSDLName_pal, name = "Planning units:") + 
-geom_sf(data = st_intersection(bom_basin_gauges, catch_demo), color = 'black')) +
+geom_sf(data = filter(bom_basin_gauges, gauge %in% unique(scenehydros$gauge)), color = 'black')) +
 theme_werp_toolkit(axis.ticks = element_blank(), 
                          axis.text=element_blank(),
                          legend.position="bottom") +
 guides(fill=guide_legend(nrow=3,byrow=TRUE))
 #need to cut back more gauges i think
 
-saveRDS(system_plot, file = file.path(comp_results, "system_plot.Rdata"))
-system_plot
+
+system_plots <- system_plot + inset_element(Aus_plot, 0.01, 0.6, 0.4, 1)
+system_plots
+saveRDS(system_plots, file = file.path(comp_results, "system_plot.Rdata"))
+
 ```
 
 ```{r}
@@ -430,7 +490,7 @@ Failed_EWRs_MAX <- agged_data$ewr_code |>
 #BK1 - Gauge 412039, Target frequency seems correct, everything else 0.
 
 #where ewr is % of years that % is the target frequency - but that doesnt match up wiht frequency.
-
+Failed_EWRs_MAX
 ```
 
 ```{r}
@@ -495,6 +555,32 @@ Fig_5_PanelA
 ```
 
 ```{r}
+#attemption to extract info from figure:
+names(Fig_5_PanelA)
+temp <-Fig_5_PanelA$data
+
+Fig_5_PanelA$layers
+
+Fig_5_PanelA$scales
+
+Fig_5_PanelA$mapping
+
+#Fig_5_PanelA$theme
+
+#Fig_5_PanelA$coordinates
+
+#Fig_5_PanelA$facet
+
+#Fig_5_PanelA$plot_env
+
+Fig_5_PanelA$labels
+
+#Fig_5_PanelA$guides
+```
+
+
+
+```{r}
 #| echo: false
 #| include: false
 
@@ -518,9 +604,10 @@ Fig_5_PanelB <- env_theme_sdl_to_plot |>
     ggplot2::scale_x_continuous(sec.axis = sec_axis(~ . , name = "Adaptation option", breaks = NULL, labels = NULL))+
       theme_werp_toolkit(axis.ticks = element_blank(), 
                          axis.text=element_blank(),
-                         legend.position="bottom")
+                         legend.position="bottom")+
+    paletteer::scale_fill_paletteer_c(palette = 'scico::berlin', limits = c(0,1), name = 'Proportion EWR achieved')
 
-saveRDS(Fig_5_PanelB, file = file.path(agg_results, "Fig_5_PanelB.Rdata"))
+saveRDS(Fig_5_PanelB, file = file.path(comp_results, "Fig_5_PanelB.Rdata"))
 Fig_5_PanelB 
 ```
 
@@ -548,7 +635,7 @@ saveRDS(Fig_5_table, file = file.path(comp_results, "Fig_5_table.Rdata"))
 ```
 
 ```{r}
-Fig_5 <- Fig_5_PanelA + Fig_5_PanelB #+ plot_layout(guides = "collect") & theme(legend.position = 'bottom')
+Fig_5 <- Fig_5_PanelA + Fig_5_PanelB + plot_annotation(tag_levels = 'a') #+ plot_layout(guides = "collect") & theme(legend.position = 'bottom')
 
 saveRDS(Fig_5, file = file.path(comp_results, "Fig_5.Rdata"))
 Fig_5
@@ -604,6 +691,12 @@ Fig_6Max
 #stealing legend for Fig 8
 leg <- ggpubr::get_legend(Fig_6Max)
 Fig_6_leg <- ggpubr::as_ggplot(leg)
+
+
+temp <-Fig_6$data |>
+  group_by(SWSDLName,scenario, env_group)|>
+  summarise(sum(ewr_achieved))
+
 ```
 
 ```{r}
@@ -630,73 +723,114 @@ saveRDS(Fig_6_table, file = file.path(comp_results, "Fig_6_table.Rdata"))
 #| echo: false
 #| include: false
 
-Fig_7a<- obj_sdl_to_plot |>
+# Fig_7a<- obj_sdl_to_plot |>
+#     dplyr::filter(scenario %in% scenario_to_plot) |>
+#     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
+#     plot_outcomes(#x_col = "Climate_AdapOpt",
+#                   y_col = 'ewr_achieved',
+#                   y_lab = 'Proportion EWR achieved',
+#                           x_col = 'map',
+#                           colorgroups = NULL,
+#                           colorset = 'ewr_achieved',
+#                           pal_list = list('scico::berlin'),
+#                           facet_col = 'env_obj',
+#                           facet_row = 'scenario',
+#                           scene_pal = scene_pal,
+#                           #sceneorder = sceneorder,
+#                           scenariofilter = scenario_to_plot,
+#                           underlay_list = list(underlay = basin, 
+#                                                underlay_pal = 'azure')) +
+#     ggplot2::scale_y_continuous(sec.axis = sec_axis(~ . , name = "Climate & Apaptation Option Scenario", breaks = NULL, labels = NULL)) +
+#     ggplot2::scale_x_continuous(sec.axis = sec_axis(~ . , name = "Environmental objective", breaks = NULL, labels = NULL))+
+#     theme_werp_toolkit(axis.ticks = element_blank(), 
+#                          axis.text=element_blank(),
+#                           legend.position="bottom") +
+#     paletteer::scale_fill_paletteer_c(palette = 'scico::berlin', limits = c(0,1), name = 'Proportion EWR achieved') +
+#   # scale_x_discrete(labels= scenario_labels_to_plot)
+
+
+  #making manually:  
+Fig_7a <- obj_sdl_to_plot |>
     dplyr::filter(scenario %in% scenario_to_plot) |>
     dplyr::filter(env_group == 'WB') |> # Need to reduce dimensionality
-    plot_outcomes(#x_col = "Climate_AdapOpt",
-                  y_col = 'ewr_achieved',
-                  y_lab = 'Proportion EWR achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'env_obj',
-                          facet_row = 'scenario',
-                          scene_pal = scene_pal,
-                          #sceneorder = sceneorder,
-                          scenariofilter = scenario_to_plot,
-                          underlay_list = list(underlay = basin, 
-                                               underlay_pal = 'azure')) +
-    ggplot2::scale_y_continuous(sec.axis = sec_axis(~ . , name = "Climate & Apaptation Option Scenario", breaks = NULL, labels = NULL)) +
-    ggplot2::scale_x_continuous(sec.axis = sec_axis(~ . , name = "Environmental objective", breaks = NULL, labels = NULL))+
+    ggplot(aes(fill = ewr_achieved)) + 
+    facet_grid(Climate_AdapOpt~env_obj)+
+    geom_sf(data = basin, fill = 'azure') + #basin
+    geom_sf()+ #planning units
+    paletteer::scale_fill_paletteer_c(palette = 'scico::berlin', limits = c(0,1), name = 'Proportion EWR achieved') +
+    #geom_sf(data = dplyr::filter(agged_data$env_obj, env_obj == 'WB1' & scenario %in% scenario_to_plot[1]), aes(fill = ewr_achieved), shape = 21)+ #gauges
     theme_werp_toolkit(axis.ticks = element_blank(), 
                          axis.text=element_blank(),
-                          legend.position="bottom") #+
-  # scale_x_discrete(labels= scenario_labels_to_plot)
-
-
+                         legend.position="bottom")+
+    ggplot2::scale_y_continuous(sec.axis = sec_axis(~ . , name = "Climate & Apaptation Option Scenario", breaks = NULL, labels = NULL)) +
+    ggplot2::scale_x_continuous(sec.axis = sec_axis(~ . , name = "Environmental objective", breaks = NULL, labels = NULL))
+  
+  
 saveRDS(Fig_7a, file = file.path(comp_results, "Fig_7a.Rdata"))
 Fig_7a
+
+Fig_7a_noleg <- Fig_7a +
+  theme(legend.position = "none")
+
+
 ```
 
 ```{r}
 #| echo: false
 #| include: false
+# 
+# Fig_7b<- obj_sdl_to_plot |>
+#     dplyr::filter(scenario %in% scenario_to_plot[1]) |>
+#     dplyr::filter(env_obj == 'WB1') |> # Need to reduce dimensionality
+#     plot_outcomes(#x_col = "Climate_AdapOpt",
+#                   y_col = 'ewr_achieved',
+#                   y_lab = 'Proportion EWR achieved',
+#                           x_col = 'map',
+#                           colorgroups = NULL,
+#                           colorset = 'ewr_achieved',
+#                           pal_list = list('scico::berlin'),
+#                           facet_col = 'env_obj',
+#                           facet_row = 'scenario',
+#                           scene_pal = scene_pal,
+#                           #sceneorder = sceneorder,
+#                           scenariofilter = scenario_to_plot,
+#                           underlay_list = list(underlay = basin, 
+#                                                underlay_pal = 'azure'),
+#                           overlay_list = list(#list(overlay = 'sdl_units', overlay_pal = 'black'),
+#                                               list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'WB1' & scenario %in% scenario_to_plot[1]),
+#                                                     overlay_pal = 'scico::berlin',
+#                                                     overlay_ycol = 'ewr_achieved',
+#                                                    overlay_ylab = 'Proportion EWR achieved')))+
+#     ggplot2::scale_y_continuous(sec.axis = sec_axis(~ . , name = "Climate & Apaptation Option Scenario", breaks = NULL, labels = NULL)) +
+#     ggplot2::scale_x_continuous(sec.axis = sec_axis(~ . , name = "Environmental objective", breaks = NULL, labels = NULL))+
+#     theme_werp_toolkit(axis.ticks = element_blank(), 
+#                          axis.text=element_blank(),
+#                           legend.position="none")# +
+#   ggplot2::scale_colour_gradientn(colours = list('scico::berlin'), values = c(0,1))#+#+
+  # scale_x_discrete(labels= scenario_labels_to_plot)
 
-Fig_7b<- obj_sdl_to_plot |>
+#making manually:  Cannot currently change scenario labels with plot_outcomes()
+Fig_7b <- obj_sdl_to_plot |>
     dplyr::filter(scenario %in% scenario_to_plot[1]) |>
     dplyr::filter(env_obj == 'WB1') |> # Need to reduce dimensionality
-    plot_outcomes(#x_col = "Climate_AdapOpt",
-                  y_col = 'ewr_achieved',
-                  y_lab = 'Proportion EWR achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'env_obj',
-                          facet_row = 'scenario',
-                          scene_pal = scene_pal,
-                          #sceneorder = sceneorder,
-                          scenariofilter = scenario_to_plot,
-                          underlay_list = list(underlay = basin, 
-                                               underlay_pal = 'azure'),
-                          overlay_list = list(#list(overlay = 'sdl_units', overlay_pal = 'black'),
-                                              list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'WB1' & scenario %in% scenario_to_plot[1]),
-                                                    overlay_pal = 'scico::berlin',
-                                                    overlay_ycol = 'ewr_achieved',
-                                                   overlay_ylab = 'Proportion EWR achieved')))+
-    ggplot2::scale_y_continuous(sec.axis = sec_axis(~ . , name = "Climate & Apaptation Option Scenario", breaks = NULL, labels = NULL)) +
-    ggplot2::scale_x_continuous(sec.axis = sec_axis(~ . , name = "Environmental objective", breaks = NULL, labels = NULL))+
+    ggplot(aes(fill = ewr_achieved)) + 
+    facet_grid(Climate_AdapOpt~env_obj)+
+    geom_sf(data = basin, fill = 'azure') + #basin
+    geom_sf()+ #planning units
+    paletteer::scale_fill_paletteer_c(palette = 'scico::berlin', limits = c(0,1), name = 'Proportion EWR achieved') +
+    geom_sf(data = dplyr::filter(agged_data$env_obj, env_obj == 'WB1' & scenario %in% scenario_to_plot[1]), aes(fill = ewr_achieved), shape = 21)+ #gauges
     theme_werp_toolkit(axis.ticks = element_blank(), 
                          axis.text=element_blank(),
-                          legend.position="none") #+
-  # scale_x_discrete(labels= scenario_labels_to_plot)
+                         legend.position="bottom")+
+    guides(fill = guide_colourbar(title.position="top"), title.hjust = 0.5)+
+    ggplot2::scale_y_continuous(sec.axis = sec_axis(~ . , name = "Climate & Apaptation Option Scenario", breaks = NULL, labels = NULL)) +
+    ggplot2::scale_x_continuous(sec.axis = sec_axis(~ . , name = "Environmental objective", breaks = NULL, labels = NULL))
+  
 
 saveRDS(Fig_7b, file = file.path(comp_results, "Fig_7b.Rdata"))
 Fig_7b
 
-Fig_7 <- Fig_7a + Fig_7b + plot_layout(widths = c(3,1), guides = "collect") + plot_annotation(tag_levels = 'a') &
-  theme(legend.position='bottom') 
+Fig_7 <- Fig_7a_noleg + wrap_elements(full = Fig_7b) + plot_layout(widths = c(2,1))  + plot_annotation( tag_levels = 'a') 
 
 saveRDS(Fig_7, file = file.path(comp_results, "Fig_7.Rdata"))
 
@@ -734,6 +868,7 @@ saveRDS(Fig_7_table, file = file.path(comp_results, "Fig_7_table.Rdata"))
 # Fig 8
  sdl_line <- obj_sdl_to_plot |>
     dplyr::filter(scenario %in% scenario_to_plot) |>
+    dplyr::filter(env_group == 'NF') |> # Need to reduce dimensionality
     plot_outcomes(y_col = 'ewr_achieved',
                   y_lab = "Proportion EWR achieved",
                   x_col = 'delta_diff',
@@ -768,6 +903,7 @@ saveRDS(Fig_7_table, file = file.path(comp_results, "Fig_7_table.Rdata"))
  Fig_8
 
  #use rlative instead of difference
+ # NOTES: Cannot work out how to order legend - doesnt matter now that subset to NF but still a problem
 ```
 
 ```{r}
@@ -794,27 +930,29 @@ saveRDS(Fig_8_table, file = file.path(comp_results, "Fig_8_table.Rdata"))
 #| echo: false
 #| include: false
 
-sdl_fit_sdl <- obj_sdl_to_plot |>
-  plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'delta_diff',
-                y_lab = 'Proportion EWR achieved',
-                x_lab = 'Change in flow (difference)',
-                transx = 'log10',
-                transy = 'log10',
-                color_lab = 'SDL unit',
-                colorset = 'SWSDLName',
-                pal_list = list("ggsci::default_jama"),
-                facet_wrapper = 'env_group',
-                scene_pal = scene_pal,
-                sceneorder = sceneorder[sceneorder %in% c(scenario_to_plot)],
-                base_lev = "climatebaseadapt0",
-                comp_fun = 'relative',
-                add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
-                              na.rm = TRUE)/2,
-                group_cols = c('env_obj', 'polyID'),
-                smooth = TRUE)
+#EDITS: making this manually. cant work out how to fit lines to adaptation option - i think smoothed fits for all environmental objectives isnt quite right because some targets have more than others so doing it this way
 
-suppressWarnings(print(sdl_fit_sdl))
+# sdl_fit_sdl <- obj_sdl_to_plot |>
+#   plot_outcomes(y_col = 'ewr_achieved',
+#                 x_col = 'delta_diff',
+#                 y_lab = 'Proportion EWR achieved',
+#                 x_lab = 'Change in flow (difference)',
+#                 transx = 'log10',
+#                 transy = 'log10',
+#                 color_lab = 'SDL unit',
+#                 colorset = 'SWSDLName',
+#                 pal_list = list("ggsci::default_jama"),
+#                 facet_wrapper = 'env_group',
+#                 scene_pal = scene_pal,
+#                 sceneorder = sceneorder[sceneorder %in% c(scenario_to_plot)],
+#                 base_lev = "climatebaseadapt0",
+#                 comp_fun = 'relative',
+#                 add_eps = min(obj_sdl_to_plot$ewr_achieved[obj_sdl_to_plot$ewr_achieved > 0], 
+#                               na.rm = TRUE)/2,
+#                 group_cols = c('env_obj', 'polyID'),
+#                 smooth = TRUE)
+# 
+# suppressWarnings(print(sdl_fit_sdl))
 
 # Fig 9
 # copied straight from Galens book and
@@ -923,45 +1061,10 @@ Fig_9_table <- data.frame(Scale = c("Scenario", rep("", times = 1),
 saveRDS(Fig_9_table, file = file.path(comp_results, "Fig_9_table.Rdata"))
 ```
 
-```{r}
-sdl_lm_groups_2
-```
-
-```{r}
-sdl_fit_sdl
-```
-
-```{r}
-#| echo: false
-#| include: false
-# Causal networks
-#WHERE DO I START WITH THIS????
-#Fig_4
-edges <- make_edges(dflist = causal_ewr, 
-               fromtos = list(c('ewr_code', 'env_obj'), 
-                              c('env_obj', 'Specific_goal'), 
-                              c('Specific_goal', 'Target'), 
-                              c('env_obj', 'target_5_year_2024')),
-               gaugefilter = '409025')
-
-edges
-
-nodes <- make_nodes(edges)
-# look at that for demo
-nodes
-
-default_network <- make_causal_plot(nodes, edges, render = FALSE)
-DiagrammeR::render_graph(default_network)
-
-Fig_4 <- make_causal_plot(filter(nodes, NodeType != 'target_5_year_2024'),
-                 edges, render = FALSE) %>% 
-  DiagrammeR::render_graph()
-
-```
 
 ```{r}
 # summing over planning units and Env groups
-Fig_10 <- ggplot(data = env_theme_catchment_to_plot, aes(x = Climate, y = AdapOpt, fill = proportion_ewr_achieved)) + 
+Fig_10 <- ggplot(data = filter(env_theme_catchment_to_plot, scenario != "MAX"), aes(x = Climate, y = AdapOpt, fill = proportion_ewr_achieved)) + 
   geom_tile() + theme_werp_toolkit() +
   scale_fill_paletteer_c('scico::berlin')+
   labs(x = "Climate scenario", y = "Adaptation Option", fill = "Proportion EWR achieved")
@@ -973,6 +1076,8 @@ Fig_10
  # Could may quantitative version but need to work out how to interpolate.
  # ggplot(data = filter(env_theme_catchment_to_plot, scenario != "MAX"), aes(x = log10(flow_multiplier+1), y = log10(flow_addition+1), fill = ewr_achieved)) + geom_tile()+
  
+#TO DO::::: For Fig 10, I’m not sure that the max square is adding much. I think you could just have the matrix minus that theoretical maximum given that you hit it with the upper right most box anyway.
+
 ```
 
 ```{r}
@@ -996,10 +1101,106 @@ saveRDS(Fig_10_table, file = file.path(comp_results, "Fig_10_table.Rdata"))
 ```
 
 ```{r}
+#| echo: false
+#| include: false
+# Causal networks
+
+#Fig_4a
+edges <- make_edges(dflist = causal_ewr, 
+               fromtos = list(c('ewr_code', 'env_obj'), 
+                              c('env_obj', 'Specific_goal'), 
+                              c('Specific_goal', 'Target'), 
+                              c('env_obj', 'target_5_year_2024')),
+               gaugefilter = gauges_to_plot[1]) 
+
+nodes <- make_nodes(edges)
+
+
+Fig_4a <- make_causal_plot(nodes,
+                 edges,
+                 focalnodes = filter(nodes, NodeType == "ewr_code")$Name,
+                 edge_pal = 'black',
+                 node_pal = 'white',
+                 render = FALSE
+                 ) 
+
+Fig_4a%>% 
+  DiagrammeR::render_graph()
+
+DiagrammeR::export_graph(Fig_4a,
+file_name = file.path(comp_results,"Fig_4a.png"),
+file_type = "png")
+
+```
+
+
+
+```{r}
+#| echo: false
+#| include: false
+# Causal networks
+#Fig_4b
+edges_s <- make_edges(dflist = causal_ewr, 
+               fromtos = list(c('ewr_code', 'env_obj'), 
+                              c('env_obj', 'Target')),
+               gaugefilter = gauges_to_plot[1])
+
+
+edges_targets <- make_edges(dflist = causal_ewr, 
+               fromtos = list(c('env_obj', 'Target')),
+               gaugefilter = gauges_to_plot[1])
+
+#edges <- filter(edges, gauge == gauges_to_plot[1])
+
+nodes_s <- make_nodes(edges_s)
+
+gauge_nodes_EWRs <- filter(agged_data$ewr_code, gauge == gauges_to_plot[1] & scenario == scenario_to_plot[4]) |>
+  as_tibble()|>
+  select(ewr_code, ewr_achieved) |>
+  rename(Name = ewr_code)
+
+gauge_nodes_Env_objs <- filter(agged_data$env_obj, gauge == gauges_to_plot[1] & scenario == scenario_to_plot[4]) |>
+  as_tibble()|>
+  select(env_obj, ewr_achieved)|>
+  rename(Name = env_obj)
+
+gauge_nodes_Targets <- filter(agged_data$env_obj, gauge == gauges_to_plot[1] & scenario == scenario_to_plot[4]) |>
+  left_join(edges_targets, by = c("env_obj" = "from")) |>
+  rename(Name = to )|>
+  as_tibble()|>
+  group_by(Name)|>
+  mutate(Name = case_when(env_obj == "EF3" ~ "Priority ecosystem function", 
+                            env_obj == "NV2" ~ "Native vegetation",
+                            .default = Name))|>
+  summarise(ewr_achieved = mean(ewr_achieved))
+
+gauge_nodes_values <-  bind_rows(gauge_nodes_EWRs, gauge_nodes_Env_objs, gauge_nodes_Targets)
+nodes_s <- left_join(nodes_s, gauge_nodes_values)
+
+Fig_4b <- make_causal_plot(nodes_s,
+                 edges_s,
+                 #focalnodes = c('NF4', 'Sloanes froglet'),
+                 edge_pal = 'black',
+                 node_pal = list(value = 'scico::berlin'),
+                 node_colorset = 'ewr_achieved', render = FALSE
+                 ) 
+
+Fig_4b%>% 
+  DiagrammeR::render_graph()
+
+DiagrammeR::export_graph(Fig_4b,
+file_name = file.path(comp_results,"Fig_4b.png"),
+file_type = "png")
+
+```
+
+```{r}
+library(english)
+
 proj_meta <- list(Plannning_units = knitr::combine_words(SWSDLName_to_plot),
-                  n_Plannning_units = words(length(SWSDLName_to_plot)),
+                  n_Plannning_units = english::words(length(SWSDLName_to_plot)),
                   gauges_to_plot = knitr::combine_words(gauges_to_plot),
-                  n_gauges_to_plot = words(length(gauges_to_plot)),
+                  n_gauges_to_plot = english::words(length(gauges_to_plot)),
                   n_gauges = length(unique(scenehydros$gauge)),
                   Max_scenario = max(scenarios$flow_multiplier),
                   Min_scenario = min(scenarios$flow_multiplier)
@@ -1007,5 +1208,22 @@ proj_meta <- list(Plannning_units = knitr::combine_words(SWSDLName_to_plot),
 
 yaml::write_yaml(proj_meta, 
 file = file.path(comp_results, 'project_metadata.yml'))
+
+
+## Subset for demo
+
+# We have a lot of hydrographs, so for this demonstration, we will often use a subset.
+
+# gauges_to_plot <- c('412002', '419001')#, '422028', '421001')
+# scenario_to_plot <- c("climatedown2adapt0", "climatedown2adapt201", "climatedown2adapt6001",
+#                       "climatebaseadapt0", "climatebaseadapt201", "climatebaseadapt6001",
+#                       "climateup2adapt0", "climateup2adapt201", "climateup2adapt6001")
+# 
+# scenario_labels_to_plot <- sort(filter(scenarios, scenario %in% c(scenario_to_plot))$Climate_AdapOpt)
+# 
+# SWSDLName_to_plot <- c("Macquarie–Castlereagh", "Lachlan", "Namoi")
+# 
+# catch_demo <- sdl_units %>% 
+#   dplyr::filter(SWSDLName %in% SWSDLName_to_plot)
 
 ```
