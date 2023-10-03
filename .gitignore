@@ -9,6 +9,7 @@
 
 *_cache
 *_files
+*_old
 
 # quarto output- will need to make visible to produce docs
 _output
