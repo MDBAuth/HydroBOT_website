@@ -824,18 +824,6 @@
       ],
       "Hash": "a57f0f5dbcfd0d77ad4ff33032f5dc79"
     },
-    "git2r": {
-      "Package": "git2r",
-      "Version": "0.32.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R",
-        "graphics",
-        "utils"
-      ],
-      "Hash": "1882d7a76fd8c14b2322865f74c9a348"
-    },
     "globals": {
       "Package": "globals",
       "Version": "0.16.2",
@@ -2128,25 +2116,27 @@
       "Requirements": [
         "DiagrammeR",
         "R",
-        "colorspace",
         "dplyr",
         "forcats",
         "foreach",
         "ggplot2",
-        "git2r",
         "glue",
+        "grDevices",
         "lwgeom",
-        "magrittr",
         "paletteer",
-        "patchwork",
+        "purrr",
         "readr",
         "reticulate",
         "rlang",
         "sf",
+        "stringi",
         "stringr",
-        "tidyr"
+        "tibble",
+        "tidyr",
+        "tidyselect",
+        "yaml"
       ],
-      "Hash": "be2b6ab65263f1564dae2cd4e3ce4d6a"
+      "Hash": "470ab3cdbab8e9dbdbe6cd072b6ad919"
     },
     "withr": {
       "Package": "withr",
