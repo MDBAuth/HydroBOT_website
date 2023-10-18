@@ -6,6 +6,7 @@ project:
   render:
     - "*.qmd"
     - "!.*_old.*"
+    - "!.*demo_paper.qmd"
 
 format:
   html:
@@ -133,7 +134,7 @@ website:
               text: "Run toolkit wholly in-memory"
             - href: full_toolkit/WERP_toolkit_params.qmd
               text: "Run toolkit from params"
-            - href: Presentation/walkthrough_presentation.qmd
+            - href: presentation_paper/walkthrough_presentation.qmd
               text: "Walkthrough presentation"
 
 theme:
