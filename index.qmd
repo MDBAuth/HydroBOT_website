@@ -49,7 +49,7 @@ Necessary pieces but not part of the data flow in the toolkit
 
 **In use, the toolkit expects that scenario hydrographs will be available and the causal networks are defined.**
 
-![Conceptual use of the toolkit. Scenario hydrographs are expected to come from hydrologic modelling, while the toolkit ingests those, runs them through the response modules, and provides the user the ability to aggregate and synthesize in various ways.](images/Presentation1.jpg)
+![Conceptual use of the toolkit. Scenario hydrographs are expected to come from hydrologic modelling, while the toolkit ingests those, runs them through the response modules, and provides the user the ability to aggregate and synthesize in various ways.](images/tktomgmt.jpg)
 
 ![Toolkit structure, showing the various components where the toolkit performs processing and allows the user to provide settings.](images/architecture.jpg)
 

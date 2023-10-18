@@ -1,0 +1,290 @@
+---
+title: "An integrated toolkit for assessment of hydrology-dependent outcomes in the Murray-Darling Basin: FANCYACRONYM"
+author: "Galen Holt, Georgia Dwyer, David Robertson, Andrew Freebairn, Martin Job, Lara Palmer, Rebecca Lester"
+bibliography: references.bib
+number-sections: true
+---
+
+*I have stuffed up the citations moving this to quarto, will need to fix*
+
+*I'm writing a lot of this fast, and it is ending up fairly straw-manny. Just trying to get ideas down for now. My outlines are below.*
+
+*There is a good example of a bigger project but very similar in @harrison2023 .*
+
+# Abstract
+
+# Introduction
+
+The objectives of water management in large river systems typically span a wide range of desired targets or values. For example, in the Murray-Darling Basin, Australia, the objective of water management is to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies (Basin Plan, 2012). These values are not unique to Australia; water is managed to protect the social, economic, environmental and cultural values of communities in New Zealand (Kaye-Blake et al. 2014), *EXAMPLE FROM OTHER COUNTRIES?- and make more general: Lara wants to pull back from the quad-bottom-line framing*. That these values are the targets of water management implies a hypothesized dependence on water, but in many cases these dependencies are not well-defined and management proceeds under the relatively simple assumption that if water is provided, these targets will improve *building a straw man here, need to back up with citations*.
+
+This focus on hydrology arises in part for two related reasons. First, water managers typically have a limited range of levers that primarily affect hydrology, e.g. flow releases from dams or inundation of wetlands. When non-hydrologic levers are available, e.g. water trading rules in the Murray-Darling Basin, their impact is still often assessed on how they alter hydrologic conditions- the spatio-temporal patterns of flow in the system. Second, hydrologic modelling is often better-integrated with management workflows. In part, this is due to the availability of large-scale physical models that provide robust ability to model flows as they arise from natural drivers such as rainfall and capture infrastructure such as dams and diversions. While complex, these models have relatively high precision; the impact of particular management actions such as dam releases on hydrology are well-understood and captured. While these proximate models of system state and impact of management actions are invaluable, they do not provide the necessary information to assess the status of the range of flow-dependent values and targets.
+
+Assessing values as they respond to flow and management actions requires models of these relationships. Such models exist, though their quality and extent vary widely, ranging from unstated mental models to highly-detailed population dynamics or economic models. When these models are quantitative or computational, they are written in various languages by subject-matter experts, and return disparate outputs depending on their particular goals and approaches. In particular, these models are often designed to study the values they model, e.g. fish populations, not to produce the most useful analysis for management questions. Integrating these models into a holistic modelling approach is necessary to provide capacity to assess values under different hydrologic conditions and management actions. In addition, this approach gives these response models utility beyond their initially-intended purpose and identifies where new work is needed because response models are limited or nonexistent. Addressing these needs provides the opportunity for robust decision-making, and the ability to prioritize water planning across a range of values and identify conditions that achieve disproportionately large (or small) impacts.
+
+In this paper, we describe an integrated modelling 'toolkit' for water management in the Murray-Darling Basin, Australia, hereafter referred to as *FANCYACRONYM*. The Murray-Darling Basin Authority has statutory obligations to manage water to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies (Basin Plan, 2012). Moreover, the state of the basin is required to be assessed and updates to the Basin Plan made at *XX* year timeframes. The Authority has access to robust hydrologic models describing flows in the system and responses to current management practices, and these models are under continual use, development, and improvement. Models of the responses to those hydrologic conditions are patchy, only representing some values, and have been developed and used in a more ad-hoc approach rather than integrated with each other and the hydrologic models. Moreover, the need for integration is heightened by an increasing focus by the Authority on assessing system response to climate change and possible adaptation actions that may be taken by the Authority itself or other stakeholders in the Basin.
+
+The toolkit described here greatly improves the capacity of the MDBA to assess outcomes across a range of values, and addresses a number of issues with current assessment practices and modelling approaches. By providing a single, consistent interface to a range of response models we avoid the need to manually run models separately and we abstract their different interfaces, languages, and idiosyncracies. Moreover, the toolkit design is highly modular, built to allow the integration of new response models with limited additional updates to the toolkit itself. Continuing with this consistency, the toolkit provides a standard set of synthesis approaches and functions that allow analysis and interpretation of outcomes from these disparate models with a common approach and design language. Because the need for assessing outcomes is nearly universal in water management, and not limited to a particular scenario or project, the toolkit is designed with strong scenario-comparison capabilities but is agnostic to what those scenarios represent. It can ingest any hydrograph for which it has response models. For a similar reason, the standardised synthesis and outputs are highly flexible, allowing targeting different outputs for different management needs. One common issue with modelling in general, and particularly integrated models spanning several tools, is becoming a black box. This can yield mistrust by the public and other stakeholders influenced by the model, but also mistrust and misunderstanding by users and developers of the model. To avoid these issues, the toolkit has been continuously co-designed with the MDBA, and an emphasis is put on public code, production of outputs that describe the model actions, (e.g. causal relationships), and reproducibility and self-documentation.
+
+One primary use for the toolkit is the assessment and comparison of outcomes under different climate scenarios and different climate adaptations that may occur. These axes represent changes to the system due to processes over which managers have no control, to better understand the problem space, and management actions, which would typically be targeted interventions. We use this demonstration to illustrate the problem space and show how the toolkit can aid in assessing potential system change and prioritising management actions to mitigate impacts.
+
+# Methods
+
+The purpose of the toolkit is to move from hydrographs representing various hydrologic scenarios to their impacts on multiple sets of values (e.g. economic, social, environmental, cultural), and do so in a consistent way despite differences in the response models. The toolkit then has the capability to synthesize the wide range of outputs from the response models into results that compare scenarios and are digestible and useful for management decisionmaking (@fig-tktomgmt). A co-design process including scientists, software developers, and managers was developed to ensure this goal of producing scientifically robust results that are also management-relevant.
+
+![Conceptualisation of toolkit benefits to management. Scenarios represented by hydrographs are fed in a consistent way to various response models, while the outputs are synthesized into management-relevant outputs that aid decisionmaking.](../images/tktomgmt.jpg){#fig-tktomgmt}
+
+## Co-design and scoping for management relevance
+
+To ensure the toolkit met management needs and was trusted by management users, a toolkit development team was created consisting of primary toolkit developers, hydrologic modelers, and MDBA staff. Frequent collaboration among this team allowed issues to be addressed while still small, and ensure decisions about toolkit construction reflected the needs of the end-user. This approach encouraged an iterative process, where broad goals were established as a group, and implementation discussed. As implementation proceeded, the close collaboration provided a mechanism by which goals could be adjusted or the implications of certain implementation decisions discussed and understood. By having this window into the toolkit development, the managers obtained a much more granular view of how it operates than they would otherwise have, including its capabilities and limitations. Making the toolkit less of a black box builds trust in its output and also greatly aids in knowing how to interpret and use that output.
+
+Key to the collaborative development was identification of the response models to include. These models needed to capture responses to hydrology, but more importantly need to provide information about values relevant to water management decisions. Early in the development process, a wide scan was taken to identify candidate response models. This scan considered models being used or developed within the MDBA itself, other government agencies (both federal and state), and externally. This scan found that there were a number of responses models available, but many were outdated or highly manual, and their use was patchy both within and across management agencies. Ultimately, only one was suitably modern and well-developed to include in the toolkit, the Environmental Water Response Tool (EWR). Other in-development modules were identified as candidates to include during the life of the toolkit, including economic and social models. Further, this scan identified values that are mandated management targets for which there were no available or in-development response models, highlighting areas needing future work.
+
+## Causal networks {#sec-causal_networks}
+
+The use of a causal network framing both at a high level for visualisation and communication with the MDBA and embedded in the toolkit has greatly aided in collaboration, as it provides a way to illustrate both the goals and the functioning of the toolkit, avoiding it becoming a black box. Causal networks are models that describe the topology of dependence among many drivers and outcomes of different type (adapted from @peeters2022) *need more causal refs, Peeters didn't invent them*. The relevant causal network for water management in the Murray-Darling Basin captures relationships between climate, adaptation options and outcomes for environmental, cultural, social, and economic values and assets. Thus, they include climatic and management drivers, but also include the causal relationships which form the basis of the response models (e.g. flow timeseries to EWRs in the EWR tool, or potentially the life history inherent in a population dynamics model). They incorporate any links connecting those outcomes to larger-scale outcomes (e.g. from hydrologic indicators to ecological response). Thus, causal networks define an overarching model from initial inputs (e.g. rainfall or flows or adaptations) through to all values of interest, with each link defining a response model or component of a response model. The specifications of the models underlying each link are highly variable, ranging from detailed physical models linking runoff to flow to simpler ecological models of environmental water requirements to simple averages or leaving the model unspecified where more detail about the relationships are unavailable. Assessing the quality of knowledge around each link provides a powerful assessment of knowledge deficiencies and uncertainty in responses.
+
+Causal networks themselves, i.e. the structure of the links and nodes (state variables) can be derived from many sources, including empirical studies defining the existence of causal relationships and expert opinion. The toolkit provides a clean causal network where available for included modules, to describe how their outputs arise from hydrology and how they relate to various levels of management-relevant outcomes. For example, the causal network provided for the EWR tool is developed primarily from expert opinion in the Long Term Watering Plans (LTWPs), and gives the causal relationships between the hydrologic indicators assessed by that module to ecological outcomes ranging from particular components of life cycles for individual species up to broad groupings of environmental priorities or 20 year management targets (see @sec-modules for description of LTWPs and EWRs).
+
+The causal networks enable 1) visual representation of the complex inter-relationships between scenario inputs and outcomes across a range of objectives and 2) assessment of outcomes aggregated along the thematic dimension (see @sec-aggregator). The former aids transparency, elucidating the intentions and causal relationships behind the response models and is a useful device for communication alongside other final outputs. The latter allows outcomes to be quantified for individual (or sets of) environmental objectives, target groups, long-term targets, or at the overarching level of environmental, cultural, social, or economic values. This quantification provides a powerful assessment tool and the ability to identify synergies and trade-offs across these scales.
+
+#### *Causal network thoughts*
+
+-   I'm not sure this goes here, but it was a weird mix of super specific about EWRs and super general about causal networks as a thing, so I tried to put the general stuff here and the specific below.
+
+-   Should we just call the causal networks another module? That's what the EWR one is. And any other that hits new modules. But that's different than a big overarching one (though would be a subset). Maybe that's the issue- maybe we need the big overarching one:
+
+-   we don't have the big overarching one anymore (and kind of never did other than very crudely. Should we? A fig here would be nice.
+
+-   We don't actually do an assessment of knowledge across links. We could (at least crudely- all the EWR links would be 'expert opinion', etc) and should.
+
+-   We could do an assessment of disproportionately important nodes/links. This could be really powerful with the above- are they the ones we do/don't know about? I think this is closely aligned with my let's do a network analysis for an honours idea.
+
+## Toolkit overview
+
+The key goals of the toolkit are to provide a flexible platform for comparing outcomes between different possible scenarios. Scenario comparison is essential for use in both evaluating past actions or conditions and planning for the future, whether to better understand potential shifts in the system from external forces (e.g. climate change) or to assess potential management actions.
+
+### Architecture
+
+Taken holistically, the architecture of the toolkit comprises five components and the links between them (@fig-architecture). Input data is ingested by the Controller, which packages and runs response models. Results from the models are then processed by the Aggregator, and the analysis and final outputs are prepared by the Comparer. The fifth component is the Causal networks, which are used within the Aggregator and Comparer for outputs that are aggregated along the thematic dimension (see below) and for visual representation of the complex inter-relationships defined in the response models. Each of these components is described in more detail below.
+
+![Architecture of toolkit. Hydrographs representing scenarios are inputs. Each set of boxes represents a step in the toolkit processing, allowing changes to be made at any step in a modular way without impacting the functioning of other stages.](../images/architecture.jpg){#fig-architecture}
+
+The architecture of the toolkit emphasizes modularity. Each of the components can save their outputs, allowing users to run either the whole toolkit or re-run only needed components to update analysis. For example, if a user desired to change how they aggregate the results of the modules, they could re-run the aggregation step and the subsequent comparison step to match. This ability to adjust intermediate steps allows rapid iteration of results to address a given management question, or adaptation of preexisting results to new questions. This modularity also allows rapid, iterative development of the toolkit itself. Any of the components of the toolkit can be updated without affecting others, and so obtaining new results from updated components (e.g. new aggregation capability) simply requires re-running the toolkit from that point forward.
+
+As each stage of the toolkit runs, it produces metadata files including the run settings and other attached information relating to the scenarios to enhance repeatability, ensure correctness and increase comprehension. This metadata includes all parameters for the run, allowing exactly repeatable analyses to be conducted by using the metadata files as parameter files for subsequent runs. Even if a run is started in the middle, such as to re-run aggregation in a different way, the metadata captures the metadata for the previous steps, ensuring that outputs at every stage are tagged with full provenance information about the run that created them.
+
+### Implementation
+
+The toolkit is available as an R package, which provides a suite of functions representing the steps in the architecture. These functions are designed to be general, allowing users much flexibility in how they run the toolkit for a particular set of analyses while retaining a consistent structure and outputs. Because translating from hydrologic scenarios to various responses is a general problem in water management, we expect the ways in which the toolkit is used to be highly variable. Thus, by providing the general structure users can target the particular questions and particular analyses needed for a given question. For example, in some cases we might want to look at the responses of different components of fish life cycles for a small subset of locations in the basin. In another situation, we might want a big-picture view of how climate might shift long-term goals for the environment as a whole. This structure means that although the initial purpose of the toolkit was to assess climate scenarios, its use in practice can be far more general. Any hydrograph can be assessed, and any set of scenarios represented by hydrographs can be compared. *How much of that is results? I'm really struggling with Results vs Methods*.
+
+The toolkit is designed for analysis of management questions in the Murray-Darling Basin, and so along with the functions to do so, provides a standard set of spatial data comprising the Basin itself, gauges within the basin (at which hydrographs may be available), and various managment units (Sustainable Diversion Limit units, Resource Plan Areas, and catchment boundaries for major subcatchments). Some example hydrograph data is also included for testing and demonstration. The toolkit provides a clean causal network, as this is a necessary component for analyzing the output of the modules, and is described in more detail in @sec-causal_networks.
+
+As a result of the scan of available response models, toolkit development proceeded with the EWR tool as a single response model, but with an architecture designed to allow modular integration of additional response models as they become available. The scan accentuated a critical feature of this modularity; the toolkit must be able to incorporate and standardise models written in various languages and with a wide range of input needs and outputs. The toolkit achieves this by wrapping those other tools in various ways to make their differences as hidden from the user as possible. In the case of Python modules, the toolkit uses the {reticulate} R package @ushey2023 in combination with small amounts of internal Python code to call python modules directly. This python internal to the toolkit performs limited cleaning and translation to prevent passing large objects between languages and ensure that any idiosyncrasies in module inputs and outputs are handled. Python dependencies (and python itself) are automatically installed on first use of Controller functions that call Python modules, unless they already exist on the user's system. This provides the user flexibility to provide their own Python environment if desired, or not need to worry about it if they don't. Modules in other languages are not yet available, but the key requirement is that they be available in a format that is scriptable. In that case, the toolkit will provide small setup and cleanup scripts as with the Python modules, and wrapper functions to call these modules.
+
+The modularity of the toolkit means it can be run stepwise, with the user calling functions at each step, and either saving the outputs or returning them directly to an interactive session or both. Typically outputs would be saved for reproducibility and speed unless the project is quite small. There are also wrapper functions provided that allow running the entire toolkit from Controller through Aggregator, which are extremely useful for large runs or remote runs on batching services. One particularly useful wrapper provides the ability to run from a `.yml` config file, with a yaml file providing function arguments. This function allows the use of a default file and 'tweaked' file, making it ideal for holding many parameters constant in the default and only changing some on a per-run basis in a smaller file. It also takes command-line or R list arguments, making it a flexible solution to run the toolkit from the command line, in scripting contexts, or Quarto notebooks. Most importantly, the metadata saved at each step in the process is a yaml file with parameters that are a superset of those needed to run the toolkit. Thus, an exactly identical run can be produced by running the toolkit using a metadata file as a parameter file. Some additional information included in these metadata files are the git hash, further allowing reproducibility in the face of code changes.
+
+In practice, the toolkit functions are primarily run in one of two ways. Interactive investigation of relatively small sets of hydrographs can be done in notebooks (typically Quarto, @allaire2022) or simple R scripts. Larger investigations typically would be run on remote computers as part of batching systems, whether traditional HPC or Azure AWS with the outputs at the end of the aggregation (and potentially each step) returned. The Comparer is typically best considered interactively for two reasons- through the aggregation step, all operations can proceed in parallel over scenarios, and in some cases parallelizing over gauges is possible, though this is highly dependent on the response model and the desired aggregation steps. The Comparer necessarily looks across scenarios. Doing this comparison interactively is typically not excessively CPU or memory-intensive, provided the Aggregator step has been well-thought-through. If there is enough data to require high processing or memory, it is unlikely to be simplified enough to make interpretable figures. Most importantly, the primary goal of the Comparer is to produce usable, interpretable outputs. Typically, arriving at a set of meaningful outputs is an iterative process that won't be known exactly *a priori*, and so working through this step interactively is desired. If, however, the toolkit is being used for ongoing monitoring of the same analyses (e.g. a 'dashboard'), then the first iteration may be done interactively, and then subsequent uses incorporating those settings into a script to auto-generate the same figures.
+
+## Toolkit components
+
+*These names are dumb- as usual we came up with them super quick for a presentation and they've gotten stuck. Ideas for better?* 
+
+*I still can't decide if the description of the pieces are methods or if the toolkit itself is the result. It is, but then what's the method? R?*
+
+### Controller
+
+The 'Controller' component of the toolkit is the interface between the externally generated input data (scenarios), the chosen response model, and other internal components of the toolkit @fig-architecture . This component initiates the downstream processing steps according to user-defined settings for a particular run. It includes arguments for locating the input data and the response model(s) to use along with any necessary parameters, along with control over whether and where outputs and metadata will be returned. The Controller can also control later components of the toolkit, allowing the full toolkit to be run at once. These include defining aggregation steps as discussed in @sec-aggregator and analysis of the results with the *Comparer* ( @sec-comparer ). A primary use of this full-toolkit control is for large batched runs using parameter files to specify the control arguments in `yaml` files. The core functionality of this component is delivered via simple functions that apply to the input data for each scenario and can be looped over scenarios in parallel. This component can be accessed by the user by using Quarto notebooks to work interactively, R scripts, or via the command line, depending on the use case.
+
+### Response models {#sec-modules}
+
+The impacts of climate and adaptation options on social, cultural, environmental, or economic values are estimated based on causal relationships between drivers (e.g. hydrology) and responses (e.g. the state of assets and values). The response models may exist in many different forms, ranging from binary achievement of hydrologic indicators to fully quantitative responses. These tools are expected to be sourced from existing or in-development models developed by subject-matter experts. The toolkit then provides a unified interface and ongoing analysis and modelling of their results.
+
+#### EWR (Environmental Water Requirements)
+
+The EWR tool which forms the core of the demonstration is one such response model, written in Python and in use by the MDBA internally as well as the state of New South Wales for water planning. It models the response of environmental values of the Murray-Darling Basin founded on hydrologic indicators paired with causal relationships to environmental values. It holds databases of the environmental water requirements (EWRs; the indicators) and the volume, frequency, timing and duration of flows or inundation required to meet those indicators. These indicators were developed based on hypothesized relationships to the environmental objectives of the basin, which protect or enhance environmental assets that are valued based on ecological significance. The EWR tool itself only provides an assessment of the hydrologic indicators, however. The EWR tool assesses whether spatially explicit flow timeseries data meets each EWR (hydrologic indicator) at each gauge. The precise definitions for each EWR differ at each gauge, due to the unique hydrology and channel morphology. For example, a small fresh for 10 days is required every year, ideally between October and April to meet indicator EWR = SF1 (small fresh 1), but the flow volume of a 'small fresh' differs between gauges. To obtain the ability for the toolkit to model environmental outcomes, we connect it to a specific causal network defining these links.
+
+To obtain environmental responses from the outcomes of the EWR tool (binary responses of hydrologic indicators), we developed causal networks from the relationships implied in the Long-Term Watering Plans in setting the EWRs. These plans describe how the hydrologic indicators are expected to influence both proximate and larger-scale ecological outcomes. We extracted these causal relationships from the Murray-Darling Basin Long Term Watering Plans (LTWPs), which were developed based on the best available information from water managers, ecologists, scientific publications, and analysis of gauged and modelled flows (e.g. @nswdepartmentofplanningandenvironment2020, @lobegeiger2022). This provided a dense network of links across a range of ecological outcomes at various scales, from components of the life cycle of single species to whole-community outcomes at 10 or 20 year target dates. For example, for the small fresh (SF1) indicator described above might contribute to environmental objectives pertaining to native fish (environmental objectives = NF1-9; e.g. NF1 = No loss of native fish species), native vegetation (NV1), and ecosystem functions (EF1-5). These environmental objectives are defined as values supporting the completion of all elements of a lifecycle of an organism or group of organisms (taxonomic or spatial), with these links defining another level of causal relationships. Outcomes for species or other objectives are then linked in the causal network to five target groups (native fish, native vegetation, waterbirds, other species, and ecosystem functions) and are associated with long-term targets (5, 10, and 20 year) of the LTWP's management strategies. The chain of dependencies from EWRs to environmental objectives to long-term targets are captured in the causal networks as links, with nodes defining the objectives or targets. This structure not only provides a visual definition of the links in the LTWP, it also enables assessment of outcomes in direct equivalence to the LTWP's management strategies.
+
+#### Module standardization
+
+Each response model will have a distinct set of outputs, reflecting the captured responses and the structure of the model. When run within the toolkit, these outputs are cleaned and processed into standard, expected, formats for further toolkit processing, and metadata is saved. This enables the toolkit to provide a consistent, unified home for disparate response models. The outputs can be saved to disk or retained in-memory for interactive use, depending on the user's needs. The outcomes of the response models are then processed by the *Aggregator* to enable outputs to be viewed at relevant scales (in time, space or theme).
+
+### Aggregator {#sec-aggregator}
+
+Results from the response models are typically very granular in many dimensions because the best response models occurs near the scale of the processes being modelled. In many cases, those processes (e.g. fish breeding, crop planting) individually occur at small spatial and temporal scales. Note that this is the scale of the process itself, but that may be replicated over much larger scales. For example, fish may breed across the basin but each female breeds in only one location at a given time. Moreover, outcomes from response models are typically at small theme scales as well, e.g. capturing portions of the life cycle of fish species, rather than an overall outcome for all fish, or representing planting of particular crops, rather than overall agricultural output. The consequence is that there are potentially thousands of different modelled outcomes across time, locations, and theme.
+
+Aggregation condenses that information to scales that are useful for interpretation and planning. Depending on the use, the desired scale(s) may range from local, short term responses of fine-grained outcomes to large spatial scales over longer time periods for high-level outcomes such as environmental condition (@fig-aggregation_dims). Thus, the toolkit must achieve a robust, consistent aggregation approach along three dimensions (time, space, and theme), while maintaining the ability to define those aggregation steps flexibly to meet the needs of the specific analysis. For example, the EWR tool assesses EWRs at individual gauges, but outcomes may be desired within planning units or at the basin scale. Likewise, multiple EWRs are required to meet environmental objectives, of which many are required for each target group or long-term target. The Aggregator component of the toolkit enables scaling from the hydrologic indicators at each gauge to results at any of these scales.
+
+![Aggregation along multiple dimensions. The toolkit provides flexible capability to aggregate along spatial, temporal, and theme scales. Users can control the sequence of steps along these axes, with the capability to switch between axes at different steps.](../images/aggregation.jpg){#fig-aggregation_dims}
+
+A flexible approach to aggregation is needed as specific dimensions (time, space, and theme) and units within those are best combined in different ways, depending on the meaning of the data and the use of the final outputs. The Aggregator defines a sequence of aggregation steps to take with the data, specifying the dimensions along which to aggregate and the aggregation functions to apply at each step. Each step can be along any dimension and multiple functions can be assigned at each step.The sequence of aggregation steps can interleave the dimensions, e.g. aggregate along the theme dimension to an intermediate level, then aggregate in space, then theme again. For example, following @fig-aggregation_dims, the user might want to aggregate from hydrologic indicator (EWR) to Objective to Specific Goal (species) at each gauge, but then aggregate those gauges into a planning unit to assess performance of each species over a larger area, followed by aggregating to Target (broad group, e.g. Native Fish, Waterbirds, Native Vegetation, Ecosystem Function).
+
+The Aggregator allows the user to choose any aggregation function at each aggregation step, reflecting the need to account for both the processes being aggregated and the outputs needed for managment decisionmaking. These aggregation functions should be considered carefully. For example, in some situations the user might want to know the rate at which EWRs pass across some area, or perhaps the average value of an abundance measure. In this case, a mean would be appropriate. In other situations, however, a single failure may be disproportionately important (e.g. 'no loss' requirements), or perhaps a single passing value is sufficient (e.g. bird breeding can occur anywhere in a catchment). These might be captured with min and max, respectively. To address this need for flexible aggregation, the toolkit provides a standard set of functions (e.g. mean, max, min, and spatially-weighted means), but the user can also specify any other aggregation function, including custom-written functions.  
+
+![Aggregation functions determine outcomes and reflect processes or values. Aggregating a set of outcomes (top row) yields a different outcome depending on the function used. Thus, function choice should be considered carefully and reflect the processes involved or management goals. The toolkit provides default functions for the mean, compensating (e.g. max), limiting (min), and spatially-weighted versions of the same. It also provides the ability for the user to define any desired function, allowing for more complex situtations.](../images/agg_concept.png){#fig-aggregation_types}
+
+The toolkit provides a standard set of spatial units for aggregation, but can accept any user-supplied polygons. Aggregation along the theme dimension follows the causal network, which is supplied by the toolkit for included tools, though the user can specify others if required.
+
+The complexity of the potential aggregation sequences and functions highlights the importance of tracking the provenance of the final values to understand their meaning. Thus, the Aggregator saves the sequences and functions applied at each stage to a metadata file that also can serve as the aggregation parameters for repeatable runs. Moreover, the output dataset retains the full sequence and functions alongside each value, ensuring that values are always paired with their provenance and meaning.
+
+*Georgia wrote a ton of good stuff about aggregation in the demonstration report that hasn't made it in here. I don't think we need all of it here, since this is a bit different target, but some of it would bolster the reasoning behind why we provide what we do for aggregation. For ex, I can't decide if all the stuff about how to choose an agg function fits here or not- it's not really about the toolkit per se, but it does get into why the toolkit has the functionality we just described. For ref, since I can never find it, that's at WERP/Toolkit/Writing/DemonstrationReport/Copyedits*
+
+### Comparer {#sec-comparer}
+
+The Comparer is designed primarily to make comparisons between hydrologic scenarios (typically climate or climate adaptation in the examples that follow), allowing assessment and visualisation of their differences. This component of the toolkit also provides generalised capacity to produce plots and other outputs such as tables using a consistent approach, even when not directly comparing scenarios. Comparisons are essential to assess the outcomes of various scenarios, e.g. the behaviour of the system under different climate regimes or with different adaptation options. The functions within the Comparer can be divided into two main categories, those for analysis and those for plotting. Although in some instances presenting the outcome values themselves can be useful across scenarios, explicitly calculating comparisons (e.g. the absolute or relative difference between scenarios) provides distinct advantages. Difficulty in accurately simulating a complex system means that comparing the absolute or relative differences between scenario outcomes can be more useful and accurate because any bias in the baseline assumptions applies to all outcomes and the focus moves from the total level to the change between scenarios. The best method for comparing will vary depending on the intended use of the comparison, so several common default options (differences, relative change) have been developed along with the flexibility for the user to define alternatives.
+
+The comparison functions also provide the ability to choose a baseline level for comparison, which may be one of the scenarios, but also may be a reference dataset or a scalar value. For example, we might want to compare a set of outcomes for climate scenarios to a 'no change' climate scenario, to historical observations, or to a mean value. Output values are calculated relative to this baseline using either default functions for the absolute or relative difference, or any other user-supplied function can also be applied. These functions can be used on their own, or they can be included within the plotting functions to generate comparison plots from raw Aggregator outputs without the need for subsequent data calculations by the user.
+
+The plotting functions in the Comparer provide capability to present and visualise comparisons using standardized procedures for all outputs within a project. Different purposes require different sets of outputs, for instance, maps are particularly useful for visualising geographic patterns; tables and graphs typically provide more precise ability to assess impacts on values; and timeseries plots, particularly those relative to a historical baseline, are useful for visualising climate trajectories. While the options for visualisation and comparison are varied depending on the intended use, the comparer standardises data cleaning and setup for each plot, as well as aesthetics and plotting approaches. This standardisation ensures consistency across plot types and through the project, ensuring values plotted are robust and interpretable. Key to this standardisation is the internal data cleaning, which allows providing the raw outputs of the Aggregator and arguments for the comparisons to be made to the plotting functions. By standardising data cleaning within the comparer, we avoid losing information or performing unsupported data manipulations and so ensure the quality and meaning of the outputs.
+
+## Demonstration scenarios
+
+We demonstrate toolkit functionality for environmental values by using the existing EWR (Environmental Water Requirements) tool for the response model (see @sec-modules for a description of the EWR module and its associated causal network). Our input data consists of hypothetical flow timeseries generated from historical hydrographs at 46 gauges. These gauges fall within the Lachlan, Macquarie--Castlereagh, and Namoi Sustainable Diversion Limit (SDL) units (areas defined for management purposes) of the Murray-Darling Basin, Australia. These SDL units have detailed LTWPs (Figure 1), and so well-specified EWRs and causal networks.
+
+we develop a set of simple scenarios that capture two sorts of changes that may be commonly represented in management analyses. First, we consider scaled flow throughout the period of the hydrograph, representing overall increases or decreases in flow as might occur from large-scale climate patterns. Second, we consider short-duration additions to flow, representing periodic pulses of change as might happen from targetted interventions. To achieve the first (scaled flow), we apply ten flow multipliers, ranging from 0.5 to 2.0, to the historical hydrographs (Table 1). We refer to these as 'climate' scenarios, reflecting a common situation where entire hydrographs might shift from climate change, though these scenarios are not derived from climate models and do not represent hypothesized climate change. To achieve the second (pulsed change), for each of the 'climate' scenarios four flow additions were applied including 1) no addition (baseline), 2) addition of 201 ML, 3) addition of 6001 ML, and 4) addition of 12001 ML (Table 2). These additional flows were added throughout September to December. We refer to these scenarios as 'climate adaptations' because management options are often available in the form of altering water availability for short time periods through mechanisms like water releases, though the options here do not represent proposed actions. Each scenario characterizes all water in the system including natural inflows, extraction, and release of environmental water. These do not reflect realistic future scenarios but provide an avenue to test and illustrate the capabilities of the toolkit.
+
+# Results
+
+*I still can't decide if the description of the pieces are methods or if the toolkit itself is the result. It is, but then what's the method? R?*
+
+Here, we present example results from the toolkit using the demonstration scenarios described above and the EWR tool as the response model.
+
+Website? Or is that a method?
+
+Maybe the description of the pieces- the *toolkit* is the main result, not the figures. *exists?*
+
+Figures/examples for the demo *exists*
+
+# Discussion
+
+*A lot of this is currently the general stuff I pulled out of Georgia's results/discussion and needs to be cleaned up.*
+
+The development of the toolkit is necessary to better understand the impacts of climate change and the different adaptation options in response to climate change, on water-dependent social, economic, environmental and cultural values. It incorporates new and existing information, knowledge and models to enable transparent, repeatable assessments of impacts and adaptation to future climates. In summary, the toolkit ingests scenarios (for example, climate or flow timeseries), feeds them to a response model (such as the EWR tool), reports outcomes and enables comparisons among scenarios. It uses the links in the response models for visualisation of the complex inter-relationships between water-dependent outcomes. This aids transparency and improves communication of the outputs. 
+
+How does this address MDBA needs? What cool software things do we do?
+
+Large-scale natural resource management requires the capacity to make decisions relating to multiple spatial, temporal, and thematic dimensions, and is most successful when multiple scales within those dimensions are considered (Moore 2021). The toolkit is a framework to navigate those dimensions for water-dependent social, economic, environmental, and cultural values. Combining such disparate information in a standard and comparable manner can illuminate synergies and trade-offs, which could be critical for final judgement. Our example concerns the environmental values of the Murray-Darling Basin; however, the framework is equally applicable to social, economic, and cultural values. We expand upon the utility of an existing diver-indicator model by linking its indicators to objectives. This increases the transparency in the causal relationships that underpin the model and builds understanding and trust in the outcomes. Our framework drives a consistent approach to processing, scaling, analyses, and visualising outcomes, with the flexibility built-in for most end uses. Thus, the toolkit provides a good avenue for informed decision-making concerning which adaptation options should be implemented under changing climate by explicitly modelling effects on both target and other values.  
+
+------------------------------------------------------------------------
+
+# Section outlines
+
+## Introduction
+
+-   Water management seeks to change lots of values, but typically focuses on hydrology
+
+-   Focusing on hydrology doesn't get us to the ultimate values, and so that link is a huge need
+
+    -   Need integrated modelling approach
+
+    -   Have been successful elsewhere, not available in MDB
+
+-   Different models for linking hydrology to values
+
+    -   sometimes just assumptions
+
+    -   different expertise, different coding languages, different purposes
+
+    -   Hard for managers to use
+
+    -   Need to integrate to make useful and robust
+
+-   Here we show such an integrated modelling system
+
+    -   A bit about the purpose- MDBA, what gets integrated
+
+-   What's awesome about it
+
+    -   Modular
+
+    -   Transparent
+
+    -   Consistent
+
+    -   Repeatable
+
+    -   Management-targeted
+
+-   We demonstrate with an example roughly capturing the properties of climate and climate adaptation, which is an MDBA need
+
+## Methods
+
+-   Working in tandem with MDBA. *new*
+
+-   Finding and assessing modules. *new*
+
+-   Software dev stuff- R, python, shell, etc. Working locally or remotely. AND WHY. *New*
+
+-   Basic design- take hydro, do stuff. Agnostic to scenario meaning *some new*
+
+    -   Also things like self-documenting, use on multiple systems, etc
+
+-   Code structure *new*
+
+-   Description of the pieces (to what extent is this results?) *exists*
+
+-   Generation of test/demo data *exists*
+
+## Results
+
+Maybe the description of the pieces- the *toolkit* is the main result, not the figures. *exists?*
+
+Figures/examples for the demo *exists*
+
+## Discussion
+
+-   How does this address MDBA needs?
+
+-   What cool software things do we do?
+
+-   Other awesome stuff
+
+------------------------------------------------------------------------
+
+# Journal info
+
+## Environmental Modelling & Software
+
+• Author names and affiliations. Where the family name may be ambiguous (e.g., a double name), please indicate this clearly. Present the authors' affiliation addresses (where the actual work was done) below the names. Indicate all affiliations with a lower-case superscript letter immediately after the author's name and in front of the appropriate address. Provide the full postal address of each affiliation, including the country name and, if available, the e-mail address of each author.
+
+• Corresponding author. Clearly indicate who will handle correspondence at all stages of refereeing and publication, also post-publication. Ensure that telephone numbers (with country and area code) are provided in addition to the e-mail address and the complete postal address. Contact details must be kept up to date by the corresponding author.
+
+• Present/permanent address. If an author has moved since the work described in the article was done, or was visiting at the time, a 'Present address' (or 'Permanent address') may be indicated as a footnote to that author's name. The address at which the author actually did the work must be retained as the main, affiliation address. Superscript Arabic numerals are used for such footnotes.
+
+### Authorship
+
+Authorship should be limited to those who have made a significant contribution to the conception, design, execution, or interpretation of the reported study. All those who have made significant contributions should be listed as co-authors. Where there are others who have participated in certain substantive aspects of the research project, they should be acknowledged or listed as contributors. Acknowledgement of the contributions of authors is encouraged (see Acknowledgements section below). The corresponding author should ensure that all appropriate co-authors and no inappropriate co-authors are included on the paper, and that all co-authors have seen and approved the final version of the paper and have agreed to its submission for publication.
+
+Title, Authors, Affiliations and Contact details
+
+### Abbreviations
+
+Define abbreviations that are not standard in this field in a footnote to be placed on the first page of the article. Such abbreviations that are unavoidable in the abstract must be defined at their first mention there, as well as in the footnote. Ensure consistency of abbreviations throughout the article.
+
+## Separate files
+
+### Highlights
+
+Highlights are optional yet highly encouraged for this journal, as they increase the discoverability of your article via search engines. They consist of a short collection of bullet points that capture the novel results of your research as well as new methods that were used during the study (if any). Please have a look at the examples here: example Highlights.
+
+Highlights should be submitted in a separate editable file in the online submission system. Please use 'Highlights' in the file name and include 3 to 5 bullet points (maximum 85 characters, including spaces, per bullet point).
+
+Highlights are mandatory for this journal. They consist of a short collection of bullet points that convey the core findings of the article and should be submitted in a separate file in the online submission system. Please use 'Highlights' in the file name and include 3 to 5 bullet points (maximum 85 characters, including spaces, per bullet point). See https://www.elsevier.com/highlights for examples.
+
+### Graphical abstract
+
+A Graphical abstract is optional and should summarize the contents of the article in a concise, pictorial form designed to capture the attention of a wide readership online. Authors must provide images that clearly represent the work described in the article. Graphical abstracts should be submitted as a separate file in the online submission system. Image size: Please provide an image with a minimum of 531 × 1328 pixels (h × w) or proportionally more. The image should be readable at a size of 5 × 13 cm using a regular screen resolution of 96 dpi. Preferred file types: TIFF, EPS, PDF or MS Office files. See https://www.elsevier.com/graphicalabstracts for examples.
+
+### Abstract (not included in section numbering)
+
+A concise and factual abstract is required, with a restriction of 150 words. The abstract should state briefly the purpose of the research, the principal results and major conclusions. An abstract is often presented separately from the article, so it must be able to stand alone. For this reason, References should be avoided, but if essential, then cite the author(s) and year(s). Also, non-standard or uncommon abbreviations should be avoided, but if essential they must be defined at their first mention in the abstract itself.
+
+### Keywords
+
+Immediately after the abstract, provide a maximum of 6 keywords, using American spelling and avoiding general and plural terms and multiple concepts (avoid, for example, 'and', 'of'). Be sparing with abbreviations: only abbreviations firmly established in the field may be eligible. These keywords will be used for indexing purposes.
+
+### Software and/or data availability
+
+Most EMS papers should include a software/data availability section containing as much of the following information as possible: name of software or dataset, developer and contact information, year first available, hardware required, software required, availability and cost. Also for software: program language, program size; for data: form of repository (database, files, spreadsheet), size of archive, access form. Note that "Contact the author" is not acceptable for software or data access. Please use online data and software storage and retrieval systems such as GitHub, BitBucket, FigShare, HydroShare or others to make your data and software readily available. Links to commercial software and data access web sites are also acceptable.
+
+When a software component is an essential part of the paper, authors should be prepared to make it available to reviewers during the review process. To preserve the anonymity of reviewers, the authors should make the software available for a download, protecting it if needed by a password that is communicated to the editors.
