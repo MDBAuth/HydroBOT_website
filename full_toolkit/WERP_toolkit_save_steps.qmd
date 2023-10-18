@@ -58,7 +58,7 @@ To determine what to save and what to return to the active session, use `outputT
 
 ```{r}
 outputType <- list('summary')
-returnType <- list('none') # list('summary', 'all')
+returnType <- list('summary', 'annual', 'all') #list('none') # 
 ```
 
 ## Aggregator
@@ -143,8 +143,29 @@ if (params$REBUILD_DATA) {
 ```{r}
 #| error: true
 
+# if (params$REBUILD_DATA) {
+#   aggout <- read_and_agg(datpath = ewr_results,
+#              type = aggType,
+#              geopath = bom_basin_gauges,
+#              causalpath = causal_ewr,
+#              groupers = agg_groups,
+#              aggCols = agg_var,
+#              aggsequence = aggseq,
+#              funsequence = funseq,
+#              saveintermediate = TRUE,
+#              namehistory = FALSE,
+#              keepAllPolys = FALSE,
+#              returnList = aggReturn,
+#              savepath = agg_results)
+# }
+
+# Manual fix of EWR output here:
+# using read_EDIT_and_agg instead of read_and_agg
+
+source(file.path("temporary_files/read_EDIT_and_agg.R"))
+
 if (params$REBUILD_DATA) {
-  aggout <- read_and_agg(datpath = ewr_results, 
+  aggout <- read_and_agg(datpath = ewr_results,
              type = aggType,
              geopath = bom_basin_gauges,
              causalpath = causal_ewr,
@@ -154,7 +175,7 @@ if (params$REBUILD_DATA) {
              funsequence = funseq,
              saveintermediate = TRUE,
              namehistory = FALSE,
-             keepAllPolys = FALSE,
+             keepAllPolys = FALSE, #Was TRUE in prior version
              returnList = aggReturn,
              savepath = agg_results)
 }

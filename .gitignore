@@ -9,6 +9,7 @@
 
 *_cache
 *_files
+*_old
 
 # quarto output- will need to make visible to produce docs
 _output
@@ -26,3 +27,9 @@ scenario_creation/test_scaling.rdata
 site_libs/
 
 /_*.local
+
+#python junk
+*.whl
+
+#Temporary file - e.g while working out the problems with the failing EWRs
+#temporary_files/ actually you probably need this
