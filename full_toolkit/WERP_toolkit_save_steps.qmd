@@ -54,11 +54,11 @@ We use the default IQQM model format and climate categorisations, though those c
 
 ### Control output and return
 
-To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`. For this demonstration I'll just use `summary` and not return anything to memory.
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'yearly'`, `'all_events'` `'all_successful_events'`, and `'all_successful_interEvents'`. For this demonstration I'll just use `summary` and `'yearly'` because that is needed for EWR assessment and not return anything to memory (we do that in [a different notebook](WERP_toolkit_in_memory.qmd).
 
 ```{r}
-outputType <- list('summary')
-returnType <- list('summary', 'annual', 'all') #list('none') # 
+outputType <- list('summary', 'yearly')
+returnType <- list('none') 
 ```
 
 ## Aggregator
@@ -70,7 +70,7 @@ To keep this simple, we use one aggregation list and the `read_and_agg` wrapper 
 The aggregator needs to know which set of EWR outputs to use (to navigate the directory or list structure). It *should* accept multiple types, but that's not well tested, so for now just use one.
 
 ```{r}
-aggType <- 'summary'
+aggType <- 'achievement'
 ```
 
 We need to tell it the variable to aggregate, and any grouping variables other than the themes and spatial groups. Typically, `scenario` will be a grouper, but there may be others.
@@ -112,12 +112,12 @@ funseq <- list(c('CompensatingFactor'),
                c('ArithmeticMean'),
                c('ArithmeticMean'),
                c('ArithmeticMean'),
-               rlang::quo(list(wm = ~weighted.mean(., w = area, 
-                                        na.rm = TRUE))),
+               list(wm = ~weighted.mean(., w = area, 
+                                        na.rm = TRUE)),
                c('ArithmeticMean'),
                
-               rlang::quo(list(wm = ~weighted.mean(., w = area, 
-                                    na.rm = TRUE))),
+               list(wm = ~weighted.mean(., w = area, 
+                                    na.rm = TRUE)),
                c('ArithmeticMean'))
 
 ```
@@ -126,14 +126,18 @@ funseq <- list(c('CompensatingFactor'),
 
 ## Controller
 
+Running this in parallel seems to handle an issue with hanging that happens with big datasets.
+
 ```{r}
 #| message: false
 
+future::plan(future::multisession)
 if (params$REBUILD_DATA) {
   ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
                                   output_parent_dir = project_dir, 
                                   outputType = outputType,
-                                  returnType = returnType)
+                                  returnType = returnType,
+                                rparallel = TRUE)
 }
 
 ```
@@ -142,27 +146,6 @@ if (params$REBUILD_DATA) {
 
 ```{r}
 #| error: true
-
-# if (params$REBUILD_DATA) {
-#   aggout <- read_and_agg(datpath = ewr_results,
-#              type = aggType,
-#              geopath = bom_basin_gauges,
-#              causalpath = causal_ewr,
-#              groupers = agg_groups,
-#              aggCols = agg_var,
-#              aggsequence = aggseq,
-#              funsequence = funseq,
-#              saveintermediate = TRUE,
-#              namehistory = FALSE,
-#              keepAllPolys = FALSE,
-#              returnList = aggReturn,
-#              savepath = agg_results)
-# }
-
-# Manual fix of EWR output here:
-# using read_EDIT_and_agg instead of read_and_agg
-
-source(file.path("temporary_files/read_EDIT_and_agg.R"))
 
 if (params$REBUILD_DATA) {
   aggout <- read_and_agg(datpath = ewr_results,
@@ -175,7 +158,7 @@ if (params$REBUILD_DATA) {
              funsequence = funseq,
              saveintermediate = TRUE,
              namehistory = FALSE,
-             keepAllPolys = FALSE, #Was TRUE in prior version
+             keepAllPolys = FALSE,
              returnList = aggReturn,
              savepath = agg_results)
 }
@@ -186,11 +169,11 @@ It would be straightforward here to run the comparer as well, but as discussed a
 
 # Quick check
 
-To check here that we did in fact run the toolkit, we read in the data and make a quick plot.
+To check here that we did in fact run the toolkit, we read in the data and make a quick (crude) plot.
 
 ```{r}
 #| message: false
-agged_data <- readRDS(file.path(agg_results, 'summary_aggregated.rds'))
+agged_data <- readRDS(file.path(agg_results, 'achievement_aggregated.rds'))
 
 # Scenario data
 scenarios <- jsonlite::read_json(file.path(hydro_dir, 
@@ -200,8 +183,9 @@ scenarios <- jsonlite::read_json(file.path(hydro_dir,
 
 
 sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
+
 scene_pal <- make_pal(unique(scenarios$scenario_name), 
-                      palette = 'ggsci::nrc_npg', 
+                      palette = 'ggsci::default_igv', 
                       refvals = 'base', refcols = 'black')
 
 # Quick plot
@@ -212,8 +196,7 @@ agged_data$sdl_units |>
                           colorgroups = NULL,
                           colorset = 'ewr_achieved',
                           pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'env_obj',
+                          facet_wrapper = 'scenario',
                           scene_pal = scene_pal,
                           sceneorder = sceneorder,
                           underlay_list = 'basin',

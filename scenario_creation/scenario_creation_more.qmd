@@ -15,8 +15,10 @@ params:
 #| warning: false
 #| message: false
 library(werptoolkitr)
+library(vicwater)
 library(ggplot2)
 library(sf)
+library(dplyr)
 library(reticulate) # Not strictly necessary but allows easier referencing of objects
 ```
 
@@ -113,13 +115,14 @@ Error in py_get_attr_impl(x, name, silent) :
 
 A simple {python} chunk works fine in Rstudio and for `quarto render` from command line. But in vscode, the default (and unchangeable at present) is to start a whole new engine that doesn't talk to R, rather than using `reticulate::repl_python` as is done in Rstudio and by quarto itself.
 
-``` {{python}}
+```{{{python}}}
 from py_ewr.data_inputs import get_EWR_table
 ewrs, badewrs = get_EWR_table()
 ```
 
 ```{r}
 pdi <- import("py_ewr.data_inputs")
+
 ewrs_in_pyewr <- pdi$get_EWR_table() 
 names(ewrs_in_pyewr) <- c('ewrs', 'badewrs')
 ```
@@ -136,6 +139,16 @@ length(ewr_demo_gauges)
 
 47 isn't too many.
 
+Need to categorise them so we know what to pull. Let's cut to just flow gauges for the demo for simplicity- scaling levels is less clear.
+
+```{r}
+pcg <- import("py_ewr.observed_handling")
+catgauges <- pcg$categorise_gauges(ewr_demo_gauges) |>
+  setNames(c('flow', 'level', 'stage'))
+
+gauges_to_pull <- catgauges$flow
+```
+
 ### Get all the gauge data
 
 Now we have a list of gauges, we need their hydrographs. We need a reasonable time span to account for temporal variation, but not too long- this is a simple case. Let's choose 10 years.
@@ -145,81 +158,20 @@ starttime = lubridate::ymd(20000701)
 endtime = lubridate::ymd(20210630)
 ```
 
-Pull the gauges with `mdba_gauge_getter`. The type-translation that happens in here is because translating from python time to R time is extremely slow for this particular case (though not in general).
-
-This again needs a vscode translation
-
-``` python
-
-#| message: false
-import mdba_gauge_getter as gg
-demo_levs = gg.gauge_pull(r.ewr_demo_gauges, start_time_user = r.starttime, end_time_user = r.endtime)
-demo_ids = demo_levs.SITEID.unique()
-len(demo_ids)
-
-# I think this will work, the above is running
-demo_levs['Date'] = demo_levs['DATETIME'].astype(str)
-```
+Since some of those are flow and some are level, let's do two calls and bind. We could pmap, but this will be fine. It's tempting to just use flow.
 
 ```{r}
-gg <- import('mdba_gauge_getter')
-demo_levs <- gg$gauge_pull(ewr_demo_gauges, start_time_user = starttime, end_time_user = endtime)
-demo_ids <- unique(demo_levs$SITEID)
-length(demo_ids)
-```
-
-Do a bit of cleanup- for some reason `demo_levs['VALUE']` is an object and not numeric, and `'DATETIME'` needs to be named `Date` for the EWR tool to read it. I copy the py object to R for this manipulation and visualisation, but we could just proceed in python if we wanted.
-
-Again, we need to change things to run on R
-
-``` r
-
-demo_levs <- py$demo_levs
-
-demo_levs$VALUE = as.numeric(demo_levs$VALUE)
-
-# # In python, we just need to change the name of the date column. Here, we need to change the python datetime.date objects to R dates
-# 
-# # Really slow
-# # MUCH faster to just make the dates characters in python, and back to dates here.
-# rdates <- purrr::map(demodates, py_to_r) %>% 
-#   tibble(.name_repair = ~'Date') %>%  
-#   unnest(cols = Date)
-# 
-# demo_levs <- bind_cols(rdates, demo_levs)
-demo_levs <- dplyr::select(demo_levs, -DATETIME) %>% 
-  dplyr::mutate(Date = lubridate::ymd(Date))
-```
-
-The new version has to use the `reticulate::py_to_r`, because when we're not in the repl, we have an R object to work with for every line of python. Should probably just change to {vicwater}, like we do for flow scaling.
-
-```{r}
-demo_levs <- demo_levs |> 
-  dplyr::mutate(VALUE = as.numeric(VALUE))
-
-# 47 seconds- doesn't matter if preallocated
-system.time(
-  Date <- purrr::map(demo_levs$DATETIME, reticulate::py_to_r)
-)
-
-# # 50 seconds
-# system.time(
-#   Date <- lapply(demo_levs$DATETIME,FUN = reticulate::py_to_r)
-# )
-
-Date <- tibble::tibble(Date) |>
-  tidyr::unnest(cols = Date)
-
-demo_levs <- demo_levs |>
-  dplyr::select(-DATETIME) |> 
-  dplyr::bind_cols(Date) 
-
+demo_levs <- vicwater::get_ts_traces(state = 'NSW', 
+                                      site_list = gauges_to_pull,
+                                      var_list = 141, # This is flow
+                                      start_time = starttime,
+                                      end_time = endtime)
 ```
 
 ### Map the gauges
 
 ```{r}
-demo_geo = bom_basin_gauges %>% dplyr::filter(gauge %in% demo_ids)
+demo_geo = bom_basin_gauges %>% dplyr::filter(gauge %in% unique(demo_levs$site))
 ```
 
 Looks reasonable. Probably overkill for testing, but can do a cut down version too.
@@ -237,14 +189,14 @@ if (grepl('npd-dat', Sys.info()['nodename'])) {
 ```{r}
 (ggplot() + 
 geom_sf(data = basin, fill = 'lightsteelblue') +
-geom_sf(data = catch_demo, mapping = aes(fill = SWSDLID)) +
+geom_sf(data = catch_demo, mapping = aes(fill = SWSDLName)) +
 geom_sf(data = demo_geo, color = 'black') +
 scale_fill_brewer(type = 'qual', palette = 8))
 ```
 
 # Make test scenarios
 
-To generate simple scenarios that cover a range of flow conditions, we multiply and divide the baseline data by 1, 1.1, 1.25, 1.5, and 2, yielding symmetric changes up and down in relative flow. This section could easily be modified for other simple scenarios. More complex scenarios are created in [the flow scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling).
+To generate simple scenarios that cover a range of flow conditions, we multiply and divide the baseline data by scaling factors, yielding symmetric changes up and down in relative flow. This section could easily be modified for other simple scenarios. More complex scenarios are created in [the flow scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling).
 
 ### Make the data look like IQQM
 
@@ -264,7 +216,7 @@ scenemults <- c(1/rev(multipliers), 1, multipliers)
 scenenames <- c(paste0('climatedown', as.character(rev(multipliers))), 
                 'climatebase', 
                 paste0('climateup', as.character(multipliers))) |> 
-                stringr::str_replace('\\.', '_')
+                stringr::str_replace('\\.', '_') # deals with the 1.x
 
 adaptadds <- c(0, 250, 6500, 12000)
 
@@ -273,10 +225,16 @@ adapttime <- 8 #months = Sep,Oct,Nov,Dec
 sceneaddsnames <- c(paste0('adapt', as.character(adaptadds))) |> 
   stringr::str_replace('\\.', '_')
 
-library(stringr)
-scenenames <- paste0(rep(scenenames, times = length(unique(adaptadds))), str_sort(rep(sceneaddsnames, times = length(unique(scenemults))), numeric = TRUE))
+scenenames <- paste0(rep(scenenames,
+                         times = length(unique(adaptadds))), 
+                     stringr::str_sort(rep(sceneaddsnames,
+                                  times = length(unique(scenemults))), 
+                              numeric = TRUE))
+
 scenemults <- rep(scenemults, times = length(unique(sceneaddsnames)))
+
 sceneadds <- sort(rep(adaptadds, times = length(unique(scenemults))))
+
 sceneadapttimes <- rep(adapttime, times = length(scenenames))
 
 # Add in the MAX scenario 
@@ -301,7 +259,7 @@ for (x in scenenames) {
 
 ```
 
-Create clean dataframes to save. Could be fancy with a function and a purr, but I'm just saving, so a simple loop should be fine.
+Create clean dataframes to save. Could be fancy with a function and a purr, but I'm just saving, so a simple loop should be fine. Though now that we have `check` there, a `purrr::pmap` would be the way to go.
 
 I'm not providing a toolkit function to *write* scenario metadata, since the scenarios will come from elsewhere. But we need it, so make some here (both inside and outside the directories, since we're not sure what the final form is yet).
 
@@ -310,13 +268,14 @@ I'm not providing a toolkit function to *write* scenario metadata, since the sce
 if (params$REBUILD_DATA) {
   for (i in 1:length(scenenames)) {
     demo_levs %>% 
-      dplyr::mutate(VALUE = VALUE * scenemults[i]) %>% 
-      dplyr::mutate(VALUE = ifelse(lubridate::month(Date) > sceneadapttimes[i],
-                                   VALUE + sceneadds[i], VALUE)) %>% 
-    dplyr::select(Date, VALUE, SITEID) %>% 
+      dplyr::mutate(value = value * scenemults[i]) %>% 
+      dplyr::mutate(value = ifelse(lubridate::month(time) > sceneadapttimes[i],
+                                   value + sceneadds[i], value)) %>% 
+      dplyr::mutate(Date = lubridate::date(time)) |> 
+    dplyr::select(Date, value, site) %>% 
       tidyr::pivot_wider(id_cols = Date, 
-                         names_from = SITEID, 
-                         values_from = VALUE) %>% 
+                         names_from = site, 
+                         values_from = value) %>% 
       readr::write_csv(file.path(hydro_dir, scenenames[i], 
                                  paste0(scenenames[i], '.csv')))
     # make JSON metadata
