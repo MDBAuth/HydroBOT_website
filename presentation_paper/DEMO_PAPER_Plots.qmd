@@ -8,7 +8,6 @@ editor: visual
 ---
 
 ```{r}
-#| echo: false
 #| include: false
 
 library(werptoolkitr) 
@@ -344,7 +343,6 @@ Australia <- g$geometry[-9]
 
 ```
 
-
 ```{r}
 #| echo: false
 #| include: false
@@ -577,8 +575,6 @@ Fig_5_PanelA$labels
 
 #Fig_5_PanelA$guides
 ```
-
-
 
 ```{r}
 #| echo: false
@@ -1061,7 +1057,6 @@ Fig_9_table <- data.frame(Scale = c("Scenario", rep("", times = 1),
 saveRDS(Fig_9_table, file = file.path(comp_results, "Fig_9_table.Rdata"))
 ```
 
-
 ```{r}
 # summing over planning units and Env groups
 Fig_10 <- ggplot(data = filter(env_theme_catchment_to_plot, scenario != "MAX"), aes(x = Climate, y = AdapOpt, fill = proportion_ewr_achieved)) + 
@@ -1127,13 +1122,12 @@ Fig_4a <- make_causal_plot(nodes,
 Fig_4a%>% 
   DiagrammeR::render_graph()
 
+# FYI, there are plot export functions in the toolkit that render to vector graphics.
 DiagrammeR::export_graph(Fig_4a,
 file_name = file.path(comp_results,"Fig_4a.png"),
 file_type = "png")
 
 ```
-
-
 
 ```{r}
 #| echo: false
