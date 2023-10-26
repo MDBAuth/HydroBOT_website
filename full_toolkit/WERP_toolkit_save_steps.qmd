@@ -122,6 +122,24 @@ funseq <- list(c('CompensatingFactor'),
 
 ```
 
+We may want to aggregate in different ways; it is possible to include multiple aggregation sequences. Here, we skip the env_obj and go straight to SDL units and then to Targets. This would require using env_obj first if we used `causal_ewr` as-is, but we can modify the first two sheets to get straight there from ewr_codes. We can also put this in its own directory
+
+```{r}
+aggseq_ewr <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               sdl_units = sdl_units,
+               Target = c('ewr_code', "Target"))
+
+
+funseq_ewr <- list(c('CompensatingFactor'),
+               c('ArithmeticMean'),
+               c('ArithmeticMean'))
+
+causal_to_target <- left_join(causal_ewr$ewr2obj, causal_ewr$obj2target,
+                              relationship = "many-to-many")
+
+sdl_target_agg_dir <- file.path(agg_results, 'sdl_target')
+```
+
 # Run the toolkit
 
 ## Controller
@@ -161,6 +179,20 @@ if (params$REBUILD_DATA) {
              keepAllPolys = FALSE,
              returnList = aggReturn,
              savepath = agg_results)
+  
+    aggout_ewr <- read_and_agg(datpath = ewr_results,
+             type = aggType,
+             geopath = bom_basin_gauges,
+             causalpath = causal_to_target,
+             groupers = agg_groups,
+             aggCols = agg_var,
+             aggsequence = aggseq_ewr,
+             funsequence = funseq_ewr,
+             saveintermediate = TRUE,
+             namehistory = FALSE,
+             keepAllPolys = FALSE,
+             returnList = aggReturn,
+             savepath = sdl_target_agg_dir)
 }
 
 ```
