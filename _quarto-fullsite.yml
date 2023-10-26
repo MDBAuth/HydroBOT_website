@@ -1,0 +1,108 @@
+project:
+  render:
+    - "*.qmd"
+    - "!.*_old.*"
+    - "!.*demo_paper.qmd"
+
+format:
+  html:
+    embed-resources: true
+
+website:
+
+  sidebar:
+
+
+    - title: "Background"
+      contents:
+        - index.qmd
+
+        - section: "Toolkit description"
+          contents:
+            - href: overview/spatial_data.qmd
+              text: "Spatial data with toolkit"
+
+
+    - title: "Scenario creation"
+      contents:
+        - scenario_creation/scenario_creation_overview.qmd
+        - href: scenario_creation/scenario_creation_more.qmd
+          text: "Creating demonstration scenarios"
+
+    - title: "Causal networks"
+      contents:
+        - causal_networks/causal_overview.qmd
+
+        - section: "Creation and manipulation"
+          contents:
+            - href: causal_networks/causal_manipulation.qmd
+              text: "Building and manipulating causal networks"
+
+        - section: "Visualisation"
+          contents:
+            - href: causal_networks/causal_plots.qmd
+              text: "Plotting causal networks"
+
+    - title: "Controller"
+      contents:
+        - controller/controller_overview.qmd
+
+        - section: "Simple demonstration"
+          contents:
+            - href: controller/controller_ewr_wrapped.qmd
+              text: "Clean simple controller"
+            - href: controller/controller_ewr_stepthrough.qmd
+              text: "Detailed step through"
+
+
+    - title: "Aggregation"
+      contents:
+        - aggregator/aggregation_overview.qmd
+        - aggregator/aggregation_syntax.qmd
+
+        - section: "Simple demonstration"
+          contents:
+            - href: aggregator/spatial_agg.qmd
+              text: "Spatial aggregation capability"
+            - href: aggregator/theme_agg.qmd
+              text: "Theme aggregation capability"
+            - href: aggregator/theme_space_agg.qmd
+              text: "Multi-axis interleaved aggregation"
+
+
+    - title: "Comparer"
+      contents:
+        - comparer/comparer_overview.qmd
+
+        - section: "Simple demonstration"
+          contents:
+            - href: comparer/hydrographs.qmd
+              text: "Hydrographs and baselining"
+            - href: comparer/bar_plots.qmd
+              text: "Bar plots (qual x)"
+            - href: comparer/line_plots.qmd
+              text: "Line plots (quant x)"
+            - href: comparer/maps.qmd
+              text: "Maps"
+            - href: comparer/causal_plots.qmd
+              text: "Outcomes on causal networks"
+            - href: comparer/heatmap.qmd
+              text: "Heatmaps"
+
+
+    - title: "Full toolkit"
+      contents:
+        - full_toolkit/full_toolkit_overview.qmd
+
+        - section: "Simple demonstration"
+          contents:
+            - href: full_toolkit/WERP_toolkit_save_steps.qmd
+              text: "Run toolkit, saving steps"
+            - href: full_toolkit/WERP_toolkit_in_memory.qmd
+              text: "Run toolkit wholly in-memory"
+            - href: full_toolkit/WERP_toolkit_params.qmd
+              text: "Run toolkit from params"
+            - href: presentation_paper/walkthrough_presentation.qmd
+              text: "Walkthrough presentation"
+
+
