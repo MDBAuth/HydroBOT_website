@@ -127,10 +127,12 @@ We may want to aggregate in different ways; it is possible to include multiple a
 ```{r}
 aggseq_ewr <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                sdl_units = sdl_units,
-               Target = c('ewr_code', "Target"))
+               env_obj = c('ewr_code', "env_obj"),
+               Target = c('env_obj', 'Target'))
 
 
 funseq_ewr <- list(c('CompensatingFactor'),
+               c('ArithmeticMean'),
                c('ArithmeticMean'),
                c('ArithmeticMean'))
 
@@ -238,3 +240,4 @@ agged_data$sdl_units |>
                                               clip = TRUE)) +
     ggplot2::theme(legend.position = 'bottom')
 ```
+
