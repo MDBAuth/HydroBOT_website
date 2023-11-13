@@ -36,7 +36,8 @@ ewr_results <- file.path(project_dir, 'module_output', 'EWR')
 agg_results <- file.path(project_dir, 'aggregator_output') 
 
 # outputs of aggregator
-agg_results_ewr2sdl <- file.path(project_dir, 'aggregator_output', 'sdl_target') 
+agg_results_sdlTarget <- file.path(project_dir, 'aggregator_output', 'sdl_target') 
+
 ```
 
 ```{r}
@@ -109,7 +110,7 @@ agged_data <- readRDS(file.path(agg_results, 'achievement_aggregated.rds')) |>
   purrr::map(\(x) left_join(x, scenarios, by = 'scenario'))
 
 #Agg data (1.2 GB)
-agged_data_ewr2sdl <- readRDS(file.path(agg_results_ewr2sdl, 'achievement_aggregated.rds')) |>
+agged_data_sdlTarget <- readRDS(file.path(agg_results_sdlTarget, 'achievement_aggregated.rds')) |>
   purrr::map(\(x) left_join(x, scenarios, by = 'scenario'))
 
 ```
@@ -158,8 +159,11 @@ envgroup_pal <- purrr::imap_chr(env_pals,
                                 \(x,y) make_pal(levels = y, palette = x)) |> 
   as_colors()
 
-# Quantitative- sequential (or maybe diverging?)
+# Quantitative- sequential achievement
 achieve_pal <- 'grDevices::Blue-Yellow'
+
+# quantitative- diverging achievement (e.g. relative to baseline)
+compare_pal <- 'scico::bam'
 
 # We don't end up using scene_pal, I don't think. 
 # But I also think we should
@@ -857,7 +861,7 @@ header_difference + gl_difference +
   plot_layout(ncol = 1, heights = c(1,15)) + theme(legend.position = "right")
 ```
 
-*What aggregation do we want to use here? The dots here are the mean passing of each env_obj. Georgia had the mean EWRs pooled into env group. Those are different questions- one is just throwing all the EWRs in a bucket and asking about the proportion that passes, this is saying it doesn't matter how many EWRs go into an env_obj, what we're interested in is whether that env_obj "passes" (maybe better phrasing is 'condition', and then define condition as the proportion of lower-scale passing/condition). I think that's probably more relevant to management, but if we want to do it Georgia's way, we can create a new aggregation, or do something like  how I made `agg_ewr_sdl` directly to keep all the ewrs in a bucket.*
+*What aggregation do we want to use here? The dots here are the mean passing of each env_obj. Georgia had the mean EWRs pooled into env group. Those are different questions- one is just throwing all the EWRs in a bucket and asking about the proportion that passes, this is saying it doesn't matter how many EWRs go into an env_obj, what we're interested in is whether that env_obj "passes" (maybe better phrasing is 'condition', and then define condition as the proportion of lower-scale passing/condition). I think that's probably more relevant to management, but if we want to do it Georgia's way, we can create a new aggregation, or do something like how I made `agg_ewr_sdl` directly to keep all the ewrs in a bucket.*
 
 ```{r}
 sdl_smooth_groups <- obj_sdl_to_plot |>
@@ -1018,16 +1022,16 @@ sdl_smooth_groups # + coord_cartesian(ylim = c(0.5, 2)) # + geom_abline(slope = 
   plot_annotation( tag_levels = 'a')
 ```
 
-Scenarios will often be defined along more than one axis. In the demonstration here, we define both a flow multiplication axis as a proxy for 'climate' shifts, and a flow addition as a proxy for 'adaptations'. Moreover, it will often be the case that values will respond to several different aspects of the flow regime, for example the mean flow and variance or return interval of floods or low-flow periods. Heatmaps provide a powerful tool for visualising these interacting responses (@fig-heatmap). By examining multiple driver axes, such plots can highlight important interactions and identify where thresholds occur and where change along one axis (e.g. adaptations) is effective or ineffective to mitigate change along the other (e.g. climate shifts). This ability to identify areas of one axis that provide resilience or sensitivity to changes in the other will be critically important for management uses of this toolkit targeting climate change adaptation. These assessments must also take spatial and thematic differences into account; the different environmental groupings and SDL units show very different patterns in how they respond to the interaction between the 'climate' and 'adaptation' (@fig-heatmap). 
+Scenarios will often be defined along more than one axis. In the demonstration here, we define both a flow multiplication axis as a proxy for 'climate' shifts, and a flow addition as a proxy for 'adaptations'. Moreover, it will often be the case that values will respond to several different aspects of the flow regime, for example the mean flow and variance or return interval of floods or low-flow periods. Heatmaps provide a powerful tool for visualising these interacting responses (@fig-heatmap). By examining multiple driver axes, such plots can highlight important interactions and identify where thresholds occur and where change along one axis (e.g. adaptations) is effective or ineffective to mitigate change along the other (e.g. climate shifts). This ability to identify areas of one axis that provide resilience or sensitivity to changes in the other will be critically important for management uses of this toolkit targeting climate change adaptation. These assessments must also take spatial and thematic differences into account; the different environmental groupings and SDL units show very different patterns in how they respond to the interaction between the 'climate' and 'adaptation' (@fig-heatmap).
 
-Heatmaps can also provide important information about where additional resolution is needed, typically in areas of rapid change. Perhaps most usefully, if scenarios are carefully developed to explore the range of potential change in the system, then the heatmap represents the response surface of values over this range. This idea extends to multiple dimensions, which can be collapsed in various ways (e.g. PCA, identifying dominant hydrometrics) to visualise with heatmaps even when the response surface itself is best defined and studied in more dimensions. Once this response surface exists, it can provide hypotheses about how new scenarios might perform and assess how sensitive the outcomes are to uncertainty in single scenarios. For example, we might think of the flow multipliers here as defining the entire range of plausible climate shifts, and the addition scenarios as the entire potential range of additions. Then, specific proposed adaptations or climate sequences could be mapped onto these heatmaps at particular points. The reverse is also possible- identification of areas of high sensitivity in the heatmaps could be used to choose a set of potential adaptations designed to increase climate resilience.  *What else do we want to say about this idea? I think it's really important, and Joel, David, me, and others have all described it in different ways. I feel like it's one of those things that's too obvious to easily describe- it took me a long time to figure out it's NOT standard practice.*
+Heatmaps can also provide important information about where additional resolution is needed, typically in areas of rapid change. Perhaps most usefully, if scenarios are carefully developed to explore the range of potential change in the system, then the heatmap represents the response surface of values over this range. This idea extends to multiple dimensions, which can be collapsed in various ways (e.g. PCA, identifying dominant hydrometrics) to visualise with heatmaps even when the response surface itself is best defined and studied in more dimensions. Once this response surface exists, it can provide hypotheses about how new scenarios might perform and assess how sensitive the outcomes are to uncertainty in single scenarios. For example, we might think of the flow multipliers here as defining the entire range of plausible climate shifts, and the addition scenarios as the entire potential range of additions. Then, specific proposed adaptations or climate sequences could be mapped onto these heatmaps at particular points. The reverse is also possible- identification of areas of high sensitivity in the heatmaps could be used to choose a set of potential adaptations designed to increase climate resilience. *What else do we want to say about this idea? I think it's really important, and Joel, David, me, and others have all described it in different ways. I feel like it's one of those things that's too obvious to easily describe- it took me a long time to figure out it's NOT standard practice.*
 
 ```{r}
 
 # Use the Target here to get to the big groups
 
 # qualitative axes
-qual_heatmap <- agged_data_ewr2sdl$Target |>
+qual_heatmap <- agged_data_sdlTarget$Target |>
   dplyr::filter(adapt_code %in% c(1,2,3, 4) &
                   scenario != 'MAX') |> # max isn't really relevant here
   dplyr::filter(!is.na(Target)) |> 
@@ -1045,7 +1049,7 @@ qual_heatmap <- agged_data_ewr2sdl$Target |>
   labs(x = "Climate scenario", y = "Adaptation Option", fill = "Condition")
 
 # Quantitative axes- it's more informative, but uglier
-quant_heatmap <- agged_data_ewr2sdl$Target |>
+quant_heatmap <- agged_data_sdlTarget$Target |>
   dplyr::filter(adapt_code %in% c(1,2,3) &
                   scenario != 'MAX') |> # max isn't really relevant here
   dplyr::filter(!is.na(Target)) |> 
@@ -1065,7 +1069,7 @@ quant_heatmap <- agged_data_ewr2sdl$Target |>
   scale_x_continuous(trans = 'log10')
 
 # experimental- points and fitted surfaces?
-point_heatmap <- agged_data_ewr2sdl$Target |>
+point_heatmap <- agged_data_sdlTarget$Target |>
   dplyr::filter(adapt_code %in% c(1,2,3, 4) &
                   scenario != 'MAX') |> # max isn't really relevant here
   dplyr::filter(!is.na(Target)) |> 
@@ -1085,7 +1089,7 @@ point_heatmap <- agged_data_ewr2sdl$Target |>
   scale_x_continuous(trans = 'log10')
 
 # This would be better if we had a more even and tighter set of scenarios
-contour_heatmap <- agged_data_ewr2sdl$Target |>
+contour_heatmap <- agged_data_sdlTarget$Target |>
   dplyr::filter(adapt_code %in% c(1,2,3, 4) &
                   scenario != 'MAX') |> # max isn't really relevant here
   dplyr::filter(!is.na(Target)) |> 
@@ -1129,17 +1133,150 @@ qual_heatmap
 contour_heatmap
 ```
 
-NETWORK
-  Full?
-  Filtered to some focal group
+Causal networks can be used to show outcomes in addition to the causal relationships themselves. This sort of visualisation allows identification of the holistic consequences of the different scenarios across the complex and interrelated sets of values, as well as identifying nodes that unusually resilient or sensitive to change ( @fig-network-subset ). For example, NF7 is little changed across the range of climate scenarios considered, while EF5 shows greater sensitivity. These plots also identify the dependence between values, where we can see that different environmental outcomes depend on not only different hydrologic indicators (EWRs), but also different numbers of those indicators.
 
-### Additional?
+```{r}
+#| label: network-setup
 
-Website? Does that go anywhere? Is it a result, or is that a method?
+## NOTE TO SELF: THIS ALL NEEDS TO BE A FUNCTION IN THE TOOLKIT
+# just get the theme-scale values
+# First we need the sequence lists
 
-Maybe the description of the pieces- the *toolkit* is the main result, not the figures. *exists?*
+aggparams <- yaml::read_yaml(file.path(agg_results_sdlTarget,
+                                      'agg_metadata.yml'))
 
-Figures/examples for the demo *exists*
+themeseq <- aggparams$aggregation_sequence[
+  names(aggparams$aggregation_sequence) != 'sdl_units'
+]
+
+themefuns <- aggparams$aggregation_funsequence[
+  names(aggparams$aggregation_funsequence) != 'sdl_units'
+]
+
+# skip the _timing
+ewr_edges <- make_edges(dflist = causal_ewr, 
+                        fromtos = themeseq[2:length(themeseq)],
+                        gaugefilter = gauges_to_plot[2])
+
+# get the nodes
+nodes <- make_nodes(ewr_edges)
+
+aggvals <- extract_vals_causal(agged_data_sdlTarget,
+                               whichaggs = themefuns, 
+                               valcol = 'ewr_achieved', 
+                               targetlevels = names(themeseq))
+
+# filter to a single gauge. Multiple gauges should have separate networks or otherwise split the gauge-specific nodes. And include the larger scales pertaining to that gauge.
+gaugematch <-  st_intersects(bom_basin_gauges[bom_basin_gauges$gauge ==
+                                                gauges_to_plot[2],], 
+                             aggvals, sparse = FALSE)
+
+aggvals <- aggvals[as.vector(gaugematch),] |>
+  st_drop_geometry()
+
+# join to the nodes
+nodes_with_vals <- nodes |> 
+  dplyr::filter(NodeType != 'ewr_code_timing') |> 
+  dplyr::left_join(aggvals) |>
+  dplyr::filter(!is.na(scenario)) |> 
+  # Scenario metadata fell off, return it
+  dplyr::left_join(scenarios, by = 'scenario') |> 
+  # clean up names
+    dplyr::mutate(scenario = ifelse(scenario == 'MAX', 'MAX', 
+                           paste0(climate_code, adapt_code)), 
+         adapt_code = as.character(adapt_code))
+
+# a subset of nodes so plots are readable
+set.seed(17)
+sampleenvobj <- nodes_with_vals |> 
+  filter(NodeType == 'env_obj') |> 
+  reframe(names = unique(Name)) |> 
+  pull() |> 
+  sample(10)
+
+# pre-filter to make plotting simpler
+basenodes <- nodes_with_vals |> 
+  dplyr::filter(flow_multiplier %in% c(0.5, 1, 2) & flow_addition == 0) |> 
+  baseline_compare(compare_col = 'scenario', base_lev = 'E1',
+                   values_col = 'ewr_achieved',
+                   group_cols = c('Name', 'NodeType', 'nodeorder'),
+                   comp_fun = 'relative',
+                   add_eps = 'auto') |> 
+  mutate(logrel_ewr_achieved = log(relative_ewr_achieved))
+```
+
+```{r}
+#| label: make-networks
+# use a subset again
+aggNetworkdown_sub_rel <- basenodes |> 
+  dplyr::filter(flow_multiplier == 0.5 & flow_addition == 0) |> 
+  make_causal_plot(edges = ewr_edges,
+                   focalnodes = sampleenvobj,
+                 edge_pal = 'black',
+                 node_pal = list(value = compare_pal),
+                 node_colorset = 'logrel_ewr_achieved',
+                 render = FALSE,
+                 setLimits = c(min(basenodes$logrel_ewr_achieved),
+                               0,
+                               max(basenodes$logrel_ewr_achieved)))
+
+aggNetworkup_sub_rel <- basenodes |> 
+  dplyr::filter(flow_multiplier == 2 & flow_addition == 0) |> 
+  make_causal_plot(edges = ewr_edges,
+                   focalnodes = sampleenvobj,
+                 edge_pal = 'black',
+                 node_pal = list(value = compare_pal),
+                 node_colorset = 'logrel_ewr_achieved',
+                 render = FALSE,
+                 setLimits = c(min(basenodes$logrel_ewr_achieved),
+                               0,
+                               max(basenodes$logrel_ewr_achieved)))
+```
+
+*I'll make this plot work better. We need a way to do legends on the plots. And panels. In extremis, I can save this out and read it back in as an image, but I'd like to actually fix the plot code*
+
+```{r}
+#| label: fig-network-subset
+#| fig-cap: !expr glue::glue("Subset of the causal network for gauge {gauges_to_plot[2]} relevant to a selection of {length(sampleenvobj)} environmental objectives. A version with all environmental objectives is given in the supplemental information. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the log of the relative change in condition from the baseline for the halving (a) and doubling (b) 'climate' scenario. Large reductions in condition are dark purple, large improvements are dark green, and no change is white.") 
+
+
+DiagrammeR::render_graph(aggNetworkdown_sub_rel)
+DiagrammeR::render_graph(aggNetworkup_sub_rel)
+
+# THIS NEEDS TO BE INTEGRATED IN FUNCTION 
+lims <- c(min(basenodes$logrel_ewr_achieved),
+                               0,
+                               max(basenodes$logrel_ewr_achieved))
+
+limtib <- tibble(x = seq(from = lims[1], to = lims[2], length.out = 10), y = 1) |> 
+  bind_rows(tibble(x = seq(from = lims[2], to = lims[3], length.out = 10), y = 1)) |> 
+  # make sure we have pretty options
+  bind_rows(tibble(x = labeling::extended(lims[1], lims[3], 5), y = 1)) |> 
+  distinct()
+
+limtib <- tibble(x = labeling::extended(lims[1], lims[3], 5), y = 1)
+
+allcols <- limtib |>
+  grouped_colours(pal_list = list(compare_pal), colorset = 'x')
+
+# Can I just make the legend and then steal it? using pretty breaks
+
+pal_gg <- ggplot(allcols, aes(x = x, y = y, fill = color)) + 
+  geom_tile() +
+  scale_fill_identity(guide = 'legend', breaks = allcols$color, labels = as.character(allcols$x))
+
+# I guess I could also do a line and steal that, but if we've monkeyed with a dividing point, that won't work
+
+limtc <- tibble(condition = seq(from = lims[1], to = lims[3], by = 0.1), y = 1)
+
+pal_ggc <- ggplot(limtc, aes(x = condition, y = y, color = condition)) + geom_point() +
+  paletteer::scale_color_paletteer_c(compare_pal)
+
+net_legend <- ggpubr::get_legend(pal_ggc) |> 
+  ggpubr::as_ggplot()
+
+net_legend
+```
 
 # Discussion
 
@@ -1149,7 +1286,7 @@ The development of the toolkit is necessary to better understand the impacts of 
 
 Identification of areas of resilience and sensitivity.
 
-Uncertainty, understanding parameter space.       
+Uncertainty, understanding parameter space.
 
 Modularity
 
@@ -1159,7 +1296,22 @@ Large-scale natural resource management requires the capacity to make decisions 
 
 # Appendices
 
-I'm unsure about these.
+I'm unsure about these. Might need fewer, might need more.
+
+## EWRs
+
+```{r}
+#| label: tbl-ewrs
+#| tbl-cap: !expr glue::glue("Environmental water requirements (EWR) for two example gauges ({gauges_to_plot[1]} and {gauges_to_plot[2]}).")
+
+
+ewrs_in_pyewr |> 
+  filter(Gauge %in% gauges_to_plot) |> 
+  # Why these? Same as Georgia had
+  select(Catchment = LTWPShortName, Gauge, Code, StartMonth, EndMonth, TargetFrequency, TargetFrequencyMax, TargetFrequencyMin, EventsPerYear, Duration, MinSpell, FlowThresholdMin, FlowThresholdMax, `MaxInter-event`) |>  
+  huxtable::huxtable() |>
+  theme_article()
+```
 
 ## Baselined hydrographs {#sec-baselining}
 
@@ -1216,6 +1368,86 @@ base_hydro_adapt <- scenehydros |>
       guides(colour=guide_legend(nrow=2,byrow=TRUE))
 
 base_hydro_adapt
+```
+
+## Causal networks
+
+The causal networks shown in the text have been subset for readability, and baselined. Here, we have the
+
+```{r}
+#| label: fig-full-networks
+#| fig-cap: !expr glue::glue("Subset of the causal network for gauge {gauges_to_plot[2]} for all environmental objectives. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the condition for the halving (a), baseline (b), and doubling (c) 'climate' scenario. Low condition is dark blue, high is light yellow.")
+#| 
+aggNetworkdown <- nodes_with_vals |> 
+  dplyr::filter(flow_multiplier == 0.5 & flow_addition == 0) |> 
+  make_causal_plot(edges = ewr_edges,
+                 edge_pal = 'black',
+                 node_pal = list(value = achieve_pal),
+                 node_colorset = 'ewr_achieved',
+                 setLimits = c(0,1),
+                 render = FALSE)
+
+aggNetworkbase <- nodes_with_vals |> 
+  dplyr::filter(flow_multiplier == 1 & flow_addition == 0) |> 
+  make_causal_plot(edges = ewr_edges,
+                 edge_pal = 'black',
+                 node_pal = list(value = achieve_pal),
+                 node_colorset = 'ewr_achieved',
+                 setLimits = c(0,1),
+                 render = FALSE)
+
+aggNetworkup <- nodes_with_vals |> 
+  dplyr::filter(flow_multiplier == 2 & flow_addition == 0) |> 
+  make_causal_plot(edges = ewr_edges,
+                 edge_pal = 'black',
+                 node_pal = list(value = achieve_pal),
+                 node_colorset = 'ewr_achieved',
+                 setLimits = c(0,1),
+                 render = FALSE)
+
+DiagrammeR::render_graph(aggNetworkdown)
+DiagrammeR::render_graph(aggNetworkbase)
+DiagrammeR::render_graph(aggNetworkup)
+```
+
+The same set of nodes as in the text, but the actual condition values, rather than relativized.
+
+```{r}
+
+
+aggNetworkdown_sub <- nodes_with_vals |> 
+  dplyr::filter(flow_multiplier == 0.5 & flow_addition == 0) |> 
+  make_causal_plot(edges = ewr_edges,
+                   focalnodes = sampleenvobj,
+                 edge_pal = 'black',
+                 node_pal = list(value = achieve_pal),
+                 node_colorset = 'ewr_achieved',
+                 setLimits = c(0,1),
+                 render = FALSE)
+
+aggNetworkbase_sub <- nodes_with_vals |> 
+  dplyr::filter(flow_multiplier == 1 & flow_addition == 0) |> 
+  make_causal_plot(edges = ewr_edges,
+                   focalnodes = sampleenvobj,
+                 edge_pal = 'black',
+                 node_pal = list(value = achieve_pal),
+                 node_colorset = 'ewr_achieved',
+                 setLimits = c(0,1),
+                 render = FALSE)
+
+aggNetworkup_sub <- nodes_with_vals |> 
+  dplyr::filter(flow_multiplier == 2 & flow_addition == 0) |> 
+  make_causal_plot(edges = ewr_edges,
+                   focalnodes = sampleenvobj,
+                 edge_pal = 'black',
+                 node_pal = list(value = achieve_pal),
+                 node_colorset = 'ewr_achieved',
+                 setLimits = c(0,1),
+                 render = FALSE)
+
+DiagrammeR::render_graph(aggNetworkdown_sub)
+DiagrammeR::render_graph(aggNetworkbase_sub)
+DiagrammeR::render_graph(aggNetworkup_sub)
 ```
 
 ------------------------------------------------------------------------

@@ -136,9 +136,6 @@ funseq_ewr <- list(c('CompensatingFactor'),
                c('ArithmeticMean'),
                c('ArithmeticMean'))
 
-causal_to_target <- left_join(causal_ewr$ewr2obj, causal_ewr$obj2target,
-                              relationship = "many-to-many")
-
 sdl_target_agg_dir <- file.path(agg_results, 'sdl_target')
 ```
 
@@ -185,7 +182,7 @@ if (params$REBUILD_DATA) {
     aggout_ewr <- read_and_agg(datpath = ewr_results,
              type = aggType,
              geopath = bom_basin_gauges,
-             causalpath = causal_to_target,
+             causalpath = causal_ewr,
              groupers = agg_groups,
              aggCols = agg_var,
              aggsequence = aggseq_ewr,
