@@ -1,4 +1,3 @@
 project:
-  execute-dir: project
   render:
-    - "!*.qmd"
+  - presentation_paper/demo_paper.qmd

@@ -7,6 +7,30 @@ echo: false
 ---
 
 ```{r}
+#| eval: false
+
+# This should not be run, except to make a simple quarto
+make_simpleyml <- function(renderfile = 'auto') {
+  
+  if (renderfile == 'auto') {
+    projpath <- rstudioapi::getActiveProject()
+    docpath <- rstudioapi::documentPath()
+    projdir <- sub(".*/([^/]+)$", "\\1", projpath)
+    reldocpath <- sub(paste0(".*", projdir, "/"), "", docpath)
+    renderfile <- reldocpath
+  }
+    
+  
+  simple_yaml <- list()
+  simple_yaml$project <- list()
+  simple_yaml$project$render <- list(renderfile)
+  yaml::write_yaml(simple_yaml, '_quarto-singlefile.yml')
+}
+
+make_simpleyml(rstudioapi::documentPath())
+```
+
+```{r}
 #| label: packages
 #| include: false
 library(werptoolkitr) 
@@ -54,8 +78,12 @@ scenarios_to_plot <- c("climatedown2adapt0", "climatedown2adapt250",
 ```
 
 ```{r}
-#| label: scenario-info
+writeLines(getwd(), 'out.txt')
+```
 
+```{r}
+#| label: scenario-info
+#| include: false
 print(file.path(hydro_dir,'scenario_metadata.yml'))
 
 scenarios <- yaml::read_yaml(file.path(hydro_dir,                                     
@@ -157,7 +185,7 @@ env_pals = list(EB = 'grDevices::Grays',
 # use the first level of each of those to make a named pal. I wish there were an easier way
 envgroup_pal <- purrr::imap_chr(env_pals,
                                 \(x,y) make_pal(levels = y, palette = x)) |> 
-  as_colors()
+  werptoolkitr:::as_colors()
 
 # Quantitative- sequential achievement
 achieve_pal <- 'grDevices::Blue-Yellow'
@@ -297,7 +325,10 @@ ewrs_in_pyewr <- pdi$get_EWR_table()[[1]]
 
 
 NSWEWR_gauge <- filter(ewrs_in_pyewr, Gauge %in% gauges_to_plot) |>
-  tidyr::separate(col = Code, into = c("Code", "Timing")) |>
+  tidyr::separate_wider_delim(cols = Code, delim = '_', 
+                              names = c("Code", "Timing"),
+                              too_few = 'align_start',
+                              too_many = 'merge') |>
   rename(gauge = Gauge) |>
   group_by(gauge) %>%
   distinct(Code, .keep_all = TRUE) |>
@@ -467,7 +498,7 @@ huxtable::huxtable(adapt_scenes) |> theme_article()
 
 ```{r}
 #| label: fig-hydrographs
-#| fig-cap: TEST.
+#| fig-cap: Hydrographs for two example gauges with 'climate' scenarios on rows and 'adaptation' scenarios as columns. Scenario codes as in @tbl-scenarios.
 
 
 # Currently making manually
@@ -533,11 +564,12 @@ agg_ewr_sdl <- agged_data$ewr_code |>
 
 Comparison of the direct outputs from the response model (in this example, pass/fail of EWRs) gives an overview of how locations (e.g. gauges) or areas (e.g. SDL units) respond to different scenarios. Such an assessment can identify areas that may be particularly vulnerable or which potential 'adaptation options' might be most impactful across many outcomes. In @fig-sdl-comparison, we present the EWR outcomes for three climate scenarios (A, E, and I) and three adaptation options (1, 2, and 3) (see @tbl-scenarios for definitions). This example shows that the EWRs in all SDL units are likely to be affected by the changes in flow resulting from these changes in 'climate' and application of these 'adaptation options'. However, the scenarios affect each SDL unit differently. The Lachlan has highest proportion of EWRs achieved under all scenarios and has relatively consistent increases in EWR success with the adaptation options (though the options themselves are not even; 0 to 250 to 6500 ML/d). The Macquarie--Castlereagh SDL unit is most sensitive to small increases in additional water, with large jumps between 'adaptation' options 1 and 2. In all situations, the 'climate' scenarios have less of an impact than the 'adaptation' scenarios, though neither is reflective of expected change in these dimensions. These outcomes are not yet directly linked to environmental assets or values and so each hydrologic indicator (EWR) at each gauge is represented with equal importance, whether it is required for all environmental objectives or just one.
 
-**This is quite a different result than what it was. The way the aggregation had been done didn't match the text or the intent, and led to uneven weighting. This is now just a naive mean of EWRs in SDL units as it said.**
+*This is quite a different result than what it was. The way the aggregation had been done didn't match the text or the intent, and led to uneven weighting. This is now just a naive mean of EWRs in SDL units as it said.*
 
 ```{r}
 #| label: fig-sdl-comparison
 #| fig-cap: Scenario comparison for different Sustainable Diversion Limit areas. This example shows the mean proportion of environmental watering requirements (EWRs) that are achieved for each environmental objective under each scenario for each SDL unit. This approach illuminates broad-brush differences between scenarios and geographic locations, but does not address which EWRs may be more important to environmental assets or which assets are more sensitive to particular scenarios. Climate scenarios and adaptation options as in @tbl-scenarios. Panels a and b illustrate the same data with a emphasizing quantititive differences and b emphasizing spatial patterns.
+#| message: false
 
 # The bars
 # in general, it's an issue that scenario is special, but I think here it actually is fine
@@ -591,6 +623,8 @@ This view provides a useful overview of the impact of different scenarios on the
 ```{r}
 #| label: fig-obj_in_groups
 #| fig-cap: "Proportion of EWRs achieved for each environmental objective, grouped into broader environmental groups (EF = Priority Ecosystem Function, NF = Native Fish, NV = Native Vegetation, OS = Other Species, WB = Waterbirds). This view provides an assessment of the performance of individual environmental objectives, as well as how those contribute to the overall sensitivity of the broader groups across space. Not all EWR are applicable in all locations and there are not equal number of EWR in each category. The MAX column illustrates the total number of EWRs for reference, with each black box showing the situation where all EWRs contributing to an Environmental Objective are met. Where the max column does not exist, those objectives are not relevant to that particular planning unit. ). This illustration includes three climate scenarios: A (0.5x), E (historical base level/no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+250 ML/d), and 3 (+6500 ML/d)" 
+#| message: false
+#| warning: false
 
 
 obj_in_groups <- obj_sdl_to_plot |>
@@ -628,6 +662,7 @@ obj_in_groups
 ```
 
 ```{r}
+#| include: false
 ef_maps <- obj_sdl_to_plot |>
     dplyr::filter(scenario %in% scenarios_to_plot) |>
   # Need to reduce dimensionality
@@ -758,7 +793,7 @@ Maps allow large-scale visualization of environmental objectives under various s
 
 ```{r}
 #| label: fig-gauge-to-sdl-map
-#| fig-cap: Environmental objectives aggregated to SDL unit spatial scale, illustrated here for Priority Ecosystem Function. Polygon colors indicate the proportion of EWR passed for each objective in each SDL unit. Panel A includes three climate scenarios: A (0.5x), E (historical base level/no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+250 ML/d), and 3 (+6500 ML/d). In panel B, we highlight one environmental objective (EF1) under one scenario (the baseline, E1) to illustrate the proportion of EWR passed for that objective (point colour) at each gauge location (points). The outcome for the SDL unit in a are then the mean over these points. 
+#| fig-cap: "Environmental objectives aggregated to SDL unit spatial scale, illustrated here for Priority Ecosystem Function. Polygon colors indicate the proportion of EWR passed for each objective in each SDL unit. Panel A includes three climate scenarios: A (0.5x), E (historical base level/no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+250 ML/d), and 3 (+6500 ML/d). In panel B, we highlight one environmental objective (EF1) under one scenario (the baseline, E1) to illustrate the proportion of EWR passed for that objective (point colour) at each gauge location (points). The outcome for the SDL unit in a are then the mean over these points." 
 
 # Simplest- gauges on grey
 (ef_maps + theme(legend.position = 'none') ) + 
@@ -803,7 +838,8 @@ While we can see which scenarios are better or worse than others with bar graphs
 
 ```{r}
 #| label: fig-difference-baseline
-#| fig-cap: Quantitative scenario comparison for Native Fish objectives for three SDL units. Scenarios defined here as the difference in mean flow (GL) from the baseline historical scenario (E1). A key message here is that the lines are not smooth- EWR achievement is not simply a function of the amount of water. Instead, the 'adaptation' options, particularly the '2' scenarios of adding 250 ML/d of water, have disproportionately large impact (steep slopes). Shading indicates different environmental objectives within the native fish target group. This illustration includes three climate scenarios: A (0.5x), E (historical base level/no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+250 ML/d), and 3 (+6500 ML/d).
+#| fig-cap: "Quantitative scenario comparison for Native Fish objectives for three SDL units. Scenarios defined here as the difference in mean flow (GL) from the baseline historical scenario (E1). A key message here is that the lines are not smooth- EWR achievement is not simply a function of the amount of water. Instead, the 'adaptation' options, particularly the '2' scenarios of adding 250 ML/d of water, have disproportionately large impact (steep slopes). Shading indicates different environmental objectives within the native fish target group. This illustration includes three climate scenarios: A (0.5x), E (historical base level/no change), and I (2x) and three adaptation options 1 (no adaptation), 2 (+250 ML/d), and 3 (+6500 ML/d)."
+#| message: false
 
 
 gl_difference <- obj_sdl_to_plot |>
@@ -864,6 +900,7 @@ header_difference + gl_difference +
 *What aggregation do we want to use here? The dots here are the mean passing of each env_obj. Georgia had the mean EWRs pooled into env group. Those are different questions- one is just throwing all the EWRs in a bucket and asking about the proportion that passes, this is saying it doesn't matter how many EWRs go into an env_obj, what we're interested in is whether that env_obj "passes" (maybe better phrasing is 'condition', and then define condition as the proportion of lower-scale passing/condition). I think that's probably more relevant to management, but if we want to do it Georgia's way, we can create a new aggregation, or do something like how I made `agg_ewr_sdl` directly to keep all the ewrs in a bucket.*
 
 ```{r}
+#| include: false
 sdl_smooth_groups <- obj_sdl_to_plot |>
   dplyr::filter(adapt_code %in% c(1,2,3) &
                   scenario != 'MAX') |> # max isn't really relevant here
@@ -1003,7 +1040,8 @@ The responses seen in @fig-smooth-all and @fig-smooth-climate-adapt vary between
 
 ```{r}
 #| label: fig-smooth-all
-#| fig-cap: Smoothed fits to assess change in performance across the 'climate' scenarios. Points are individual environmental objectives, fitted lines are loess smooths. Separate fits are done for each adaptation option, and so differences between lines of different colors represents the impact of those adaptations. Rows are environmental groupings, columns are SDL units. Note the very different scale of the y-axis.   
+#| fig-cap: Smoothed fits to assess change in performance across the 'climate' scenarios. Points are individual environmental objectives, fitted lines are loess smooths. Separate fits are done for each adaptation option, and so differences between lines of different colors represents the impact of those adaptations. Rows are environmental groupings, columns are SDL units. Note the very different scale of the y-axis. 
+#| message: false  
 
 
 # sdl_smooth_groups / sdl_smooth_clim +
@@ -1014,6 +1052,8 @@ sdl_smooth_groups # + coord_cartesian(ylim = c(0.5, 2)) # + geom_abline(slope = 
 ```{r}
 #| label: fig-smooth-climate-adapt
 #| fig-cap: Smoothed fits of shifts in environmental objectives to changes in flow, both multiplicatively over the whole hydrograph (panel a, 'climate' scenarios) and with pulsed flow additions (panel b, 'adaptation' scenarios. Panel a includes no flow additions, and panel b has those additions to the baseline 'climate' scenario (historical hydrograph). The full combination of scenarios are shown in @fig-smooth-all. Points are individual environmental objectives, fitted lines are loess smooths. Separate fits are done for each environmental group. Columns are SDL units. Y-axes set to match x-axes to better visualise proportionality. Thus, a small amount of data is not plotted, but is accounted for in the fits. *Too messy? Should we facet by groups? Drop the error ribbons? (I don't like that much)*
+#| message: false
+#| warning: false
 
 
 (sdl_smooth_clim  + coord_cartesian(ylim = c(0.5, 2)) )/
@@ -1137,6 +1177,7 @@ Causal networks can be used to show outcomes in addition to the causal relations
 
 ```{r}
 #| label: network-setup
+#| message: false
 
 ## NOTE TO SELF: THIS ALL NEEDS TO BE A FUNCTION IN THE TOOLKIT
 # just get the theme-scale values
@@ -1231,19 +1272,8 @@ aggNetworkup_sub_rel <- basenodes |>
                  setLimits = c(min(basenodes$logrel_ewr_achieved),
                                0,
                                max(basenodes$logrel_ewr_achieved)))
-```
 
-*I'll make this plot work better. We need a way to do legends on the plots. And panels. In extremis, I can save this out and read it back in as an image, but I'd like to actually fix the plot code*
-
-```{r}
-#| label: fig-network-subset
-#| fig-cap: !expr glue::glue("Subset of the causal network for gauge {gauges_to_plot[2]} relevant to a selection of {length(sampleenvobj)} environmental objectives. A version with all environmental objectives is given in the supplemental information. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the log of the relative change in condition from the baseline for the halving (a) and doubling (b) 'climate' scenario. Large reductions in condition are dark purple, large improvements are dark green, and no change is white.") 
-
-
-DiagrammeR::render_graph(aggNetworkdown_sub_rel)
-DiagrammeR::render_graph(aggNetworkup_sub_rel)
-
-# THIS NEEDS TO BE INTEGRATED IN FUNCTION 
+# GET LEGEND: THIS NEEDS TO BE INTEGRATED IN FUNCTION 
 lims <- c(min(basenodes$logrel_ewr_achieved),
                                0,
                                max(basenodes$logrel_ewr_achieved))
@@ -1274,7 +1304,17 @@ pal_ggc <- ggplot(limtc, aes(x = condition, y = y, color = condition)) + geom_po
 
 net_legend <- ggpubr::get_legend(pal_ggc) |> 
   ggpubr::as_ggplot()
+```
 
+*I'll make this plot work better. We need a way to do legends on the plots. And panels. In extremis, I can save this out and read it back in as an image, but I'd like to actually fix the plot code*
+
+```{r}
+#| label: fig-network-subset
+#| fig-cap: !expr glue::glue("Subset of the causal network for gauge {gauges_to_plot[2]} relevant to a selection of {length(sampleenvobj)} environmental objectives. A version with all environmental objectives is given in the supplemental information. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the log of the relative change in condition from the baseline for the halving (a) and doubling (b) 'climate' scenario. Large reductions in condition are dark purple, large improvements are dark green, and no change is white.") 
+
+
+DiagrammeR::render_graph(aggNetworkdown_sub_rel)
+DiagrammeR::render_graph(aggNetworkup_sub_rel)
 net_legend
 ```
 
