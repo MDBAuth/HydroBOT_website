@@ -78,10 +78,6 @@ scenarios_to_plot <- c("climatedown2adapt0", "climatedown2adapt250",
 ```
 
 ```{r}
-writeLines(getwd(), 'out.txt')
-```
-
-```{r}
 #| label: scenario-info
 #| include: false
 print(file.path(hydro_dir,'scenario_metadata.yml'))
@@ -201,14 +197,6 @@ scene_pal <- make_pal(unique(scenehydros$scenario),
                       palette = "viridis::mako", #'ggsci::nrc_npg', 
                       refvals = 'base', refcols = 'black')
 ```
-
-*I have stuffed up the citations moving this to quarto, will need to fix*
-
-*I'm writing a lot of this fast, and it is ending up fairly straw-manny. Just trying to get ideas down for now. My outlines are below.*
-
-*There is a good example of a bigger project but very similar in @harrison2023 .*
-
-*The 'MAX' scenario still needs to be fixed- it is carryover from original method of lots of water, but isn't truly max anymore with the better achievement assessment.*
 
 # Abstract
 
@@ -385,17 +373,13 @@ Each response model will have a distinct set of outputs, reflecting the captured
 
 Results from the response models are typically very granular in many dimensions because the best response models operate near the scale of the processes being modelled. In many cases, those processes (e.g. fish breeding, crop planting) individually occur at small spatial and temporal scales. Note that this is the scale of the process itself, but that may be replicated over much larger scales. For example, fish may breed across the basin but each female breeds in only one location at a given time. Moreover, outcomes from response models are typically at small theme scales as well, e.g. capturing portions of the life cycle of fish species, rather than an overall outcome for all fish, or representing planting of particular crops, rather than overall agricultural output. The consequence is that there are potentially thousands of different modeled outcomes across time, locations, and theme.
 
-Aggregation condenses that information to scales that are useful for interpretation and planning. Depending on the use, the desired scale(s) may range from local, short term responses of fine-grained outcomes to large spatial scales over longer time periods for high-level outcomes such as environmental condition (@fig-aggregation_dims). Thus, the toolkit must achieve a robust, consistent aggregation approach along three dimensions (time, space, and theme), while maintaining the ability to define those aggregation steps flexibly to meet the needs of the specific analysis. For example, the EWR tool assesses EWRs at individual gauges, but outcomes may be desired within SDL units or at the basin scale. Likewise, multiple EWRs are required to meet environmental objectives, of which many are required for each target group or long-term target. The Aggregator component of the toolkit enables scaling from the hydrologic indicators at each gauge to results at any of these scales.
+Aggregation condenses that information to scales that are useful for interpretation and planning. Depending on the use, the desired scale(s) may range from local, short term responses of fine-grained outcomes to large spatial scales over longer time periods for high-level outcomes such as environmental condition (@fig-aggregation_dims). Thus, the toolkit must achieve a robust, consistent aggregation approach along three dimensions (time, space, and theme), while maintaining the ability to define those aggregation steps flexibly to meet the needs of the specific analysis. For example, the EWR tool assesses EWRs at individual gauges, but outcomes may be desired within SDL units or at the basin scale. Likewise, multiple EWRs are required to meet environmental objectives, of which many are required for each target group or long-term target. The Aggregator component of the toolkit enables scaling from the hydrology at each gauge to results at any of these scales. The toolkit provides a standard set of spatial units for aggregation, but can accept any user-supplied polygons. Aggregation along the theme dimension follows the causal network, which is supplied by the toolkit for included tools, though the user can specify other causal relationships if required.
 
 ![Aggregation along multiple dimensions. The toolkit provides flexible capability to aggregate along spatial, temporal, and theme scales. Users can control the sequence of steps along these axes, with the capability to switch between axes at different steps.](../images/aggregation.jpg){#fig-aggregation_dims}
 
 A flexible approach to aggregation is needed as specific dimensions (time, space, and theme) and units within those are best combined in different ways, depending on the meaning of the data and the use of the final outputs. The choices made in these aggregation steps are critical to ensure the final values are scientifically justified and capture the intended meaning. The Aggregator defines a sequence of aggregation steps to take with the data, specifying the dimensions along which to aggregate and the aggregation functions to apply at each step. Each step can be along any dimension and multiple functions can be assigned at each step. The sequence of aggregation steps can interleave the dimensions, e.g. aggregate along the theme dimension to an intermediate level, then aggregate in space, then theme again. For example, following @fig-aggregation_dims, the user might want to aggregate from hydrologic indicator (EWR) to Objective to Specific Goal (species) at each gauge, then aggregate those gauges into a SDL unit to assess performance of each species over a larger area, followed by aggregating to Target (broad group, e.g. Native Fish, Waterbirds, Native Vegetation, Ecosystem Function).
 
-The Aggregator allows the user to choose any aggregation function at each aggregation step, reflecting the need to account for both the processes being aggregated and the outputs needed for management decisionmaking. These aggregation functions should be considered carefully, as they have different meaning both for the processes being modeled and the interpretation of the outcomes ([@fig-aggregation_types]). For example, in some situations the user might want to know the rate at which EWRs pass across some area, or perhaps the average value of an abundance measure. In this case, a mean would be appropriate. In other situations, however, a single failure may be disproportionately important (e.g. 'no loss' requirements), or perhaps a single passing value is sufficient (e.g. bird breeding can occur anywhere in a catchment). These might be captured with min and max, respectively. To address this need for flexible aggregation, the toolkit provides a standard set of functions (e.g. mean, max, min, and spatially-weighted mean), but the user can also specify any other aggregation function, including custom-written functions.
-
-![Aggregation functions determine outcomes and reflect processes or values. Aggregating a set of outcomes (top row) yields a different outcome depending on the function used. Thus, function choice should be considered carefully and reflect the processes involved or management goals. The toolkit provides default functions for the mean, compensating (e.g. max), limiting (min), and spatially-weighted versions of the same. It also provides the ability for the user to define any desired function, allowing for more complex situtations.](../images/agg_concept.png){#fig-aggregation_types}
-
-The toolkit provides a standard set of spatial units for aggregation, but can accept any user-supplied polygons. Aggregation along the theme dimension follows the causal network, which is supplied by the toolkit for included tools, though the user can specify other causal relationships if required.
+The Aggregator allows the user to choose any aggregation function at each aggregation step, reflecting the need to account for both the processes being aggregated and the outputs needed for management decisionmaking. These aggregation functions should be considered carefully, as they have different meaning both for the processes being modeled and the interpretation of the outcomes ([@fig-aggregation_types]) *I've sent the fig to the appendix. Is it needed here?*. For example, in some situations the user might want to know the rate at which EWRs pass across some area, or perhaps the average value of an abundance measure. In this case, a mean would be appropriate. In other situations, however, a single failure may be disproportionately important (e.g. 'no loss' requirements), or perhaps a single passing value is sufficient (e.g. bird breeding can occur anywhere in a catchment). These might be captured with min and max, respectively. To address this need for flexible aggregation, the toolkit provides a standard set of functions (e.g. mean, max, min, and spatially-weighted mean), but the user can also specify any other aggregation function, including custom-written functions.
 
 The complexity of the potential aggregation sequences and functions highlights the importance of tracking the provenance of the final values to understand their meaning. Thus, the Aggregator saves the sequences and functions applied at each stage to a metadata file that also can serve as the aggregation parameters for repeatable runs. Moreover, the output dataset retains the full sequence and functions alongside each value, ensuring that values are always paired with their provenance and meaning.
 
@@ -461,10 +445,10 @@ To achieve the first (scaled flow), we apply ten flow multipliers, ranging from 
 ```{r}
 #| label: tbl-scenarios
 #| tbl-cap: Demonstration scenarios are a factorial combination of 'climate' (scaled flow) and 'adaptation' (pulsed additions). Climate scenarios included in this demonstration were produced by applying a flow multiplier to historical flows. Adaptation options were applied to each climate scenario with additional flows added throughout September to December. For ease of display in some figures, we provide alpha codes for the 'climate' changes and numeric codes for the 'adaptations'.
-#| layout-ncol: 2
 #| tbl-subcap: 
 #|  - "Climate"
 #|  - "Adaptation"
+#| layout-ncol: 2
 
 
 adapt_scenes <- scenarios |> 
@@ -1368,6 +1352,10 @@ The development of the toolkit is necessary to better understand the impacts of 
 # Appendices
 
 I'm unsure about these. Might need fewer, might need more.
+
+### Aggregation
+
+![Aggregation functions determine outcomes and reflect processes or values. Aggregating a set of outcomes (top row) yields a different outcome depending on the function used. Thus, function choice should be considered carefully and reflect the processes involved or management goals. The toolkit provides default functions for the mean, compensating (e.g. max), limiting (min), and spatially-weighted versions of the same. It also provides the ability for the user to define any desired function, allowing for more complex situtations.](../images/agg_concept.png){#fig-aggregation_types}
 
 ## EWRs {#sec-ewr-table}
 
