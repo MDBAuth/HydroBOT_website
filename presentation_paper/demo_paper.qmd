@@ -1,9 +1,64 @@
 ---
-title: "An integrated toolkit for assessment of hydrology-dependent outcomes in the Murray-Darling Basin: FANCYACRONYM"
-author: "Galen Holt, Georgia Dwyer, David Robertson, Andrew Freebairn, Martin Job, Lara Palmer, Rebecca Lester"
+title: "An integrated toolkit for assessment of hydrology-dependent outcomes in the Murray-Darling Basin: CLEVERACRONYM"
+author: 
+ - name: Galen Holt
+   orcid: 0000-0002-7455-9275
+   corresponding: true
+   email: galen@deakin.edu.au
+   affiliation:
+    - ref: du
+ - name: Georgia Dwyer
+   orcid: 
+   corresponding: false
+   affiliations:
+     - ref: du
+ - name: David Robertson
+   orcid: 
+   corresponding: false
+   affiliations:
+     - CSIRO
+ - name: Andrew Freebairn
+   orcid: 
+   corresponding: false
+   affiliations:
+     - CSIRO
+ - name: Martin Job
+   orcid: 
+   corresponding: false
+   affiliations:
+     - MDBA
+ - name: Lara Palmer
+   orcid: 
+   corresponding: false
+   affiliations:
+     - MDBA
+ - name: Rebecca Lester
+   orcid: 
+   corresponding: false
+   affiliations:
+     - ref: du
+
+affiliations:
+  - id: du
+    name: Deakin University
+    city: Waurn Ponds
+    state: Victoria
+        
+keywords: 
+ - Murray-Darling Basin
+ - Holistic modeling
+ - Management modeling
+ - Climate change
+ - Climate adaptation
+date: last-modified
 bibliography: references.bib
 number-sections: true
 echo: false
+
+# format:
+#   docx:
+#     toc: true
+#     number-sections: true
 ---
 
 ```{r}
@@ -202,13 +257,13 @@ scene_pal <- make_pal(unique(scenehydros$scenario),
 
 # Introduction
 
-Water management in large river systems typically targets a wide range of desired values. For example, in the Murray-Darling Basin, Australia, the objective of water management is to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies (@murray-darlingbasinauthority2011). These values are not unique to Australia; water is managed to protect the social, economic, environmental and cultural values of communities worldwide (e.g. @stern2019, @kaye-blake2014 ) *neither of these are actually papers, and we need something from Europe/Asia*. That these values are the targets of water management implies a hypothesized dependence on water, but in many cases these dependencies are not well-defined and management proceeds under the relatively simple assumption that if water is provided, these targets will improve.
+Water management in large river systems typically targets a wide range of desired values. For example, in the Murray-Darling Basin, Australia, the objective of water management is to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies ([@murray-darlingbasinauthority2011]). These values are not unique to Australia; water is managed to protect the social, economic, environmental and cultural values of communities worldwide ([e.g. @stern2019; @kaye-blake2014]) *neither of these are actually papers, and we need something from Europe/Asia*. That these values are the targets of water management implies a hypothesized dependence on water, but in many cases these dependencies are not well-defined and management proceeds under the relatively simple assumption that if water is provided, these targets will improve.
 
 Water managers typically have a limited range of levers that primarily affect hydrology, e.g. flow releases from dams or inundation of wetlands. When non-hydrologic levers are available, such as water trading rules in the Murray-Darling Basin, their impact is still often assessed on how they alter hydrologic conditions- the spatio-temporal patterns of flow in the system. Further, hydrologic modelling is often better-integrated with management workflows than models of other values. In part, this is due to the availability of large-scale physical models that provide robust ability to model flows as they arise from natural drivers such as rainfall and capture infrastructure such as dams and diversions. While complex, these models have relatively high precision and relatively few outcomes compared to models of ecological or economic responses, for example. The impact of particular management actions such as dam releases on hydrology are well-understood and captured by the hydrograph, allowing accurate targeting of particular aspects of the flow regime. While these proximate models of system state and impact of management actions are invaluable, they do not provide the necessary information to assess the status of the range of flow-dependent values and targets.
 
-Assessing values as they respond to flow and management actions requires models of these relationships. Such models exist, though their quality and extent vary widely, ranging from unstated mental models to highly-detailed population dynamics or economic models. When these models are quantitative or computational, they are written in various languages by subject-matter experts, and return disparate outputs depending on their particular goals and approaches. These models are often designed to study the values they model, e.g. fish populations, not to produce the most useful analysis for management questions or to capture the breadth of target values. Integrating these models into a holistic modelling approach is necessary to assess management-relevant outcomes of disparate values under different hydrologic conditions and management actions. Integrating diverse response models gives them utility beyond their initially-intended purpose and identifies where new work is needed because response models are limited or nonexistent. The creation of an integrated model provides the opportunity for robust decision-making @harrison2023 and the ability to prioritize water planning across a range of values and identify conditions that achieve disproportionately large (or small) impacts.
+Assessing values as they respond to flow and management actions requires models of these relationships. Such models exist, though their quality and extent vary widely, ranging from unstated mental models to highly-detailed population dynamics or economic models. When these models are quantitative or computational, they are written in various languages by subject-matter experts, and return disparate outputs depending on their particular goals and approaches. These models are often designed to study the values they model, e.g. fish populations, not to produce the most useful analysis for management questions or to capture the breadth of target values. Integrating these models into a holistic modelling approach is necessary to assess management-relevant outcomes of disparate values under different hydrologic conditions and management actions. Integrating diverse response models gives them utility beyond their initially-intended purpose and identifies where new work is needed because response models are limited or nonexistent. The creation of an integrated model provides the opportunity for robust decision-making [@harrison2023] and the ability to prioritize water planning across a range of values and identify conditions that achieve disproportionately large (or small) impacts.
 
-Exemplifying these issues, the Murray-Darling Basin Authority (MDBA) is the federal body charged with water management in the Murray-Darling Basin, Australia *do we need to say the usual stuff about how big it is, economic importance, etc?*. The MDBA has statutory obligations to manage water to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies (@murray-darlingbasinauthority2011). Moreover, the state of the basin is required to be assessed annually *right?* and updates to the Basin Plan made at *XX* year timeframes. Beyond these requirements, the MDBA has an increasing focus on assessing system response to climate change and possible adaptation actions that may be taken by the Authority itself or other stakeholders in the Basin. Taken together, these management goals require a holistic modeling approach that integrates across values and is adaptable to these various management needs while also simplifying repeated, ongoing use.
+Exemplifying these issues, the Murray-Darling Basin Authority (MDBA) is the federal body charged with water management in the Murray-Darling Basin, Australia *do we need to say the usual stuff about how big it is, economic importance, etc?*. The MDBA has statutory obligations to manage water to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies ([@murray-darlingbasinauthority2011]). Moreover, the state of the basin is required to be assessed annually *right?* and updates to the Basin Plan made at *XX* year timeframes. Beyond these requirements, the MDBA has an increasing focus on assessing system response to climate change and possible adaptation actions that may be taken by the Authority itself or other stakeholders in the Basin. Taken together, these management goals require a holistic modeling approach that integrates across values and is adaptable to these various management needs while also simplifying repeated, ongoing use.
 
 The MDBA has access to robust hydrologic models describing flows in the system and responses to current management practices, and these models are under continual use, development, and improvement (*CITE*). Despite the need for ongoing assessment and forward planning across a range of values, models of the responses to those hydrologic conditions are patchy, only represent some values, and have been developed and used in a more ad-hoc approach rather than integrated with each other or the hydrologic models. In this paper, we describe an integrated modelling 'toolkit' to address these water management needs in the Murray-Darling Basin, Australia, hereafter referred to as *FANCYACRONYM*.
 
@@ -445,10 +500,10 @@ To achieve the first (scaled flow), we apply ten flow multipliers, ranging from 
 ```{r}
 #| label: tbl-scenarios
 #| tbl-cap: Demonstration scenarios are a factorial combination of 'climate' (scaled flow) and 'adaptation' (pulsed additions). Climate scenarios included in this demonstration were produced by applying a flow multiplier to historical flows. Adaptation options were applied to each climate scenario with additional flows added throughout September to December. For ease of display in some figures, we provide alpha codes for the 'climate' changes and numeric codes for the 'adaptations'.
+#| layout-ncol: 2
 #| tbl-subcap: 
 #|  - "Climate"
 #|  - "Adaptation"
-#| layout-ncol: 2
 
 
 adapt_scenes <- scenarios |> 
@@ -1219,6 +1274,7 @@ basenodes <- nodes_with_vals |>
 
 ```{r}
 #| label: make-networks
+#| include: false
 # use a subset again
 aggNetworkdown_sub_rel <- basenodes |> 
   dplyr::filter(flow_multiplier == 0.5 & flow_addition == 0) |> 
@@ -1230,7 +1286,10 @@ aggNetworkdown_sub_rel <- basenodes |>
                  render = FALSE,
                  setLimits = c(min(basenodes$logrel_ewr_achieved),
                                0,
-                               max(basenodes$logrel_ewr_achieved)))
+                               max(basenodes$logrel_ewr_achieved)),
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'aggNetworkdown_sub_rel')
 
 aggNetworkup_sub_rel <- basenodes |> 
   dplyr::filter(flow_multiplier == 2 & flow_addition == 0) |> 
@@ -1242,7 +1301,10 @@ aggNetworkup_sub_rel <- basenodes |>
                  render = FALSE,
                  setLimits = c(min(basenodes$logrel_ewr_achieved),
                                0,
-                               max(basenodes$logrel_ewr_achieved)))
+                               max(basenodes$logrel_ewr_achieved)),
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'aggNetworkup_sub_rel')
 
 # GET LEGEND: THIS NEEDS TO BE INTEGRATED IN FUNCTION 
 lims <- c(min(basenodes$logrel_ewr_achieved),
@@ -1275,11 +1337,14 @@ pal_ggc <- ggplot(limtc, aes(x = condition, y = y, color = condition)) + geom_po
 
 net_legend <- ggpubr::get_legend(pal_ggc) |> 
   ggpubr::as_ggplot()
+
+ggsave('images/aggNetworkup_sub_legend.png', width = 1, height = 2, units = 'cm')
 ```
 
-*I'll make this plot work better. We need a way to do legends on the plots. And panels. In extremis, I can save this out and read it back in as an image, but I'd like to actually fix the plot code. Leaving it ugly for now.*
+*I'll make this plot work better. It's cobbled together from saved objects for now. We need a way to do legends on the plots. And panels. Diagrammer is great for html but otherwise a disaster. I need to actually fix the plot code. Leaving it ugly for now.*
 
 ```{r}
+#| eval: false
 #| label: fig-network-subset
 #| fig-cap: !expr glue::glue("Subset of the causal network for gauge {gauges_to_plot[2]} relevant to a selection of {length(sampleenvobj)} environmental objectives. A version with all environmental objectives is given in the supplemental information. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the log of the relative change in condition from the baseline for the halving (a) and doubling (b) 'climate' scenario. Large reductions in condition are dark purple, large improvements are dark green, and no change is white.") 
 
@@ -1288,6 +1353,16 @@ DiagrammeR::render_graph(aggNetworkdown_sub_rel)
 DiagrammeR::render_graph(aggNetworkup_sub_rel)
 net_legend
 ```
+
+::: {#fig-network-subset layout="[[90,10], [90, -10]]"}
+![a](../images/aggNetworkdown_sub_rel202311151651.png){#fig-agd}
+
+![b](../images/aggNetworkup_sub_legend.png){#fig-agl}
+
+![c](../images/aggNetworkup_sub_rel202311151651.png){#fig-agu}
+
+Subset of the causal network for gauge `r gauges_to_plot[2]` relevant to a selection of `r length(sampleenvobj)` environmental objectives. A version with all environmental objectives is given in the supplemental information. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the log of the relative change in condition from the baseline for the halving (a) and doubling (b) 'climate' scenario. Large reductions in condition are dark purple, large improvements are dark green, and no change is white.
+:::
 
 # Implications and conclusions
 
@@ -1518,9 +1593,10 @@ qual_heatmap
 
 ### Causal networks
 
-The causal networks shown in the text have been subset for readability, and baselined. Here, we have the
+The causal networks shown in the text have been subset for readability, and baselined. Here, we have the ones they're based on. *I've turned these off for word because diagrammer hates word and I don't have the energy to do a workaround*.
 
 ```{r}
+#| echo: !expr knitr::is_html_output()
 #| label: fig-full-networks
 #| fig-cap: !expr glue::glue("Subset of the causal network for gauge {gauges_to_plot[2]} for all environmental objectives. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the condition for the halving (a), baseline (b), and doubling (c) 'climate' scenario. Low condition is dark blue, high is light yellow.")
 #| 
@@ -1559,6 +1635,8 @@ DiagrammeR::render_graph(aggNetworkup)
 The same set of nodes as in the text, but the actual condition values, rather than relativized.
 
 ```{r}
+#| echo: !expr knitr::is_html_output()
+#| label: fig-network-notbaseline
 
 
 aggNetworkdown_sub <- nodes_with_vals |> 
