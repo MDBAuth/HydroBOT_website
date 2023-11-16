@@ -50,15 +50,14 @@ keywords:
  - Management modeling
  - Climate change
  - Climate adaptation
+ 
 date: last-modified
-bibliography: references.bib
-number-sections: true
-echo: false
 
-# format:
-#   docx:
-#     toc: true
-#     number-sections: true
+bibliography: references.bib
+
+number-sections: true
+
+echo: false
 ---
 
 ```{r}
@@ -257,7 +256,7 @@ scene_pal <- make_pal(unique(scenehydros$scenario),
 
 # Introduction
 
-Water management in large river systems typically targets a wide range of desired values. For example, in the Murray-Darling Basin, Australia, the objective of water management is to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies ([@murray-darlingbasinauthority2011]). These values are not unique to Australia; water is managed to protect the social, economic, environmental and cultural values of communities worldwide ([e.g. @stern2019; @kaye-blake2014]) *neither of these are actually papers, and we need something from Europe/Asia*. That these values are the targets of water management implies a hypothesized dependence on water, but in many cases these dependencies are not well-defined and management proceeds under the relatively simple assumption that if water is provided, these targets will improve.
+Water management in large river systems typically targets a wide range of desired values. For example, in the Murray-Darling Basin, Australia, the objective of water management is to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies [@murray-darlingbasinauthority2011]. These values are not unique to Australia; water is managed to protect the social, economic, environmental and cultural values of communities worldwide [e.g. @stern2019; @kaye-blake2014] *neither of these are actually papers, and we need something from Europe/Asia*. That these values are the targets of water management implies a hypothesized dependence on water, but in many cases these dependencies are not well-defined and management proceeds under the relatively simple assumption that if water is provided, these targets will improve.
 
 Water managers typically have a limited range of levers that primarily affect hydrology, e.g. flow releases from dams or inundation of wetlands. When non-hydrologic levers are available, such as water trading rules in the Murray-Darling Basin, their impact is still often assessed on how they alter hydrologic conditions- the spatio-temporal patterns of flow in the system. Further, hydrologic modelling is often better-integrated with management workflows than models of other values. In part, this is due to the availability of large-scale physical models that provide robust ability to model flows as they arise from natural drivers such as rainfall and capture infrastructure such as dams and diversions. While complex, these models have relatively high precision and relatively few outcomes compared to models of ecological or economic responses, for example. The impact of particular management actions such as dam releases on hydrology are well-understood and captured by the hydrograph, allowing accurate targeting of particular aspects of the flow regime. While these proximate models of system state and impact of management actions are invaluable, they do not provide the necessary information to assess the status of the range of flow-dependent values and targets.
 
@@ -265,7 +264,7 @@ Assessing values as they respond to flow and management actions requires models 
 
 Exemplifying these issues, the Murray-Darling Basin Authority (MDBA) is the federal body charged with water management in the Murray-Darling Basin, Australia *do we need to say the usual stuff about how big it is, economic importance, etc?*. The MDBA has statutory obligations to manage water to maintain a healthy working river that supports productive and resilient water-dependent industries, healthy and resilient ecosystems, and communities with access to sufficient and reliable water supplies ([@murray-darlingbasinauthority2011]). Moreover, the state of the basin is required to be assessed annually *right?* and updates to the Basin Plan made at *XX* year timeframes. Beyond these requirements, the MDBA has an increasing focus on assessing system response to climate change and possible adaptation actions that may be taken by the Authority itself or other stakeholders in the Basin. Taken together, these management goals require a holistic modeling approach that integrates across values and is adaptable to these various management needs while also simplifying repeated, ongoing use.
 
-The MDBA has access to robust hydrologic models describing flows in the system and responses to current management practices, and these models are under continual use, development, and improvement (*CITE*). Despite the need for ongoing assessment and forward planning across a range of values, models of the responses to those hydrologic conditions are patchy, only represent some values, and have been developed and used in a more ad-hoc approach rather than integrated with each other or the hydrologic models. In this paper, we describe an integrated modelling 'toolkit' to address these water management needs in the Murray-Darling Basin, Australia, hereafter referred to as *FANCYACRONYM*.
+The MDBA has access to robust hydrologic models describing flows in the system and responses to current management practices, and these models are under continual use, development, and improvement (*CITE*). Despite the need for ongoing assessment and forward planning across a range of values, models of the responses to those hydrologic conditions are patchy, only represent some values, and have been developed and used in a more ad-hoc approach rather than integrated with each other or the hydrologic models. In this paper, we describe an integrated modelling 'toolkit' to address these water management needs in the Murray-Darling Basin, Australia, hereafter referred to as *CLEVERACRONYM*.
 
 The toolkit described here greatly improves the capacity of the MDBA to assess outcomes across a range of values, provides the structure to adapt and include additional values as models become available, and addresses a number of issues with current assessment practices and modelling approaches. By providing a single, consistent interface to a range of response models we avoid the need to manually run models separately and we abstract their different interfaces, languages, and idiosyncracies. Moreover, the toolkit design is highly modular, built to allow the integration of new response models with limited additional updates to the toolkit itself. Continuing with this consistency, the toolkit provides a standard set of synthesis approaches and functions that target management-relevant analysis and interpretation of outcomes from these disparate models with a common approach and design language. Because the need for assessing outcomes is nearly universal in water management, and not limited to a particular scenario or project, the toolkit is designed with strong scenario-comparison capabilities but is agnostic to what those scenarios represent. For a similar reason, the standardised synthesis and outputs are highly flexible, allowing the user to choose the most relevant outputs for different management needs.
 
@@ -329,7 +328,8 @@ Here we describe the specific implementation of each component of the toolkit il
 
 comp_tab <- readr::read_csv('presentation_paper/component_table.csv', show_col_types = FALSE)
 
-huxtable::huxtable(comp_tab) |> theme_article()
+knitr::kable(comp_tab)
+# huxtable::huxtable(comp_tab) |> theme_article()
 ```
 
 ### Controller
@@ -408,16 +408,28 @@ edges <- make_edges(dflist = causal_ewr,
 nodes <- make_nodes(edges)
 
 
+# To work with both html and word, save out and read back in.
 causal_example <- make_causal_plot(nodes,
                  edges,
                  focalnodes = filter(nodes, NodeType == "ewr_code")$Name,
                  edge_pal = 'black',
                  node_pal = list(NodeType = 'nationalparkcolors::MtRainier'),
-                 render = FALSE) 
+                 render = FALSE,
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'causal_structure') 
 
- 
-causal_example |> 
-  DiagrammeR::render_graph()
+# if (knitr::is_html_output()) {
+  # causal_example |> 
+  # DiagrammeR::render_graph()
+# } else {
+#   knitr::include_graphics("images/causal_structure.png")
+# }
+
+causal_structure <- png::readPNG('images/causal_structure.png')
+causal_structure_grob <- grid::rasterGrob(causal_structure, interpolate = TRUE)
+patchwork::wrap_plots(causal_structure_grob)
+
 ```
 
 #### Module standardization
@@ -518,7 +530,7 @@ climate_scenes <- scenarios |>
          `Flow multiplier` = flow_multiplier) |>
   distinct()
 
-# Huxtables look better, but won't go side-by-side
+# Huxtables look better, but won't go side-by-side. and despite saying they work better in word, they're much worse.
 
 # huxtable::huxtable(climate_scenes) |> theme_article()
 # huxtable::huxtable(adapt_scenes) |> theme_article()
@@ -1275,6 +1287,7 @@ basenodes <- nodes_with_vals |>
 ```{r}
 #| label: make-networks
 #| include: false
+#| warning: false
 # use a subset again
 aggNetworkdown_sub_rel <- basenodes |> 
   dplyr::filter(flow_multiplier == 0.5 & flow_addition == 0) |> 
@@ -1338,31 +1351,37 @@ pal_ggc <- ggplot(limtc, aes(x = condition, y = y, color = condition)) + geom_po
 net_legend <- ggpubr::get_legend(pal_ggc) |> 
   ggpubr::as_ggplot()
 
-ggsave('images/aggNetworkup_sub_legend.png', width = 1, height = 2, units = 'cm')
+# ggsave('images/aggNetworkup_sub_legend.png', width = 1, height = 2, units = 'cm')
 ```
 
 *I'll make this plot work better. It's cobbled together from saved objects for now. We need a way to do legends on the plots. And panels. Diagrammer is great for html but otherwise a disaster. I need to actually fix the plot code. Leaving it ugly for now.*
 
 ```{r}
-#| eval: false
 #| label: fig-network-subset
 #| fig-cap: !expr glue::glue("Subset of the causal network for gauge {gauges_to_plot[2]} relevant to a selection of {length(sampleenvobj)} environmental objectives. A version with all environmental objectives is given in the supplemental information. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the log of the relative change in condition from the baseline for the halving (a) and doubling (b) 'climate' scenario. Large reductions in condition are dark purple, large improvements are dark green, and no change is white.") 
 
+# if (knitr::is_html_output()) {
+  # DiagrammeR::render_graph(aggNetworkdown_sub_rel)
+  # DiagrammeR::render_graph(aggNetworkup_sub_rel)
+  # net_legend
+# } else {
+#   knitr::include_graphics("images/aggNetworkdown_sub_rel.png")
+#   knitr::include_graphics("images/aggNetworkup_sub_rel.png")
+#   knitr::include_graphics("images/aggNetworkup_sub_legend.png")
+# }
+  
+aggNetworkdown_sub_rel_grob <- png::readPNG('images/aggNetworkdown_sub_rel.png') |>
+  grid::rasterGrob(interpolate = TRUE)
+aggNetworkup_sub_rel_grob <- png::readPNG('images/aggNetworkup_sub_rel.png') |>
+  grid::rasterGrob(interpolate = TRUE)
 
-DiagrammeR::render_graph(aggNetworkdown_sub_rel)
-DiagrammeR::render_graph(aggNetworkup_sub_rel)
-net_legend
+patchwork::wrap_plots(aggNetworkdown_sub_rel_grob, 
+                      aggNetworkup_sub_rel_grob, 
+                      net_legend,
+                      ncol = 2, widths = c(9, 1), byrow = FALSE) +
+  plot_annotation(tag_levels = list(c('a', 'b', '')))
+
 ```
-
-::: {#fig-network-subset layout="[[90,10], [90, -10]]"}
-![a](../images/aggNetworkdown_sub_rel202311151651.png){#fig-agd}
-
-![b](../images/aggNetworkup_sub_legend.png){#fig-agl}
-
-![c](../images/aggNetworkup_sub_rel202311151651.png){#fig-agu}
-
-Subset of the causal network for gauge `r gauges_to_plot[2]` relevant to a selection of `r length(sampleenvobj)` environmental objectives. A version with all environmental objectives is given in the supplemental information. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the log of the relative change in condition from the baseline for the halving (a) and doubling (b) 'climate' scenario. Large reductions in condition are dark purple, large improvements are dark green, and no change is white.
-:::
 
 # Implications and conclusions
 
@@ -1424,6 +1443,11 @@ concerning which adaptation options should be implemented under changing climate
 
 The development of the toolkit is necessary to better understand the impacts of climate change and the different adaptation options in response to climate change, on water-dependent social, economic, environmental and cultural values. It incorporates new and existing information, knowledge and models to enable transparent, repeatable assessments of impacts and adaptation to future climates. In summary, the toolkit ingests scenarios (for example, climate or flow timeseries), feeds them to a response model (such as the EWR tool), reports outcomes and enables comparisons among scenarios. It uses the links in the response models for visualisation of the complex inter-relationships between water-dependent outcomes. This aids transparency and improves communication of the outputs.
 
+# References
+
+::: {#refs}
+:::
+
 # Appendices
 
 I'm unsure about these. Might need fewer, might need more.
@@ -1443,8 +1467,9 @@ ewrs_in_pyewr |>
   filter(Gauge %in% gauges_to_plot) |> 
   # Why these? Same as Georgia had
   select(Catchment = LTWPShortName, Gauge, Code, StartMonth, EndMonth, TargetFrequency, TargetFrequencyMax, TargetFrequencyMin, EventsPerYear, Duration, MinSpell, FlowThresholdMin, FlowThresholdMax, `MaxInter-event`) |>  
-  huxtable::huxtable() |>
-  theme_article()
+  # huxtable::huxtable() |>
+  # theme_article()
+  knitr::kable()
 ```
 
 ## Baselined hydrographs {#sec-baselining}
@@ -1514,11 +1539,11 @@ base_hydro_adapt
 
 ### Map aggregation {#sec-map-versions}
 
-The goal here is to show the values at the sdl scale, but also to show how the gauges aggregate to that scale. See which one works best, and make suggestions for improvements, please. In the text, @fig-gauge-to-sdl-map has just a large number of env_objs and scenarios in a and the gauges on grey sdl units in b. @fig-gauge-to-sdl-map-few is similar, it just reduces the panels in a so it's easier to see which matches b. @fig-gauge-to-sdl-map-stepwise-agg shows both steps of the gauge to sdl aggregation in panel b. @fig-gauge-to-sdl-map-gaugecolor has the gauges and sdl colors overlaid in b, but that requires using different color ramps for the same variable, which is confusing. @fig-gauge-to-sdl-map-gaugecolor-same does the same overlay, but uses the same colorramp, which is better for meaning, but worse to see what's happening (maybe?).
+The goal here is to show the values at the sdl scale, but also to show how the gauges aggregate to that scale. See which one works best, and make suggestions for improvements, please. In the text, @fig-gauge-to-sdl-map has just a large number of env_objs and scenarios in a and the gauges on grey sdl units in b. @fig-gauge-to-sdl-map-few is similar, it just reduces the panels so it's easier to see which matches b. @fig-gauge-to-sdl-map-stepwise-agg shows both steps of the gauge to sdl aggregation in panel b. @fig-gauge-to-sdl-map-gaugecolor has the gauges and sdl colors overlaid in b, but that requires using different color ramps for the same variable, which might be confusing. @fig-gauge-to-sdl-map-gaugecolor-same does the same overlay, but uses the same colorramp, which is better for meaning, but worse to see what's happening (maybe?).
 
 ```{r}
 #| label: fig-gauge-to-sdl-map-few
-#| fig-cap: "" 
+#| fig-cap: "reduces the panels so it's easier to see which matches b." 
 
 # reduced set of objectives and scenarios- closer to the next option
 (ef_maps_few + theme(legend.position = 'none') ) + 
@@ -1533,7 +1558,7 @@ The goal here is to show the values at the sdl scale, but also to show how the g
 
 ```{r}
 #| label: fig-gauge-to-sdl-map-stepwise-agg
-#| fig-cap: "" 
+#| fig-cap: "both steps of the gauge to sdl aggregation in panel b." 
 
 
 # buildup agg demo- gauges on grey and sdl outcome
@@ -1554,7 +1579,7 @@ gauge_to_sdl <- (ef_gauges +
 
 ```{r}
 #| label: fig-gauge-to-sdl-map-gaugecolor
-#| fig-cap: "" 
+#| fig-cap: "gauges and sdl colors overlaid in b, but that requires using different color ramps for the same variable, which might be confusing." 
 
 
 # gauges in a different color ramp
@@ -1569,7 +1594,7 @@ gauge_to_sdl <- (ef_gauges +
 
 ```{r}
 #| label: fig-gauge-to-sdl-map-gaugecolor-same
-#| fig-cap: "" 
+#| fig-cap: "overlay, but uses the same colorramp, which is better for meaning, but worse to see what's happening (maybe?)." 
 
 
 # gauges in a different color ramp
@@ -1596,7 +1621,6 @@ qual_heatmap
 The causal networks shown in the text have been subset for readability, and baselined. Here, we have the ones they're based on. *I've turned these off for word because diagrammer hates word and I don't have the energy to do a workaround*.
 
 ```{r}
-#| echo: !expr knitr::is_html_output()
 #| label: fig-full-networks
 #| fig-cap: !expr glue::glue("Subset of the causal network for gauge {gauges_to_plot[2]} for all environmental objectives. The data is at the gauge scale for the first and second columns (EWRs and environmental objectives) and at the SDL unit scale for the third (Target groups). Thus, the final set of nodes contain information from other gauges that are not shown here for clarity. Colors represent the condition for the halving (a), baseline (b), and doubling (c) 'climate' scenario. Low condition is dark blue, high is light yellow.")
 #| 
@@ -1607,7 +1631,10 @@ aggNetworkdown <- nodes_with_vals |>
                  node_pal = list(value = achieve_pal),
                  node_colorset = 'ewr_achieved',
                  setLimits = c(0,1),
-                 render = FALSE)
+                 render = FALSE,
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'aggNetworkdown')
 
 aggNetworkbase <- nodes_with_vals |> 
   dplyr::filter(flow_multiplier == 1 & flow_addition == 0) |> 
@@ -1616,7 +1643,10 @@ aggNetworkbase <- nodes_with_vals |>
                  node_pal = list(value = achieve_pal),
                  node_colorset = 'ewr_achieved',
                  setLimits = c(0,1),
-                 render = FALSE)
+                 render = FALSE,
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'aggNetworkbase')
 
 aggNetworkup <- nodes_with_vals |> 
   dplyr::filter(flow_multiplier == 2 & flow_addition == 0) |> 
@@ -1625,19 +1655,49 @@ aggNetworkup <- nodes_with_vals |>
                  node_pal = list(value = achieve_pal),
                  node_colorset = 'ewr_achieved',
                  setLimits = c(0,1),
-                 render = FALSE)
+                 render = FALSE,
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'aggNetworkup')
 
-DiagrammeR::render_graph(aggNetworkdown)
-DiagrammeR::render_graph(aggNetworkbase)
-DiagrammeR::render_graph(aggNetworkup)
+# DiagrammeR::render_graph(aggNetworkdown)
+# DiagrammeR::render_graph(aggNetworkbase)
+# DiagrammeR::render_graph(aggNetworkup)
+
+# make the legend
+lim_full <- tibble(condition = seq(from = 0, to = 1, by = 0.1), y = 1)
+
+pal_full <- ggplot(lim_full, aes(x = condition, y = y, color = condition)) + geom_point() +
+  paletteer::scale_color_paletteer_c(achieve_pal)
+
+fullnet_legend <- ggpubr::get_legend(pal_full) |> 
+  ggpubr::as_ggplot()
+
+aggNetworkdown_grob <- png::readPNG('images/aggNetworkdown.png') |>
+  grid::rasterGrob(interpolate = TRUE)
+aggNetworkbase_grob <- png::readPNG('images/aggNetworkbase.png') |>
+  grid::rasterGrob(interpolate = TRUE)
+aggNetworkup_grob <- png::readPNG('images/aggNetworkup.png') |>
+  grid::rasterGrob(interpolate = TRUE)
+
+layout <- "
+AAAAABBBBB
+CCCCC##D##
+"
+patchwork::wrap_plots(aggNetworkdown_grob, 
+                      aggNetworkbase_grob, 
+                      aggNetworkup_grob,
+                      fullnet_legend,
+                      design = layout, byrow = FALSE) +
+  plot_annotation(tag_levels = list(c('a', 'b', 'c')))
+
 ```
 
 The same set of nodes as in the text, but the actual condition values, rather than relativized.
 
 ```{r}
-#| echo: !expr knitr::is_html_output()
 #| label: fig-network-notbaseline
-
+#| fig-cap: "Causal networks as in @fig-network-subset, but with the raw condition values for the halved (a), baseline (b), and doubled (c) scenarios instead of relativized to the baseline."
 
 aggNetworkdown_sub <- nodes_with_vals |> 
   dplyr::filter(flow_multiplier == 0.5 & flow_addition == 0) |> 
@@ -1647,7 +1707,10 @@ aggNetworkdown_sub <- nodes_with_vals |>
                  node_pal = list(value = achieve_pal),
                  node_colorset = 'ewr_achieved',
                  setLimits = c(0,1),
-                 render = FALSE)
+                 render = FALSE,
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'aggNetworkdown_sub')
 
 aggNetworkbase_sub <- nodes_with_vals |> 
   dplyr::filter(flow_multiplier == 1 & flow_addition == 0) |> 
@@ -1657,7 +1720,10 @@ aggNetworkbase_sub <- nodes_with_vals |>
                  node_pal = list(value = achieve_pal),
                  node_colorset = 'ewr_achieved',
                  setLimits = c(0,1),
-                 render = FALSE)
+                 render = FALSE,
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'aggNetworkbase_sub')
 
 aggNetworkup_sub <- nodes_with_vals |> 
   dplyr::filter(flow_multiplier == 2 & flow_addition == 0) |> 
@@ -1667,11 +1733,33 @@ aggNetworkup_sub <- nodes_with_vals |>
                  node_pal = list(value = achieve_pal),
                  node_colorset = 'ewr_achieved',
                  setLimits = c(0,1),
-                 render = FALSE)
+                 render = FALSE,
+                 save = TRUE,
+                 savedir = 'images',
+                 savename = 'aggNetworkup_sub')
 
-DiagrammeR::render_graph(aggNetworkdown_sub)
-DiagrammeR::render_graph(aggNetworkbase_sub)
-DiagrammeR::render_graph(aggNetworkup_sub)
+# DiagrammeR::render_graph(aggNetworkdown_sub)
+# DiagrammeR::render_graph(aggNetworkbase_sub)
+# DiagrammeR::render_graph(aggNetworkup_sub)
+
+aggNetworkdown_sub_grob <- png::readPNG('images/aggNetworkdown_sub.png') |>
+  grid::rasterGrob(interpolate = TRUE)
+aggNetworkbase_sub_grob <- png::readPNG('images/aggNetworkbase_sub.png') |>
+  grid::rasterGrob(interpolate = TRUE)
+aggNetworkup_sub_grob <- png::readPNG('images/aggNetworkup_sub.png') |>
+  grid::rasterGrob(interpolate = TRUE)
+
+layout2 <- "
+AAAAAAAAAAA#
+BBBBBBBBBBBD
+CCCCCCCCCCC#
+"
+patchwork::wrap_plots(aggNetworkdown_sub_grob, 
+                      aggNetworkbase_sub_grob, 
+                      aggNetworkup_sub_grob,
+                      fullnet_legend,
+                      design = layout2) +
+  plot_annotation(tag_levels = list(c('a', 'b', 'c')))
 ```
 
 ------------------------------------------------------------------------

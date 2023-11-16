@@ -19,6 +19,7 @@ _output
 scenario_example/
 more_scenarios/
 *.png
+*.pdf
 
 scenario_creation/test_scaling.rdata
 
