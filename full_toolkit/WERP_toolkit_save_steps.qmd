@@ -161,6 +161,8 @@ if (params$REBUILD_DATA) {
 
 ## Aggregator
 
+Because we're aggregating EWRs, which might be defined for multiple planning units from the same gauge, we use `group_until` to group by them until we aggregate up to larger spatial scales.
+
 ```{r}
 #| error: true
 
@@ -170,6 +172,7 @@ if (params$REBUILD_DATA) {
              geopath = bom_basin_gauges,
              causalpath = causal_ewr,
              groupers = agg_groups,
+             group_until = list('planning_unit_name' = is_notpoint),
              aggCols = agg_var,
              aggsequence = aggseq,
              funsequence = funseq,
@@ -184,6 +187,7 @@ if (params$REBUILD_DATA) {
              geopath = bom_basin_gauges,
              causalpath = causal_ewr,
              groupers = agg_groups,
+             group_until = list('planning_unit_name' = is_notpoint),
              aggCols = agg_var,
              aggsequence = aggseq_ewr,
              funsequence = funseq_ewr,
@@ -210,30 +214,39 @@ agged_data <- readRDS(file.path(agg_results, 'achievement_aggregated.rds'))
 scenarios <- jsonlite::read_json(file.path(hydro_dir, 
                                            'scenario_metadata.json')) |> 
   tibble::as_tibble() |> 
-  tidyr::unnest(cols = everything())
+  tidyr::unnest(cols = everything()) |> 
+  dplyr::mutate(scenario = stringr::str_c(scenario_name, '_', scenario_name))
 
 
-sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
+sceneorder <- forcats::fct_reorder(scenarios$scenario, scenarios$flow_multiplier)
 
-scene_pal <- make_pal(unique(scenarios$scenario_name), 
+scene_pal <- make_pal(unique(scenarios$scenario), 
                       palette = 'ggsci::default_igv', 
                       refvals = 'base', refcols = 'black')
 
+agged_data <- purrr::map(agged_data, \(x) dplyr::left_join(x, scenarios))
+```
+
+```{r}
 # Quick plot
 agged_data$sdl_units |>
-    dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
+    dplyr::filter(env_obj == 'NF1' &
+                    flow_multiplier %in% c(0.8, 1, 1.5) &
+                    flow_addition %in% c(1, 250, 6500)) |> # Need to reduce dimensionality
+    plot_outcomes(outcome_col = 'ewr_achieved',
+                          plot_type = 'map',
                           colorset = 'ewr_achieved',
                           pal_list = list('scico::berlin'),
-                          facet_wrapper = 'scenario',
-                          scene_pal = scene_pal,
-                          sceneorder = sceneorder,
+                          facet_row = 'flow_addition',
+                  facet_col = 'flow_multiplier',
                           underlay_list = 'basin',
-                          overlay_list = list(overlay = dplyr::filter(agged_data$env_obj, env_obj == 'NF1'),
-                                              overlay_pal = 'scico::oslo',
-                                              overlay_ycol = 'ewr_achieved',
-                                              clip = TRUE)) +
+                          overlay_list = list(
+                            overlay = agged_data$env_obj |> 
+                              dplyr::filter(env_obj == 'NF1' &
+                                              flow_multiplier %in% c(0.8, 1, 1.5) &
+                                              flow_addition %in% c(1, 250, 6500)),
+                            pal_list = 'scico::oslo',
+                            outcome_col = 'ewr_achieved',
+                            clip = TRUE)) +
     ggplot2::theme(legend.position = 'bottom')
 ```
