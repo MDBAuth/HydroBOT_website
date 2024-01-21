@@ -96,11 +96,22 @@ Fundamentally, the aggregator needs paths and two lists
 
 Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
 
+The ewr codes are defined at gauges, but are intended to inform planning units. A single gauge might inform several planning units (and a single planning unit might encompass several gauges). Thus, we would typically immediately move to the planning unit scale after EWR-codes for the EWRs.
+
+Because the planning units span multiple sdl units, but we know all the gauges are in the Namoi, Lachlan, and Macquarie, we clip the sdl units we use for aggregation. It would not be appropriate to report on others base only on the small planning unit overlaps, rather than assessing all their gauges.
+
+```{r}
+sdl_clip <- sdl_units |>    
+  dplyr::filter(SWSDLName %in%                    
+                  c('Lachlan', 'Macquarie–Castlereagh', 'Namoi'))
+```
+
 ```{r}
 
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               planning_unit = planning_units,
                env_obj =  c('ewr_code', "env_obj"),
-               sdl_units = sdl_units,
+               sdl_units = sdl_clip,
                Specific_goal = c('env_obj', "Specific_goal"),
                catchment = cewo_valleys,
                Objective = c('Specific_goal', 'Objective'),
@@ -108,33 +119,42 @@ aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                target_5_year_2024 = c('Objective', 'target_5_year_2024'))
 
 
-funseq <- list(c('CompensatingFactor'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               list(wm = ~weighted.mean(., w = area, 
-                                        na.rm = TRUE)),
-               c('ArithmeticMean'),
-               
-               list(wm = ~weighted.mean(., w = area, 
-                                    na.rm = TRUE)),
-               c('ArithmeticMean'))
+funseq <- list('CompensatingFactor',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean')
 
 ```
 
-We may want to aggregate in different ways; it is possible to include multiple aggregation sequences. Here, we skip the env_obj and go straight to SDL units and then to Targets. This would require using env_obj first if we used `causal_ewr` as-is, but we can modify the first two sheets to get straight there from ewr_codes. We can also put this in its own directory
+We may want to aggregate in different ways; it is possible to include multiple aggregation sequences. Here, we skip the env_obj and go straight to SDL units and then to Targets. We don't need the intervening planning unit step here becuase each gauge x planning unit combination has a row in the EWR table, and so they are appropriately weighted already going into the SDL unit if the question is just about the proportion of EWRs in the sdl unit. This would require using env_obj first if we used `causal_ewr` as-is, but we can modify the first two sheets to get straight there from ewr_codes. This is only appropriate in certain situations (just putting the EWRs in a Target bucket, ignoring their spatial definitions and environmental objectives, and associated potentail uneven weighting). We can also put this in its own directory
 
 ```{r}
 aggseq_ewr <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
-               env_obj = c('ewr_code', "env_obj"),
-               sdl_units = sdl_units,
-               Target = c('env_obj', 'Target'))
+               sdl_units = sdl_clip,
+               Target = c('ewr_code', 'Target'))
 
 
 funseq_ewr <- list(c('CompensatingFactor'),
                c('ArithmeticMean'),
-               c('ArithmeticMean'),
                c('ArithmeticMean'))
+
+# Naively joining the first two dataframes would include planning unit info, but we've already jumped to sdl, so cut those out first.
+nopue2o <- causal_ewr$ewr2obj |> 
+  dplyr::select(ewr_code, env_obj) |> 
+  dplyr::distinct()
+nopuo2t <- causal_ewr$obj2target |> 
+  dplyr::select(env_obj, Target) |> 
+  dplyr::distinct()
+
+causal_ewr2tar <- list(ewr2obj = causal_ewr$ewr2obj,
+                       pooled2target = dplyr::left_join(nopue2o, 
+                                                        nopuo2t) |> 
+  dplyr::distinct())
 
 sdl_target_agg_dir <- file.path(agg_results, 'sdl_target')
 ```
@@ -163,6 +183,8 @@ if (params$REBUILD_DATA) {
 
 Because we're aggregating EWRs, which might be defined for multiple planning units from the same gauge, we use `group_until` to group by them until we aggregate up to larger spatial scales.
 
+We add a `pseudo_spatial = 'planning_unit'` argument where we have a planning unit to handle the situation where the EWRs are spatially referenced to gauges, but have rows for gauges and planning units, and the gauges may affect several planning units. This uses `dplyr::left_join()` instead of a spatial join to get to the planning unit scale, and then aggregates to planning unit.
+
 ```{r}
 #| error: true
 
@@ -172,22 +194,24 @@ if (params$REBUILD_DATA) {
              geopath = bom_basin_gauges,
              causalpath = causal_ewr,
              groupers = agg_groups,
-             group_until = list('planning_unit_name' = is_notpoint),
+             group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint),
              aggCols = agg_var,
              aggsequence = aggseq,
              funsequence = funseq,
+             pseudo_spatial = 'planning_unit',
              saveintermediate = TRUE,
              namehistory = FALSE,
              keepAllPolys = FALSE,
              returnList = aggReturn,
              savepath = agg_results)
   
+  # note this one uses the re-formulated causal relationships to get at the direct pooling.
     aggout_ewr <- read_and_agg(datpath = ewr_results,
              type = aggType,
              geopath = bom_basin_gauges,
-             causalpath = causal_ewr,
+             causalpath = causal_ewr2tar,
              groupers = agg_groups,
-             group_until = list('planning_unit_name' = is_notpoint),
+             group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint),
              aggCols = agg_var,
              aggsequence = aggseq_ewr,
              funsequence = funseq_ewr,
@@ -227,12 +251,14 @@ scene_pal <- make_pal(unique(scenarios$scenario),
 agged_data <- purrr::map(agged_data, \(x) dplyr::left_join(x, scenarios))
 ```
 
+Note the gauge achievement here is shifted a theme scale from the sdl units, because the planning unit scale is in between- this is just here to make sure we're getting results at various spatial scales.
+
 ```{r}
 # Quick plot
 agged_data$sdl_units |>
     dplyr::filter(env_obj == 'NF1' &
                     flow_multiplier %in% c(0.8, 1, 1.5) &
-                    flow_addition %in% c(1, 250, 6500)) |> # Need to reduce dimensionality
+                    flow_addition %in% c(0, 250, 6500)) |> # Need to reduce dimensionality
     plot_outcomes(outcome_col = 'ewr_achieved',
                           plot_type = 'map',
                           colorset = 'ewr_achieved',
@@ -241,10 +267,10 @@ agged_data$sdl_units |>
                   facet_col = 'flow_multiplier',
                           underlay_list = 'basin',
                           overlay_list = list(
-                            overlay = agged_data$env_obj |> 
-                              dplyr::filter(env_obj == 'NF1' &
-                                              flow_multiplier %in% c(0.8, 1, 1.5) &
-                                              flow_addition %in% c(1, 250, 6500)),
+                            overlay = agged_data$ewr_code |> 
+                              dplyr::filter(flow_multiplier %in% c(0.8, 1, 1.5) &
+                                              flow_addition %in% c(0, 250, 6500)) |> 
+                              dplyr::summarise(ewr_achieved = mean(ewr_achieved, na.rm = TRUE), .by = geometry),
                             pal_list = 'scico::oslo',
                             outcome_col = 'ewr_achieved',
                             clip = TRUE)) +
