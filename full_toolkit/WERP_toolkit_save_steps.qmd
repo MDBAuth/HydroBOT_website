@@ -129,9 +129,10 @@ funseq <- list('CompensatingFactor',
                'SpatialWeightedMean',
                'ArithmeticMean')
 
+complex_agg_dir <- file.path(agg_results, 'complex_aggregations')
 ```
 
-We may want to aggregate in different ways; it is possible to include multiple aggregation sequences. Here, we skip the env_obj and go straight to SDL units and then to Targets. We don't need the intervening planning unit step here becuase each gauge x planning unit combination has a row in the EWR table, and so they are appropriately weighted already going into the SDL unit if the question is just about the proportion of EWRs in the sdl unit. This would require using env_obj first if we used `causal_ewr` as-is, but we can modify the first two sheets to get straight there from ewr_codes. This is only appropriate in certain situations (just putting the EWRs in a Target bucket, ignoring their spatial definitions and environmental objectives, and associated potentail uneven weighting). We can also put this in its own directory
+We may want to aggregate in different ways; it is possible to include multiple aggregation sequences. Here, we skip the env_obj and go straight to SDL units and then to Targets. We don't need the intervening planning unit step here because each gauge x planning unit combination has a row in the EWR table, and so they are appropriately weighted already going into the SDL unit if the question is just about the proportion of EWRs in the sdl unit. This would require using env_obj first if we used `causal_ewr` as-is, but we can modify the first two sheets to get straight there from ewr_codes. This is only appropriate in certain situations (just putting the EWRs in a Target bucket, ignoring their spatial definitions and environmental objectives, and associated potential uneven weighting). We can also put this in its own directory
 
 ```{r}
 aggseq_ewr <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
@@ -155,6 +156,28 @@ causal_ewr2tar <- list(ewr2obj = causal_ewr$ewr2obj,
                        pooled2target = dplyr::left_join(nopue2o, 
                                                         nopuo2t) |> 
   dplyr::distinct())
+
+ewr_pooled_agg_dir <- file.path(agg_results, 'pooled_ewr')
+```
+
+In general, we will likely want to go from EWRs to their plannign units, then assess environmental objectives, and then get to SDL units or Specific goals (or vice-versa), and then Targets or longer-term Objectives). A reasonable standard aggregation is:
+
+```{r}
+target_aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+               planning_unit = planning_units,
+               env_obj =  c('ewr_code', "env_obj"),
+               sdl_units = sdl_clip,
+               Specific_goal = c('env_obj', "Specific_goal"),
+               Target = c('Specific_goal', 'Target'),
+               mdb = basin)
+
+target_funseq <- list('CompensatingFactor',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean')
 
 sdl_target_agg_dir <- file.path(agg_results, 'sdl_target')
 ```
@@ -194,7 +217,8 @@ if (params$REBUILD_DATA) {
              geopath = bom_basin_gauges,
              causalpath = causal_ewr,
              groupers = agg_groups,
-             group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint),
+             group_until = list(planning_unit_name = is_notpoint, 
+                                gauge = is_notpoint),
              aggCols = agg_var,
              aggsequence = aggseq,
              funsequence = funseq,
@@ -203,7 +227,7 @@ if (params$REBUILD_DATA) {
              namehistory = FALSE,
              keepAllPolys = FALSE,
              returnList = aggReturn,
-             savepath = agg_results)
+             savepath = complex_agg_dir)
   
   # note this one uses the re-formulated causal relationships to get at the direct pooling.
     aggout_ewr <- read_and_agg(datpath = ewr_results,
@@ -211,10 +235,27 @@ if (params$REBUILD_DATA) {
              geopath = bom_basin_gauges,
              causalpath = causal_ewr2tar,
              groupers = agg_groups,
-             group_until = list(planning_unit_name = is_notpoint, gauge = is_notpoint),
+             group_until = list(planning_unit_name = is_notpoint,
+                                gauge = is_notpoint),
              aggCols = agg_var,
              aggsequence = aggseq_ewr,
              funsequence = funseq_ewr,
+             saveintermediate = TRUE,
+             namehistory = FALSE,
+             keepAllPolys = FALSE,
+             returnList = aggReturn,
+             savepath = ewr_pooled_agg_dir)
+    
+        aggout_target <- read_and_agg(datpath = ewr_results,
+             type = aggType,
+             geopath = bom_basin_gauges,
+             causalpath = causal_ewr,
+             groupers = agg_groups,
+             group_until = list(planning_unit_name = is_notpoint, 
+                                gauge = is_notpoint),
+             aggCols = agg_var,
+             aggsequence = target_aggseq,
+             funsequence = target_funseq,
              saveintermediate = TRUE,
              namehistory = FALSE,
              keepAllPolys = FALSE,
@@ -232,7 +273,7 @@ To check here that we did in fact run the toolkit, we read in the data and make 
 
 ```{r}
 #| message: false
-agged_data <- readRDS(file.path(agg_results, 'achievement_aggregated.rds'))
+agged_data <- readRDS(file.path(sdl_target_agg_dir, 'achievement_aggregated.rds'))
 
 # Scenario data
 scenarios <- jsonlite::read_json(file.path(hydro_dir, 
