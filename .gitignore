@@ -18,6 +18,7 @@ _output
 # Demonstration data outputs
 scenario_example/
 more_scenarios/
+more_scenarios*
 *.png
 *.pdf
 

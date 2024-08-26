@@ -7,21 +7,22 @@ format:
 editor: visual
 cache: false
 params:
-  REBUILD_DATA: FALSE
+  REBUILD_DATA: TRUE
 ---
 
 Load the package
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
+library(future)
 ```
 
 The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, we set the directory and any other needed parameters (e.g. point at a config file), and the controller functions auto-generate the folder structure, run the ewr, and output the results. This can be taken up a level to the [the whole toolkit](../full_toolkit/full_toolkit_overview.qmd), where the controller and subsequent steps are all run at once. A [detailed stepthrough](controller_ewr_stepthrough.qmd) of what happens in the controller is also available, useful to see what is happening under the hood.
 
 # Setup
 
-There are a few bits of info the user needs to set for a particular run. These can be set here, or done in a parameters `.yaml` file (though that's still buggy). These needed bits of information for the controller are the location of the data and the sort of output desired.
+There are a few bits of info the user needs to set for a particular run. These can be set here, or done in a parameters `.yaml` file. These needed bits of information for the controller are the location of the data and the sort of output desired.
 
 ## Set paths
 
@@ -34,20 +35,20 @@ hydro_dir = file.path(project_dir, 'hydrographs')
 
 ## Control output and return
 
-To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`, with more I need to add to reflect new EWR functionality (e.g. `returnType = list('summary', 'all')` in R or `returnType = ['summary', 'all]` in python). These have to be lists to work right- To make a `list` in python, need to have unnamed lists in R.
-
-*There's an issue with* `'annual'` *in py-ewr- I'm getting an error inside the EWR tool. Until I updated the EWR version, skip that.*
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'yearly'`, `'all_events'`, `'all_successful_events'`, `'all_interEvents'`, and `'all_successful_interEvents'` (e.g. `returnType = list('summary', 'all')` in R. These have to be lists to work right- To make a `list` in python, need to have unnamed lists in R. The easiest to work with in HydroBOT is `'yearly'`, as that allows assessment of the outcomes, but we will return `'summary'` here as well.
 
 ```{r}
-returnType <- list('summary', 'all')
+
 
 # We use outputtype to save, so only save outputs if params$REBUILD_DATA is TRUE
 # To make a list in python, need to have unnamed lists in R
 if (!params$REBUILD_DATA) {
+  returnType <- list('yearly', 'summary')
   outputType <- list('none')
 }
 if (params$REBUILD_DATA) {
-  outputType <- list('summary', 'all')
+  returnType <- list('none')
+  outputType <- list('yearly', 'summary')
 }
 ```
 
@@ -55,16 +56,18 @@ if (params$REBUILD_DATA) {
 
 The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent. This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd).
 
-The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allows replication of this step with `run_toolkit_params`. These files build on earlier steps if possible, including any available metadata from scenarios.
-
-*Note*: the `prep_run_save_ewrs` uses the default climate categorisation from the EWR, but for dates outside the range provided (1890-2100, categorised from 1911-2018), `climate = 'NSW 10,000 year climate sequence'` needs to be used. The EWR tool provides those files, and any year considered has to have a row in them, even if it is blank.
+The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allows replication of this step with `run_toolkit_params`. These files build on earlier steps if possible, including any available metadata from scenarios. Using `rparallel = TRUE` runs this in parallel if available.
 
 ```{r}
 #| eval: false
+#| message: false
+
+plan(multisession)
 ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
                                 output_parent_dir = project_dir, 
                                 outputType = outputType, 
-                                returnType = returnType)
+                                returnType = returnType,
+                              rparallel = TRUE)
 ```
 
 Now we have a `summary` and `all`. Because the chunk above is not run (`#| eval: false`), these dataframes are not available here, but would be.
@@ -80,7 +83,7 @@ ewr_out$summary
 #| eval: false
 #| rows.print: 20
 
-ewr_out$all
+ewr_out$yearly
 ```
 
 # Next steps
