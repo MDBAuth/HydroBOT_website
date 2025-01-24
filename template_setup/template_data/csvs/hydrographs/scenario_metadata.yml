@@ -1,0 +1,8 @@
+scenario_name:
+- down4
+- base
+- up4
+flow_multiplier:
+- 0.25
+- 1.0
+- 4.0

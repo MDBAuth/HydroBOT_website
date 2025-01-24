@@ -1,0 +1,44 @@
+# output and return - everything is currently supported
+outputType:
+  - summary
+  - yearly
+
+# These allow defining funs internally as lists. if aggregation_def is NULL, these need to have values and vice versa
+aggregation_sequence:
+  ewr_code:
+  - ewr_code_timing
+  - ewr_code
+  env_obj:
+  - ewr_code
+  - env_obj
+  sdl_units: sdl_units
+  Specific_goal:
+  - env_obj
+  - Specific_goal
+  cewo_valleys: cewo_valleys
+  Objective:
+  - Specific_goal
+  - Objective
+  basin: basin
+  target_5_year_2024:
+  - Objective
+  - target_5_year_2024
+
+aggregation_funsequence:
+  ewr_code:
+  - CompensatingFactor
+  env_obj:
+  - ArithmeticMean
+  sdl_units:
+  - ArithmeticMean
+  Specific_goal:
+  - list(mean = ~mean(., na.rm = TRUE))
+  cewo_valleys:
+  - SpatialWeightedMean
+  Objective:
+  - ArithmeticMean
+  basin:
+  - SpatialWeightedMean
+  target_5_year_2024:
+  - ArithmeticMean
+

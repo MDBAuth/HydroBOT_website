@@ -1,0 +1,51 @@
+---
+title: "Toolkit from parameters"
+editor: visual
+params:
+  # Outer directory for scenario
+  output_parent_dir: 'template_data/csvs'
+---
+
+This document provides a template for running the toolkit from a parameters file, as we might do when batch processing. We have the ability to have a default params file, a second params file that tweaks those defaults, as well as include params in Quarto header yaml. These different options are all used here.
+
+See a more detailed version of this file at the [demo website](https://mdbauth.github.io/WERP_toolkit_demo) for more discussion about the params.
+
+Load the package
+
+```{r}
+#| message: false
+library(werptoolkitr)
+```
+
+## Structure of params files and arguments
+
+The `run_toolkit_params` function takes three arguments: `yamlpath`, which is a path to a yaml params file, `passed_args` which can come from the command line, and `defaults`, which is another yaml file, and lets us set most of the params, and only modify a subset with the `yamlpath` file and `passed_args`.
+
+The package comes with a set of default parameters in `system.file('yml/default_params.yml', package = 'werptoolkitr')`. Users can however create their own default yaml params file to set a standard set of defaults for a given project. See the file provided with the toolkit for available parameters.
+
+The `params.yml` file (or any other name, passed to `yamlpath`) and `passed_args` and `list_args` then can be used to modify the default values. The idea is only a small subset of those defaults would be modified for a particular run.
+
+The arguments overwrite each other, so `list_args` has highest precedence, followed by `passed_args`, `yamlpath`, and finally `defaults`.
+
+### Note- no comparer
+
+At present we do not provide yaml param options for the comparer. This is possible in future, but the possibilities are a bit too wide open at present. It is likely the user will want to explore the output, rather than generate parameterised output, at least until some specific uses are settled on.
+
+# Run the toolkit
+
+Here, we use use a params.yml (with EWR controls and aggregation functions), quarto params (with directories), and passed arguments (for climate) to illustrate. In typical use only one or two would be used at a time. Note: there is also a possible `passed_args` argument that allows passing in the form `passed_args = "parametername: 'value'"` , but it is not used here.
+
+```{r}
+run_toolkit_params(yamlpath = 'params.yml',
+                   list_args = params) # These are from the Quarto header)
+
+```
+
+## Replication
+
+The `prep_run_save_ewrs` and `read_and_agg` functions save metadata yaml files that are fully-specified parameters files. Using the final file (after aggregation), we can replicate the whole sequence. Thus, to replicate the run above, we can call
+
+```{r}
+run_toolkit_params(yamlpath = file.path(params$output_parent_dir,
+                                        'aggregator_output/agg_metadata.yml'))
+```
