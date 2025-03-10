@@ -11,8 +11,7 @@ Load the package
 
 ```{r}
 #| message: false
-library(werptoolkitr)
-library(sf)
+library(HydroBOT)
 ```
 
 ## Structure
@@ -126,7 +125,8 @@ funseq <- list(c('CompensatingFactor'),
 # Run the toolkit
 
 ## Controller
-This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit saving steps](../full_toolkit/WERP_toolkit_save_steps.qmd). 
+
+This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit saving steps](../full_toolkit/WERP_toolkit_save_steps.qmd).
 
 ```{r}
 #| eval: false
@@ -138,6 +138,7 @@ This is not actually run here for speed- the same thing is done in a notebook fo
 ```
 
 ## Aggregator
+
 Because the chunk above is not run, the needed EWR outputs are not available, but would be if it were run.
 
 ```{r}

@@ -10,7 +10,7 @@ editor: visual
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 library(dplyr)
 library(ggplot2)
 library(patchwork)
@@ -38,7 +38,7 @@ For this demonstration, we start with gauge-referenced data at the `env_obj` the
 
 ## Demonstration setup
 
-First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
+First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
 project_dir <- file.path('more_scenarios')
@@ -86,7 +86,7 @@ This provides a spatially-referenced (to gauge) theme-aggregated tibble to use t
 
 ### Spatial inputs (polygons)
 
-Spatial aggregation requires polygons to aggregate into, and we want the capability to do that several times. The user can read in any desired polygons with `sf::read_sf(path/to/polygon.shp)`, but here we use those provided in the standard set with {werptoolkitr}. We'll use SDL units, catchments (from cewo), and the basin to show how the aggregation can have multiple steps with polygons that may not be nested (though care should be taken when that is the case).
+Spatial aggregation requires polygons to aggregate into, and we want the capability to do that several times. The user can read in any desired polygons with `sf::read_sf(path/to/polygon.shp)`, but here we use those provided in the standard set with {HydroBOT}. We'll use SDL units, catchments (from cewo), and the basin to show how the aggregation can have multiple steps with polygons that may not be nested (though care should be taken when that is the case).
 
 # Demonstrations
 

@@ -9,13 +9,13 @@ editor: visual
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 library(dplyr)
 ```
 
 # Plots of causal networks
 
-This document demonstrates and discusses the causal network plotting code. There are many reasons to present causal networks, each of which likely will require different characteristic plots. This develops some of the foundational work needed to allow a flexible range of those uses. Causal networks are inherently complex, and there are different aspects we might want to accentuate, and some capability we need to prune/focus them. Thus, {werptoolkitr} provides a number of helper functions and plotting options.
+This document demonstrates and discusses the causal network plotting code. There are many reasons to present causal networks, each of which likely will require different characteristic plots. This develops some of the foundational work needed to allow a flexible range of those uses. Causal networks are inherently complex, and there are different aspects we might want to accentuate, and some capability we need to prune/focus them. Thus, {HydroBOT} provides a number of helper functions and plotting options.
 
 -   Why plot causal networks?
 
@@ -39,7 +39,7 @@ This document demonstrates and discusses the causal network plotting code. There
 
 ## Get the network relationships
 
-First we need the relationships defining the network, which are extracted from tables in {werptoolkitr} and provided as the dataset `werptoolkitr::causal_ewrs`.
+First we need the relationships defining the network, which are extracted from tables in {HydroBOT} and provided as the dataset `HydroBOT::causal_ewrs`.
 
 ## Process data for network plots
 
@@ -53,13 +53,13 @@ Causal networks need an edges dataframe specifying all pairwise connections, and
 
 3.  We want to have the general ability to make edges and nodes available for other uses, e.g. aggregations
 
-    1.  {werptoolkitr} exports `make_edges` and `make_nodes`, along with some other network-manipulation functions
+    1.  {HydroBOT} exports `make_edges` and `make_nodes`, along with some other network-manipulation functions
 
 To build the nodes and edges for a specific plot or set of plots, we first build a dataframe of edges, and then extract nodes.
 
 ### Construct edge dataframe
 
-The `edges` dataframe contains all pairwise links between nodes in `from` and `to` columns. To get that, we need to pass it dataframes specifying links. There will usually be multiple datasets, reflecting the differing scales of the nodes (as in the `causal_ewrs` list provided by {werptoolkitr}). These dataframes may include many columns of potential nodes, e.g. they might provide the mapping for several steps in the network. Thus, we need to provide the node columns we actually want to map and their directionality- what are the 'from-to' pairings. We may want to filter to only some subset of nodes; for example we may only be interested in the environmental objectives related to waterbirds. Further, we will likely want to filter by geography, currently possible by either gauge or planning unit (deprecated).
+The `edges` dataframe contains all pairwise links between nodes in `from` and `to` columns. To get that, we need to pass it dataframes specifying links. There will usually be multiple datasets, reflecting the differing scales of the nodes (as in the `causal_ewrs` list provided by {HydroBOT}). These dataframes may include many columns of potential nodes, e.g. they might provide the mapping for several steps in the network. Thus, we need to provide the node columns we actually want to map and their directionality- what are the 'from-to' pairings. We may want to filter to only some subset of nodes; for example we may only be interested in the environmental objectives related to waterbirds. Further, we will likely want to filter by geography, currently possible by either gauge or planning unit (deprecated).
 
 As an example, we can make the relationships present at gauge 409025 linking EWRs to environmental objectives, environmental objectives to specific goals, Specific goals to Targets, and environmental objectives to 5-year targets. There are many more possible connections to include in the `fromtos`, which to include will depend on the questions being asked. I've just chosen these for a quick demo.
 

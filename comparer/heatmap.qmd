@@ -9,7 +9,7 @@ editor: visual
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 library(ggplot2)
 library(dplyr)
 ```
@@ -51,7 +51,7 @@ gauges_to_plot <- c('412002', '419001', '422028', '421001')
 
 # Standard scenario appearance
 
-We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.
+We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {HydroBOT} package because they are project/analysis- specific.
 
 ```{r}
 sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)

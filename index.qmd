@@ -1,15 +1,65 @@
 ---
-title: "WERP toolkit demonstration"
+title: "HydroBOT demonstration"
 editor: visual
 ---
 
-This repo provides a templates and documentation for using the toolkit in various ways. In use, we would expect a user to consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters (at least through the aggregator step), similar to what is shown in the [full toolkit pages](full_toolkit/full_toolkit_overview.qmd) and implement that in an analysis repo for that particular set of analyses/scenarios.
+```{r}
+#| label: move figs
+#| include: false
 
-The `full_toolkit` directory provides notebooks for running the full toolkit in single files, either [in memory](full_toolkit/WERP_toolkit_in_memory) or [saving each step and reading back in](full_toolkit/WERP_toolkit_save_steps.qmd). It can also be run [from parameters files](full_toolkit/WERP_toolkit_params.qmd). These parameters files can be generated manually, but also allow replication since the toolkit auto-documents itself when run, saving metadatafiles that are fully-specified params files.
+demo_webdir <- file.path('~', '../Deakin University/QAEL - WERP in house - WERP/Toolkit/Writing/Demonstration paper')
 
-Within this repo there are also documents providing templates for each step separately (in `controller` and `aggregation` directories). These files allow exploring more of the options for calling, particularly for aggregation. There are also a few templates or examples of notebooks that are not in the toolkit flow per se, but are necessary for it (`scenario_creation` and `causal_networks`).
+file.copy(file.path(demo_webdir, 'images', 'GraphicalAbstract_small.png'), 
+          file.path('images', 'graphical_abstract.png'),
+          overwrite = TRUE)
 
-Toolkit flow
+file.copy(file.path(demo_webdir, 'images', 'GraphicalAbstract_small.eps'), 
+          file.path('images', 'graphical_abstract.eps'),
+          overwrite = TRUE)
+
+file.copy(file.path(demo_webdir, 'images', 'Conceptual_fig_demopaper.png'), 
+          file.path('images', 'Figure_1.png'),
+          overwrite = TRUE)
+
+file.copy(file.path(demo_webdir, 'images', 'Conceptual_fig_demopaper.eps'), 
+          file.path('images', 'Figure_1.eps'),
+          overwrite = TRUE)
+
+file.copy(file.path(demo_webdir, 'images', 'Aggregations_General.png'), 
+          file.path('images', 'Figure_2.png'),
+          overwrite = TRUE)
+
+file.copy(file.path(demo_webdir, 'images', 'Aggregations_General.eps'), 
+          file.path('images', 'Figure_2.eps'),
+          overwrite = TRUE)
+
+file.copy(file.path(demo_webdir, 'images', 'architecture.png'), 
+          file.path('images', 'architecture.png'),
+          overwrite = TRUE)
+file.copy(file.path(demo_webdir, 'images', 'architecture.eps'), 
+          file.path('images', 'architecture.eps'),
+          overwrite = TRUE)
+
+# This is a placeholder to move conceptual figs, since it HATES spaces in names of the raw {fig} divs
+```
+
+This website and [associated github repository](https://github.com/MDBAuth/HydroBOT) provides examples of using HydroBOT in various ways, as well as its capabilities and pitfalls. To install and use, see [get started](getting_started.qmd).
+
+HydroBOT has several goals, and provides workflow and analysis capabilities to achieve them. It treats scenario comparison as a first-class objective, and so is structured to automate over many scenarios, performing the same processing to each, followed by comparison across scenarios (though it can run single scenarios if desired).
+
+HydroBOT is built to provide general capacity for synthesis, to then be tailored for specific analysis: what questions are being asked of the scenarios, what synthesis do they need, and how should they be compared. It is designed to be modular, incorporating many different response models, though at this point it contains only the EWR tool. It provides important guardrails for both idiosyncrasies of the EWR outputs and multidimensional scaling.
+
+Users should consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters relevant to the particular analysis.
+
+## Workflow
+
+The basic workflow of HydroBOT involves identifying and selecting data inputs representing scenarios, running response models, aggregation, scaling, and onward modelling of those outputs, and finally synthesis and production of output figures, tables, and other products. In concept, the HydroBOT workflow is split into three components: the *controller*, which points to data and runs response models, the *aggregator*, which scales the outputs of those models in space, time, and along causal networks, and the *comparer*, which synthesizes and produces interpretable outputs. There are many ways to structure this workflow in practice, with examples [here](full_toolkit/full_toolkit_overview.qmd).
+
+![Conceptualisation of HydroBOT architecture (blue arrows) and links to management decision making (yellow arrows). Scenarios, represented by hydrographs, reflect observed flows or modeled scenarios (produced via hydrological modelling outside HydroBOT). These hydrographs are fed in a consistent way to various response models via the HydroBOT Controller. These response models could assess response of any values of interest, here illustrated as a range of value types across environmental and human dimensions. Additional inputs of spatial data and causal networks provide grouping information for scaling via the HydroBOT Aggregator. The HydroBOT Comparer synthesizes the results into management-relevant outputs that aid decision making. This decision-making process is also supported by feedback from stakeholders, other expert advice and the social and political landscape. Water planning and policy decisions can then guide the development of scenarios to assess potential management options, which in turn can be assessed with HydroBOT.](images/Figure_1.png){#fig-tktomgmt}
+
+## Components
+
+Each of the components are discussed in more detail, with this detail used to modify the sorts of workflows in the workflow examples to tailor them for a particular analysis.
 
 -   [Controller](controller/controller_overview.qmd)
 
@@ -33,67 +83,20 @@ Toolkit flow
 
     -   [bar](comparer/bar_plots.qmd), [line](comparer/line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from the toolkit
 
-Necessary pieces but not part of the data flow in the toolkit
+### Dependencies
+
+HydroBOT relies on external information in three main ways. First, it uses externally-defined response models, currently the [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool). It also requires causal networks to link those outputs to larger-scale values. Finally, it requires the input scenarios, without which it would have nothing to model from.
 
 -   [Causal networks](causal_networks/causal_plots.qmd)
 
-    -   Causal networks are needed for aggregation and some plotting, but are not part of the flow per-se. Much of this will be integrated into the *Comparer* module
+    -   Causal networks are needed for aggregation and comparison, but are not part of the flow *per se*.
 
 -   [Scenario creation](scenario_creation/scenario_creation_more.qmd)
 
     -   Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit
 
-    -   These are simple demo scenarios, but useful for seeing expected formats, and to let the rest of the kit work.
+**In use, the toolkit expects that scenario hydrographs are available and the causal networks are defined.**
 
-    -   Python notebooks exist, but are not maintained. Contact authors if needed.
+## Development
 
-**In use, the toolkit expects that scenario hydrographs will be available and the causal networks are defined.**
-
-![Conceptual use of the toolkit. Scenario hydrographs are expected to come from hydrologic modelling, while the toolkit ingests those, runs them through the response modules, and provides the user the ability to aggregate and synthesize in various ways.](images/tktomgmt.jpg)
-
-![Toolkit structure, showing the various components where the toolkit performs processing and allows the user to provide settings.](images/architecture.jpg)
-
-## Installing werptoolkitr
-
-The {werptoolkitr} package needs to be installed to provide all functions used here. It also provides some necessary data for the causal network relationships, and (at least for now) canonical shapefiles that have been prepped.
-
-Typically install it from github over SSH while the package is private.
-
-```{r}
-#| warning: false
-#| message: false
-#| eval: false
-
-# GITHUB INSTALL
-# SSH- preferred
-
-devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
-```
-
-The package allowing SSH install is broken in R 4.3, so in that case and for rapid development, clone the repo and use `devtools::install_local` (or even just to `load_all`), but these rely on paths that aren't portable and are more manual to keep up with updates.
-
-```{r}
-#| eval: false
-# LOCAL INSTALL- easier for quick iterations, but need a path.
-devtools::install_local("C:/path/to/WERP_toolkit", force = TRUE)
-
-# And for very fast iteration (no building, but exposes too much, often)
-devtools::load_all("C:/path/to/WERP_toolkit")
-```
-
-Load the package
-
-```{r}
-#| eval: false
-library(werptoolkitr)
-```
-
-## Github and development
-
-See the [repo readme](https://github.com/MDBAuth/WERP_toolkit_demo) for overall structure of the repo and additional dev info for package installation issues and development, and the [{werptoolkitr} repo](https://github.com/MDBAuth/WERP_toolkit) for the package itself.
-
-## Using notebooks
-
-Most notebooks that generate outputs have a `REBUILD_DATA` parameter in the yaml header that is set to FALSE to avoid overwriting data. To rebuild the data, we can manually change them to TRUE, or on a case-by-case basis at the terminal `quarto render path/to/file.qmd -P REBUILD_DATA:TRUE`, and for all files in the project (dangerous!), `quarto render -P REBUILD_DATA:TRUE`.
-
-If there is unexpected behaviour, e.g. changes not reflected in the output, check the \_cache files and probably throw them out. Caching speeds up by not re-running code and is supposed to notice changes and re-evaluate, but sometimes hangs on when it shouldn't.
+See the [repo readme](https://github.com/MDBAuth/WERP_toolkit_demo) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/MDBAuth/WERP_toolkit) repo for development of the package itself.

@@ -12,7 +12,7 @@ params:
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 library(ggplot2)
 ```
 
@@ -20,7 +20,7 @@ library(ggplot2)
 
 We have [theme aggregation](theme_agg.qmd) and [spatial aggregation](spatial_agg.qmd) shown separately for in-depth looks at their meaning and capability. Here, we focus on the typical use-case of interleaved aggregation along multiple dimensions. We do not get into all the different options and [syntax](aggregation_syntax.qmd) as they are covered in those other documents.
 
-All aggregation in [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) operate on the same core function and use similar principles- take a list of aggregation sequences, and aggregate each step according to a list of aggregation functions. Here, we show how `multi_aggregate` allos us to interleave the dimensions along which we aggregate, including auto-detecting which dimension we're operating on (though that is fragile).
+All aggregation in [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) operate on the same core function and use similar principles- take a list of aggregation sequences, and aggregate each step according to a list of aggregation functions. Here, we show how `multi_aggregate` allos us to interleave the dimensions along which we aggregate, including auto-detecting which dimension we're operating on (though that is fragile).
 
 Fundamentally, `multi_aggregate` wraps `theme_aggregate` and `spatial_aggregate` with some data organisation and tracking of what the previous level of aggregation was to maintain proper grouping as they alternate. Both of those, in turn, wrap `general_aggregate` with some data arrangement specific to the dimension they aggregate along, such as stripping and re-adding geometry.
 
@@ -28,7 +28,7 @@ For inputs, `multi_aggregate` expects the incoming data to be in memory and geog
 
 ## Demonstration setup
 
-First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
+First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
 project_dir <- file.path('more_scenarios')
@@ -72,7 +72,7 @@ To make the actual multi-aggregate loop general and only do one thing, dataprep 
 ewrdata <- prep_ewr_agg(ewr_results, type = 'summary', geopath = bom_basin_gauges)
 ```
 
-We use `causal_ewrs` for causal relationships and spatial layers provided by {werptoolkitr} to define the aggregation units.
+We use `causal_ewrs` for causal relationships and spatial layers provided by {HydroBOT} to define the aggregation units.
 
 ## Setup
 
@@ -425,7 +425,7 @@ allagg$target_5_year_2024 |>
 
 ## Simple inputs and saving
 
-In practice, we often won't call `multi_aggregate` directly, but will use `read_and_agg` to run `multi_aggregate`, since it automates data read-in and processing and saving. To do the same analysis as above but using `read_and_agg`, we give it the path to the data instead of the data itself. Note also that the `geopath` and `causalpath` arguments can be objects or paths; we use objects here because they are provided with the {werptoolkitr} package. We use `returnList` to return the output to the active session, and `savepath` to save an .rds file to `out_path` (but only if we're rebuilding data). The `aggsequence` here can use character specification for the spatial units, since this wraps `multi_aggregate`.
+In practice, we often won't call `multi_aggregate` directly, but will use `read_and_agg` to run `multi_aggregate`, since it automates data read-in and processing and saving. To do the same analysis as above but using `read_and_agg`, we give it the path to the data instead of the data itself. Note also that the `geopath` and `causalpath` arguments can be objects or paths; we use objects here because they are provided with the {HydroBOT} package. We use `returnList` to return the output to the active session, and `savepath` to save an .rds file to `out_path` (but only if we're rebuilding data). The `aggsequence` here can use character specification for the spatial units, since this wraps `multi_aggregate`.
 
 The `read_and_agg` function also saves metadata files (yaml and json) that allows replication of this step with `run_toolkit_params`. These files build on earlier steps if possible, including any available metadata from the modules.
 

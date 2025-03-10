@@ -9,13 +9,13 @@ editor: visual
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 library(ggplot2)
 ```
 
-## Visualizing spatial data from werptoolkitr
+## Visualizing spatial data from HydroBOT
 
-The [{werptoolkitr}](https://github.com/MDBAuth/WERP_toolkit){style="font-size: 11pt;"} package provides a standard set of spatial data, generated in `data_creation/spatial_data_creation.qmd`. Here, we make quick plots of the data so we know what it looks like.
+The [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit){style="font-size: 11pt;"} package provides a standard set of spatial data, generated in `data_creation/spatial_data_creation.qmd`. Here, we make quick plots of the data so we know what it looks like.
 
 The datasets are `bom_basin_gauges` (points), and `basin` (the MDB as a single polygon), `sdl_units`, `resource_plan_areas`, and `cewo_valleys`. Relevant to the case study- the original polygon used was the Macquarie-Castlereagh in the sdls. The crs all match from the creation.
 

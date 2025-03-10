@@ -10,7 +10,7 @@ editor: visual
 ```{r}
 #| include: false
 
-library(werptoolkitr) 
+library(HydroBOT) 
 library(ggplot2) 
 library(dplyr)
 library(sf)

@@ -1,0 +1,19 @@
+---
+title: "Pseudo-spatial and group_until"
+format: html
+---
+
+Placeholder for pseudo-spatial, group_until, and auto_ewr_PU.
+
+## auto_ewr_PU
+
+The `auto_ewr_PU = TRUE` argument in \[read_and_agg()\] and \[multi_aggregate()\] is a shortcut to do known best-practices for EWR outputs. It sets any aggregations to planning units or sdl units to pseudo-spatial, since gauges informing those units may not be geographically located within them. It also uses `group_until` to hold their groupings and not accidentially collapse over them in preceding aggregation steps.
+
+Best practice is to be explicit, with the following arguments to \[read_and_agg()\] and \[multi_aggregate()\], but it is often faster to use `auto_ewr_PU = TRUE`.
+
+``` R
+group_until = list(SWSDLName = is_notpoint, 
+                   planning_unit_name = is_notpoint, 
+                   gauge = is_notpoint),
+pseudo_spatial = 'sdl_units'
+```

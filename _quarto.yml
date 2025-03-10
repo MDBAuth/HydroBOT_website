@@ -1,5 +1,5 @@
 project:
-  title: "WERP_toolkit_demo"
+  title: "HydroBOT demo"
   type: website
   output-dir: _output
   execute-dir: project
@@ -9,7 +9,7 @@ project:
 #     embed-resources: true
 
 website:
-  title: "Using the WERP toolkit"
+  title: "HydroBOT examples and detail"
   repo-url: https://github.com/MDBAuth/WERP_toolkit_demo
   page-footer:
     left: "Website, documentation, and toolkit work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in the toolkit, please use its [github issues](https://github.com/MDBAuth/WERP_toolkit/issues)"
@@ -21,10 +21,8 @@ website:
     backgroud: primary
     search: true
     left:
-      - href: scenario_creation/scenario_creation_overview.qmd
-        text: Scenario creation
-      - href: causal_networks/causal_overview.qmd
-        text: Causal networks
+      - href: getting_started.qmd
+        text: Get started
       - href: controller/controller_overview.qmd
         text: Controller
       - href: aggregator/aggregation_overview.qmd
@@ -33,6 +31,10 @@ website:
         text: Comparer
       - href: full_toolkit/full_toolkit_overview.qmd
         text: Full toolkit
+      - href: scenario_creation/scenario_creation_overview.qmd
+        text: Scenario creation
+      - href: causal_networks/causal_overview.qmd
+        text: Causal networks
     right:
       - icon: github
         href: https://github.com/MDBAuth/WERP_toolkit_demo

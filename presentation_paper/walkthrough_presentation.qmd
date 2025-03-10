@@ -10,7 +10,7 @@ echo: true
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 library(sf)
 library(dplyr)
 ```

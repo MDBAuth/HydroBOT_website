@@ -5,11 +5,11 @@
 # Aggregation sequence
 aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
                env_obj =  c('ewr_code', "env_obj"),
-               sdl_units = werptoolkitr::sdl_units,
+               sdl_units = HydroBOT::sdl_units,
                Specific_goal = c('env_obj', "Specific_goal"),
-               catchment = werptoolkitr::cewo_valleys,
+               catchment = HydroBOT::cewo_valleys,
                Objective = c('Specific_goal', 'Objective'),
-               mdb = werptoolkitr::basin,
+               mdb = HydroBOT::basin,
                target_5_year_2024 = c('Objective', 'target_5_year_2024'))
 
 # Functions for each aggregation

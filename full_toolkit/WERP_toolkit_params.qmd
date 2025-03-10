@@ -21,20 +21,20 @@ Load the package
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 ```
 
 ## Structure of params files and arguments
 
 The `run_toolkit_params` function takes three arguments: `yamlpath`, which is a path to a yaml params file, `passed_args` which can come from the command line, and `defaults`, which is another yaml file, and lets us set most of the params, and only modify a subset with the `yamlpath` file and `passed_args`.
 
-The package comes with a set of default parameters in `system.file('yml/default_params.yml', package = 'werptoolkitr')`. Users can however create their own default yaml params file to set a standard set of defaults for a given project. See this file for available parameters.
+The package comes with a set of default parameters in `system.file('yml/default_params.yml', package = 'HydroBOT')`. Users can however create their own default yaml params file to set a standard set of defaults for a given project. See this file for available parameters.
 
 The `params.yml` file (or any other name, passed to `yamlpath`) and `passed_args` and `list_args` then can be used to modify the default values. The idea is only a small subset of those defaults would be modified for a particular run.
 
 The `params.R` file (pointed to with the yaml parameter `aggregation_def`) is necessary because aggregation specification needs R objects or syntax.
 
-Finally, `werptoolkitr::param_runner()` ingests paths to these files (or passed command line or lists), turns their params into R arguments, and runs the toolkit.
+Finally, `HydroBOT::param_runner()` ingests paths to these files (or passed command line or lists), turns their params into R arguments, and runs the toolkit.
 
 The arguments overwrite each other, so `list_args` has highest precedence, followed by `passed_args`, `yamlpath`, and finally `defaults`.
 

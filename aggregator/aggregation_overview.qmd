@@ -70,4 +70,3 @@ Typically, aggregating (and some other operations) on \`sf\` dataframes with geo
 
 Spatial aggregation is inherently slow because of the geometric operations (specifically `sf::st_intersection`) but we've optimized the amount of intersecting and unpicked space where possible so nothing is slowed down by being spatial unless absolutely necessary (including the actual aggregation of the spatial data). We're doing the absolute minimum spatially-aware processing, and doing that in a way that early spatial processing does not slow down later non-spatial processing.
 :::
-

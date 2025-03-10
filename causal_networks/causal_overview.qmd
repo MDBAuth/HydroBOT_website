@@ -17,7 +17,7 @@ Causal networks can [show many relationships and outcomes](causal_plots.qmd). To
 ```{r}
 #| echo: false 
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 library(dplyr)
 edges <- make_edges(dflist = causal_ewr,
                     fromtos = list(c('ewr_code', 'env_obj'),

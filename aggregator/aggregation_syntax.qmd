@@ -9,7 +9,7 @@ editor: visual
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 ```
 
 ## Argument options and syntax

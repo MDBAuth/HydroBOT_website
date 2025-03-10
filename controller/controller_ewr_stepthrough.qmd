@@ -14,7 +14,7 @@ Load the package
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 ```
 
 The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, the series of steps below is wrapped with `prep_run_save_ewrs`. Once we have the directory and set any other needed parameters (e.g. point at a config file), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I'm stepping through that here so we can see what's happening and where we need to tweak as formats change; this document is intended to expose some of the inner workings of the black box. Wrapped versions of [the controller alone](controller_ewr_wrapped.qmd) and [the whole toolkit](../full_toolkit/full_toolkit_overview.qmd) are available to illustrate this more normal use.
@@ -72,15 +72,15 @@ The output directory and subdirs for scenarios is created by `make_output_dir`, 
 ```{r}
 # get the paths to all the hydrographs. python needs a list, not a vector
 # have to triple ::: because this isn't exported
-  hydro_paths <- as.list(werptoolkitr:::find_scenario_paths(hydro_dir))
+  hydro_paths <- as.list(HydroBOT:::find_scenario_paths(hydro_dir))
   
   # There's a bit more error catching etc in `prep_run_save_ewrs`, but ignoring that here.
 
   # extract scenarios if not given
-  scenarios <- werptoolkitr:::scenario_names_from_hydro(hydro_dir)
+  scenarios <- HydroBOT:::scenario_names_from_hydro(hydro_dir)
   
   # set up the output directory
-  output_path <- werptoolkitr:::make_output_dir(project_dir, 
+  output_path <- HydroBOT:::make_output_dir(project_dir, 
                                                 scenarios = scenarios, 
                                                 module_name = 'EWR')
 ```

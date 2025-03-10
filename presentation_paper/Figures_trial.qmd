@@ -10,7 +10,7 @@ metadata-file: "C:/Users/georgiad/Documents/WERP_toolkit_demo/more_scenarios/com
 #| echo: false
 #| include: false
 
-library(werptoolkitr) 
+library(HydroBOT) 
 library(ggplot2) 
 library(dplyr)
 library(sf)

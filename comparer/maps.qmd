@@ -5,7 +5,7 @@ author: "Galen Holt"
 
 ```{r}
 #| message: false
-library(werptoolkitr)
+library(HydroBOT)
 library(ggplot2)
 library(dplyr)
 library(sf)
@@ -15,7 +15,7 @@ library(sf)
 
 This notebook provides examples of creating maps to display toolkit data and especially aggregated outcomes. Typically, these have quantitative fill that is spatially-relevant, whether that is a point (gauge) or polygon (SDL unit, basin, etc). The numerical values can be more difficult to ascertain precisely from maps, but they are often the clearest way to present spatial data, especially when the message is one of spatial variation. Because maps lose two dimensions for data, we often have to reduce the number of categories we look at and rely heavily on facetting.
 
-As with all plots in {werptoolkitr}, maps have the ability to use color and different color palettes to include additional information, including type of response. These settings are dealt with more completely in the [bar_plots](bar_plots.qmd), with much of the mechanics the same for maps and [lines](line_plots.qmd) e.g. the use of `colorgroups` and a list for `pal_list`.
+As with all plots in {HydroBOT}, maps have the ability to use color and different color palettes to include additional information, including type of response. These settings are dealt with more completely in the [bar_plots](bar_plots.qmd), with much of the mechanics the same for maps and [lines](line_plots.qmd) e.g. the use of `colorgroups` and a list for `pal_list`.
 
 With maps, we can also plot multiple layers in the foreground `overlay` and background `underlay`, though at present these have fewer options than the 'primary' layer (e.g. we cannot plot data as fill in multiple polygon layers).
 
@@ -50,7 +50,7 @@ scenario_subset <- c('down2', 'down1_25', 'base', 'up1_25', 'up2')
 
 # Standard scenario appearance
 
-We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {werptoolkitr} package because they are project/analysis- specific.
+We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {HydroBOT} package because they are project/analysis- specific.
 
 ```{r}
 sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)

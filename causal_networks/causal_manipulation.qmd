@@ -5,7 +5,7 @@ author: "Galen Holt"
 
 # Purpose
 
-This document will cover the functions provided by {werptoolkitr} to interact with and manipulate causal networks.
+This document will cover the functions provided by {HydroBOT} to interact with and manipulate causal networks.
 
 For example
 
