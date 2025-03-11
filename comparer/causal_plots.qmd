@@ -5,6 +5,6 @@ author: "Galen Holt"
 
 As we showed in the [theme aggregation example](../aggregator/theme_agg.qmd), we can color the nodes in a causal network by outcome values. That is perhaps the best place to see the use of causal networks for outcomes- using the interleaved example data is less clearly relevant, since spatial scale changes as well, though it can be done. Integrating these plots with the more general approach of `plot_outcomes` is high on the priority list.
 
-There are [many other causal network plots](../causal_networks/causal_plots.qmd) we can make but those in the [theme aggregation example](../aggregator/theme_agg.qmd), target outcomes, rather than adjusting other aesthetics of the network for other reasons, such as altering color by level.
+There are [many other causal network plots](../provided_data/causal_plots.qmd) we can make but those in the [theme aggregation example](../aggregator/theme_agg.qmd), target outcomes, rather than adjusting other aesthetics of the network for other reasons, such as altering color by level.
 
 *We should be able to change size as well*. And we can color the edges, but that's less clear what the meaning is.

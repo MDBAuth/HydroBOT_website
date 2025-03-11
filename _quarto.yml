@@ -9,10 +9,10 @@ project:
 #     embed-resources: true
 
 website:
-  title: "HydroBOT examples and detail"
+  title: "HydroBOT"
   repo-url: https://github.com/MDBAuth/HydroBOT_website
   page-footer:
-    left: "Website, documentation, and toolkit work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in the toolkit, please use its [github issues](https://github.com/MDBAuth/WERP_toolkit/issues)"
+    left: "Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its [github issues](https://github.com/MDBAuth/HydroBOT/issues)"
     center:
       - text: "License"
         href: LICENSE.md
@@ -29,11 +29,11 @@ website:
         text: Aggregator
       - href: comparer/comparer_overview.qmd
         text: Comparer
-      - href: full_toolkit/full_toolkit_overview.qmd
-        text: Full toolkit
-      - href: scenario_creation/scenario_creation_overview.qmd
+      - href: workflows/workflow_overview.qmd
+        text: Workflows
+      - href: provided_data/data_overview.qmd
         text: Scenario creation
-      - href: causal_networks/causal_overview.qmd
+      - href: provided_data/causal_overview.qmd
         text: Causal networks
     right:
       - icon: github

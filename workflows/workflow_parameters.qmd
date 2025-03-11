@@ -1,5 +1,5 @@
 ---
-title: "HydroBOT_website"
+title: "Parameterised workflow"
 editor: visual
 params:
   REBUILD_DATA: FALSE
@@ -7,13 +7,13 @@ params:
   output_parent_dir: 'more_scenarios'
   
   # aggregation sequences (need to be defined in R)
-  aggregation_def: 'full_toolkit/params.R'
+  aggregation_def: 'workflows/params.R'
   
   # Climate
   climate: 'NSW 10,000 year climate sequence'
 ---
 
-This document provides a template for running the toolkit from a parameters file, as we might do when batch processing. As such, it typically wouldn't be run through a notebook, but be called with `Rscript`. That sort of setup could go a lot of different directions depending on use case, so for now we'll just demonstrate how to set up the parameter file and use it, and leave it to the user to build the script that gets called with `Rscript` from the command line or as part of an external process.
+This document provides a template for running HydroBOT from a parameters file, as we might do when batch processing. As such, it typically wouldn't be run through a notebook, but be called with `Rscript`. That sort of setup could go a lot of different directions depending on use case, so for now we'll just demonstrate how to set up the parameter file and use it, and leave it to the user to build the script that gets called with `Rscript` from the command line or as part of an external process.
 
 It is *also* possible to put the parameters in the yaml header of a quarto notebook (which we also do here, as an example. We provide examples of using the parameterised system several different ways below, including from external `params.yml` files, passed parameters, and the list Quarto generates in parameterised notebooks.
 
@@ -34,7 +34,7 @@ The `params.yml` file (or any other name, passed to `yamlpath`) and `passed_args
 
 The `params.R` file (pointed to with the yaml parameter `aggregation_def`) is necessary because aggregation specification needs R objects or syntax.
 
-Finally, `HydroBOT::param_runner()` ingests paths to these files (or passed command line or lists), turns their params into R arguments, and runs the toolkit.
+Finally, `HydroBOT::param_runner()` ingests paths to these files (or passed command line or lists), turns their params into R arguments, and runs HydroBOT.
 
 The arguments overwrite each other, so `list_args` has highest precedence, followed by `passed_args`, `yamlpath`, and finally `defaults`.
 
@@ -46,7 +46,7 @@ At present we do not provide yaml param options for the comparer. This is possib
 
 This section provides a look at the parameters being set in the various params files or passed in.
 
-There are a number of parameters to set, mirroring those set in the notebook-driven runs of the toolkit, e.g. [running while saving steps](WERP_toolkit_save_steps.qmd).
+There are a number of parameters to set, mirroring those set in the notebook-driven runs of HydroBOT, e.g. [running while saving steps](workflow_save_steps.qmd).
 
 Here, we provide example yaml that may appear in the files at `defaults` or `yamlpath` .
 
@@ -118,9 +118,9 @@ namehistory: FALSE
 keepAllPolys: TRUE
 ```
 
-# Run the toolkit
+# Run HydroBOT
 
-These actually run the toolkit, so they are set not to evaluate in normal use- only one of the notebooks for this website actually runs the controller- the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd) with saving steps.
+These actually run HydroBOT, so they are set not to evaluate in normal use- only one of the notebooks for this website actually runs the controller- the [full toolkit](../workflows/workflow_save_steps.qmd) with saving steps.
 
 ```{r}
 #| eval: false

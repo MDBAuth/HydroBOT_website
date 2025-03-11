@@ -42,7 +42,7 @@ Nearly all analyses will be comparisons of some kind, and so the Comparer provid
 
     -   [Maps](maps.qmd)
 
-    -   [Causal networks](../causal_networks/causal_plots.qmd)
+    -   [Causal networks](../provided_data/causal_plots.qmd)
 
     -   [Heatmaps](heatmap.qmd)
 

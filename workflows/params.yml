@@ -4,5 +4,5 @@
 output_parent_dir: 'more_scenarios'
 
 # aggregation sequences (need to be defined in R)
-aggregation_def: 'full_toolkit/params.R'
+aggregation_def: 'workflows/params.R'
 

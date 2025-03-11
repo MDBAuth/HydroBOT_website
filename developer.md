@@ -1,6 +1,6 @@
 # Developing
 
-This repo is intended to contain demonstration/template examples of using the toolkit. It contains an R project for the work and a Quarto project, enabling the provision of quarto notebooks and their display as the documentation website. Users may want to re-create the structure by creating the R project from Rstudio and may or may not use a Quarto project with `quarto create-project` in terminal, or if only some components are needed for a particular set of analysis (e.g. the full explorations of capacity are not needed), single notebooks can be copied. Development proceeding in this repo itself should not need to do either of these tasks.
+This repo is intended to contain demonstration/template examples of using HydroBOT. It contains an R project for the work and a Quarto project, enabling the provision of quarto notebooks and their display as the documentation website. Users may want to re-create the structure by creating the R project from Rstudio and may or may not use a Quarto project with `quarto create-project` in terminal, or if only some components are needed for a particular set of analysis (e.g. the full explorations of capacity are not needed), single notebooks can be copied. Development proceeding in this repo itself should not need to do either of these tasks.
 
 ## Github
 
@@ -10,18 +10,18 @@ Obtaining the repo for dev should be a straightforward git clone. However, maint
 
 The current version of `git2R`, which is used by `devtools::install_git()` to install over ssh is broken in R 4.3.
 
-There are two solutions. One is clone the toolkit repo and use `devtools::install_local()`. The other is to use external (system) git, which is cleaner, but might mean setting up new SSH keys. R uses a different Home directory than standard (typically `~/Documents`), and so for this to work, you need to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well (e.g. in `~/Documents/.ssh/`) and [connect them to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Then this should work:
+There are two solutions. One is clone the HydroBOT repo and use `devtools::install_local()`. The other is to use external (system) git, which is cleaner, but might mean setting up new SSH keys. R uses a different Home directory than standard (typically `~/Documents`), and so for this to work, you need to [set up SSH keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) in that location as well (e.g. in `~/Documents/.ssh/`) and [connect them to github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account). Then this should work:
 
 ``` r
 
 # install.packages("devtools")
 
-devtools::install_git("git\@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
+devtools::install_git("git\@github.com:MDBAuth/HydroBOT.git", ref = 'master', force = TRUE, upgrade = 'ask', git = 'external')
 ```
 
 :::
 
-Some pitfalls with cloning encountered in working across local and MDBA systems are covered in more detail in the [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) developer page for both Linux and Windows.
+Some pitfalls with cloning encountered in working across local and MDBA systems are covered in more detail in the [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) developer page for both Linux and Windows.
 
 ## Python environment
 
@@ -39,39 +39,39 @@ To install poetry, follow the [docs](https://python-poetry.org/docs/), with some
 
 ## R
 
-Use `rig` to manage R versions. See developer note for [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) and [my notes](https://galenholt.github.io/RpyEnvs/rig.html)
+Use `rig` to manage R versions. See developer note for [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) and [my notes](https://galenholt.github.io/RpyEnvs/rig.html)
 
-Use `renv` to manage R environments. See the developer note for [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit).
+Use `renv` to manage R environments. See the developer note for [{HydroBOT}](https://github.com/MDBAuth/HydroBOT).
 
-The EWR tool is written in python, and so while we have wrapped the necessary functions in the [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) R package, we need to be careful about data type translations. To have an R object that works as a dict in python, for example, use a named list (see a few more translation options at [my github](https://galenholt.github.io/RpyEnvs/R_py_type_passing.html)). The names can be quoted or unquoted; keep quoted to be most like python specs.
+The EWR tool is written in python, and so while we have wrapped the necessary functions in the [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) R package, we need to be careful about data type translations. To have an R object that works as a dict in python, for example, use a named list (see a few more translation options at [my github](https://galenholt.github.io/RpyEnvs/R_py_type_passing.html)). The names can be quoted or unquoted; keep quoted to be most like python specs.
 
 ### HydroBOT updates
 
-We expect that [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) will change frequently since we're simultaneously developing it. To reload and rebuild, there are several options, ranging from more structured (github) to local package install, to just loading the scripts into memory for rapid changes. Note that while the `load_all` option is tempting and very useful, it often works differently than a real package install and so all code should be tested with one of the other two methods. By default, this loads from `master`, include the argument `ref = BRANCH_NAME` to install from a branch. For `devtools::install_git()` to work with SSH, first install the {git2r} package (though even this doesn't work in R 4.3).
+We expect that [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) will change frequently since we're simultaneously developing it. To reload and rebuild, there are several options, ranging from more structured (github) to local package install, to just loading the scripts into memory for rapid changes. Note that while the `load_all` option is tempting and very useful, it often works differently than a real package install and so all code should be tested with one of the other two methods. By default, this loads from `master`, include the argument `ref = BRANCH_NAME` to install from a branch. For `devtools::install_git()` to work with SSH, first install the {git2r} package (though even this doesn't work in R 4.3).
 
 ```         
 ## GITHUB INSTALL
 
 # SSH- preferred
 
-devtools::install_git("git@github.com:MDBAuth/WERP_toolkit.git", ref = 'master', force = TRUE, upgrade = 'ask')
+devtools::install_git("git@github.com:MDBAuth/HydroBOT.git", ref = 'master', force = TRUE, upgrade = 'ask')
 
 ## LOCAL INSTALL- easier for quick iterations, but need a path.
-devtools::install_local("path/to/WERP_toolkit/HydroBOT", force = TRUE)
+devtools::install_local("path/to/HydroBOT/HydroBOT", force = TRUE)
 
 # And for very fast iteration (no building, but exposes too much, often)
-devtools::load_all("path/to/WERP_toolkit/HydroBOT")
+devtools::load_all("path/to/HydroBOT")
 ```
 
 If you're installing this repo and rebuilding the R environment with `renv`, it will fail to install {HydroBOT} if you haven't set up SSH for github.
 
-Using `renv` to manage installations enforces the same install of [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) when the environment is rebuilt. The `renv.lock` has the address for the repo as either the SSH or HTTPS path, and the hash. And so if trying to `renv::restore` the package locally or with HTTPS instead of SSH, it will get mad. That's fine, we can still `install` it, but keeping environments synced gets annoying. Until HydroBOT is public, the easiest way to do this is to be on SSH everywhere, but this is not currently possible with R 4.3.
+Using `renv` to manage installations enforces the same install of [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) when the environment is rebuilt. The `renv.lock` has the address for the repo as either the SSH or HTTPS path, and the hash. And so if trying to `renv::restore` the package locally or with HTTPS instead of SSH, it will get mad. That's fine, we can still `install` it, but keeping environments synced gets annoying. Until HydroBOT is public, the easiest way to do this is to be on SSH everywhere, but this is not currently possible with R 4.3.
 
 **If possible, please use `install_git` with the ssh path before taking a `renv::snapshot`- that is the only way that captures a version out of github (and so accessible to everyone), and works cross-platform. If there's been a lot of active building using `load_all` or `install_local`, that's fine, but before updating the renv version, push those changes and `install_git`.**
 
 #### Windows note
 
-This seems to be working now, as long as the `renv.lock` was generated from a location that used `install_git` to install it. Make sure to create both the profile and bashrc as in the [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) dev notes- they both seem to be needed to install. Then, we also need to install the `git2r` package, or `install_git` will still fail, but we *cannot* pass the `credentials` argument, even though that seems like what we should do.
+This seems to be working now, as long as the `renv.lock` was generated from a location that used `install_git` to install it. Make sure to create both the profile and bashrc as in the [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) dev notes- they both seem to be needed to install. Then, we also need to install the `git2r` package, or `install_git` will still fail, but we *cannot* pass the `credentials` argument, even though that seems like what we should do.
 
 #### Azure note
 
@@ -95,7 +95,7 @@ Strange render errors could be due to out-of-date quarto versions, currently usi
 
 Rebuilding data across the notebooks is done with params to avoid overwriting data unless we mean to. To rebuild, at the terminal in HydroBOT_website run `quarto render path/to/notebook_to_rebuild.qmd -P REBUILD_DATA:TRUE`. To rebuild *everything* in the project, run `quarto render -P REBUILD_DATA:TRUE`. Running these commands without the parameters will re-render but not rebuild.
 
-The only documents with `REBUILD_DATA: TRUE` by default are the `scenario_creation/scenario_creation_more.qmd` notebook and the `full_toolkit/WERP_toolkit_save_steps.qmd`, to avoid having multiple notebooks rebuild the same data when we render the site. Because `quarto render` runs in alphabetical order, it is usually best to run those two files first manually so the data exists for all downstream uses.
+The only documents with `REBUILD_DATA: TRUE` by default are the `provided_data/scenario_creation.qmd` notebook and the `workflows/workflow_save_steps.qmd`, to avoid having multiple notebooks rebuild the same data when we render the site. Because `quarto render` runs in alphabetical order, it is usually best to run those two files first manually so the data exists for all downstream uses.
 
 ## Building website
 

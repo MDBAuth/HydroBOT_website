@@ -20,7 +20,7 @@ library(ggplot2)
 
 We have [theme aggregation](theme_agg.qmd) and [spatial aggregation](spatial_agg.qmd) shown separately for in-depth looks at their meaning and capability. Here, we focus on the typical use-case of interleaved aggregation along multiple dimensions. We do not get into all the different options and [syntax](aggregation_syntax.qmd) as they are covered in those other documents.
 
-All aggregation in [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) operate on the same core function and use similar principles- take a list of aggregation sequences, and aggregate each step according to a list of aggregation functions. Here, we show how `multi_aggregate` allos us to interleave the dimensions along which we aggregate, including auto-detecting which dimension we're operating on (though that is fragile).
+All aggregation in [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) operate on the same core function and use similar principles- take a list of aggregation sequences, and aggregate each step according to a list of aggregation functions. Here, we show how `multi_aggregate` allos us to interleave the dimensions along which we aggregate, including auto-detecting which dimension we're operating on (though that is fragile).
 
 Fundamentally, `multi_aggregate` wraps `theme_aggregate` and `spatial_aggregate` with some data organisation and tracking of what the previous level of aggregation was to maintain proper grouping as they alternate. Both of those, in turn, wrap `general_aggregate` with some data arrangement specific to the dimension they aggregate along, such as stripping and re-adding geometry.
 
@@ -28,7 +28,7 @@ For inputs, `multi_aggregate` expects the incoming data to be in memory and geog
 
 ## Demonstration setup
 
-First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/WERP_toolkit) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
+First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
 project_dir <- file.path('more_scenarios')

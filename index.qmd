@@ -53,7 +53,7 @@ Users should consider the various capabilities demonstrated here, and then devel
 
 ## Workflow
 
-The basic workflow of HydroBOT involves identifying and selecting data inputs representing scenarios, running response models, aggregation, scaling, and onward modelling of those outputs, and finally synthesis and production of output figures, tables, and other products. In concept, the HydroBOT workflow is split into three components: the *controller*, which points to data and runs response models, the *aggregator*, which scales the outputs of those models in space, time, and along causal networks, and the *comparer*, which synthesizes and produces interpretable outputs. There are many ways to structure this workflow in practice, with examples [here](full_toolkit/full_toolkit_overview.qmd).
+The basic workflow of HydroBOT involves identifying and selecting data inputs representing scenarios, running response models, aggregation, scaling, and onward modelling of those outputs, and finally synthesis and production of output figures, tables, and other products. In concept, the HydroBOT workflow is split into three components: the [*controller*](controller/controller_overview.qmd) which points to data and runs response models, the [*aggregator*](aggregator/aggregation_overview.qmd) which scales the outputs of those models in space, time, and along causal networks, and the [*comparer*](comparer/comparer_overview.qmd) which synthesizes and produces interpretable outputs. There are many ways to structure this workflow in practice, with examples [here](workflows/workflow_overview.qmd).
 
 ![Conceptualisation of HydroBOT architecture (blue arrows) and links to management decision making (yellow arrows). Scenarios, represented by hydrographs, reflect observed flows or modeled scenarios (produced via hydrological modelling outside HydroBOT). These hydrographs are fed in a consistent way to various response models via the HydroBOT Controller. These response models could assess response of any values of interest, here illustrated as a range of value types across environmental and human dimensions. Additional inputs of spatial data and causal networks provide grouping information for scaling via the HydroBOT Aggregator. The HydroBOT Comparer synthesizes the results into management-relevant outputs that aid decision making. This decision-making process is also supported by feedback from stakeholders, other expert advice and the social and political landscape. Water planning and policy decisions can then guide the development of scenarios to assess potential management options, which in turn can be assessed with HydroBOT.](images/Figure_1.png){#fig-tktomgmt}
 
@@ -81,22 +81,22 @@ Each of the components are discussed in more detail, with this detail used to mo
 
     -   [hydrographs](comparer/hydrographs.qmd)
 
-    -   [bar](comparer/bar_plots.qmd), [line](comparer/line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from the toolkit
+    -   [bar](comparer/bar_plots.qmd), [line](comparer/line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from HydroBOT
 
 ### Dependencies
 
 HydroBOT relies on external information in three main ways. First, it uses externally-defined response models, currently the [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool). It also requires causal networks to link those outputs to larger-scale values. Finally, it requires the input scenarios, without which it would have nothing to model from.
 
--   [Causal networks](causal_networks/causal_plots.qmd)
+-   [Causal networks](provided_data/causal_plots.qmd)
 
     -   Causal networks are needed for aggregation and comparison, but are not part of the flow *per se*.
 
--   [Scenario creation](scenario_creation/scenario_creation_more.qmd)
+-   [Scenario creation](provided_data/scenario_creation.qmd)
 
-    -   Scenario creation is not part of the toolkit, but scenarios are needed to run the toolkit
+    -   Scenario creation is not part of HydroBOT, but scenarios are needed to run HydroBOT
 
-**In use, the toolkit expects that scenario hydrographs are available and the causal networks are defined.**
+**In use, HydroBOT expects that scenario hydrographs are available and the causal networks are defined.**
 
 ## Development
 
-See the [repo readme](https://github.com/MDBAuth/HydroBOT_website) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/MDBAuth/WERP_toolkit) repo for development of the package itself.
+See the [repo readme](https://github.com/MDBAuth/HydroBOT_website) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/MDBAuth/HydroBOT) repo for development of the package itself.

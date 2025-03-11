@@ -37,8 +37,8 @@ The causal networks for environmental, cultural, social, or economic values are 
 
 ### How are they useful?
 
-The causal networks enables 1) visual representation of the complex inter-relationships between scenario inputs (hydrographs) and river-related outcomes and 2) assessment of outcomes aggregated along the [thematic dimension](../aggregator/theme_agg.qmd). The former, aids transparency, elucidating the targets and causal relationships behind the Driver-indicator-response models and is a useful device for communication about the toolkit and its outputs. The latter, allows outcomes to be assessed for individual (or sets of) environmental objectives, target groups, long-term targets, or at the level of the quadruple bottom line to identify synergies and trade-offs among values. 
+The causal networks enables 1) visual representation of the complex inter-relationships between scenario inputs (hydrographs) and river-related outcomes and 2) assessment of outcomes aggregated along the [thematic dimension](../aggregator/theme_agg.qmd). The former, aids transparency, elucidating the targets and causal relationships behind the Driver-indicator-response models and is a useful device for communication about HydroBOT and its outputs. The latter, allows outcomes to be assessed for individual (or sets of) environmental objectives, target groups, long-term targets, or at the level of the quadruple bottom line to identify synergies and trade-offs among values. 
 
-### In the toolkit
+### In HydroBOT
 
-The toolkit provides various functions for [creation and manipulation](causal_manipulation.qmd) of causal networks, depending on what needs to be plotted or investigated, and the [causal plots](causal_plots.qmd) page provides some examples of various ways they can be visualised with the toolkit.
+HydroBOT provides various functions for [creation and manipulation](causal_manipulation.qmd) of causal networks, depending on what needs to be plotted or investigated, and the [causal plots](causal_plots.qmd) page provides some examples of various ways they can be visualised with HydroBOT.

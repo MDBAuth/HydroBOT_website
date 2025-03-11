@@ -1,0 +1,22 @@
+---
+title: "Data"
+format: html
+---
+
+Some spatial units and networks are needed for spatial and value-dimension aggregation. Users can supply their own, but HydroBOT includes a set of [spatial data](spatial_data.qmd) and [causal networks](causal_overview.qmd) relevant to the Murray-Darling Basin and EWRs.
+
+HydroBOT also includes example hydrographs suitable for example analyses in both csv and netcdf formats in `extdata`. To access, use
+
+``` R
+system.file('extdata/testsmall/hydrographs', package = 'HydroBOT')
+```
+
+for csvs or
+
+``` R
+system.file('extdata/ncdfexample/nchydros', package = 'HydroBOT')
+```
+
+for netcdfs.
+
+For this website, we use a larger set of example scenarios that are too large to provide with the package but make more interesting demonstrations. These are in the `more_scenarios` directory in this repository, and created [here](scenario_creation.qmd).

@@ -63,7 +63,7 @@ scene_pal <- make_pal(unique(scenarios$scenario_name),
 
 ## Choosing example data
 
-First, we read in the aggregated data. There is example data provided by the toolkit (`agg_theme_space` and `agg_theme_space_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/theme_space_agg.qmd).
+First, we read in the aggregated data. There is example data provided by HydroBOT (`agg_theme_space` and `agg_theme_space_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/theme_space_agg.qmd).
 
 *Note*- to `readRDS` `sf` objects, we need to have `sf` loaded.
 
@@ -139,7 +139,7 @@ sdl_line_options <- obj_sdl_to_plot |>
 sdl_line_options
 ```
 
-We can also give the groups different palettes, as demonstrated more completely in the [bar plots](bar_plots.qmd) and [causal networks](../causal_networks/causal_plots.qmd). Now, we don't need `point_group` anymore, since the colors are assigned to the unique `env_obj`s.
+We can also give the groups different palettes, as demonstrated more completely in the [bar plots](bar_plots.qmd) and [causal networks](../provided_data/causal_plots.qmd). Now, we don't need `point_group` anymore, since the colors are assigned to the unique `env_obj`s.
 
 ```{r}
 #| label: fig-env-grouped

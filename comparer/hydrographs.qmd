@@ -16,7 +16,7 @@ library(dplyr)
 
 # Overview
 
-This notebook provides descriptive plots of the inputs to the toolkit (hydrographs), as they are often necessary for understanding the outputs. Though these are plots of the inputs, they do still allow various sorts of comparisons, whether simple visual comparisons or calculated differences, relative flows, etc.
+This notebook provides descriptive plots of the inputs to HydroBOT (hydrographs), as they are often necessary for understanding the outputs. Though these are plots of the inputs, they do still allow various sorts of comparisons, whether simple visual comparisons or calculated differences, relative flows, etc.
 
 ## Demonstration setup
 

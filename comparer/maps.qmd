@@ -13,7 +13,7 @@ library(sf)
 
 # Overview
 
-This notebook provides examples of creating maps to display toolkit data and especially aggregated outcomes. Typically, these have quantitative fill that is spatially-relevant, whether that is a point (gauge) or polygon (SDL unit, basin, etc). The numerical values can be more difficult to ascertain precisely from maps, but they are often the clearest way to present spatial data, especially when the message is one of spatial variation. Because maps lose two dimensions for data, we often have to reduce the number of categories we look at and rely heavily on facetting.
+This notebook provides examples of creating maps to display HydroBOT data and especially aggregated outcomes. Typically, these have quantitative fill that is spatially-relevant, whether that is a point (gauge) or polygon (SDL unit, basin, etc). The numerical values can be more difficult to ascertain precisely from maps, but they are often the clearest way to present spatial data, especially when the message is one of spatial variation. Because maps lose two dimensions for data, we often have to reduce the number of categories we look at and rely heavily on facetting.
 
 As with all plots in {HydroBOT}, maps have the ability to use color and different color palettes to include additional information, including type of response. These settings are dealt with more completely in the [bar_plots](bar_plots.qmd), with much of the mechanics the same for maps and [lines](line_plots.qmd) e.g. the use of `colorgroups` and a list for `pal_list`.
 
@@ -61,7 +61,7 @@ scene_pal <- make_pal(unique(scenarios$scenario_name),
 
 ## Choosing example data
 
-First, we read in the aggregated data. There is example data provided by the toolkit (`agged_data` and `agged_data_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/theme_space_agg.qmd).
+First, we read in the aggregated data. There is example data provided by HydroBOT (`agged_data` and `agged_data_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/theme_space_agg.qmd).
 
 *Note*- to `readRDS` `sf` objects, we need to have `sf` loaded.
 

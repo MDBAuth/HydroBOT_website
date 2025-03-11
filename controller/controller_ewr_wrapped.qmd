@@ -18,7 +18,7 @@ library(HydroBOT)
 library(future)
 ```
 
-The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, we set the directory and any other needed parameters (e.g. point at a config file), and the controller functions auto-generate the folder structure, run the ewr, and output the results. This can be taken up a level to the [the whole toolkit](../full_toolkit/full_toolkit_overview.qmd), where the controller and subsequent steps are all run at once. A [detailed stepthrough](controller_ewr_stepthrough.qmd) of what happens in the controller is also available, useful to see what is happening under the hood.
+The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, we set the directory and any other needed parameters (e.g. point at a config file), and the controller functions auto-generate the folder structure, run the ewr, and output the results. This can be taken up a level to the [combined workflow](../workflows/workflow_overview.qmd), where the controller and subsequent steps are all run at once. A [detailed stepthrough](controller_ewr_stepthrough.qmd) of what happens in the controller is also available, useful to see what is happening under the hood.
 
 # Setup
 
@@ -54,7 +54,7 @@ if (params$REBUILD_DATA) {
 
 ## Run and save
 
-The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent. This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit](../full_toolkit/WERP_toolkit_save_steps.qmd).
+The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent. This is not actually run here for speed- the same thing is done in a notebook for the [combined workflow](../workflows/workflow_save_steps.qmd).
 
 The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allows replication of this step with `run_toolkit_params`. These files build on earlier steps if possible, including any available metadata from scenarios. Using `rparallel = TRUE` runs this in parallel if available.
 

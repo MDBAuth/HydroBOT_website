@@ -5,7 +5,7 @@ params:
   REBUILD_DATA: FALSE
 ---
 
-This document provides a template for running through the toolkit, saving the output of each step along the way in a single document (e.g. not running the Controller, Aggregator, and Comparer as separate notebooks). Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_in_memory.qmd).
+This document provides a template for running through HydroBOT, saving the output of each step along the way in a single document (e.g. not running the Controller, Aggregator, and Comparer as separate notebooks). Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](workflow_in_memory.qmd).
 
 ```{r}
 #| message: false
@@ -15,7 +15,7 @@ library(sf)
 
 ## Structure
 
-To run the toolkit, we need to provide paths to directories for input data and output data, as well as arguments for the aggregation.
+To run HydroBOT, we need to provide paths to directories for input data and output data, as well as arguments for the aggregation.
 
 One option is to do that in a parameters file, and then treat this as a parameterised notebook.
 
@@ -27,7 +27,7 @@ The other option is to have this *be* the parameterising file, so we can have a 
 
 ### Input and output directories
 
-Use the `scenario_example/` directory [created](../scenario_creation/scenario_creation_more.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
+Use the `scenario_example/` directory [created](../provided_data/scenario_creation.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
 
 *Normally* `project_dir` should point somewhere external (though keeping it outside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.The [flow scaling example](https://github.com/MDBAuth/toolkit-flow-scaling) takes the more typical approach of pointing to data external to the repo.
 
@@ -54,7 +54,7 @@ We use the default IQQM model format and climate categorisations, though those c
 
 ### Control output and return
 
-To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'yearly'`, `'all_events'` `'all_successful_events'`, and `'all_successful_interEvents'`. For this demonstration I'll just use `summary` and `'yearly'` because that is needed for EWR assessment and not return anything to memory (we do that in [a different notebook](WERP_toolkit_in_memory.qmd).
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'yearly'`, `'all_events'` `'all_successful_events'`, and `'all_successful_interEvents'`. For this demonstration I'll just use `summary` and `'yearly'` because that is needed for EWR assessment and not return anything to memory (we do that in [a different notebook](workflow_in_memory.qmd).
 
 ```{r}
 outputType <- list('summary', 'yearly')
@@ -188,7 +188,7 @@ target_funseq <- list('ArithmeticMean',
 sdl_target_agg_dir <- file.path(agg_results, 'sdl_target')
 ```
 
-# Run the toolkit
+# Run HydroBOT
 
 ## Controller
 
@@ -276,7 +276,7 @@ It would be straightforward here to run the comparer as well, but as discussed a
 
 # Quick check
 
-To check here that we did in fact run the toolkit, we read in the data and make a quick (crude) plot.
+To check here that we did in fact run HydroBOT, we read in the data and make a quick (crude) plot.
 
 ```{r}
 #| message: false

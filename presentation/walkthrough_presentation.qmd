@@ -1,12 +1,12 @@
 ---
-title: "Toolkit walkthrough"
+title: "HydroBOT walkthrough"
 format:
   revealjs: 
     theme: default
 echo: true
 ---
 
-## Full toolkit run
+## Full HydroBOT run
 
 ```{r}
 #| message: false
@@ -87,7 +87,7 @@ funseq <- list(c('CompensatingFactor'),
                c('ArithmeticMean'))
 ```
 
-# Run the toolkit
+# Run HydroBOT
 
 Typically automatically
 

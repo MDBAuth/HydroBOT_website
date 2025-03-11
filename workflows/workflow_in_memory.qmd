@@ -1,11 +1,11 @@
 ---
-title: "Run full toolkit in memory"
+title: "Run full workflow in memory"
 editor: visual
 params:
   REBUILD_DATA: FALSE
 ---
 
-This document provides a template for running through the toolkit in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](WERP_toolkit_save_steps.qmd).
+This document provides a template for running through HydroBOT in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](workflow_save_steps.qmd).
 
 Load the package
 
@@ -16,7 +16,7 @@ library(HydroBOT)
 
 ## Structure
 
-To run the toolkit, we need to provide paths to directories for input data and output data, as well as arguments for the aggregation.
+To run HydroBOT, we need to provide paths to directories for input data and output data, as well as arguments for the aggregation.
 
 One option is to do that in a parameters file, and then treat this as a parameterised notebook.
 
@@ -28,7 +28,7 @@ The other option is to have this *be* the parameterising file, so we can have a 
 
 ### Input and output directories
 
-Use the `scenario_example/` directory [created](../scenario_creation/scenario_creation_more.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
+Use the `scenario_example/` directory [created](../provided_data/scenario_creation.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
 
 *Normally* `scenario_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo. *I will probably change that when I move to Azure*.
 
@@ -122,11 +122,11 @@ funseq <- list(c('CompensatingFactor'),
 
 ```
 
-# Run the toolkit
+# Run HydroBOT
 
 ## Controller
 
-This is not actually run here for speed- the same thing is done in a notebook for the [full toolkit saving steps](../full_toolkit/WERP_toolkit_save_steps.qmd).
+This is not actually run here for speed- the same thing is done in a notebook for the [workflow saving each step](../workflows/workflow_save_steps.qmd).
 
 ```{r}
 #| eval: false
