@@ -1,0 +1,102 @@
+---
+title: "Build demo data"
+format: html
+params:
+  REBUILD_DATA: FALSE
+---
+
+This notebook regenerates outputs for the demonstrations. We generally do not want to run it every time.
+
+```{r}
+#| message: false
+library(HydroBOT)
+library(sf)
+library(dplyr)
+library(ggplot2)
+```
+
+This is a big run, best to do it in parallel.
+
+```{r}
+future::plan(future::multisession)
+```
+
+```{r}
+#| message: false
+# Outer directory for scenario
+project_dir = file.path('more_scenarios')
+
+# Preexisting data
+# Hydrographs (expected to exist already)
+hydro_dir = file.path(project_dir, 'hydrographs')
+
+# Generated data
+# EWR outputs (will be created here in controller, read from here in aggregator)
+ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+
+# outputs of aggregator. There may be multiple modules
+agg_results <- file.path(project_dir, 'aggregator_output')
+```
+
+## Run the EWR tool
+
+Using `rparallel = TRUE` for speed to parallelise over all scenarios.
+
+```{r}
+#| message: false
+
+if (params$REBUILD_DATA) {
+  ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                              output_parent_dir = project_dir, 
+                              outputType = list('yearly'),
+                              rparallel = TRUE)
+}
+
+```
+
+## Aggregate
+
+Use a 'standard' aggregation sequence, as in [getting started](../getting_started.qmd).
+
+```{r}
+aggseq <- list(all_time = 'all_time',
+               ewr_code = c('ewr_code_timing', 'ewr_code'),
+               sdl_units = sdl_units,
+               env_obj =  c('ewr_code', "env_obj"),
+               Target = c('env_obj', 'Target'),
+               mdb = basin,
+               target_5_year_2024 = c('Target', 'target_5_year_2024'))
+
+funseq <- list('ArithmeticMean', 
+               'CompensatingFactor',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean')
+```
+
+Be explicit instead of using `auto_ewr_PU`
+
+```{r}
+
+if (params$REBUILD_DATA) {
+  aggout <- read_and_agg(datpath = ewr_results, 
+             type = 'achievement',
+             geopath = bom_basin_gauges,
+             causalpath = causal_ewr,
+             groupers = 'scenario',
+             aggCols = 'ewr_achieved',
+           group_until = list(planning_unit_name = is_notpoint, 
+                                gauge = is_notpoint),
+            pseudo_spatial = 'planning_unit',
+             aggsequence = aggseq,
+             funsequence = funseq,
+             saveintermediate = TRUE,
+             namehistory = FALSE,
+             keepAllPolys = FALSE,
+             returnList = TRUE,
+             savepath = agg_results,
+           rparallel = TRUE)
+}
+```

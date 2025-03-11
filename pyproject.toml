@@ -5,7 +5,7 @@ description = ""
 authors = ["Galen Holt <53928785+galenholt@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "werp_toolkit_demo"}]
+packages = [{include = "HydroBOT_website"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"

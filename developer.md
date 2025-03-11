@@ -33,7 +33,7 @@ Use `pyenv` [to manage python versions](https://github.com/pyenv/pyenv). Follow 
 
 Then close and restart bash, and run `pyenv install 3.11.0` or whatever version we're using. I needed to `sudo apt-get install libffi-dev` to get it to compile some C bits on Azure. Poetry doesn't actually recognize the defaults, but this still works to install versions. We just end up needing to use `poetry env use VERSION`- see below.
 
-At present, we do most of the work in R, but {HydroBOT} wraps some python, and we also use some (predominantly from [py-ewr](https://pypi.org/project/py-ewr/) and [mdba gauge-getter](https://pypi.org/project/mdba-gauge-getter/)). To manage this, we need to create a python environment. I have already run `poetry new WERP_toolkit_demo` to create the project.
+At present, we do most of the work in R, but {HydroBOT} wraps some python, and we also use some (predominantly from [py-ewr](https://pypi.org/project/py-ewr/) and [mdba gauge-getter](https://pypi.org/project/mdba-gauge-getter/)). To manage this, we need to create a python environment. I have already run `poetry new HydroBOT_website` to create the project.
 
 To install poetry, follow the [docs](https://python-poetry.org/docs/), with some more step-by-step and issue-solving [in my notes](https://galenholt.github.io/RpyEnvs/python_setup.html)
 
@@ -93,7 +93,7 @@ Strange render errors could be due to out-of-date quarto versions, currently usi
 
 ## Rebuilding data
 
-Rebuilding data across the notebooks is done with params to avoid overwriting data unless we mean to. To rebuild, at the terminal in WERP_toolkit_demo run `quarto render path/to/notebook_to_rebuild.qmd -P REBUILD_DATA:TRUE`. To rebuild *everything* in the project, run `quarto render -P REBUILD_DATA:TRUE`. Running these commands without the parameters will re-render but not rebuild.
+Rebuilding data across the notebooks is done with params to avoid overwriting data unless we mean to. To rebuild, at the terminal in HydroBOT_website run `quarto render path/to/notebook_to_rebuild.qmd -P REBUILD_DATA:TRUE`. To rebuild *everything* in the project, run `quarto render -P REBUILD_DATA:TRUE`. Running these commands without the parameters will re-render but not rebuild.
 
 The only documents with `REBUILD_DATA: TRUE` by default are the `scenario_creation/scenario_creation_more.qmd` notebook and the `full_toolkit/WERP_toolkit_save_steps.qmd`, to avoid having multiple notebooks rebuild the same data when we render the site. Because `quarto render` runs in alphabetical order, it is usually best to run those two files first manually so the data exists for all downstream uses.
 

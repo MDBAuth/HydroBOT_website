@@ -9,9 +9,9 @@ The {HydroBOT} package needs to be installed to provide all functions used here.
 
 Installation is slightly more complex than the usual `devtools::install_github(MDBAuth/WERP_toolkit)` because the repo is private. The SSH method seems to be the most robust, though https with a github PAT is often the recommendation for private repos. In general, just use the below. A [template repo](https://github.com/MDBAuth/toolkit_use) is available, however, with necessary setup scripts and test notebooks for a range of systems and uses.
 
-- To set up SSH, go to the github instructions [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) and then [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
+-   To set up SSH, go to the github instructions [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) and then [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
 
-- To set up a PAT, {usethis} has a good [walkthrough](https://usethis.r-lib.org/articles/git-credentials.html).
+-   To set up a PAT, {usethis} has a good [walkthrough](https://usethis.r-lib.org/articles/git-credentials.html).
 
 ```{r}
 #| warning: false
@@ -40,6 +40,7 @@ Load the package
 #| eval: false
 library(HydroBOT)
 ```
+
 ## Example workflow
 
 ### Controller
@@ -72,7 +73,7 @@ ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir,
 
 ### Aggregation
 
-We need to define an aggregation sequence, which specifies the steps along space, time, and value dimensions, as well as a matching sequence of aggregation functions at each step. The example here is a reasonable default for many situations, but should be considered carefully. Please see the [aggregator section](aggregator/aggregation_overview.qmd) for a detailed treatment of the syntax and capabilities of these sequences.  
+We need to define an aggregation sequence, which specifies the steps along space, time, and value dimensions, as well as a matching sequence of aggregation functions at each step. The example here is a reasonable default for many situations, but should be considered carefully. Please see the [aggregator section](aggregator/aggregation_overview.qmd) for a detailed treatment of the syntax and capabilities of these sequences.
 
 For this example, if any of the 'versions' of an EWR pass, say it passes in step 2. If we think the 'versions' are actually separate EWRs for different purposes, we might use 'ArithmeticMean' in step 2 intead.
 
@@ -157,4 +158,3 @@ plot_outcomes(outcome_col = 'ewr_achieved',
 
 catchcompare
 ```
-

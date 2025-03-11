@@ -124,7 +124,7 @@ make_causal_plot(nodes, edges,
 
 ## Plot setup- more options and next steps
 
-The above is running with defaults, but there's quite a bit more capacity to change what is plotted and the look of the graphs. Primarily, I've focused on development related to how we'll want to feed the outputs of the toolkit to the the network (e.g. shifts in the relationships or values of the nodes, such as fewer birds- see for example [theme aggregation](../aggregator/theme_agg.qmd) and [overview presentation](../presentation_paper/walkthrough_presentation.qmd). That could be done with colour, node size, or edge penwidth.
+The above is running with defaults, but there's quite a bit more capacity to change what is plotted and the look of the graphs. Primarily, I've focused on development related to how we'll want to feed the outputs of the toolkit to the the network (e.g. shifts in the relationships or values of the nodes, such as fewer birds- see for example [theme aggregation](../aggregator/theme_agg.qmd) and [overview presentation](../presentation/walkthrough_presentation.qmd). That could be done with colour, node size, or edge penwidth.
 
 Colour can be specified differently than is done by default above, such as coloring the nodes within the node groups by outcome, or assigning different node groups different color palettes, following the same idea as the generic `colorgroups` and `colorset` arguments in all the plotting functions. There's an obvious step of making it interactive/dynamic, but that hasn't been implemented yet.
 
@@ -151,7 +151,7 @@ make_causal_plot(nodes,
 
 #### Nodes (and single-colour edges)
 
-We can also colour the nodes by results. Here I've also set the edges just to a single color - feeding `edge_pal` or `node_pal` a single character value specifying a colour or a character vector of length `nrow` of the relevant dataframe will just insert those values and bypass the palettes. Again, I start by dummying up some 'toolkit results' in a `value` column. Examples where these values do come out of EWR results is in the [theme aggregation notebook](../aggregator/theme_agg.qmd) and the [overview presentation](../presentation_paper/walkthrough_presentation.qmd).
+We can also colour the nodes by results. Here I've also set the edges just to a single color - feeding `edge_pal` or `node_pal` a single character value specifying a colour or a character vector of length `nrow` of the relevant dataframe will just insert those values and bypass the palettes. Again, I start by dummying up some 'toolkit results' in a `value` column. Examples where these values do come out of EWR results is in the [theme aggregation notebook](../aggregator/theme_agg.qmd) and the [overview presentation](../presentation/walkthrough_presentation.qmd).
 
 ```{r}
 nodewithvals <- nodes %>% 

@@ -17,7 +17,7 @@ library(dplyr)
 
 -   Many options we could set
 
--   See options at [github pages site](https://special-disco-eyonrvy.pages.github.io/){target="_blank"} for [WERP_toolkit_demo](https://github.com/MDBAuth/WERP_toolkit_demo){target="_blank"}
+-   See options at [github pages site](https://special-disco-eyonrvy.pages.github.io/){target="_blank"} for [HydroBOT_website](https://github.com/MDBAuth/HydroBOT_website){target="_blank"}
 
 -   Can run with minimal arguments
 

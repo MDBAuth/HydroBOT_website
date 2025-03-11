@@ -99,4 +99,4 @@ HydroBOT relies on external information in three main ways. First, it uses exter
 
 ## Development
 
-See the [repo readme](https://github.com/MDBAuth/WERP_toolkit_demo) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/MDBAuth/WERP_toolkit) repo for development of the package itself.
+See the [repo readme](https://github.com/MDBAuth/HydroBOT_website) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/MDBAuth/WERP_toolkit) repo for development of the package itself.
