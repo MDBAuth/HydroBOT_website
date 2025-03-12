@@ -1,8 +1,56 @@
-# For this demonstration, we just modify the output_parent_dir and aggregation_def
+# For this demonstration, we modify the output_parent_dir and aggregation
 
-# Outer directory for scenario
-output_parent_dir: 'more_scenarios'
+ewr:
+  # Outer directory for scenario
+  output_parent_dir: 'hydrobot_scenarios/testsmall'
 
-# aggregation sequences (need to be defined in R)
-aggregation_def: 'workflows/params.R'
+aggregation:
+  # aggregation sequences defined in R- either NULL to define here or a path to a .R file
+  aggregation_def: NULL
+
+  # These allow defining funs internally as lists. if aggregation_def is NULL, these need to have values and vice versa
+  aggsequence:
+    ewr_code:
+    - ewr_code_timing
+    - ewr_code
+    env_obj:
+    - ewr_code
+    - env_obj
+    sdl_units: sdl_units
+    Specific_goal:
+    - env_obj
+    - Specific_goal
+    Objective:
+    - Specific_goal
+    - Objective
+    basin: basin
+    target_5_year_2024:
+    - Objective
+    - target_5_year_2024
+
+  funsequence:
+    ewr_code:
+    - CompensatingFactor
+    env_obj:
+    - ArithmeticMean
+    sdl_units:
+    - ArithmeticMean
+    Specific_goal:
+    - list(mean = ~mean(., na.rm = TRUE))
+    Objective:
+    - ArithmeticMean
+    basin:
+    - SpatialWeightedMean
+    target_5_year_2024:
+    - ArithmeticMean
+
+  # Setting auto_ewr_PU is TRUE (as in the default yaml) is easier than passing pseudo_spatial, but we can do the group_until and pseudo-spatial explicitly
+  auto_ewr_PU: FALSE
+
+  group_until:
+    planning_unit_name: sdl_units
+    gauge: sdl_units
+    SWSDLName: sdl_units
+
+  pseudo_spatial: sdl_units
 

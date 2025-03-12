@@ -23,18 +23,16 @@ website:
     left:
       - href: getting_started.qmd
         text: Get started
+      - href: workflows/workflow_overview.qmd
+        text: Workflows
       - href: controller/controller_overview.qmd
         text: Controller
       - href: aggregator/aggregation_overview.qmd
         text: Aggregator
       - href: comparer/comparer_overview.qmd
         text: Comparer
-      - href: workflows/workflow_overview.qmd
-        text: Workflows
       - href: provided_data/data_overview.qmd
-        text: Scenario creation
-      - href: provided_data/causal_overview.qmd
-        text: Causal networks
+        text: Provided data
     right:
       - icon: github
         href: https://github.com/MDBAuth/HydroBOT_website

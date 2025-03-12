@@ -1,21 +1,15 @@
 ---
 title: "Parameterised workflow"
 editor: visual
-params:
-  REBUILD_DATA: FALSE
-  # Outer directory for scenario
-  output_parent_dir: 'more_scenarios'
-  
-  # aggregation sequences (need to be defined in R)
-  aggregation_def: 'workflows/params.R'
-  
-  # Climate
-  climate: 'NSW 10,000 year climate sequence'
+# params:
+#   ewr: !r list(output_parent_dir = 'hydrobot_scenarios/testsmall')
+# 
+#   aggregation: !r list(aggregation_def = 'workflows/params.R')
 ---
 
-This document provides a template for running HydroBOT from a parameters file, as we might do when batch processing. As such, it typically wouldn't be run through a notebook, but be called with `Rscript`. That sort of setup could go a lot of different directions depending on use case, so for now we'll just demonstrate how to set up the parameter file and use it, and leave it to the user to build the script that gets called with `Rscript` from the command line or as part of an external process.
+This document provides a template for running HydroBOT from a parameters file, as we might do when batch processing. As such, it typically wouldn't be run through a notebook, but be called with `Rscript`. That sort of setup can go a lot of different directions depending on use case, and we assume a user would be familiar with shell scripting and the particular idiosyncracies of their relevant batching system. Here, we demonstrate how to set up the parameter file and use it, and leave it to the user to build the script that gets called with `Rscript` from the command line or as part of an external process.
 
-It is *also* possible to put the parameters in the yaml header of a quarto notebook (which we also do here, as an example. We provide examples of using the parameterised system several different ways below, including from external `params.yml` files, passed parameters, and the list Quarto generates in parameterised notebooks.
+We have the ability to have a default params file, a second params file that tweaks those defaults, as well as include params in Quarto header yaml. These different options are all used here.
 
 Load the package
 
@@ -26,21 +20,25 @@ library(HydroBOT)
 
 ## Structure of params files and arguments
 
-The `run_toolkit_params` function takes three arguments: `yamlpath`, which is a path to a yaml params file, `passed_args` which can come from the command line, and `defaults`, which is another yaml file, and lets us set most of the params, and only modify a subset with the `yamlpath` file and `passed_args`.
+The `run_hydrobot_params` function takes four arguments: `yamlpath`, which is a path to a yaml params file, `passed_args` which can come from the command line, `list_args`, and `defaults`, which is another yaml file. This two-yaml approach lets us set most of the params in common across all runs, and only modify a subset with the `yamlpath` file or `passed_args`.
 
-The package comes with a set of default parameters in `system.file('yml/default_params.yml', package = 'HydroBOT')`. Users can however create their own default yaml params file to set a standard set of defaults for a given project. See this file for available parameters.
+In all cases, the arguments end up in a list with two top-level items: `ewr` and `aggregation`, within which items can be added with names matching the arguments to \[prep_run_save_ewrs()\] and \[read_and_agg()\], respectively. This gives full control over those functions.
+
+The package comes with a set of default parameters in `system.file('yml/default_params.yml', package = 'HydroBOT')`. Users can (should) however create their own default yaml params file to set a standard set of defaults for a given project. See this file for basic structure.
 
 The `params.yml` file (or any other name, passed to `yamlpath`) and `passed_args` and `list_args` then can be used to modify the default values. The idea is only a small subset of those defaults would be modified for a particular run.
 
-The `params.R` file (pointed to with the yaml parameter `aggregation_def`) is necessary because aggregation specification needs R objects or syntax.
+In general, it is best to specify everything in terms of characters, logicals, or NULL. If there is a situation where that isn't possible (bespoke spatial data, for example), it is possible to specify the `aggsequence` and `funsequence` with an R script. To do that, change the `aggregation_def` entry of the `aggregation` list to the path to that R script. For an example, see `system.file('yml/params.R', package = 'HydroBOT')`.
 
-Finally, `HydroBOT::param_runner()` ingests paths to these files (or passed command line or lists), turns their params into R arguments, and runs HydroBOT.
+Finally, \[run_hydrobot_params()\] ingests paths to these files (or passed command line or lists), turns their params into R arguments, and runs HydroBOT.
 
+::: callout-important
 The arguments overwrite each other, so `list_args` has highest precedence, followed by `passed_args`, `yamlpath`, and finally `defaults`.
+:::
 
-### Note- no comparer
-
-At present we do not provide yaml param options for the comparer. This is possible in future, but the possibilities are a bit too wide open at present. It is likely the user will want to explore the output, rather than generate parameterised output, at least until some specific uses are settled on.
+::: callout-note
+At present we do not provide yaml param options for the comparer. This is possible, but the possibilities are a bit too wide open. It is likely the user will want to explore the output, rather than generate parameterised output, though that may change in future.
+:::
 
 # Parameters
 
@@ -55,8 +53,9 @@ Here, we provide example yaml that may appear in the files at `defaults` or `yam
 Specify the aggregation sequence in R and pass the path to that file.
 
 ``` yaml
-# aggregation sequences (need to be defined in R)
-aggregation_def: 'toolkit_project/agg_params.R'
+aggregation:
+  # aggregation sequences (need to be defined in R)
+  aggregation_def: 'toolkit_project/agg_params.R'
 ```
 
 ## Directories
@@ -64,94 +63,102 @@ aggregation_def: 'toolkit_project/agg_params.R'
 ### Input and output directories
 
 ``` yaml
-# Outer directory for scenario
-output_parent_dir: 'toolkit_project'
+ewr:
+  # Outer directory for scenario
+  output_parent_dir: 'toolkit_project'
 
-# Preexisting data
-# Hydrographs (expected to exist already)
-hydro_dir: NULL
+  # Preexisting data
+  # Hydrographs (expected to exist already)
+  hydro_dir: NULL
+  
 
-# Generated data
-# EWR outputs (will be created here in controller, read from here in aggregator)
-ewr_results: NULL
-
-# outputs of aggregator. There may be multiple modules
-# NULL doesn't save it, but holds in memory.
-agg_results: NULL
+aggregation:
+  # outputs of aggregator
+  savepath: 'path/to/aggs'
 ```
 
-*Normally* `output_parent_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo.
+*Normally* `output_parent_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.).
 
-Setting the output directories to `NULL` builds a standard toolkit directory structure, with `output_parent_dir` as the outer directory, holding `hydrographs`, `aggregator_output`, and `module_output` subdirectories.
+Setting the output directories to `NULL` expects (in the case of hydro_dir) or builds (for `savepath`) a standard toolkit directory structure, with `output_parent_dir` as the outer directory, holding `hydrographs`, `aggregator_output`, and `module_output` subdirectories.
 
 ## Module arguments
 
-Currently, just the EWR tool. More could be exposed here, but this is typically all we need.
+Currently, just the EWR tool. Any argument in \[prep_run_save_ewrs()\] can be passed. Some examples are
 
 ``` yaml
-# Model type
-model_format: 'IQQM - NSW 10,000 years'
-
-# Climate
-climate: 'Standard - 1911 to 2018 climate categorisation'
-
-# output and return
-outputType:
-  - summary
-
-returnType: none
+ewr:
+  # Model type
+  model_format: 'IQQM - netcdf'
+  
+  # output and return
+  outputType:
+    - summary
+  
+  returnType: none
 ```
 
 ## Aggregation settings
 
-These are additional arguments to `read_and_agg`.
+Any arguments to `read_and_agg`. Some examples are
 
 ``` yaml
-# What to aggregate
-aggType: summary
-
-# Aggregation settings
-agg_groups: scenario
-agg_var: ewr_achieved
-aggReturn: FALSE
-namehistory: FALSE
-keepAllPolys: TRUE
+aggregation:
+  # What to aggregate
+  type: achievement
+  
+  # Aggregation settings
+  groupers: scenario
+  aggCols: ewr_achieved
+  namehistory: FALSE
+  keepAllPolys: TRUE
 ```
 
 # Run HydroBOT
 
-These actually run HydroBOT, so they are set not to evaluate in normal use- only one of the notebooks for this website actually runs the controller- the [full toolkit](../workflows/workflow_save_steps.qmd) with saving steps.
+These examples are set not to evaluate in normal use, but show different ways of running the parameters.
+
+This runs the toolkit using a yaml parameter file that modifies the default provided with HydroBOT.
 
 ```{r}
-#| eval: false
-run_toolkit_params(yamlpath = file.path('full_toolkit', 'params.yml'))
-
+run_hydrobot_params(yamlpath = file.path('workflows', 'params.yml'))
 ```
 
-Passing arguments as text is tricky to do for more than one argument, but it would be useful for command-line use, for example. Here, we demonstrate changing the climate sequence. In practice, this would need some tweaking to use with `Rscript` and extract the string from `commandArgs()` .
+Passing arguments as text is tricky to get the yaml right for more than one argument, but it can be useful for command-line use, for example. Here, we demonstrate changing the `output_parent_dir` and the `namehistory`, noting that the number of spaces and newlines is critical to get it to work. In practice, this would need some tweaking to use with `Rscript` and extract the string from `commandArgs()` .
 
 ```{r}
 #| eval: false
-if (params$REBUILD_DATA) {
-  run_toolkit_params(yamlpath = file.path('full_toolkit', 'params.yml'),
-                     passed_args = "climate: 'NSW 10,000 year climate sequence'")
-}
+run_hydrobot_params(yamlpath = file.path('workflows', 'params.yml'),
+                    passed_args = "ewr:\n output_parent_dir: 'hydrobot_scenarios/testsmall'\naggregation:\n namehistory: TRUE")
 ```
 
-And finally, if the params are included in the parameters section of a Quarto notebook, they get parsed already, and so instead of reading them from yaml, we can use that list as if it were already read-in `params.yml`. Quarto with R puts these in a list called `params`, so we can just pass that.
+We can also pass arguments in a list from R, which is a bit easier syntax. Here, we use it to only run a subset of the scenarios and put the outputs in the same directory, as well as specify aggregation with an R file.
 
 ```{r}
 #| eval: false
-if (params$REBUILD_DATA) {
-  run_toolkit_params(list_args = params)
-}
+run_hydrobot_params(list_args = list(
+                      ewr = list(
+                        output_parent_dir = 'hydrobot_scenarios/testsmall/hydrographs/base',
+                        hydro_dir = 'hydrobot_scenarios/testsmall/hydrographs/base'
+                      ),
+                      aggregation = list(
+                        aggregation_def = "workflows/params.R",
+                        auto_ewr_PU = TRUE
+                      )
+                    ))
+```
+
+And finally, if the params are included in the parameters section of a Quarto notebook, they should get parsed. Quarto with R puts these in a list called `params`, so we could just pass that. Unfortunately, the `params` list in quarto isn't full-featured yaml, and can't do nested lists and does not currently work, but may work with `!r` syntax in Rmarkdown. This is likely to not be very useful.
+
+```{r}
+#| eval: false
+run_hydrobot_params(list_args = params)
 ```
 
 ## Replication
 
-The `prep_run_save_ewrs` and `read_and_agg` functions save metadata yaml files that are fully-specified parameters files. Thus, to replicate runs, we can run
+The `prep_run_save_ewrs` and `read_and_agg` functions save metadata yaml files that are fully-specified parameters files. Thus, to replicate runs, we can run from the final yaml (after the aggregator), as it has all preceding steps.
 
 ```{r}
 #| eval: false
-run_toolkit_params(yamlpath = 'path/to/generated/metadata.yml')
+run_hydrobot_params(yamlpath = 'hydrobot_scenarios/testsmall/aggregator_output/agg_metadata.yml')
 ```

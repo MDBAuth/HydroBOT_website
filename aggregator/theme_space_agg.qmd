@@ -427,7 +427,7 @@ allagg$target_5_year_2024 |>
 
 In practice, we often won't call `multi_aggregate` directly, but will use `read_and_agg` to run `multi_aggregate`, since it automates data read-in and processing and saving. To do the same analysis as above but using `read_and_agg`, we give it the path to the data instead of the data itself. Note also that the `geopath` and `causalpath` arguments can be objects or paths; we use objects here because they are provided with the {HydroBOT} package. We use `returnList` to return the output to the active session, and `savepath` to save an .rds file to `out_path` (but only if we're rebuilding data). The `aggsequence` here can use character specification for the spatial units, since this wraps `multi_aggregate`.
 
-The `read_and_agg` function also saves metadata files (yaml and json) that allows replication of this step with `run_toolkit_params`. These files build on earlier steps if possible, including any available metadata from the modules.
+The `read_and_agg` function also saves metadata files (yaml and json) that allows replication of this step with `run_hydrobot_params`. These files build on earlier steps if possible, including any available metadata from the modules.
 
 *Note*- to `readRDS` `sf` objects produced here, we need to have `sf` loaded in the reading script.
 

@@ -90,7 +90,7 @@ gauges_sdl <- ggplot() +
   geom_sf(data = sdl_units, fill = 'cadetblue', color = 'grey40') +
   geom_sf(data = bom_basin_gauges, color = 'goldenrod', alpha = 0.5) +
   colorspace::scale_fill_discrete_qualitative(palette = 'Set2') +
-  theme_werp_toolkit()
+  theme_hydrobot()
 gauges_sdl
 ```
 
@@ -102,7 +102,7 @@ These are most relevant in NSW; analysis at basin scale often skips and goes str
 planning_sdl <- ggplot() + 
   geom_sf(data = planning_units, mapping = aes(fill = PlanningUnitName)) +
   colorspace::scale_fill_discrete_qualitative(palette = 'Set2') +
-  theme_werp_toolkit(legend.position = 'none')
+  theme_hydrobot(legend.position = 'none')
 planning_sdl
 ```
 
@@ -116,6 +116,6 @@ gauges_rivers <- ggplot() +
   geom_sf(data = bom_basin_gauges, color = 'goldenrod',
           alpha = 0.5) +
   geom_sf(data = basin_rivers, color = 'cadetblue') +
-  theme_werp_toolkit()
+  theme_hydrobot()
 gauges_rivers
 ```

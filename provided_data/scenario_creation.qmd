@@ -26,6 +26,23 @@ library(reticulate) # Not strictly necessary but allows easier referencing of ob
 
 HydroBOT proper begins with hydrographs as inputs. The creation of those hydrographs, and particularly their modification to create scenarios is therefore typically a step that occurs prior to the use of HydroBOT. For the demonstrations here, however, we generate some example scenarios from historical hydrographs. For the purposes of capacity demonstration we simply multiply short hydrographs and put them in a standard HydroBOT input format here.
 
+For this website, we use two sets of scenarios
+
+1.  The small set that comes with hydrobot itself, useful for examples that run the modules and aggregation steps
+2.  A larger set with more interesting structure, used for demonstrating the comparer.
+
+This document mostly generates that second set, though we will also use it to copy the HydroBOT set over for ease of calling.
+
+```{r}
+if (!dir.exists('hydrobot_scenarios')) {
+  dir.create('hydrobot_scenarios')
+}
+file.copy(system.file('extdata/testsmall', package = 'HydroBOT'),
+          'hydrobot_scenarios', recursive = TRUE)
+file.copy(system.file('extdata/ncdfexample', package = 'HydroBOT'),
+          'hydrobot_scenarios', recursive = TRUE)
+```
+
 ## HydroBOT relevance
 
 The creation of flow scenarios is not part of HydroBOT proper. Instead, HydroBOT expects to ingest hydrographs and then handles the ongoing response models, aggregation, and analyses. Thus, hydrographs are an essential input to HydroBOT. The point of this code is to generate those hydrographs.

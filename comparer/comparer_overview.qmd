@@ -54,7 +54,7 @@ The `plot_*` functions use a set of theming and color controls to maintain a sta
 
 ## Theme
 
-I have developed a `theme_werp_toolkit()` ggplot theme that we use to get a consistent look. We can build on this and change it as we go, as it is fairly simple at present. Additional `theme` arguments can be passed to it, if we want to change any of the other arguments in `ggplot2::theme()` on a per-plot basis. By default, `theme_werp_toolkit` is applied when making the plots inside `plot_outcomes` and `plot_hydrographs`, though it can be applied to any ggplot object.
+I have developed a `theme_hydrobot()` ggplot theme that we use to get a consistent look. We can build on this and change it as we go, as it is fairly simple at present. Additional `theme` arguments can be passed to it, if we want to change any of the other arguments in `ggplot2::theme()` on a per-plot basis. By default, `theme_hydrobot` is applied when making the plots inside `plot_outcomes` and `plot_hydrographs`, though it can be applied to any ggplot object.
 
 ## Colour
 

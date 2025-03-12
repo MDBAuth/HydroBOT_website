@@ -11,7 +11,7 @@ HydroBOT takes hydrographs as input data and then processes it through downstrea
 
 In typical use, the controller simply points to the input data and initiates processing steps according to the user. Examples of this for [the controller alone](controller_ewr_wrapped.qmd) and [the whole toolkit](../workflows/workflow_overview.qmd) are available to illustrate this, as well as a [stepthrough](controller_ewr_stepthrough.qmd) to better understand what the controller is doing.
 
-similar to what is shown in the [combined workflow](../workflows/workflow_overview.qmd) and implement that in an analysis repo for that particular set of analyses/scenarios.
+Similar to what is shown in the [combined workflow](../workflows/workflow_overview.qmd) and implement that in an analysis repo for that particular set of analyses/scenarios.
 
 The [workflows](../workflows/workflow_overview.qmd) illustrate various workflows and example notebooks for running HydroBOT in single files, either [in memory](../workflows/workflow_in_memory) or [saving each step and reading back in](../workflows/workflow_save_steps.qmd). It can also be run [from parameter files](../workflows/workflow_parameters.qmd). These parameter files can be generated manually, but also allow replication since HydroBOT auto-documents itself when run, saving metadata files that are fully-specified parameter files.
 

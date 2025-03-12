@@ -94,7 +94,7 @@ heatexample <- ggplot() +
              aes(x = Env_var1, y = Env_var2, color = isscenario)) +
   scale_color_manual(values = c('firebrick', 'magenta4')) +
   guides(color = 'none') + 
-  theme_werp_toolkit()
+  theme_hydrobot()
 
 heatexample
 ```

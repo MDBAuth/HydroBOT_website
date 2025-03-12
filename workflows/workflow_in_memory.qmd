@@ -5,7 +5,9 @@ params:
   REBUILD_DATA: FALSE
 ---
 
-This document provides a template for running through HydroBOT in a single document, retaining everything in-memory (no intermediate saving). Intermediate saving is a very simple flip of a switch, demoed in [its own doc](workflow_save_steps.qmd).
+This document provides a template for running through HydroBOT in a single document, retaining everything in-memory (no intermediate saving). In general, given the time the EWR tool (and sometimes aggregation) take to run, this approach would only be taken with small sets of input data.
+
+Intermediate saving is a very simple flip of a switch, demoed in [its own doc](workflow_save_steps.qmd).
 
 Load the package
 
@@ -14,31 +16,21 @@ Load the package
 library(HydroBOT)
 ```
 
-## Structure
-
-To run HydroBOT, we need to provide paths to directories for input data and output data, as well as arguments for the aggregation.
-
-One option is to do that in a parameters file, and then treat this as a parameterised notebook.
-
-The other option is to have this *be* the parameterising file, so we can have a bit more text around the parameterisations. Not sure which makes more sense, but they're not mutually exclusive, and the answer likely depends on whether we're working interactively or want to fire off 1,000 runs.
-
-# Parameters
+# Set parameters
 
 ## Directories
 
 ### Input and output directories
 
-Use the `scenario_example/` directory [created](../provided_data/scenario_creation.qmd) to capture a very simple demonstration case of 46 gauges in three catchments for 10 years.
+Here, we will use the example hydrographs that come with HydroBOT.
 
-*Normally* `scenario_dir` should point somewhere external (though keeping it inside or alongside the hydrograph data is a good idea.). But here, I'm generating test data, so I'm keeping it in the repo. *I will probably change that when I move to Azure*.
+*Normally* `project_dir` and `hydro_dir` would point somewhere external (and typically, having `hydro_dir` inside `project_dir` will make life easier).
 
 ```{r}
-# Outer directory for scenario
-project_dir = file.path('more_scenarios')
+#| message: false
+hydro_dir <- system.file('extdata/testsmall/hydrographs', package = 'HydroBOT')
 
-# Preexisting data
-# Hydrographs (expected to exist already)
-hydro_dir = file.path(project_dir, 'hydrographs')
+project_dir <- file.path('test_dir')
 
 # Generated data
 # EWR outputs (will be created here in controller, read from here in aggregator)
@@ -50,15 +42,15 @@ agg_results <- file.path(project_dir, 'aggregator_output')
 
 ## Controller
 
-We use the default IQQM model format and climate categorisations, though those could be passed here as well (see [controller](../controller/controller_ewr_stepthrough.qmd)).
+Here, we use a simple set of default arguments, see [controller](../controller/controller_overview.qmd) for detailed treatments of arguments and their meaning.
 
 ### Control output and return
 
-To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'annual'`, `'all'`. For this demonstration I'll not save anything and return `summary` to the active session.
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of the EWR output options (see `?prep_run_save_ewrs()`). For this demonstration I'll not save anything and return `yearly` to the active session.
 
 ```{r}
-outputType <- list('summary')
-returnType <- list('summary') # list('summary', 'all')
+outputType <- list('none')
+returnType <- list('yearly') 
 ```
 
 ## Aggregator
@@ -67,23 +59,11 @@ To keep this simple, we use one aggregation list and the `read_and_agg` wrapper 
 
 ### What to aggregate
 
-The aggregator needs to know which set of EWR outputs to use (to navigate the directory or list structure). It *should* accept multiple types, but that's not well tested, so for now just use one.
+We need to tell it the variable to aggregate, and any grouping variables other than time, themes, and spatial groups. Typically, `scenario` will be a grouper, but there may be others.
 
 ```{r}
-aggType <- 'summary'
-```
-
-We need to tell it the variable to aggregate, and any grouping variables other than the themes and spatial groups. Typically, `scenario` will be a grouper, but there may be others.
-
-```{r}
-agg_groups <- 'scenario'
 agg_var <- 'ewr_achieved'
-```
-
-Do we want it to return to the active session? For this demo, I'm keeping everything in the session, so set to `TRUE`.
-
-```{r}
-aggReturn <- TRUE
+agg_groups <- 'scenario'
 ```
 
 ### How to aggregate
@@ -94,31 +74,25 @@ Fundamentally, the aggregator needs paths and two lists
 
 -   sequence of aggregation functions (can be multiple per step)
 
-Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps are specified a range of different ways to give a small taste of the flexibility here, but see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
+Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps can be specified a range of different ways, see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
 
 ```{r}
 
-aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
+aggseq <- list(all_time = 'all_time',
+               ewr_code = c('ewr_code_timing', 'ewr_code'),
+               sdl_units = sdl_units,
                env_obj =  c('ewr_code', "env_obj"),
-               resource_plan = resource_plan_areas,
-               Specific_goal = c('env_obj', "Specific_goal"),
-               catchment = cewo_valleys,
-               Objective = c('Specific_goal', 'Objective'),
+               Target = c('env_obj', 'Target'),
                mdb = basin,
-               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+               target_5_year_2024 = c('Target', 'target_5_year_2024'))
 
-
-funseq <- list(c('CompensatingFactor'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               rlang::quo(list(wm = ~weighted.mean(., w = area, 
-                                        na.rm = TRUE))),
-               c('ArithmeticMean'),
-               
-               rlang::quo(list(wm = ~weighted.mean(., w = area, 
-                                    na.rm = TRUE))),
-               c('ArithmeticMean'))
+funseq <- list('ArithmeticMean', 
+               'CompensatingFactor',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               'ArithmeticMean',
+               'SpatialWeightedMean',
+               'ArithmeticMean')
 
 ```
 
@@ -126,15 +100,14 @@ funseq <- list(c('CompensatingFactor'),
 
 ## Controller
 
-This is not actually run here for speed- the same thing is done in a notebook for the [workflow saving each step](../workflows/workflow_save_steps.qmd).
+This is not actually run here for speed.
 
 ```{r}
-#| eval: false
 #| message: false
-  ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                                  output_parent_dir = project_dir, 
-                                  outputType = outputType,
-                                  returnType = returnType)
+ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                              output_parent_dir = project_dir, 
+                              outputType = outputType,
+                              returnType = returnType)
 ```
 
 ## Aggregator
@@ -142,47 +115,45 @@ This is not actually run here for speed- the same thing is done in a notebook fo
 Because the chunk above is not run, the needed EWR outputs are not available, but would be if it were run.
 
 ```{r}
-#| eval: false
-aggout <- read_and_agg(datpath = ewr_results, 
-             type = aggType,
+#| label: run-agg
+aggout <- read_and_agg(datpath = ewr_out, 
+             type = 'achievement',
              geopath = bom_basin_gauges,
              causalpath = causal_ewr,
-             groupers = agg_groups,
-             aggCols = agg_var,
+             groupers = 'scenario',
+             aggCols = 'ewr_achieved',
+             auto_ewr_PU = TRUE,
              aggsequence = aggseq,
              funsequence = funseq,
              saveintermediate = TRUE,
              namehistory = FALSE,
-             keepAllPolys = TRUE,
-             returnList = aggReturn,
-             savepath = agg_results)
+             keepAllPolys = FALSE,
+             returnList = TRUE,
+             add_max = FALSE,
+             savepath = NULL)
 ```
 
 # Quick check
 
-Plotting will be developed in the comparer, this is just a quick check to see that there is data. Code borrowed from [theme x space demo](../aggregator/theme_space_agg.qmd).
+Plotting is considered in detail in the \[comparer\](../comparer/comparer_overview(), this is just a quick check to see that there is data. Code borrowed from [theme x space demo](../aggregator/theme_space_agg.qmd).
 
 But only if we returned the output- since the chunks above are not run, we skip this as well.
 
 ```{r}
-#| eval: false
 #| message: false
-if (aggReturn) {
 
-  # Scenario data
-scenarios <- jsonlite::read_json(file.path(hydro_dir, 
-                                           'scenario_metadata.json')) |> 
-  tibble::as_tibble() |> 
-  tidyr::unnest(cols = everything())
+map_example <- aggout$env_obj |>
+  dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
+  plot_outcomes(outcome_col = 'ewr_achieved',
+                plot_type = 'map',
+                colorset = 'ewr_achieved',
+                pal_list = list('scico::berlin'),
+                facet_col = 'scenario',
+                facet_row = 'env_obj',
+                sceneorder = c('down4', 'base', 'up4'),
+                underlay_list = 'basin') +
+  ggplot2::theme(legend.position = 'bottom')
 
-  # plot
-aggout$catchment %>% 
-  dplyr::filter(Specific_goal == 'All recorded fish species') %>%
-  left_join(scenarios, by = c('scenario' = 'scenario_name')) %>% 
-  ggplot2::ggplot() +
-  ggplot2::geom_sf(data = basin) +
-  ggplot2::geom_sf(ggplot2::aes(fill = ewr_achieved)) +
-  ggplot2::facet_grid(.~forcats::fct_reorder(scenario, delta))
-}
+map_example
 
 ```

@@ -16,7 +16,9 @@ _output
 /none/
 
 # Demonstration data outputs
+test_dir/
 scenario_example/
+hydrobot_scenarios/
 more_scenarios/
 more_scenarios*
 *.png

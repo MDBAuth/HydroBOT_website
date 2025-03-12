@@ -35,7 +35,23 @@ hydro_dir = file.path(project_dir, 'hydrographs')
 
 ## Control output and return
 
-To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of `'none'`, `'summary'`, `'yearly'`, `'all_events'`, `'all_successful_events'`, `'all_interEvents'`, and `'all_successful_interEvents'` (e.g. `returnType = list('summary', 'all')` in R. These have to be lists to work right- To make a `list` in python, need to have unnamed lists in R. The easiest to work with in HydroBOT is `'yearly'`, as that allows assessment of the outcomes, but we will return `'summary'` here as well.
+To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of
+
+-   `'none'`
+
+-   `'summary'`
+
+-   `'yearly'`
+
+-   `'all_events'`
+
+-   `'all_successful_events'`
+
+-   `'all_interEvents'`, and
+
+-   `'all_successful_interEvents'`
+
+(e.g. `returnType = list('summary', 'all')` in R. These have to be lists, not `c()` to work right when sent to Python- to make a `list` in python, need to have unnamed lists in R. The easiest to work with in HydroBOT is `'yearly'`, as that allows assessment of the outcomes, but we will return `'summary'` here as well.
 
 ```{r}
 
@@ -56,7 +72,7 @@ if (params$REBUILD_DATA) {
 
 The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent. This is not actually run here for speed- the same thing is done in a notebook for the [combined workflow](../workflows/workflow_save_steps.qmd).
 
-The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allows replication of this step with `run_toolkit_params`. These files build on earlier steps if possible, including any available metadata from scenarios. Using `rparallel = TRUE` runs this in parallel if available.
+The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allows replication of this step with `run_hydrobot_params`. These files build on earlier steps if possible, including any available metadata from scenarios. Using `rparallel = TRUE` runs this in parallel if available.
 
 ```{r}
 #| eval: false

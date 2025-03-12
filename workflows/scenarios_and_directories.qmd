@@ -1,0 +1,33 @@
+---
+title: "Scenarios and directory structure"
+format: html
+---
+
+Placeholder-
+
+HydroBOT is designed to run both modules (at present, EWRs) and aggregation within each scenario, followed by comparison between scenarios in the comparer step. This means it is straightforward to automate (and parallelise) runs over many scenarios.
+
+While many different directory structures are possible, life is easiest if the directory structure represents scenarios, with single hydrograph files for each scenario. This structure can be nested, as the path then provides the unique scenario naming. For a simple example of a factorial combination of three climate scenarios and two management scenarios, we might have this structure:
+
+```         
+hydrographs/
+├─ historical flow/
+│  ├─ management/
+│  │  ├─ gauges.csv
+│  ├─ no management/
+│  │  ├─ gauges.csv
+├─ increased flow/
+│  ├─ management/
+│  │  ├─ gauges.csv
+│  ├─ no management/
+│  │  ├─ gauges.csv
+├─ decreased flow/
+│  ├─ management/
+│  │  ├─ gauges.csv
+│  ├─ no management/
+│  │  ├─ gauges.csv
+```
+
+In such a structure, HydroBOT can treat each `gauges.csv` file as the realisation for that unique scenario, and so run them in parallel (with argument `rparallel = TRUE`). It will reproduce this structure with the module outputs.
+
+Other directory structures are possible, though they often make parallelisation and automation more difficult. In general, the key to success in those cases is to set the `scenarios_from` argument in \[prep_run_save_ewrs()\].
