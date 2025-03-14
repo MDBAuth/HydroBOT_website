@@ -40,8 +40,8 @@ The scenarios should to be in separate directories inside `/hydrographs`, but th
 
 HydroBOT currently handles csvs, netcdfs, and zipped netcdfs. Netcdfs should be in the WERP format parseable by the EWR tool as `IQQM - netcdf`, while csvs can be in any other option parsed by the EWR tool, see `?prep_run_save_ewrs` for options.
 
-* 'Standard time-series': (default, among other things accepts a csv with a Date column followed by gauge columns, with _flow or _level appended to the gauge number)
-* 'IQQM - netcdf': finds all netcdf files in `hydro_dir`. Should also work when `hydro_dir` is a .zip with netcdfs inside
-* 'ten thousand year': old default (IQQM - NSW 10,000 years), works nearly the same as standard time-series
-* 'All Bigmod': previously 'Bigmod - MDBA'
-* 'Source - NSW (res.csv)'
+-   'Standard time-series': (default, among other things accepts a csv with a Date column followed by gauge columns, with \_flow or \_level appended to the gauge number)
+-   'IQQM - netcdf': finds all netcdf files in `hydro_dir`. Should also work when `hydro_dir` is a .zip with netcdfs inside
+-   'ten thousand year': old default (IQQM - NSW 10,000 years), works nearly the same as standard time-series
+-   'All Bigmod': previously 'Bigmod - MDBA'
+-   'Source - NSW (res.csv)'

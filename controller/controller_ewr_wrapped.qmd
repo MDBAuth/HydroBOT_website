@@ -129,7 +129,7 @@ project_dir/
 │  ├─ EWR/
 ```
 
-See [here](/workflows/scenarios_and_directories.qmd) for more detail. 
+See [here](/workflows/scenarios_and_directories.qmd) for more detail.
 
 If we want to change this, we use some combination of the `output_parent_dir` and `output_subdir` arguments, which do slightly different things.
 
@@ -197,10 +197,10 @@ It is sometimes the case that we want subdirectories within `module_output/EWR`.
 
 ```{r}
 ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                                output_parent_dir = project_dir,
+                              output_parent_dir = project_dir,
                               output_subdir = 'new_run',
-                                outputType = outputType, 
-                                returnType = returnType,
+                              outputType = outputType, 
+                              returnType = returnType,
                               rparallel = TRUE)
 ```
 
@@ -240,11 +240,11 @@ For example, we can rename scenarios and only run a subset, as illustrated here 
 
 ```{r}
 ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                                output_parent_dir = project_dir,
+                              output_parent_dir = project_dir,
                               scenarios = list(decrease = 'down4/down4.csv',
                                                increase = 'up4/up4.csv'),
-                                outputType = outputType, 
-                                returnType = returnType,
+                              outputType = outputType, 
+                              returnType = returnType,
                               rparallel = TRUE)
 ```
 
@@ -263,8 +263,8 @@ In some cases (often, large batched jobs over many scenarios), some subset of th
 ## Data formats
 
 The input data formats are limited to those the EWR tool is capable of processing, and the files can be single or multiple, discussed in more detail [here](/workflows/scenarios_and_directories.qmd).
+
 ```{r}
 #| include: false
 withr::deferred_run()
 ```
-

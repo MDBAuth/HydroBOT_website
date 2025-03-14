@@ -7,7 +7,7 @@ format: html
 
 The {HydroBOT} package needs to be installed to provide all functions used here. It also provides some necessary data for the causal network relationships, and canonical shapefiles that have been prepped.
 
-Installation is slightly more complex than the usual `devtools::install_github(MDBAuth/HydroBOT)` because the repo is private. The SSH method seems to be the most robust, though https with a github PAT is often the recommendation for private repos. In general, just use the below. A [template](https://github.com/MDBAuth/toolkit_use)[ repo](https://github.com/MDBAuth/toolkit_use) is available, however, with necessary setup scripts and test notebooks for a range of systems and uses.
+Installation is slightly more complex than the usual `devtools::install_github(MDBAuth/HydroBOT)` because the repo is private. The SSH method seems to be the most robust, though https with a github PAT is often the recommendation for private repos. In general, just use the below. A [templaterepo](https://github.com/MDBAuth/toolkit_use) is available, however, with necessary setup scripts and test notebooks for a range of systems and uses.
 
 -   To set up SSH, go to the github instructions [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent) and then [here](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account)
 

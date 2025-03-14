@@ -5,6 +5,12 @@ params:
   REBUILD_DATA: FALSE
 ---
 
+```{r}
+#| include: false
+source('R/helpers.R')
+make_hydro_csv()
+```
+
 A common way to run HydroBOT is to use a single document (i.e. not running the Controller, Aggregator, and Comparer as separate notebooks), but save the outputs at each step. This allows re-starting analyses if necessary and is particularly useful for large jobs, especially if batching over many scenarios. That said, in practice, once batching takes more than several minutes per stage, it often does make most sense to split into separate notebooks or scripts for each step.
 
 Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](/workflows/workflow_in_memory.qmd).
@@ -133,4 +139,10 @@ plot_outcomes(outcome_col = 'ewr_achieved',
               position = 'dodge')
 
 catchcompare
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
 ```

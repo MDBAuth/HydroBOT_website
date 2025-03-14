@@ -7,6 +7,12 @@ editor: visual
 #   aggregation: !r list(aggregation_def = 'workflows/params.R')
 ---
 
+```{r}
+#| include: false
+source('R/helpers.R')
+make_hydro_csv()
+```
+
 This document provides a template for running HydroBOT from a parameters file, as we might do when batch processing. As such, it typically wouldn't be run through a notebook, but be called with `Rscript`. That sort of setup can go a lot of different directions depending on use case, and we assume a user would be familiar with shell scripting and the particular idiosyncracies of their relevant batching system. Here, we demonstrate how to set up the parameter file and use it, and leave it to the user to build the script that gets called with `Rscript` from the command line or as part of an external process.
 
 We have the ability to have a default params file, a second params file that tweaks those defaults, as well as include params in Quarto header yaml. These different options are all used here.
@@ -161,4 +167,10 @@ The `prep_run_save_ewrs` and `read_and_agg` functions save metadata yaml files t
 ```{r}
 #| eval: false
 run_hydrobot_params(yamlpath = 'hydrobot_scenarios/aggregator_output/agg_metadata.yml')
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
 ```

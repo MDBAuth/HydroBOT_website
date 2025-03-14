@@ -1,5 +1,5 @@
 ---
-title: "Scenario controller in detail"
+title: "Scenario controller internals"
 author: "Galen Holt"
 format:
   html:
@@ -9,6 +9,13 @@ cache: false
 params:
   REBUILD_DATA: FALSE
 ---
+
+```{r}
+#| include: false
+
+source('R/helpers.R')
+make_hydro_csv()
+```
 
 ```{r}
 #| message: false
@@ -90,12 +97,15 @@ controller_functions <- reticulate::import_from_path("controller_functions",
   delay_load = TRUE
 )
 
-ewr_out <- controller_functions$run_save_ewrs(hydro_paths[[1]], output_path,
-                                                model_format, 
-                                              outputType = outputType,
-                                                returnType = list('summary'),
-                                              scenario_name = names(hydro_paths)[1],
-                                              scenarios_from = 'directory')
+ewr_out <- controller_functions$run_save_ewrs(
+  hydro_paths[[1]], 
+  output_path,
+  model_format, 
+  outputType = outputType,
+  returnType = list('summary'),
+  scenario_name = names(hydro_paths)[1],
+  scenarios_from = 'directory'
+  )
 
 ```
 
@@ -110,3 +120,10 @@ Without running `prep_run_save_ewrs`, we have not saved the metadata.
 # Next steps
 
 This now has the EWR outputs saved into `project_dir/module_output/EWR` and available for further processing with the aggregator.
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```
+

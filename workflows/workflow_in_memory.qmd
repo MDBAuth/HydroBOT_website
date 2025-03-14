@@ -5,6 +5,13 @@ params:
   REBUILD_DATA: FALSE
 ---
 
+```{r}
+#| include: false
+
+source('R/helpers.R')
+make_hydro_csv()
+```
+
 This document provides a template for running through HydroBOT in a single document, retaining everything in-memory (no intermediate saving). In general, given the time the EWR tool (and sometimes aggregation) take to run, this approach would only be taken with small sets of input data.
 
 Intermediate saving is a very simple flip of a switch, demoed in [its own doc](workflow_save_steps.qmd).
@@ -156,4 +163,10 @@ map_example <- aggout$env_obj |>
 
 map_example
 
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
 ```
