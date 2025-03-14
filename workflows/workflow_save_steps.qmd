@@ -15,7 +15,6 @@ The [getting started page](../getting_started.qmd) uses this sort of workflow.
 library(HydroBOT)
 ```
 
-
 ## Directories
 
 Here, we will use the example hydrographs that come with HydroBOT.
@@ -135,4 +134,3 @@ plot_outcomes(outcome_col = 'ewr_achieved',
 
 catchcompare
 ```
-

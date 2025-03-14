@@ -45,7 +45,7 @@ file.copy(file.path(demo_webdir, 'images', 'architecture.eps'),
 
 This website and [associated github repository](https://github.com/MDBAuth/HydroBOT) provides examples of using HydroBOT in various ways, as well as its capabilities and pitfalls. To install and use, see [get started](getting_started.qmd).
 
-HydroBOT has several goals, and provides workflow and analysis capabilities to achieve them. It treats scenario comparison as a first-class objective, and so is structured to automate over many scenarios, performing the same processing to each, followed by comparison across scenarios (though it can run single scenarios if desired).
+HydroBOT has several goals, and provides workflow and analysis capabilities to achieve them. It treats scenario comparison as a first-class objective, and so is structured to automate over many scenarios, performing the same processing to each, followed by comparison across scenarios (though it can run single scenarios if desired). It produces metadata files to document settings at each step, which double as runnable parameter files for reproducibility.
 
 HydroBOT is built to provide general capacity for synthesis, to then be tailored for specific analysis: what questions are being asked of the scenarios, what synthesis do they need, and how should they be compared. It is designed to be modular, incorporating many different response models, though at this point it contains only the EWR tool. It provides important guardrails for both idiosyncrasies of the EWR outputs and multidimensional scaling.
 

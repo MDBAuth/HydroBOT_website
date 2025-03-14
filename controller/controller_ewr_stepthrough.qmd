@@ -10,117 +10,102 @@ params:
   REBUILD_DATA: FALSE
 ---
 
-Load the package
-
 ```{r}
 #| message: false
 library(HydroBOT)
 ```
 
-The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, the series of steps below is wrapped with `prep_run_save_ewrs`. Once we have the directory and set any other needed parameters (e.g. point at a config file), we should just click go, and auto-generate the folder structure, run the ewr, and output the results. I'm stepping through that here so we can see what's happening and where we need to tweak as formats change; this document is intended to expose some of the inner workings of the black box. Wrapped versions of [the controller alone](controller_ewr_wrapped.qmd) and [in a combined workflow](../workflows/workflow_overview.qmd) are available to illustrate this more normal use.
+The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, the series of steps below is wrapped with `prep_run_save_ewrs`, as shown [here](/getting_started.qmd) and [here](controller_ewr_wrapped.qmd), which allows cleaner automation and saves the metadata. I'm stepping through the internal parts of `prep_run_save_ewrs` here to show more clearly what's happening when that runs; this document is intended to expose some of the inner workings of the black box. Wrapped versions of [the controller alone](controller_ewr_wrapped.qmd) and [in a combined workflow](../workflows/workflow_overview.qmd) are available to illustrate this more normal use.
+
+This document focuses on the parts of the internal flow that help understand what's happening and those that may sometimes be useful to run ad-hoc for e.g. troubleshooting to see what HydroBOT is doing on a more granular level. This document skips over quite a lot of error-checking, safeguarding, and formatting, as well as parallelisation structure and metadata saving that happens within `prep_run-save_ewrs`.
 
 # Setup
 
 ## Set paths
 
-We need to set the path to this demonstration. This should all be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`. These would typically point to external shared directories. It also works to point to a single scenario, as if run off the end of a hydrology model for one scenario, e.g. `/hydrographs/scenario1`. For this simple example though, we put the data inside the repo to make it self contained. The saved data goes to `project_dir/module_output` automatically. The `/hydrographs` subdirectory could be made automatic as well, but I'm waiting for the input data format to firm up.
+We need to identify the path to the hydrographs and set up directories for outpus. In use, the hydrograph paths would typically point to external shared directories. The cleanest, default, situation is for everything to be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`.
+
+::: callout-tip
+Within `/hydrographs`, scenarios should be kept in separate folders, i.e. files for gauges or all gauges within a catchment, basin, etc, within directories for scenarios (see [here](/workflows/scenarios_and_directories.qmd)). This allows cleaner scenario structures and parallelisation. Any given run needs all the locations within a scenario, but scenarios should run separately (possibly in parallel) because outcomes (e.g. EWRs, fish performance) cannot logically depend on other scenarios representing other hydrological sequences or climates. A common situation that is much more cumbersome is to have the directory structure reflect gauges or other spatial unit, and files within them per scenario. *It is worth restructuring your files if this is the case.*
+:::
+
+It also works to point to a single scenario, as might be the case if HydroBOT runs off the end of a hydrology model that generates that scenario, e.g. `/hydrographs/scenario1`. This allows both targeting single scenarios for HydroBOT analysis, but also batching hydrology and HydroBOT together. By default, the saved data goes to `project_dir/module_output` automatically, though this can be changed, see the `output_parent_dir` and `output_subdir` arguments.
 
 ```{r}
-project_dir = file.path('more_scenarios')
+project_dir = file.path('hydrobot_scenarios')
 hydro_dir = file.path(project_dir, 'hydrographs')
 ```
 
 ## Format
 
-We need to pass the data format to the downstream modules so they can parse the data. Currently the demo csvs are created in a format that parses like IQQM, and the netcdf will be. The EWR tool (the only current module) has three options currently 1) `'Bigmod - MDBA'`, 2) `'IQQM - NSW 10,000 years'`, and 3) `'Source - NSW (res.csv)'`. I'm exposing this for the example, but we can auto-set this to the IQQM default in normal use, or set it in a params file.
+We need to pass the data format to the downstream modules so they can parse the data. Currently the demo csvs are created in a format that parses like `Standard time-series`, and the demo netcdfs parse in the bespoke `IQQM - netcdf` format. Any available option in the [EWR tool](https://github.com/MDBAuth/EWR_tool) will work, see `?prep_run_save_ewrs`.
+
+We also set the output type from the EWR tool. The 'yearly' is needed in most cases, but any option is available, see `?prep_run_save_ewrs`. It must be a list in order to pass correctly to python.
 
 ```{r}
-# Options
-# 'Bigmod - MDBA'
-# 'IQQM - NSW 10,000 years'
-# 'Source - NSW (res.csv)'
-
-model_format = 'IQQM - NSW 10,000 years'
-```
-
-## Climate info
-
-Like the format, `allowance` and `climate` are arguments to the EWR tool, so I set them here to be clear what we're doing, but in general they would be set by default. The `climate` does need to use the other option (`'NSW 10,000 year climate sequence'`) for dates outside the range 1890-2100, (which are categorised from 1911-2018). The EWR tool provides those files, and any year considered has to have a row in them, even if it is blank.
-
-```{r}
-MINT <- (100 - 0)/100
-MAXT <- (100 + 0 )/100
-DUR <- (100 - 0 )/100
-DRAW <- (100 -0 )/100
-
-# A named list in R becomes a dict in python
-allowance <- list('minThreshold' = MINT, 'maxThreshold' = MAXT, 'duration' = DUR, 'drawdown' = DRAW)
-
-climate <- 'Standard - 1911 to 2018 climate categorisation'
+model_format = 'Standard time-series'
+outputType = list('yearly', 'summary')
 ```
 
 # Processing internals
 
-Above, we've been setting variables that should be set by default to expose what they are. Now we move into the processing step, which is typically wrapped into a single function, but here we pull off the wrapping to step through the processing sequence. All of this is typically hidden in `prep_run_save_ewrs`, as in the [wrapped example](controller_ewr_wrapped.qmd), but I'm exposing the steps here for easier viewing and testing, especially as the formats change.
+All of this is typically hidden in `prep_run_save_ewrs`, as in the [wrapped example](controller_ewr_wrapped.qmd), but I'm exposing the steps here for easier viewing and because some internal functions can be useful for troubleshooting, e.g. \[find_scenario_paths()\].
 
 ## Set up output directories
 
-We get the information about the gauges and filepaths `project_dir` with `find_scenario_paths` and `scenario_names_from_hydro`. The scenarios need to be in separate directories inside `/hydro_dir`, but the files in those directories could come in multiple arrangements. Currently, we allow multiple csvs of single-gauge hydrographs or single csvs of multiple-gauge hydrographs. Once the netcdf format settles down, we will include parsing that. If there are multiple gauges within each csv. For this example, we have single csvs with multiple gauges.
-
-The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location.
+We get the information about the gauges and filepaths `project_dir` with `find_scenario_paths`. The names of the resulting list of paths are the names of the scenarios. Note that including a `scenarios` argument to \[prep_run_save_ewrs()\] overrides this, allowing passing in this list explicitly if there is no good way to parse scenarios and file names (e.g. perhaps to run a subset of scenarios across several different directories).
 
 ```{r}
-# get the paths to all the hydrographs. python needs a list, not a vector
-# have to triple ::: because this isn't exported
-  hydro_paths <- as.list(HydroBOT:::find_scenario_paths(hydro_dir))
-  
-  # There's a bit more error catching etc in `prep_run_save_ewrs`, but ignoring that here.
-
-  # extract scenarios if not given
-  scenarios <- HydroBOT:::scenario_names_from_hydro(hydro_dir)
-  
-  # set up the output directory
-  output_path <- HydroBOT:::make_output_dir(project_dir, 
-                                                scenarios = scenarios, 
-                                                module_name = 'EWR')
+# get the paths to all the hydrographs
+hydro_paths <- find_scenario_paths(hydro_dir, type = 'csv')
 ```
+
+The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location. Note that `output_subdir` allows subdirectories. This can be useful for running different analyses on the same set of hydrographs.
+
+```{r}
+# set up the output directory
+output_path <- make_output_dir(parent_dir = project_dir,
+      scenarios = names(hydro_paths),
+      module_name = "EWR",
+      subdir = "example",
+      ewr_outtypes = unlist(outputType)
+    )
+```
+
+This directory machinery makes the `file_search` and `fill_missing` arguments possible to ensure only a subset of files are run or missing files are able to be run if, for example, a long run crashed. See `?prep_run_save_ewrs` and the [main controller page](controller_ewr_wrapped.qmd).
 
 ## Run the ewr tool
 
-Now we run the ewr tool with the parameters given and save the output.
+Now we run the ewr tool with the parameters given and save the output. The EWR tool is in python, and HydroBOT provides some linking python functions. This is all handled internally to HydroBOT, but here we need to import these functions to demonstrate. It is designed to loop over scenarios (in parallel with `rparallel = TRUE`), and so here we only run the first scenario.
 
-There's an issue with `outputType = 'annual'` in the version of the EWR tool this was built with. Until I update and test the new EWR tool, skip the annual data. There are still a number of messages printed by the EWR code, about pulling the data and gauge dependencies. Those are useful when using the code, but I'll suppress printing them here since there are so many.
-
-This is not actually run here for speed- the same thing is done in a notebook for the [the full workflow](../workflows/workflow_save_steps.qmd).
+The `outputType` argument we've seen earlier as it determines the saved outputs and so matters for the directory setup, while the `returnType` argument determines what gets returned to the active R session.
 
 ```{r}
-#| eval: false
 #| message: false
 
-# To make a list in python, need to have unnamed lists in R
-if (!params$REBUILD_DATA) {
-  outputType <- list('none')
-}
-if (params$REBUILD_DATA) {
-  outputType <- list('summary', 'all')
-}
+controller_functions <- reticulate::import_from_path("controller_functions",
+  path = system.file("python",
+    package = "HydroBOT"
+  ),
+  delay_load = TRUE
+)
 
-
-ewr_out <- controller_functions$run_save_ewrs(hydro_paths, output_path,
-                                                model_format, allowance, climate,
-                                                outputType = outputType,
-                                                returnType = list('summary'))
+ewr_out <- controller_functions$run_save_ewrs(hydro_paths[[1]], output_path,
+                                                model_format, 
+                                              outputType = outputType,
+                                                returnType = list('summary'),
+                                              scenario_name = names(hydro_paths)[1],
+                                              scenarios_from = 'directory')
 
 ```
 
-Briefly, we can see that that has returned dataframes from the EWR (with some leftover pandas datetime environments that we could clean up if we wanted to use this in-memory). Typically, though, we just save this out. Because we do not actually run the chunk above for rendering this site, these dataframes are not available here.
+Briefly, we can see that that has returned dataframes from the EWR. Typically, though, we just save this out.
 
 ```{r}
-#| eval: false
-names(ewr_out)
-str(ewr_out$summary)
-str(ewr_out$all)
+ewr_out$summary
 ```
+
+Without running `prep_run_save_ewrs`, we have not saved the metadata.
 
 # Next steps
 

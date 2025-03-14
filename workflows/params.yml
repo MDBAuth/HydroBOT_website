@@ -2,7 +2,7 @@
 
 ewr:
   # Outer directory for scenario
-  output_parent_dir: 'hydrobot_scenarios/testsmall'
+  output_parent_dir: 'hydrobot_scenarios'
 
 aggregation:
   # aggregation sequences defined in R- either NULL to define here or a path to a .R file

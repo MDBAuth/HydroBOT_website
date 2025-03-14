@@ -31,17 +31,7 @@ For this website, we use two sets of scenarios
 1.  The small set that comes with hydrobot itself, useful for examples that run the modules and aggregation steps
 2.  A larger set with more interesting structure, used for demonstrating the comparer.
 
-This document mostly generates that second set, though we will also use it to copy the HydroBOT set over for ease of calling.
-
-```{r}
-if (!dir.exists('hydrobot_scenarios')) {
-  dir.create('hydrobot_scenarios')
-}
-file.copy(system.file('extdata/testsmall', package = 'HydroBOT'),
-          'hydrobot_scenarios', recursive = TRUE)
-file.copy(system.file('extdata/ncdfexample', package = 'HydroBOT'),
-          'hydrobot_scenarios', recursive = TRUE)
-```
+This document generates that second set. We copy the HydroBOT set over for ease of calling using the setup script, since we actually want to do that cleanly on a per-notebook basis to avoid cross-notebook contamination due to example processing.
 
 ## HydroBOT relevance
 

@@ -5,9 +5,9 @@ format: html
 editor: visual
 ---
 
-## Purpose
-
 HydroBOT may be used stepwise, that is calling the Controller, Aggregator, and Comparer in separate scripts or notebooks. This may in fact be the best solution for large jobs, especially where Aggregator and Comparer steps might need to be re-run without re-running the response modules. It can also be called in one go, feeding all necessary parameters in at once. In this case, we can think of the Controller as simply having larger scope, passing arguments all the way through instead of just to the modules. This can be done [in-memory](workflow_in_memory.qmd), or [saving outputs at each step](workflow_save_steps.qmd). In either case, it can be controlled interactively in notebooks, or with [parameters](workflow_parameters.qmd) which might be passed from a `params.yml` file, parameters in a notebook, or arguments passed to `Rscript` at the command line.
+
+The workflows section here provides three examples. Similar but not identical examples are available in the [template repository](https://github.com/MDBAuth/toolkit_use), which contains helper scripts for setup on several systems as well as skeleton scripts for various workflows.
 
 ::: callout-important
 ### Parameters and metadata

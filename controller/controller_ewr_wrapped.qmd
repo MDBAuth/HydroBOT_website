@@ -5,10 +5,14 @@ format:
   html:
     df-print: paged
 editor: visual
-cache: false
-params:
-  REBUILD_DATA: TRUE
 ---
+
+```{r}
+#| include: false
+
+source('R/helpers.R')
+make_hydro_csv()
+```
 
 Load the package
 
@@ -18,18 +22,24 @@ library(HydroBOT)
 library(future)
 ```
 
-The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, we set the directory and any other needed parameters (e.g. point at a config file), and the controller functions auto-generate the folder structure, run the ewr, and output the results. This can be taken up a level to the [combined workflow](../workflows/workflow_overview.qmd), where the controller and subsequent steps are all run at once. A [detailed stepthrough](controller_ewr_stepthrough.qmd) of what happens in the controller is also available, useful to see what is happening under the hood.
+The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, we set the directory and any other needed parameters (e.g. desired saving formats, parallelisation), and the controller functions auto-generate the folder structure, run the ewr, and output the results. This can be taken up a level to the [combined workflow](../workflows/workflow_overview.qmd), where the controller and subsequent steps are all run at once. A [detailed stepthrough](controller_ewr_stepthrough.qmd) of what happens in the controller is also available, useful to see what is happening under the hood.
 
 # Setup
 
-There are a few bits of info the user needs to set for a particular run. These can be set here, or done in a parameters `.yaml` file. These needed bits of information for the controller are the location of the data and the sort of output desired.
+There are a few bits of info the user needs to set for a particular run. These can be set here, or done in a parameters `.yaml` file for the [controller and aggregator together](../workflows/workflow_parameters.qmd) These needed bits of information for the controller are the location of the data and the sort of output desired.
 
-## Set paths
+## Paths
 
-We need to set the path to this demonstration. This should all be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`. It also works to point to a single scenario, as if run off the end of a hydrology model for one scenario, e.g. `/hydrographs/scenario1`. These would typically point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The saved data goes to `project_dir/module_output` automatically. The `/hydrographs` subdirectory could be made automatic as well, but I'm waiting for the input data format to firm up.
+We need to identify the path to the hydrographs and set up directories for outpus. In use, the hydrograph paths would typically point to external shared directories. The cleanest, default, situation is for everything to be in a single outer directory `project_dir`, and there should be an inner directory with the input data `/hydrographs`.
+
+::: callout-tip
+Within the hydrograph directory, scenarios should be kept in separate folders, i.e. files for gauges or all gauges within a catchment, basin, etc, within directories for scenarios (see [here](/workflows/scenarios_and_directories.qmd)). This allows cleaner scenario structures and parallelisation. Any given run needs all the locations within a scenario, but scenarios should run separately (possibly in parallel) because outcomes (e.g. EWRs, fish performance) cannot logically depend on other scenarios representing other hydrological sequences or climates. A common situation that is much more cumbersome is to have the directory structure reflect gauges or other spatial unit, and files within them per scenario. *It is worth restructuring your files if this is the case.*
+:::
+
+It also works to point to a single scenario, as might be the case if HydroBOT runs off the end of a hydrology model that generates that scenario, e.g. `/hydrographs/scenario1`. This allows both targeting single scenarios for HydroBOT analysis, but also batching hydrology and HydroBOT together. By default, the saved data goes to `project_dir/module_output` automatically, though this can be changed, see the `output_parent_dir` and `output_subdir` arguments.
 
 ```{r}
-project_dir = file.path('more_scenarios')
+project_dir = file.path('hydrobot_scenarios')
 hydro_dir = file.path(project_dir, 'hydrographs')
 ```
 
@@ -51,33 +61,45 @@ To determine what to save and what to return to the active session, use `outputT
 
 -   `'all_successful_interEvents'`
 
-(e.g. `returnType = list('summary', 'all')` in R. These have to be lists, not `c()` to work right when sent to Python- to make a `list` in python, need to have unnamed lists in R. The easiest to work with in HydroBOT is `'yearly'`, as that allows assessment of the outcomes, but we will return `'summary'` here as well.
+(e.g. `returnType = list('summary', 'all')` in R. These have to be lists, not `c()` to work right when sent to Python. The easiest to work with in HydroBOT is `'yearly'`, as that allows assessment of the outcomes, but we will return `'summary'` here as well, as it is often nicer to look at as an EWR output.
 
 ```{r}
-
-
-# We use outputtype to save, so only save outputs if params$REBUILD_DATA is TRUE
-# To make a list in python, need to have unnamed lists in R
-if (!params$REBUILD_DATA) {
   returnType <- list('yearly', 'summary')
-  outputType <- list('none')
-}
-if (params$REBUILD_DATA) {
-  returnType <- list('none')
   outputType <- list('yearly', 'summary')
-}
 ```
 
-## Run and save
+# A simple run
 
-The above is all user parameters. All the formatting, running, and saving is then handled with the wrapper function `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version used to run test data and expand each step to make testing/changes more transparent. This is not actually run here for speed- the same thing is done in a notebook for the [combined workflow](../workflows/workflow_save_steps.qmd).
+The above is all user parameters. All the formatting, running, and saving is then handled by `prep_run_save_ewrs`. See [stepthrough](controller_ewr_stepthrough.qmd) for an expanded version to see (some) of what this does internally.
 
-The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allows replication of this step with `run_hydrobot_params`. These files build on earlier steps if possible, including any available metadata from scenarios. Using `rparallel = TRUE` runs this in parallel if available.
+The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allows replication of this step with `run_hydrobot_params`. These metadata files build on earlier steps if possible, including any available metadata from scenarios.
 
 ```{r}
-#| eval: false
 #| message: false
+ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                                output_parent_dir = project_dir, 
+                                outputType = outputType, 
+                                returnType = returnType)
+```
 
+Now we have a `summary` and `yearly` dataframes both in-memory (because of `returnType`) and saved (because of `outputType`).
+
+```{r}
+#| rows.print: 20
+
+ewr_out$summary
+```
+
+# Complexities and more detail
+
+## Parallelism
+
+With many scenarios, it is often a good idea to parallelise. Because scenarios run independently, massive parallelisation is possible, up to one scenario per core. Speedups can be very large, even on local machines, but are particularly useful on HPCs.
+
+The `prep_run_save_ewrs` function provides this parallelisation internally and seamlessly, provided the user has the suggested package `{furrr}` (and its dependency, `{future}`). In that case, parallelising is as easy as setting a `future::plan` and the argument `rparallel = TRUE`;
+
+```{r}
+#| message: false
 plan(multisession)
 ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
                                 output_parent_dir = project_dir, 
@@ -86,22 +108,163 @@ ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir,
                               rparallel = TRUE)
 ```
 
-Now we have a `summary` and `all`. Because the chunk above is not run (`#| eval: false`), these dataframes are not available here, but would be.
+## Selected scenarios or extra files in scenarios
+
+The `file_search` argument uses regex to filter what gets run. It's primarily used in two ways:
+
+By default, \[prep_run_save_ewrs()\] assumes everything with a '.csv' or '.nc' file extension is a hydrograph file. In some cases, however, those directories might have other files in them. For example, maybe there's a `gauges.csv` file and a `run_info.csv` file with metadata or a `rainfall.csv` with other variables. Trying to run the EWR tool will fail with anything other than gauges. In this example, we could use `file_search = 'gauges.csv'` to select only the correct file.
+
+The `file_search` argument works on the full filepath as well, and so can be used for selecting a subset of scenarios. For example, we are using 'down4', 'base', and 'up4' scenarios as demonstrations here, but if we wanted to run only the down and up scenarios, we could use `file_search = 'down|up'`.
+
+## Changing output directories
+
+### Parent
+
+By default, HydroBOT builds a directory `module_output/EWR` in the `output_parent_dir`, which typically contains the `hydro_dir`:
+
+```         
+project_dir/
+├─ hydrographs/
+├─ module_output/
+│  ├─ EWR/
+```
+
+See [here](/workflows/scenarios_and_directories.qmd) for more detail. 
+
+If we want to change this, we use some combination of the `output_parent_dir` and `output_subdir` arguments, which do slightly different things.
+
+Changing `output_parent_dir` often happens for two reasons; either we want to save the modules somewhere other than the folder with the hydrographs, or we are forced to save them *inside* the relevant hydrograph folder, as might happen in remote batched runs that only have access to single directories.
+
+Since we always have to set `output_parent_dir`, the first case just involves setting it to something that does not contain the hydrographs, e.g.
 
 ```{r}
-#| eval: false
-#| rows.print: 20
+#| include: false
 
-ewr_out$summary
+# reset example dir
+withr::deferred_run()
+make_hydro_csv()
 ```
 
 ```{r}
-#| eval: false
-#| rows.print: 20
-
-ewr_out$yearly
+ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                                output_parent_dir = 'new_parent', 
+                                outputType = outputType, 
+                                returnType = returnType,
+                              rparallel = TRUE)
 ```
 
-# Next steps
+```{r}
+#| include: false
 
-This now has the EWR outputs saved into `scenario_dir/module_output/EWR` and available for further processing with the aggregator.
+# reset example dir
+unlink('new_parent', recursive = TRUE)
+withr::deferred_run()
+make_hydro_csv()
+```
+
+If we only have access to a specific scenario, as might happen sometimes in batched jobs, we set both `hydro_dir` and `output_parent_dir` to that scenario, which puts the module output within the scenario folder. That makes onward processing with the aggregator a bit more difficult but sometimes it's all we can do.
+
+```{r}
+ewr_out <- prep_run_save_ewrs(hydro_dir = 'hydrobot_scenarios/hydrographs/base', 
+                                output_parent_dir = 'hydrobot_scenarios/hydrographs/base', 
+                                outputType = outputType, 
+                                returnType = returnType)
+```
+
+This yields
+
+```         
+project_dir/
+├─ hydrographs/
+│  ├─ base/
+│  │  ├─ gauges.csv
+│  │  ├─ module_output/
+│  │  │  ├─ EWR/
+│  │  │  │  ├─ base/
+```
+
+```{r}
+#| include: false
+
+# reset example dir
+withr::deferred_run()
+make_hydro_csv()
+```
+
+### Subdirectories
+
+It is sometimes the case that we want subdirectories within `module_output/EWR`. For example, maybe we want to retain results from an earlier run for reproducibility while updating either the arguments used or the EWR tool itself. In this case, we use the `output_subdir` argument, which simply adds the requested directory inside `module_output/EWR`:
+
+```{r}
+ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                                output_parent_dir = project_dir,
+                              output_subdir = 'new_run',
+                                outputType = outputType, 
+                                returnType = returnType,
+                              rparallel = TRUE)
+```
+
+This yields:
+
+```         
+project_dir/
+├─ hydrographs/
+│  ├─ base/
+│  ├─ down4/
+│  ├─ up4/
+├─ module_output/
+│  ├─ EWR/
+│  │  ├─ new_run/
+│  │  │  ├─ base/
+│  │  │  ├─ down4/
+│  │  │  ├─ up4/
+```
+
+```{r}
+#| include: false
+
+# reset example dir
+withr::deferred_run()
+make_hydro_csv()
+```
+
+## Scenario names and file paths
+
+Scenarios need to have unique names. As such, in most cases they are extracted from the file paths, which must be unique. This can get a bit messy, but is the only consistent way to ensure uniqueness. Analysis stages can incorporate cleanup steps. One way to reduce the messiness a bit is to use `scenarios_from = 'directory'` (the default), which drops the filename, in the case that the filenames are not needed for uniqueness, e.g. in common situations like `/scenario1/gauge.csv` or `/scenario1/scenario1.csv`. If more control over the naming is needed, use `scenarios`. Even in that case, the *file* names will be unique, but the `scenario` column will reflect the names in the passed list.
+
+## Full control over scenarios
+
+In some cases, the scenario names or directory structures might be such that they cannot reasonably be inferred from the directories, or more granular control is needed over the subset of scenarios to run. In this case, the `scenarios` argument allows passing in a named list of paths, with the names being scenario names and the paths the paths to the files. This then bypasses all the path and scenario inference, giving the user direct control.
+
+For example, we can rename scenarios and only run a subset, as illustrated here to run the down4 and up4 scenarios and rename the scenarios to decrease and increase. We do still need a `hydro_dir` argument, as the paths in `scenarios` are assumed to be relative to that directory, and it's where metadata gets saved. That said, using a high-level location for `hydro_dir` would allow the paths to be essentially anywhere.
+
+```{r}
+ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
+                                output_parent_dir = project_dir,
+                              scenarios = list(decrease = 'down4/down4.csv',
+                                               increase = 'up4/up4.csv'),
+                                outputType = outputType, 
+                                returnType = returnType,
+                              rparallel = TRUE)
+```
+
+```{r}
+#| include: false
+
+# reset example dir
+withr::deferred_run()
+make_hydro_csv()
+```
+
+## Completing runs
+
+In some cases (often, large batched jobs over many scenarios), some subset of the runs will fail. Sometimes this is because of data problems, sometimes because a computer shuts down or an HPC times out. And it could happen as well if additional scenarios are added after an initial run. In these cases, we don't want to have to either re-run everything or write a unique script for the missing pieces. Instead, we can use the `fill_missing = TRUE` argument to find the scenarios in the inputs (hydrographs) that are missing in the outputs (`module_output/EWR` directory). *This should work with any directory structure (it uses the same machinery), but isn't well-tested for nonstandard directory structures (`output_subdirs` are tested).*
+
+## Data formats
+
+The input data formats are limited to those the EWR tool is capable of processing, and the files can be single or multiple, discussed in more detail [here](/workflows/scenarios_and_directories.qmd).
+```{r}
+#| include: false
+withr::deferred_run()
+```
+

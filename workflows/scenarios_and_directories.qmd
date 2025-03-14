@@ -3,7 +3,7 @@ title: "Scenarios and directory structure"
 format: html
 ---
 
-Placeholder-
+## Directory structure
 
 HydroBOT is designed to run both modules (at present, EWRs) and aggregation within each scenario, followed by comparison between scenarios in the comparer step. This means it is straightforward to automate (and parallelise) runs over many scenarios.
 
@@ -31,3 +31,17 @@ hydrographs/
 In such a structure, HydroBOT can treat each `gauges.csv` file as the realisation for that unique scenario, and so run them in parallel (with argument `rparallel = TRUE`). It will reproduce this structure with the module outputs.
 
 Other directory structures are possible, though they often make parallelisation and automation more difficult. In general, the key to success in those cases is to set the `scenarios_from` argument in \[prep_run_save_ewrs()\].
+
+## Files
+
+The scenarios should to be in separate directories inside `/hydrographs`, but the files in those directories could come in multiple arrangements. Currently, we allow multiple csvs of single-gauge hydrographs or single csvs of multiple-gauge hydrographs. It is generally better to include all gauges in a single file, as any multigage EWRs cannot be assessed if they are separate. The catch, particularly with historical data, is that the timespans will differ, yielding periods of NA for some columns, which the EWR tool treats as 0. If this is the case, some post-processing will be needed to ignore zeros in the EWR output prior to the first real data for a gauge.
+
+### File types
+
+HydroBOT currently handles csvs, netcdfs, and zipped netcdfs. Netcdfs should be in the WERP format parseable by the EWR tool as `IQQM - netcdf`, while csvs can be in any other option parsed by the EWR tool, see `?prep_run_save_ewrs` for options.
+
+* 'Standard time-series': (default, among other things accepts a csv with a Date column followed by gauge columns, with _flow or _level appended to the gauge number)
+* 'IQQM - netcdf': finds all netcdf files in `hydro_dir`. Should also work when `hydro_dir` is a .zip with netcdfs inside
+* 'ten thousand year': old default (IQQM - NSW 10,000 years), works nearly the same as standard time-series
+* 'All Bigmod': previously 'Bigmod - MDBA'
+* 'Source - NSW (res.csv)'

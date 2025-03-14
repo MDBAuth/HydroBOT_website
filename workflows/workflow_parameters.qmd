@@ -2,7 +2,7 @@
 title: "Parameterised workflow"
 editor: visual
 # params:
-#   ewr: !r list(output_parent_dir = 'hydrobot_scenarios/testsmall')
+#   ewr: !r list(output_parent_dir = 'hydrobot_scenarios')
 # 
 #   aggregation: !r list(aggregation_def = 'workflows/params.R')
 ---
@@ -128,7 +128,7 @@ Passing arguments as text is tricky to get the yaml right for more than one argu
 ```{r}
 #| eval: false
 run_hydrobot_params(yamlpath = file.path('workflows', 'params.yml'),
-                    passed_args = "ewr:\n output_parent_dir: 'hydrobot_scenarios/testsmall'\naggregation:\n namehistory: TRUE")
+                    passed_args = "ewr:\n output_parent_dir: 'hydrobot_scenarios'\naggregation:\n namehistory: TRUE")
 ```
 
 We can also pass arguments in a list from R, which is a bit easier syntax. Here, we use it to only run a subset of the scenarios and put the outputs in the same directory, as well as specify aggregation with an R file.
@@ -137,8 +137,8 @@ We can also pass arguments in a list from R, which is a bit easier syntax. Here,
 #| eval: false
 run_hydrobot_params(list_args = list(
                       ewr = list(
-                        output_parent_dir = 'hydrobot_scenarios/testsmall/hydrographs/base',
-                        hydro_dir = 'hydrobot_scenarios/testsmall/hydrographs/base'
+                        output_parent_dir = 'hydrobot_scenarios/hydrographs/base',
+                        hydro_dir = 'hydrobot_scenarios/hydrographs/base'
                       ),
                       aggregation = list(
                         aggregation_def = "workflows/params.R",
@@ -160,5 +160,5 @@ The `prep_run_save_ewrs` and `read_and_agg` functions save metadata yaml files t
 
 ```{r}
 #| eval: false
-run_hydrobot_params(yamlpath = 'hydrobot_scenarios/testsmall/aggregator_output/agg_metadata.yml')
+run_hydrobot_params(yamlpath = 'hydrobot_scenarios/aggregator_output/agg_metadata.yml')
 ```

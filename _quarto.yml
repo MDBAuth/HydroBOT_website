@@ -4,9 +4,9 @@ project:
   output-dir: _output
   execute-dir: project
 
-# format:
-#   html:
-#     embed-resources: true
+format:
+  html:
+    code-link: true
 
 website:
   title: "HydroBOT"
