@@ -12,8 +12,7 @@ params:
 
 ```{r}
 #| include: false
-
-source('R/helpers.R')
+source("R/helpers.R")
 make_hydro_csv()
 ```
 
@@ -39,8 +38,8 @@ Within `/hydrographs`, scenarios should be kept in separate folders, i.e. files 
 It also works to point to a single scenario, as might be the case if HydroBOT runs off the end of a hydrology model that generates that scenario, e.g. `/hydrographs/scenario1`. This allows both targeting single scenarios for HydroBOT analysis, but also batching hydrology and HydroBOT together. By default, the saved data goes to `project_dir/module_output` automatically, though this can be changed, see the `output_parent_dir` and `output_subdir` arguments.
 
 ```{r}
-project_dir = file.path('hydrobot_scenarios')
-hydro_dir = file.path(project_dir, 'hydrographs')
+project_dir <- file.path("hydrobot_scenarios")
+hydro_dir <- file.path(project_dir, "hydrographs")
 ```
 
 ## Format
@@ -50,8 +49,8 @@ We need to pass the data format to the downstream modules so they can parse the 
 We also set the output type from the EWR tool. The 'yearly' is needed in most cases, but any option is available, see `?prep_run_save_ewrs`. It must be a list in order to pass correctly to python.
 
 ```{r}
-model_format = 'Standard time-series'
-outputType = list('yearly', 'summary')
+model_format <- "Standard time-series"
+outputType <- list("yearly", "summary")
 ```
 
 # Processing internals
@@ -64,19 +63,20 @@ We get the information about the gauges and filepaths `project_dir` with `find_s
 
 ```{r}
 # get the paths to all the hydrographs
-hydro_paths <- find_scenario_paths(hydro_dir, type = 'csv')
+hydro_paths <- find_scenario_paths(hydro_dir, type = "csv")
 ```
 
 The output directory and subdirs for scenarios is created by `make_output_dir`, which also returns that outer directory location. Note that `output_subdir` allows subdirectories. This can be useful for running different analyses on the same set of hydrographs.
 
 ```{r}
 # set up the output directory
-output_path <- make_output_dir(parent_dir = project_dir,
-      scenarios = names(hydro_paths),
-      module_name = "EWR",
-      subdir = "example",
-      ewr_outtypes = unlist(outputType)
-    )
+output_path <- make_output_dir(
+  parent_dir = project_dir,
+  scenarios = names(hydro_paths),
+  module_name = "EWR",
+  subdir = "example",
+  ewr_outtypes = unlist(outputType)
+)
 ```
 
 This directory machinery makes the `file_search` and `fill_missing` arguments possible to ensure only a subset of files are run or missing files are able to be run if, for example, a long run crashed. See `?prep_run_save_ewrs` and the [main controller page](controller_ewr_wrapped.qmd).
@@ -98,15 +98,14 @@ controller_functions <- reticulate::import_from_path("controller_functions",
 )
 
 ewr_out <- controller_functions$run_save_ewrs(
-  hydro_paths[[1]], 
+  hydro_paths[[1]],
   output_path,
-  model_format, 
+  model_format,
   outputType = outputType,
-  returnType = list('summary'),
+  returnType = list("summary"),
   scenario_name = names(hydro_paths)[1],
-  scenarios_from = 'directory'
-  )
-
+  scenarios_from = "directory"
+)
 ```
 
 Briefly, we can see that that has returned dataframes from the EWR. Typically, though, we just save this out.
@@ -126,4 +125,3 @@ This now has the EWR outputs saved into `project_dir/module_output/EWR` and avai
 #| label: cleanup
 withr::deferred_run()
 ```
-

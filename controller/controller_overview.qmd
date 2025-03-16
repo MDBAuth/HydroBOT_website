@@ -15,7 +15,7 @@ In typical use, the controller simply points to the input data and initiates pro
 
 In practice, it often makes the most sense to run the controller in a notebook or script, and then have a separate notebook or script for aggregation. This is because running the EWR tool is a long process relative to other steps, and aggregations may need to change as projects progress. Achieving this without re-running the modules is thus a common situation. That said, the [workflows](../workflows/workflow_overview.qmd) section illustrates various workflows that run them together.
 
-Whether run alone or as a combined workflow, the controller, specifically \[prep_run_save_ewrs()\] auto-documents itself by saving metadata yaml files with all arguments used. These parameter files not only document a run, but also allow replication since they are fully-specified parameter files acceptable for \[run_hydrobot_params()\].
+Whether run alone or as a combined workflow, the controller, specifically `prep_run_save_ewrs()` auto-documents itself by saving metadata yaml files with all arguments used. These parameter files not only document a run, but also allow replication since they are fully-specified parameter files acceptable for \[run_hydrobot_params()\].
 
 ::: callout-note
 Scenarios need to have unique names. As such, in most cases they are extracted from the file paths, which must be unique. This can get a bit messy, but is the only consistent way to ensure uniqueness. Analysis stages can incorporate cleanup steps. See [additional detail](controller_ewr_wrapped.qmd).

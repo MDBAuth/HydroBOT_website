@@ -155,6 +155,75 @@
       "Repository": "RSPM",
       "Encoding": "UTF-8"
     },
+    "HydroBOT": {
+      "Package": "HydroBOT",
+      "Version": "0.2.2.9009",
+      "Source": "Local",
+      "Title": "Toolkit For Flow-Dependent outcomes in the Murray-Darling Basin",
+      "Authors@R": "c(person(\"Galen\", \"Holt\", , \"g.holt@deakin.edu.au\", role = c(\"aut\", \"cre\"), comment = c(ORCID = \"0000-0002-7455-9275\")), person(\"Georgia\", \"Dwyer\", , \"g.dwyer@deakin.edu.au\", role = c(\"aut\"), comment = c(ORCID = \"\")))",
+      "Description": "Provides tools to assess responses to flows in the MDB. Wraps the EWR tool and provides ongoing modeling of ecological responses with causal networks, as well as analysis, synthesis and visualisation functionality targetted at scenario comparisons.",
+      "License": "MIT + file LICENSE",
+      "Encoding": "UTF-8",
+      "Roxygen": "list(markdown = TRUE)",
+      "RoxygenNote": "7.3.2",
+      "Imports": [
+        "DiagrammeR",
+        "dplyr",
+        "forcats",
+        "foreach",
+        "ggplot2",
+        "glue",
+        "grDevices",
+        "lubridate",
+        "lwgeom",
+        "paletteer",
+        "purrr",
+        "readr",
+        "reticulate",
+        "rlang",
+        "scales",
+        "stringi",
+        "stringr",
+        "tibble",
+        "tidyr",
+        "tidyselect",
+        "yaml"
+      ],
+      "Suggests": [
+        "covr",
+        "ggthemes",
+        "knitr",
+        "patchwork",
+        "rmapshaper (>= 0.4.6)",
+        "colorspace",
+        "rmarkdown",
+        "scico",
+        "testthat (>= 3.0.0)",
+        "vdiffr",
+        "withr",
+        "jsonlite",
+        "furrr",
+        "future",
+        "DiagrammeRsvg",
+        "rsvg",
+        "metR",
+        "PCICt",
+        "ncdf4"
+      ],
+      "Config/testthat/edition": "3",
+      "Depends": [
+        "R (>= 2.10)",
+        "sf"
+      ],
+      "LazyData": "true",
+      "Config/reticulate": "list( packages = list( list(package = \"py-ewr\") ) )",
+      "URL": "https://laughing-adventure-8jypg4z.pages.github.io/",
+      "RemoteType": "local",
+      "RemoteUrl": "C:\\Users\\galen\\Documents\\code\\WERP\\HydroBOT",
+      "NeedsCompilation": "no",
+      "Author": "Galen Holt [aut, cre] (<https://orcid.org/0000-0002-7455-9275>), Georgia Dwyer [aut]",
+      "Maintainer": "Galen Holt <g.holt@deakin.edu.au>"
+    },
     "KernSmooth": {
       "Package": "KernSmooth",
       "Version": "2.23-26",
@@ -286,6 +355,118 @@
       "Repository": "RSPM",
       "Encoding": "UTF-8"
     },
+    "R.cache": {
+      "Package": "R.cache",
+      "Version": "0.16.0",
+      "Source": "Repository",
+      "Depends": [
+        "R (>= 2.14.0)"
+      ],
+      "Imports": [
+        "utils",
+        "R.methodsS3 (>= 1.8.1)",
+        "R.oo (>= 1.24.0)",
+        "R.utils (>= 2.10.1)",
+        "digest (>= 0.6.13)"
+      ],
+      "Title": "Fast and Light-Weight Caching (Memoization) of Objects and Results to Speed Up Computations",
+      "Authors@R": "c(person(\"Henrik\", \"Bengtsson\", role=c(\"aut\", \"cre\", \"cph\"), email = \"henrikb@braju.com\"))",
+      "Author": "Henrik Bengtsson [aut, cre, cph]",
+      "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+      "Description": "Memoization can be used to speed up repetitive and computational expensive function calls.  The first time a function that implements memoization is called the results are stored in a cache memory.  The next time the function is called with the same set of parameters, the results are momentarily retrieved from the cache avoiding repeating the calculations.  With this package, any R object can be cached in a key-value storage where the key can be an arbitrary set of R objects.  The cache memory is persistent (on the file system).",
+      "License": "LGPL (>= 2.1)",
+      "LazyLoad": "TRUE",
+      "URL": "https://github.com/HenrikBengtsson/R.cache",
+      "BugReports": "https://github.com/HenrikBengtsson/R.cache/issues",
+      "RoxygenNote": "7.2.1",
+      "NeedsCompilation": "no",
+      "Repository": "PPM",
+      "Encoding": "UTF-8"
+    },
+    "R.methodsS3": {
+      "Package": "R.methodsS3",
+      "Version": "1.8.2",
+      "Source": "Repository",
+      "Depends": [
+        "R (>= 2.13.0)"
+      ],
+      "Imports": [
+        "utils"
+      ],
+      "Suggests": [
+        "codetools"
+      ],
+      "Title": "S3 Methods Simplified",
+      "Authors@R": "c(person(\"Henrik\", \"Bengtsson\", role=c(\"aut\", \"cre\", \"cph\"), email = \"henrikb@braju.com\"))",
+      "Author": "Henrik Bengtsson [aut, cre, cph]",
+      "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+      "Description": "Methods that simplify the setup of S3 generic functions and S3 methods.  Major effort has been made in making definition of methods as simple as possible with a minimum of maintenance for package developers.  For example, generic functions are created automatically, if missing, and naming conflict are automatically solved, if possible.  The method setMethodS3() is a good start for those who in the future may want to migrate to S4.  This is a cross-platform package implemented in pure R that generates standard S3 methods.",
+      "License": "LGPL (>= 2.1)",
+      "LazyLoad": "TRUE",
+      "URL": "https://github.com/HenrikBengtsson/R.methodsS3",
+      "BugReports": "https://github.com/HenrikBengtsson/R.methodsS3/issues",
+      "NeedsCompilation": "no",
+      "Repository": "PPM",
+      "Encoding": "UTF-8"
+    },
+    "R.oo": {
+      "Package": "R.oo",
+      "Version": "1.27.0",
+      "Source": "Repository",
+      "Depends": [
+        "R (>= 2.13.0)",
+        "R.methodsS3 (>= 1.8.2)"
+      ],
+      "Imports": [
+        "methods",
+        "utils"
+      ],
+      "Suggests": [
+        "tools"
+      ],
+      "Title": "R Object-Oriented Programming with or without References",
+      "Authors@R": "c(person(\"Henrik\", \"Bengtsson\", role=c(\"aut\", \"cre\", \"cph\"), email = \"henrikb@braju.com\"))",
+      "Author": "Henrik Bengtsson [aut, cre, cph]",
+      "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+      "Description": "Methods and classes for object-oriented programming in R with or without references.  Large effort has been made on making definition of methods as simple as possible with a minimum of maintenance for package developers.  The package has been developed since 2001 and is now considered very stable.  This is a cross-platform package implemented in pure R that defines standard S3 classes without any tricks.",
+      "License": "LGPL (>= 2.1)",
+      "LazyLoad": "TRUE",
+      "URL": "https://github.com/HenrikBengtsson/R.oo",
+      "BugReports": "https://github.com/HenrikBengtsson/R.oo/issues",
+      "NeedsCompilation": "no",
+      "Repository": "CRAN"
+    },
+    "R.utils": {
+      "Package": "R.utils",
+      "Version": "2.13.0",
+      "Source": "Repository",
+      "Depends": [
+        "R (>= 2.14.0)",
+        "R.oo"
+      ],
+      "Imports": [
+        "methods",
+        "utils",
+        "tools",
+        "R.methodsS3"
+      ],
+      "Suggests": [
+        "datasets",
+        "digest (>= 0.6.10)"
+      ],
+      "Title": "Various Programming Utilities",
+      "Authors@R": "c(person(\"Henrik\", \"Bengtsson\", role=c(\"aut\", \"cre\", \"cph\"), email = \"henrikb@braju.com\"))",
+      "Author": "Henrik Bengtsson [aut, cre, cph]",
+      "Maintainer": "Henrik Bengtsson <henrikb@braju.com>",
+      "Description": "Utility functions useful when programming and developing R packages.",
+      "License": "LGPL (>= 2.1)",
+      "LazyLoad": "TRUE",
+      "URL": "https://henrikbengtsson.github.io/R.utils/, https://github.com/HenrikBengtsson/R.utils",
+      "BugReports": "https://github.com/HenrikBengtsson/R.utils/issues",
+      "NeedsCompilation": "no",
+      "Repository": "PPM",
+      "Encoding": "UTF-8"
+    },
     "R6": {
       "Package": "R6",
       "Version": "2.6.1",
@@ -361,19 +542,18 @@
     },
     "RcppTOML": {
       "Package": "RcppTOML",
-      "Version": "0.2.2",
+      "Version": "0.2.3",
       "Source": "Repository",
       "Type": "Package",
       "Title": "'Rcpp' Bindings to Parser for \"Tom's Obvious Markup Language\"",
-      "Date": "2023-01-29",
-      "Author": "Dirk Eddelbuettel",
-      "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
+      "Date": "2025-03-08",
+      "Authors@R": "c(person(\"Dirk\", \"Eddelbuettel\", role = c(\"aut\", \"cre\"), email = \"edd@debian.org\", comment = c(ORCID = \"0000-0001-6419-907X\")), person(\"Mark\", \"Gillard\", role = \"aut\", comment = \"Author of 'toml++' header library\"))",
       "Description": "The configuration format defined by 'TOML' (which expands to \"Tom's Obvious Markup Language\") specifies an excellent format (described at <https://toml.io/en/>) suitable for both human editing as well as the common uses of a machine-readable format. This package uses 'Rcpp' to connect to the 'toml++' parser written by Mark Gillard to R.",
       "SystemRequirements": "A C++17 compiler",
       "BugReports": "https://github.com/eddelbuettel/rcpptoml/issues",
       "URL": "http://dirk.eddelbuettel.com/code/rcpp.toml.html",
       "Imports": [
-        "Rcpp (>= 0.11.5)"
+        "Rcpp (>= 1.0.8)"
       ],
       "Depends": [
         "R (>= 3.3.0)"
@@ -386,6 +566,8 @@
       ],
       "License": "GPL (>= 2)",
       "NeedsCompilation": "yes",
+      "Author": "Dirk Eddelbuettel [aut, cre] (<https://orcid.org/0000-0001-6419-907X>), Mark Gillard [aut] (Author of 'toml++' header library)",
+      "Maintainer": "Dirk Eddelbuettel <edd@debian.org>",
       "Repository": "RSPM",
       "Encoding": "UTF-8"
     },
@@ -5042,7 +5224,7 @@
     },
     "reticulate": {
       "Package": "reticulate",
-      "Version": "1.41.0",
+      "Version": "1.41.0.1",
       "Source": "Repository",
       "Type": "Package",
       "Title": "Interface to 'Python'",
@@ -5088,7 +5270,7 @@
       "NeedsCompilation": "yes",
       "Author": "Tomasz Kalinowski [ctb, cre], Kevin Ushey [aut], JJ Allaire [aut], RStudio [cph, fnd], Yuan Tang [aut, cph] (<https://orcid.org/0000-0001-5243-233X>), Dirk Eddelbuettel [ctb, cph], Bryan Lewis [ctb, cph], Sigrid Keydana [ctb], Ryan Hafen [ctb, cph], Marcus Geelnard [ctb, cph] (TinyThread library, http://tinythreadpp.bitsnbites.eu/)",
       "Maintainer": "Tomasz Kalinowski <tomasz@posit.co>",
-      "Repository": "PPM"
+      "Repository": "RSPM"
     },
     "rex": {
       "Package": "rex",
@@ -5998,6 +6180,54 @@
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
       "Repository": "RSPM"
     },
+    "styler": {
+      "Package": "styler",
+      "Version": "1.10.3",
+      "Source": "Repository",
+      "Type": "Package",
+      "Title": "Non-Invasive Pretty Printing of R Code",
+      "Authors@R": "c(person(given = \"Kirill\", family = \"Müller\", role = \"aut\", email = \"kirill@cynkra.com\", comment = c(ORCID = \"0000-0002-1416-3412\")), person(given = \"Lorenz\", family = \"Walthert\", role = c(\"cre\", \"aut\"), email = \"lorenz.walthert@icloud.com\"), person(given = \"Indrajeet\", family = \"Patil\", role = \"ctb\", email = \"patilindrajeet.science@gmail.com\", comment = c(ORCID = \"0000-0003-1995-6531\", Twitter = \"@patilindrajeets\")))",
+      "Description": "Pretty-prints R code without changing the user's formatting intent.",
+      "License": "MIT + file LICENSE",
+      "URL": "https://github.com/r-lib/styler, https://styler.r-lib.org",
+      "BugReports": "https://github.com/r-lib/styler/issues",
+      "Depends": [
+        "R (>= 3.6.0)"
+      ],
+      "Imports": [
+        "cli (>= 3.1.1)",
+        "magrittr (>= 2.0.0)",
+        "purrr (>= 0.2.3)",
+        "R.cache (>= 0.15.0)",
+        "rlang (>= 1.0.0)",
+        "rprojroot (>= 1.1)",
+        "tools",
+        "vctrs (>= 0.4.1)",
+        "withr (>= 2.3.0)"
+      ],
+      "Suggests": [
+        "data.tree (>= 0.1.6)",
+        "digest",
+        "here",
+        "knitr",
+        "prettycode",
+        "rmarkdown",
+        "roxygen2",
+        "rstudioapi (>= 0.7)",
+        "tibble (>= 1.4.2)",
+        "testthat (>= 3.0.0)"
+      ],
+      "VignetteBuilder": "knitr",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.1",
+      "Config/testthat/edition": "3",
+      "Config/testthat/parallel": "true",
+      "Collate": "'addins.R' 'communicate.R' 'compat-dplyr.R' 'compat-tidyr.R' 'detect-alignment-utils.R' 'detect-alignment.R' 'environments.R' 'expr-is.R' 'indent.R' 'initialize.R' 'io.R' 'nest.R' 'nested-to-tree.R' 'parse.R' 'reindent.R' 'token-define.R' 'relevel.R' 'roxygen-examples-add-remove.R' 'roxygen-examples-find.R' 'roxygen-examples-parse.R' 'roxygen-examples.R' 'rules-indention.R' 'rules-line-breaks.R' 'rules-spaces.R' 'rules-tokens.R' 'serialize.R' 'set-assert-args.R' 'style-guides.R' 'styler-package.R' 'stylerignore.R' 'testing-mocks.R' 'testing-public-api.R' 'ui-caching.R' 'testing.R' 'token-create.R' 'transform-block.R' 'transform-code.R' 'transform-files.R' 'ui-styling.R' 'unindent.R' 'utils-cache.R' 'utils-files.R' 'utils-navigate-nest.R' 'utils-strings.R' 'utils.R' 'vertical.R' 'visit.R' 'zzz.R'",
+      "NeedsCompilation": "no",
+      "Author": "Kirill Müller [aut] (<https://orcid.org/0000-0002-1416-3412>), Lorenz Walthert [cre, aut], Indrajeet Patil [ctb] (<https://orcid.org/0000-0003-1995-6531>, @patilindrajeets)",
+      "Maintainer": "Lorenz Walthert <lorenz.walthert@icloud.com>",
+      "Repository": "PPM"
+    },
     "survival": {
       "Package": "survival",
       "Version": "3.8-3",
@@ -6444,7 +6674,7 @@
     },
     "units": {
       "Package": "units",
-      "Version": "0.8-5",
+      "Version": "0.8-7",
       "Source": "Repository",
       "Title": "Measurement Units for R Vectors",
       "Authors@R": "c(person(\"Edzer\", \"Pebesma\", role = c(\"aut\", \"cre\"), email = \"edzer.pebesma@uni-muenster.de\", comment = c(ORCID = \"0000-0001-8049-7069\")), person(\"Thomas\", \"Mailund\", role = \"aut\", email = \"mailund@birc.au.dk\"), person(\"Tomasz\", \"Kalinowski\", role = \"aut\"), person(\"James\", \"Hiebert\", role = \"ctb\"), person(\"Iñaki\", \"Ucar\", role = \"aut\", email = \"iucar@fedoraproject.org\", comment = c(ORCID = \"0000-0001-6403-5550\")), person(\"Thomas Lin\", \"Pedersen\", role = \"ctb\") )",
@@ -6469,6 +6699,7 @@
         "testthat (>= 3.0.0)",
         "vdiffr",
         "knitr",
+        "rvest",
         "rmarkdown"
       ],
       "VignetteBuilder": "knitr",
@@ -6477,13 +6708,13 @@
       "License": "GPL-2",
       "URL": "https://r-quantities.github.io/units/, https://github.com/r-quantities/units",
       "BugReports": "https://github.com/r-quantities/units/issues",
-      "RoxygenNote": "7.2.3",
+      "RoxygenNote": "7.3.2",
       "Encoding": "UTF-8",
       "Config/testthat/edition": "3",
       "NeedsCompilation": "yes",
       "Author": "Edzer Pebesma [aut, cre] (<https://orcid.org/0000-0001-8049-7069>), Thomas Mailund [aut], Tomasz Kalinowski [aut], James Hiebert [ctb], Iñaki Ucar [aut] (<https://orcid.org/0000-0001-6403-5550>), Thomas Lin Pedersen [ctb]",
       "Maintainer": "Edzer Pebesma <edzer.pebesma@uni-muenster.de>",
-      "Repository": "RSPM"
+      "Repository": "CRAN"
     },
     "urlchecker": {
       "Package": "urlchecker",

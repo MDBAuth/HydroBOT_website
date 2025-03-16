@@ -15,19 +15,25 @@ Causal networks are models that describe the relationships between climate, adap
 Causal networks can [show many relationships and outcomes](causal_plots.qmd). To illustrate here, we show the links between EWRs (hydrologic indicators), proximate environmental objectives, larger-scale objectives, and finally broad-based ecological groupings.
 
 ```{r}
-#| echo: false 
+#| echo: false
 #| message: false
 library(HydroBOT)
 library(dplyr)
-edges <- make_edges(dflist = causal_ewr,
-                    fromtos = list(c('ewr_code', 'env_obj'),
-                                   c('env_obj', 'Specific_goal'),
-                                   c('Specific_goal', 'Target'),
-                                   c('env_obj', 'target_5_year_2024')),
-                    gaugefilter = '409025') 
-nodes <- make_nodes(edges)  
-make_causal_plot(filter(nodes, NodeType != 'target_5_year_2024'), 
-                 edges, render = FALSE) %>%
+edges <- make_edges(
+  dflist = causal_ewr,
+  fromtos = list(
+    c("ewr_code", "env_obj"),
+    c("env_obj", "Specific_goal"),
+    c("Specific_goal", "Target"),
+    c("env_obj", "target_5_year_2024")
+  ),
+  gaugefilter = "409025"
+)
+nodes <- make_nodes(edges)
+make_causal_plot(filter(nodes, NodeType != "target_5_year_2024"),
+  edges,
+  render = FALSE
+) %>%
   DiagrammeR::render_graph()
 ```
 

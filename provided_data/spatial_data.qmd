@@ -22,15 +22,17 @@ The datasets are `bom_basin_gauges` (points), and `basin` (the MDB as a single p
 ### Basin
 
 ```{r}
-ggplot(basin) + geom_sf(fill = 'powderblue')
+ggplot(basin) +
+  geom_sf(fill = "powderblue")
 ```
 
 ### Resource plan areas
 
 ```{r}
-ggplot(resource_plan_areas) + geom_sf(aes(fill = SWWRPANAME), show.legend = FALSE) +
-  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, 'lines')) + 
-  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+ggplot(resource_plan_areas) +
+  geom_sf(aes(fill = SWWRPANAME), show.legend = FALSE) +
+  geom_sf_label(aes(label = SWWRPANAME), size = 3, label.padding = unit(0.1, "lines")) +
+  colorspace::scale_fill_discrete_qualitative(palette = "Set2")
 ```
 
 These have 'SW' codes
@@ -42,11 +44,12 @@ resource_plan_areas
 ### SDL plan areas
 
 ```{r}
-ggplot(sdl_units) + 
+ggplot(sdl_units) +
   geom_sf(aes(fill = SWSDLName), show.legend = FALSE) +
-  geom_sf_label(aes(label = SWSDLName), 
-                size = 3, label.padding = unit(0.1, 'lines')) + 
-  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+  geom_sf_label(aes(label = SWSDLName),
+    size = 3, label.padding = unit(0.1, "lines")
+  ) +
+  colorspace::scale_fill_discrete_qualitative(palette = "Set2")
 ```
 
 These have 'SS' codes.
@@ -58,11 +61,12 @@ sdl_units
 ### Catchments
 
 ```{r}
-ggplot(cewo_valleys) + 
+ggplot(cewo_valleys) +
   geom_sf(aes(fill = ValleyName), show.legend = FALSE) +
   geom_sf_label(aes(label = ValleyName),
-                size = 3, label.padding = unit(0.1, 'lines')) + 
-  colorspace::scale_fill_discrete_qualitative(palette = 'Set2')
+    size = 3, label.padding = unit(0.1, "lines")
+  ) +
+  colorspace::scale_fill_discrete_qualitative(palette = "Set2")
 ```
 
 These have names, ID, and ValleyCodes
@@ -74,8 +78,8 @@ cewo_valleys
 ### Gauges
 
 ```{r}
-ggplot() + 
-  geom_sf(data = basin, fill = 'powderblue') +
+ggplot() +
+  geom_sf(data = basin, fill = "powderblue") +
   geom_sf(data = bom_basin_gauges)
 ```
 
@@ -86,10 +90,10 @@ bom_basin_gauges
 ### Gauges, sdl, basin
 
 ```{r}
-gauges_sdl <- ggplot() + 
-  geom_sf(data = sdl_units, fill = 'cadetblue', color = 'grey40') +
-  geom_sf(data = bom_basin_gauges, color = 'goldenrod', alpha = 0.5) +
-  colorspace::scale_fill_discrete_qualitative(palette = 'Set2') +
+gauges_sdl <- ggplot() +
+  geom_sf(data = sdl_units, fill = "cadetblue", color = "grey40") +
+  geom_sf(data = bom_basin_gauges, color = "goldenrod", alpha = 0.5) +
+  colorspace::scale_fill_discrete_qualitative(palette = "Set2") +
   theme_hydrobot()
 gauges_sdl
 ```
@@ -99,10 +103,10 @@ gauges_sdl
 These are most relevant in NSW; analysis at basin scale often skips and goes straight to the sdl unit.
 
 ```{r}
-planning_sdl <- ggplot() + 
+planning_sdl <- ggplot() +
   geom_sf(data = planning_units, mapping = aes(fill = PlanningUnitName)) +
-  colorspace::scale_fill_discrete_qualitative(palette = 'Set2') +
-  theme_hydrobot(legend.position = 'none')
+  colorspace::scale_fill_discrete_qualitative(palette = "Set2") +
+  theme_hydrobot(legend.position = "none")
 planning_sdl
 ```
 
@@ -111,11 +115,13 @@ planning_sdl
 Despite the gauges falling on rivers, analyses tend to be in polygons (planning units, sdl units, etc) and not restricted to the channel. That said, visualising the location of the rivers can be very helpful.
 
 ```{r}
-gauges_rivers <- ggplot() + 
-  geom_sf(data = basin, fill = NA, color = 'grey40') +
-  geom_sf(data = bom_basin_gauges, color = 'goldenrod',
-          alpha = 0.5) +
-  geom_sf(data = basin_rivers, color = 'cadetblue') +
+gauges_rivers <- ggplot() +
+  geom_sf(data = basin, fill = NA, color = "grey40") +
+  geom_sf(
+    data = bom_basin_gauges, color = "goldenrod",
+    alpha = 0.5
+  ) +
+  geom_sf(data = basin_rivers, color = "cadetblue") +
   theme_hydrobot()
 gauges_rivers
 ```

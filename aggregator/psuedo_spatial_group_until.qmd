@@ -11,7 +11,7 @@ The `auto_ewr_PU = TRUE` argument in \[read_and_agg()\] and \[multi_aggregate()\
 
 Best practice is to be explicit, with the following arguments to \[read_and_agg()\] and \[multi_aggregate()\], but it is often faster to use `auto_ewr_PU = TRUE`.
 
-``` R
+``` r
 group_until = list(SWSDLName = is_notpoint, 
                    planning_unit_name = is_notpoint, 
                    gauge = is_notpoint),

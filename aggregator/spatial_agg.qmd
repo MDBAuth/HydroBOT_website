@@ -41,8 +41,8 @@ For this demonstration, we start with gauge-referenced data at the `env_obj` the
 First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
-project_dir <- file.path('more_scenarios')
-ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+project_dir <- file.path("more_scenarios")
+ewr_results <- file.path(project_dir, "module_output", "EWR")
 ```
 
 ### Theme aggregated inputs
@@ -53,17 +53,21 @@ Before any aggregation, we need to read the data in and make it spatial (`gauge2
 
 ```{r}
 #| message: false
-sumdat <- prep_ewr_agg(ewr_results, type = 'summary', geopath = bom_basin_gauges)
+sumdat <- prep_ewr_agg(ewr_results, type = "summary", geopath = bom_basin_gauges)
 ```
 
 Define simple theme aggregation lists to get to `env_obj` level, assuming that any pass on `ewr_code_timing` yields a pass for `ewr_code` and `ewr_code`s are averaged into `env_obj`. More complexity for the theme aggregations are shown [in the theme notebook](theme_agg.qmd).
 
 ```{r}
-themeseq <- list(c('ewr_code_timing', 'ewr_code'),
-               c('ewr_code', "env_obj"))
+themeseq <- list(
+  c("ewr_code_timing", "ewr_code"),
+  c("ewr_code", "env_obj")
+)
 
-funseq <- list(c('CompensatingFactor'),
-               c('ArithmeticMean'))
+funseq <- list(
+  c("CompensatingFactor"),
+  c("ArithmeticMean")
+)
 ```
 
 Perform that simple theme aggregation so we have some test data. Since edges are only relevant for theme aggregation, make them in the call. This and everything that follows could be done with interleaved theme and spatial sequences starting with `themeseq` and `funseq` fed to `multi_aggregate`, but here I split them apart to better accentuate the spatial aggregation.
@@ -73,12 +77,14 @@ Perform that simple theme aggregation so we have some test data. Since edges are
 #| warning: false
 
 
-simpleThemeAgg <- multi_aggregate(dat = sumdat,
-                         causal_edges = make_edges(causal_ewr, themeseq),
-                         groupers = c('scenario', 'gauge'),
-                         aggCols = 'ewr_achieved',
-                         aggsequence = themeseq,
-                         funsequence = funseq)
+simpleThemeAgg <- multi_aggregate(
+  dat = sumdat,
+  causal_edges = make_edges(causal_ewr, themeseq),
+  groupers = c("scenario", "gauge"),
+  aggCols = "ewr_achieved",
+  aggsequence = themeseq,
+  funsequence = funseq
+)
 simpleThemeAgg
 ```
 
@@ -101,25 +107,28 @@ Note that the `aggCols` argument is `ends_with(original_name)` to reference the 
 ```{r}
 #| message: false
 
-obj2poly <- spatial_aggregate(dat = simpleThemeAgg, 
-                             to_geo = sdl_units,
-                             groupers = 'scenario',
-                             aggCols = ends_with('ewr_achieved'),
-                             funlist = ArithmeticMean,
-                             keepAllPolys = TRUE)
+obj2poly <- spatial_aggregate(
+  dat = simpleThemeAgg,
+  to_geo = sdl_units,
+  groupers = "scenario",
+  aggCols = ends_with("ewr_achieved"),
+  funlist = ArithmeticMean,
+  keepAllPolys = TRUE
+)
 obj2poly
 ```
 
 Note that that has a horribly long name tracking the aggregation history, and has lost the theme levels- e.g. the different `env_obj`s are no longer there and were all averaged together. The `multi_aggregate` function automatically handles this preservation, but `spatial_aggregate` is more general, and does not make any assumptions about the grouping structure of the data. Thus, to keep the `env_obj` groupings (as we should, otherwise we're inadvertently theme-aggregating over all of them), we need to add `env_obj` to the `groupers` argument.
 
 ```{r}
-
-obj2poly <- spatial_aggregate(dat = simpleThemeAgg, 
-                             to_geo = sdl_units,
-                             groupers = c('scenario', 'env_obj'),
-                             aggCols = ends_with('ewr_achieved'),
-                             funlist = ArithmeticMean,
-                             keepAllPolys = TRUE)
+obj2poly <- spatial_aggregate(
+  dat = simpleThemeAgg,
+  to_geo = sdl_units,
+  groupers = c("scenario", "env_obj"),
+  aggCols = ends_with("ewr_achieved"),
+  funlist = ArithmeticMean,
+  keepAllPolys = TRUE
+)
 obj2poly
 ```
 
@@ -129,35 +138,37 @@ There are many built-in plotting options in HydroBOT, which we will use shortly.
 
 ```{r}
 # The name is horrible, so change it.
-obj2poly %>% 
-  rename(ewr_achieved = spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved) %>% 
-  filter(grepl('^EF', env_obj)) %>% 
-ggplot(aes(fill = ewr_achieved)) +
-  geom_sf() + 
-  facet_grid(scenario~env_obj) + 
-  theme(legend.position = 'bottom')
+obj2poly %>%
+  rename(ewr_achieved = spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved) %>%
+  filter(grepl("^EF", env_obj)) %>%
+  ggplot(aes(fill = ewr_achieved)) +
+  geom_sf() +
+  facet_grid(scenario ~ env_obj) +
+  theme(legend.position = "bottom")
 ```
 
 Moving forward, we'll use the built-in plotting functions to keep consistent with the rest of the project.
 
 ```{r}
-scene_pal <- make_pal(unique(simpleThemeAgg$scenario), palette = 'ggsci::nrc_npg', refvals = 'base', refcols = 'black')
+scene_pal <- make_pal(unique(simpleThemeAgg$scenario), palette = "ggsci::nrc_npg", refvals = "base", refcols = "black")
 ```
 
 ```{r}
-obj2poly %>% 
-  rename(ewr_achieved = spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved) %>% 
-  filter(grepl('^EF[1-3]', env_obj)) %>% 
-plot_outcomes(y_col = 'ewr_achieved',
-                  y_lab = 'Arithmetic Mean',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'env_obj',
-                          facet_row = 'scenario',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'))
+obj2poly %>%
+  rename(ewr_achieved = spatial_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved) %>%
+  filter(grepl("^EF[1-3]", env_obj)) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    y_lab = "Arithmetic Mean",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "env_obj",
+    facet_row = "scenario",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2")
+  )
 ```
 
 ## Multiple spatial levels
@@ -174,15 +185,15 @@ Aggregating from SDL units to cewo valleys requires addressing issues of overlap
 overlay_cewo_sdl <- ggplot() +
   geom_sf(data = sdl_units, aes(fill = SWSDLName), color = NA, alpha = 0.5) +
   geom_sf(data = cewo_valleys, aes(color = ValleyName), fill = NA) +
-  theme(legend.position = 'none')
+  theme(legend.position = "none")
 
 valleys <- ggplot() +
-  geom_sf(data = cewo_valleys, aes(color = ValleyName), fill = 'white') + 
-  theme(legend.position = 'none')
+  geom_sf(data = cewo_valleys, aes(color = ValleyName), fill = "white") +
+  theme(legend.position = "none")
 
 sdls <- ggplot() +
-  geom_sf(data = sdl_units, aes(fill = SWSDLName), alpha = 0.5) + 
-  theme(legend.position = 'none')
+  geom_sf(data = sdl_units, aes(fill = SWSDLName), alpha = 0.5) +
+  theme(legend.position = "none")
 
 valleys + sdls + overlay_cewo_sdl
 ```
@@ -207,19 +218,27 @@ nvorig <- ggplot() +
   geom_sf(data = dplyr::filter(sdl_units, SWSDLName == "Victorian Murray"))
 
 nvpostjoin <- ggplot() +
-  geom_sf(data = dplyr::filter(joinpolys, 
-                        SWSDLName == "Victorian Murray"), 
-          aes(fill = ValleyName))
+  geom_sf(
+    data = dplyr::filter(
+      joinpolys,
+      SWSDLName == "Victorian Murray"
+    ),
+    aes(fill = ValleyName)
+  )
 
 avorig <- ggplot() +
-  geom_sf(data = dplyr::filter(cewo_valleys, ValleyName == 'Loddon'))
+  geom_sf(data = dplyr::filter(cewo_valleys, ValleyName == "Loddon"))
 
 avpostjoin <- ggplot() +
-  geom_sf(data = dplyr::filter(joinpolys, 
-                        ValleyName == 'Loddon'), 
-          aes(fill = SWSDLName))
+  geom_sf(
+    data = dplyr::filter(
+      joinpolys,
+      ValleyName == "Loddon"
+    ),
+    aes(fill = SWSDLName)
+  )
 
-(nvorig + nvpostjoin)/(avorig + avpostjoin)
+(nvorig + nvpostjoin) / (avorig + avpostjoin)
 ```
 
 As a simple example, we could again do a one-off aggregation from a polygon to another polygon using `spatial_aggregate`. Here, we could use the `obj2poly` aggregation into SDL units created above as the starting point.
@@ -227,14 +246,16 @@ As a simple example, we could again do a one-off aggregation from a polygon to a
 ```{r}
 #| warning: false
 #| message: false
-simplepolypoly <- spatial_aggregate(dat = obj2poly, 
-                 to_geo = cewo_valleys,
-                 groupers = c('scenario', 'env_obj'),
-                 aggCols = 'ewr_achieved',
-                 funlist = mean,
-                 na.rm = TRUE,
-                 keepAllPolys = TRUE,
-                 failmissing = FALSE)
+simplepolypoly <- spatial_aggregate(
+  dat = obj2poly,
+  to_geo = cewo_valleys,
+  groupers = c("scenario", "env_obj"),
+  aggCols = "ewr_achieved",
+  funlist = mean,
+  na.rm = TRUE,
+  keepAllPolys = TRUE,
+  failmissing = FALSE
+)
 simplepolypoly
 ```
 
@@ -251,20 +272,24 @@ First, set up a list of the spatial aggregation steps, defined by the polygon se
 ```{r}
 glist <- list(sdl_units = sdl_units, catchment = cewo_valleys, mdb = basin)
 
-funlist <- list(c('ArithmeticMean', 'LimitingFactor'),
-                rlang::quo(list(wm = ~weighted.mean(., area, na.rm = TRUE))),
-                rlang::quo(list(wm = ~weighted.mean(., area, na.rm = TRUE))))
+funlist <- list(
+  c("ArithmeticMean", "LimitingFactor"),
+  rlang::quo(list(wm = ~ weighted.mean(., area, na.rm = TRUE))),
+  rlang::quo(list(wm = ~ weighted.mean(., area, na.rm = TRUE)))
+)
 ```
 
 ```{r}
 #| warning: false
 #| message: false
-multispat <- multi_aggregate(dat = simpleThemeAgg,
-                         causal_edges = themeedges,
-                         groupers = c('scenario', 'env_obj'),
-                         aggCols = 'ewr_achieved',
-                         aggsequence = glist,
-                         funsequence = funlist)
+multispat <- multi_aggregate(
+  dat = simpleThemeAgg,
+  causal_edges = themeedges,
+  groupers = c("scenario", "env_obj"),
+  aggCols = "ewr_achieved",
+  aggsequence = glist,
+  funsequence = funlist
+)
 ```
 
 By default, that returns only the final outcome, here the basin scale and with the aggregation history in column names so we are sure of what the values represent @fig-final-stepwise-agg . That does not make a very readable legend, but we can rename it manually and tracking the meaning is very important.
@@ -272,11 +297,12 @@ By default, that returns only the final outcome, here the basin scale and with t
 ```{r}
 #| label: fig-final-stepwise-agg
 #| fig-cap: Final basin-scale results of aggregating EWR achieved with arithmetic mean to sdl units, then weighted-mean aggregation of SDL units into CEWO valleys and weighted means of CEWO valleys to the Basin.
-multispat %>% 
-  filter(grepl('^NF[1-3]', env_obj)) %>% 
-ggplot() +
+multispat %>%
+  filter(grepl("^NF[1-3]", env_obj)) %>%
+  ggplot() +
   geom_sf(aes(fill = mdb_wm_catchment_wm_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved)) +
-  facet_grid(env_obj~scenario) + theme(legend.position = 'bottom')
+  facet_grid(env_obj ~ scenario) +
+  theme(legend.position = "bottom")
 ```
 
 ### Saveintermediate and namehistory
@@ -286,26 +312,28 @@ We might only want the final outcome as above, but we also might want all the st
 ```{r}
 #| message: false
 #| warning: false
-simpleclean <- simpleThemeAgg %>% 
+simpleclean <- simpleThemeAgg %>%
   rename(ewr_achieved = env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved)
 
-multispatb <- multi_aggregate(dat = simpleclean,
-                              causal_edges = themeedges,
-                              groupers = c('scenario', 'env_obj'),
-                              aggCols = 'ewr_achieved',
-                              aggsequence = glist,
-                              funsequence = funlist,
-                              saveintermediate = TRUE,
-                              namehistory = FALSE)
+multispatb <- multi_aggregate(
+  dat = simpleclean,
+  causal_edges = themeedges,
+  groupers = c("scenario", "env_obj"),
+  aggCols = "ewr_achieved",
+  aggsequence = glist,
+  funsequence = funlist,
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 That final list item is scenario \* aggfun1\*aggfun2\*aggfun3\*env_obj long, e.g. it has a row for each scenario and env_obj by aggregation function, and the aggregation functions are factorial- both the aggregations at step 1 are subsequently aggregated at each of the following steps.
 
 ```{r}
-length(unique(multispatb$mdb$scenario)) * 
-length(unique(multispatb$mdb$aggfun_1)) * 
-length(unique(multispatb$mdb$aggfun_2)) * 
-length(unique(multispatb$mdb$aggfun_3)) *
+length(unique(multispatb$mdb$scenario)) *
+  length(unique(multispatb$mdb$aggfun_1)) *
+  length(unique(multispatb$mdb$aggfun_2)) *
+  length(unique(multispatb$mdb$aggfun_3)) *
   length(unique(multispatb$mdb$env_obj))
 
 nrow(multispatb$mdb)
@@ -314,71 +342,78 @@ nrow(multispatb$mdb)
 Now we can more easily analyse the output, but it's bigger. The three spatial levels plus the input can all be mapped. We'll cut it down to a single env_obj for clarity and use the comparer standard plots, with a common set of limits. We have to choose one of the aggfun_1 values.
 
 ```{r}
-l1 <- multispatb$simpleclean %>% 
-  filter(grepl('^NF1', env_obj)) %>% 
-  plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'map',
-                colorgroups = NULL,
-                colorset = 'ewr_achieved',
-                pal_list = list('scico::berlin'),
-                facet_col = 'scenario',
-                facet_row = 'env_obj',
-                scene_pal = scene_pal,
-                sceneorder = c('down2', 'base', 'up2'),
-                underlay_list = 'basin',
-                setLimits = c(0,1))
+l1 <- multispatb$simpleclean %>%
+  filter(grepl("^NF1", env_obj)) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = "basin",
+    setLimits = c(0, 1)
+  )
 
-l2 <- multispatb$sdl_units %>% 
-  filter(grepl('^NF1', env_obj) &
-           aggfun_1 == 'ArithmeticMean') %>% 
-  plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'map',
-                colorgroups = NULL,
-                colorset = 'ewr_achieved',
-                pal_list = list('scico::berlin'),
-                facet_col = 'scenario',
-                facet_row = 'env_obj',
-                scene_pal = scene_pal,
-                sceneorder = c('down2', 'base', 'up2'),
-                underlay_list = 'basin',
-                setLimits = c(0,1))
+l2 <- multispatb$sdl_units %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = "basin",
+    setLimits = c(0, 1)
+  )
 
-l3 <- multispatb$catchment %>% 
-  filter(grepl('^NF1', env_obj) &
-           aggfun_1 == 'ArithmeticMean') %>% 
-  plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'map',
-                colorgroups = NULL,
-                colorset = 'ewr_achieved',
-                pal_list = list('scico::berlin'),
-                facet_col = 'scenario',
-                facet_row = 'env_obj',
-                scene_pal = scene_pal,
-                sceneorder = c('down2', 'base', 'up2'),
-                underlay_list = 'basin',
-                setLimits = c(0,1))
+l3 <- multispatb$catchment %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = "basin",
+    setLimits = c(0, 1)
+  )
 
-l4 <- multispatb$mdb %>% 
-  filter(grepl('^NF1', env_obj) &
-           aggfun_1 == 'ArithmeticMean') %>% 
-  plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'map',
-                colorgroups = NULL,
-                colorset = 'ewr_achieved',
-                pal_list = list('scico::berlin'),
-                facet_col = 'scenario',
-                facet_row = 'env_obj',
-                scene_pal = scene_pal,
-                sceneorder = c('down2', 'base', 'up2'),
-                underlay_list = 'basin',
-                setLimits = c(0,1))
-
+l4 <- multispatb$mdb %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = "basin",
+    setLimits = c(0, 1)
+  )
 ```
 
 ```{r}
 #| label: fig-allsteps
 #| fig-cap: Each step in spatial aggregation from gauge to SDL unit to catchment to basin, using arithmetic means of EWR achieved
-l1 / l2 / l3 / l4 + plot_layout(guides = 'collect')
+l1 / l2 / l3 / l4 + plot_layout(guides = "collect")
 ```
 
 ### failmissing and keepallpolys
@@ -388,73 +423,85 @@ As above, we might want to ignore some groupers or aggregation columns, and we m
 ```{r}
 #| message: false
 #| warning: false
-multispatextra <- multi_aggregate(dat = simpleclean,
-                                  causal_edges = themeedges,
-                                  groupers = c('scenario', 'env_obj',
-                                               'doesnotexist'),
-                                  aggCols = c('ewr_achieved', 'notindata'),
-                                  aggsequence = glist,
-                                  funsequence = funlist,
-                                  saveintermediate = TRUE,
-                                  namehistory = FALSE,
-                                  failmissing = FALSE,
-                                  keepAllPolys = TRUE)
+multispatextra <- multi_aggregate(
+  dat = simpleclean,
+  causal_edges = themeedges,
+  groupers = c(
+    "scenario", "env_obj",
+    "doesnotexist"
+  ),
+  aggCols = c("ewr_achieved", "notindata"),
+  aggsequence = glist,
+  funsequence = funlist,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  failmissing = FALSE,
+  keepAllPolys = TRUE
+)
 ```
 
 We can see that the missing groupers and aggcols get ignored, while we have retained polygons without data. The default is `keepAllPolys = FALSE`, so the original `multispatb` only has relevant catchments while `multispatextra` has all of them. I've taken off the basin underlay from the plots above to make this clearer.
 
 ```{r}
-keepfalse <- multispatb$catchment %>% 
-  filter(grepl('^NF1', env_obj) &
-           aggfun_1 == 'ArithmeticMean') %>% 
-  plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'map',
-                colorgroups = NULL,
-                colorset = 'ewr_achieved',
-                pal_list = list('scico::berlin'),
-                facet_col = 'scenario',
-                facet_row = 'env_obj',
-                scene_pal = scene_pal,
-                sceneorder = c('down2', 'base', 'up2'),
-                setLimits = c(0,1))
+keepfalse <- multispatb$catchment %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    setLimits = c(0, 1)
+  )
 
-keeptrue <- multispatextra$catchment %>% 
-  filter(grepl('^NF1', env_obj) &
-           aggfun_1 == 'ArithmeticMean') %>% 
-  plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'map',
-                colorgroups = NULL,
-                colorset = 'ewr_achieved',
-                pal_list = list('scico::berlin'),
-                facet_col = 'scenario',
-                facet_row = 'env_obj',
-                scene_pal = scene_pal,
-                sceneorder = c('down2', 'base', 'up2'),
-                setLimits = c(0,1))
+keeptrue <- multispatextra$catchment %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    setLimits = c(0, 1)
+  )
 ```
 
 ```{r}
-keepfalse / keeptrue + plot_layout(guides = 'collect')
+keepfalse / keeptrue + plot_layout(guides = "collect")
 ```
 
 It would be possible to make the same plot by using the catchment polys themselves as underlay, and while the default (`underlay_list = 'cewo_valleys'` ) would yield white, we also have more control over colour too (not limited to the NA grey).
 
 ```{r}
-keepfalse_underlay <- multispatb$catchment %>% 
-  filter(grepl('^NF1', env_obj) &
-           aggfun_1 == 'ArithmeticMean') %>% 
-  plot_outcomes(y_col = 'ewr_achieved',
-                x_col = 'map',
-                colorgroups = NULL,
-                colorset = 'ewr_achieved',
-                pal_list = list('scico::berlin'),
-                facet_col = 'scenario',
-                facet_row = 'env_obj',
-                scene_pal = scene_pal,
-                sceneorder = c('down2', 'base', 'up2'),
-                underlay_list = list(underlay = 'cewo_valleys', 
-                                     underlay_pal = 'cornsilk'),
-                setLimits = c(0,1))
+keepfalse_underlay <- multispatb$catchment %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = list(
+      underlay = "cewo_valleys",
+      underlay_pal = "cornsilk"
+    ),
+    setLimits = c(0, 1)
+  )
 keepfalse_underlay
 ```
 
@@ -470,15 +517,15 @@ As a quick example, here is a single-step spatial aggregation using `multi_aggre
 #| message: false
 
 obj2polyM1 <- multi_aggregate(simpleThemeAgg,
-                            causal_edges = themeedges,
-                            groupers = c('scenario', 'env_obj'), 
-                         aggCols = 'ewr_achieved',
-                         aggsequence = list(sdl_units = sdl_units),
-                         funsequence = list(list(am = ~ArithmeticMean(.))),
-                         keepAllPolys = TRUE)
+  causal_edges = themeedges,
+  groupers = c("scenario", "env_obj"),
+  aggCols = "ewr_achieved",
+  aggsequence = list(sdl_units = sdl_units),
+  funsequence = list(list(am = ~ ArithmeticMean(.))),
+  keepAllPolys = TRUE
+)
 
 obj2polyM1
-
 ```
 
 ## Next steps

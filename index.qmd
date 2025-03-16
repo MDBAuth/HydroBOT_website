@@ -7,38 +7,46 @@ editor: visual
 #| label: move figs
 #| include: false
 
-demo_webdir <- file.path('~', '../Deakin University/QAEL - WERP in house - WERP/Toolkit/Writing/Demonstration paper')
+demo_webdir <- file.path("~", "../Deakin University/QAEL - WERP in house - WERP/Toolkit/Writing/Demonstration paper")
 
-file.copy(file.path(demo_webdir, 'images', 'GraphicalAbstract_small.png'), 
-          file.path('images', 'graphical_abstract.png'),
-          overwrite = TRUE)
+file.copy(file.path(demo_webdir, "images", "GraphicalAbstract_small.png"),
+  file.path("images", "graphical_abstract.png"),
+  overwrite = TRUE
+)
 
-file.copy(file.path(demo_webdir, 'images', 'GraphicalAbstract_small.eps'), 
-          file.path('images', 'graphical_abstract.eps'),
-          overwrite = TRUE)
+file.copy(file.path(demo_webdir, "images", "GraphicalAbstract_small.eps"),
+  file.path("images", "graphical_abstract.eps"),
+  overwrite = TRUE
+)
 
-file.copy(file.path(demo_webdir, 'images', 'Conceptual_fig_demopaper.png'), 
-          file.path('images', 'Figure_1.png'),
-          overwrite = TRUE)
+file.copy(file.path(demo_webdir, "images", "Conceptual_fig_demopaper.png"),
+  file.path("images", "Figure_1.png"),
+  overwrite = TRUE
+)
 
-file.copy(file.path(demo_webdir, 'images', 'Conceptual_fig_demopaper.eps'), 
-          file.path('images', 'Figure_1.eps'),
-          overwrite = TRUE)
+file.copy(file.path(demo_webdir, "images", "Conceptual_fig_demopaper.eps"),
+  file.path("images", "Figure_1.eps"),
+  overwrite = TRUE
+)
 
-file.copy(file.path(demo_webdir, 'images', 'Aggregations_General.png'), 
-          file.path('images', 'Figure_2.png'),
-          overwrite = TRUE)
+file.copy(file.path(demo_webdir, "images", "Aggregations_General.png"),
+  file.path("images", "Figure_2.png"),
+  overwrite = TRUE
+)
 
-file.copy(file.path(demo_webdir, 'images', 'Aggregations_General.eps'), 
-          file.path('images', 'Figure_2.eps'),
-          overwrite = TRUE)
+file.copy(file.path(demo_webdir, "images", "Aggregations_General.eps"),
+  file.path("images", "Figure_2.eps"),
+  overwrite = TRUE
+)
 
-file.copy(file.path(demo_webdir, 'images', 'architecture.png'), 
-          file.path('images', 'architecture.png'),
-          overwrite = TRUE)
-file.copy(file.path(demo_webdir, 'images', 'architecture.eps'), 
-          file.path('images', 'architecture.eps'),
-          overwrite = TRUE)
+file.copy(file.path(demo_webdir, "images", "architecture.png"),
+  file.path("images", "architecture.png"),
+  overwrite = TRUE
+)
+file.copy(file.path(demo_webdir, "images", "architecture.eps"),
+  file.path("images", "architecture.eps"),
+  overwrite = TRUE
+)
 
 # This is a placeholder to move conceptual figs, since it HATES spaces in names of the raw {fig} divs
 ```

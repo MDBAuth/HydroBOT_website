@@ -1,0 +1,5 @@
+---
+title: "Temporal aggregation"
+---
+
+Placeholder, see the space and value versions

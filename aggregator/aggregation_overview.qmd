@@ -5,27 +5,57 @@ format: html
 editor: visual
 ---
 
-## Goals
+Incoming data from modules is typically very granular in many dimensions (as it should be if the modules are modelling data near the scale of processes). However, this means that there are thousands of different outcomes across the basin and through time. To make that useful for anything other than targeted local planning, we need to scale up in space, time, and along the 'value' dimension (causal network). For example, scaling along the value dimension involves modelling how flow requirements influence fish spawning which influence fish populations which contribute to overall environmental success.
 
-Incoming data from modules is typically very granular in many dimensions (as it should be if the modules are modelling data near the scale of processes). However, this means that there are thousands of different outcomes across the basin and through time. To make that useful for anything other than targeted local planning, we need to aggregate. Here, we aggregate along three dimensions- space, time, and 'Objective', where 'Objective' is the axis along increasing organisational levels, for example flow requirements for fish spawning to fish spawning to fish populations to overall environmental success.
+HydroBOT supports aggregation along each of these dimensions with any number of aggregation functions (e.g. mean, min, max, more complex) to reflect the processes being aggregated or the desired assessment. For example, we may want to know the average passing rate of EWRs, whether any EWRs passed, or whether they all passed. Acceptable functions are highly flexible and in general, any summary statistic will work, as will user-developed summary functions.
 
-We want to be able to aggregate along each of these dimensions with any number of aggregation functions (e.g. mean, min, max, more complex) to reflect the processes being aggregated. These should be factorial- if we aggregate with min and max at step 2 (generating two columns of aggregated data), then each of those columns should be aggregated according to the step-3 aggregation, and so on.
+The aggregation steps can be interleaved, e.g. aggregate along the value dimension to some intermediate level, then aggregate in space, then time, then more value levels, then more time and more space. Each step can have more than one aggregation, e.g. we might calculate both the min and max over space.
 
-We want to be able to interleave the dimensions, e.g. aggregate along the Objective dimension to some intermediate level, then aggregate in space, then time, then more Objective levels, then more time and more space.
+To achieve this, HydroBOT contains a flexible set of aggregation functions that take a list of aggregation steps, each of which can be along any dimension, and a matching list of aggregation functions to apply to that step in the aggregation. It is possible to ask for multiple functions per step.
 
-To achieve this, we have developed a flexible set of aggregation functions that take a list of aggregation steps, each of which can be along any dimension, and a matching list of aggregation functions to apply to that step in the aggregation. It is possible to ask for multiple functions per step.
+![Aggregation can occur along three axes: space, time, and objective. The user can provide the sequence of aggregation steps and the aggregation function(s) to apply at each step.](/images/Figure_2.png)
 
-![Aggregation can occur along three axes: space, time, and objective. The user can provide the sequence of aggregation steps and the aggregation function(s) to apply at each step.](images/aggregation.jpg)
+# Advantages
+
+Fundamentally, these aggregation steps are a sequence of grouped data summaries, which `dplyr` excels at. So why not use `dplyr`? Internally, that's exactly what happens. What HydroBOT provides is extensive automation, error checking, and consistency to provide safeguards and data provenance tracking while allowing the user wide latitude to tailor analyses for a particular set of scenarios and questions. Complex sequences of aggregations are easy to miss steps or particular nuance, follow the logic of what was aggregated when looking at the data, and lend themselves to copy-paste errors when updating or setting up analyses. HydroBOT goes a long way towards addressing these issues.
+
+::: callout-note
+This is not to say that setting up an aggregation sequence does not require thought, and isn't exposed to pitfalls. Instead, this approach puts the emphasis on putting that thought into what the aggregations should be, rather than chasing and tracing complex code structure and remembering and addressing a wide range of potential errors.
+:::
+
+## Flexibility and consistency
+
+Users need to be able to conduct summaries in a number of ways, and so the aggregation functions allow a wide range of summary functions to provide this needed flexibility. Within the aggregators, particularly `multi_aggregate` and `read_and_agg`, these aggregations are done consistently and produce standard outputs with standard formats. Intermediate data manipulations are handled internally, and so the user can feed raw module output data and an aggregation sequence and recieve clean output data, without having to manage many intermediate data groupings and summaries that are liable to introduce errors and differences between runs. By enforcing a consistent format for specifying the aggregations, it is easier to see what is being *aggregated*, rather than what is being *grouped* which greatly reduces the complexity of calls and and makes forgetting grouping levels much more difficult.
+
+## Dimensional safety
+
+The incoming data has known grouping structure in the space, time, and value dimensions, and nearly always has a 'scenario' column. The outer aggregation functions `multi_aggregate` and `read_and_agg` check and manage this structure, ensuring that aggregation over one dimension does not also collapse over others. Because these functions manage the steps through a sequence of aggregations, they ensure the data is set up appropriately for aggregating over a given dimension while holding the others constant, including optimisations for faster nonspatial aggregations of spatial data. These features eliminates many accidental errors in manual setup in both setting up the grouping structure, especially when copy-pasting to make small changes. This also eliminates the large amounts of data manipulation and obsolete objects in the environment and the attention that must be devoted for manual control and makes the code far more readable.
+
+This dimensional awareness also enhances speed. Typically, aggregating (and some other operations) on `sf` dataframes with geometry is *much* slower than without. So HydroBOT puts a heavy focus on safely stripping and re-adding geometry. This allows us to use dataframes that reference geometry without the geometry itself attached and only take the performance hit from geometry if it is needed. We're doing the absolute minimum spatially-aware processing, and doing that in a way that early spatial processing does not slow down later non-spatial processing.
+
+## Automation
+
+A manual approach to multi-step aggregation can be incredibly cumbersome, leading to complex scripts to manage. This makes automation incredibly difficult, and the script would need to be looped over a set of scenarios to run the same analysis on each scenario. The situation gets worse if some parameters need to change between runs. For example, what if step three needs to change the aggregation function or move from a value to a spatial aggregation? This will have cascading effects through the rest of the script, making errors more likely and automation more difficult.
+
+The HydroBOT aggregator manages all of this internally, and so a change to the aggregation sequences as described would involve changing a single item in two lists (the `aggsequence` and `funsequence`). The `read_and_agg` function is explicitly designed to apply the same aggregations to a set of scenarios, and can do so in parallel for speed without any need for the user to manage loops or parallelisation beyond installing the `furrr` package. Moreover, these lists can be specified in very simple scripts that are run remotely, and can also be specified in `yml` parameter files and changed programatically. Thus, automating the *same* set of aggregations over e.g. scenarios is straightforward, and automating *different* aggregations is a matter of a simple change of a small number of arguments rather than re-developing or tweaking and testing a complex script with many sources of error.
 
 ## Tracking
 
-In general, aggregation over many steps can get quite complicated to track, particularly if some of the steps have multiple aggregation functions. Tracking the provenance of the final values is therefore critical to understand their meaning. By default, columns of values are named in a way that tracks their provenance, e.g. step_function_step_function_originalName. This is memory-friendly but ugly, and so we can also stack this information into columns (two for each step- one the step, the second the function) with the `agg_names_to_cols` function.
+In general, aggregation over many steps can get quite complicated to track, particularly if some of the steps have multiple aggregation functions, and is nearly impossible if using a manual approach of a sequence of `dplyr::group_by()` and `dplyr::summarise()`. Tracking the provenance of the final values is therefore critical to understand their meaning. By default, HydroBOT aggregation outputs have column names that track their provenance, e.g. `step2_function2_step1_function1_originalName`. This is memory-friendly but ugly, and so we can also stack this information into columns (two for each step- one the step, the second the function) by setting the argument `namehistory = FALSE` (which calls the `agg_names_to_cols()` function; this can be called on a dataframe with tracking names post-hoc as well).
 
-Further, in the case of a multi-step aggregation, we can either save only the final output (better for memory) or save the entire stepwise procedure, which can be very useful both for investigating results and visualisation, and it is often the case that we want to ask questions of several levels anyway.
+If using the `read_and_agg()` function, it saves out a `yml` metadata file that has all needed arguments to replicate the aggregation run and saves it with the outputs. This both documents the provenance of the outputs, and can allow re-running the same aggregation by passing that parameter file to `run_hydrobot_params()` (see the [parameterised workflow](/workflows/workflow_parameters.qmd)).
 
-## User inputs
+In the case of a multi-step aggregation, we can either save only the final output (better for memory) or save the entire stepwise procedure, which can be very useful both for investigating results and visualisation, and it is often the case that we want to ask questions of several levels anyway.
 
-The user potentially has control over a number of decisions for the aggregation-
+## Module idiosyncracies
+
+Modules (currently the EWR tool) will produce data with specific idiosyncracies, such as particular ways it should not be aggregated. For example, the EWR data is linked to gauges, but some gauges provide information for spatial units that do not contain them (planning units or sustainable diversion limit units). The HydroBOT aggregator provides internal checks that infers whether EWR data is being aggregated in an inappropriate way, and throws warnings or errors. It also contains functionality to address these issues in a general way (in this example, retaining grouping with `group_until` and using non-spatial joins of spatial data with `pseudo_spatial`), as well as some functionality (e.g. `auto_ewr_PU = TRUE`) that can automatically address these known issues.
+
+# Examples
+
+The example notebooks here focus on illustrating use cases and how arguments work at several levels, from the dimension specific aggregations ([space](spatial_agg.qmd), [value](theme_agg.qmd), and [temporal](temporal_agg.qmd)), to the interleaved sequence of aggregations across dimensions that needs to manage dimensional safety and any necessary data changes ([interleaved sequences](theme_space_agg.qmd)) to the most [common interface](read_and_agg.qmd) for workflows that manages data read-in and metadata saving. These focus on different aspects, but there are valuable demonstrations of capacity in each, focusing on what each adds on to the lower levels. There are additional notebooks focusing on the specifics of syntax for specifying [groupings and functions](aggregation_syntax.qmd) and managing [partial grouping and non-spatial joins of spatial data](pseudo_spatial_group_until.qmd).
+
+The user potentially has control over a number of decisions for the aggregation:
 
 -   Sequencing in multiple dimensions
 
@@ -37,36 +67,13 @@ The user potentially has control over a number of decisions for the aggregation-
 
 -   Various others related primarily to data format (tracking format, saving each aggregation step, retention of NA spatial units, etc)
 
-Many of these can be specified in a number of ways. I have tried to demonstrate a number of these capabilities and options in the [spatial](spatial_agg.qmd) and [theme](theme_agg.qmd) notebooks, while keeping to simpler, more typical uses in the [interleaved example](theme_space_agg.qmd) and the [full workflow sequence](../workflows/workflow_overview.qmd). Some of the most useful, but also trickiest, capabilities revolve around being able to format the groupers and aggregation columns as bare names, character vectors, or `tidyselect` syntax, and the functions as single or multiple at each step, defined as bare names, characters, or lists with arguments. These approaches make the functions highly general and flexible to new datasets (and sequential aggregation) and custom aggregation functions.
+Many of these can be specified in a number of ways. Many (but not all) of these capabilities and options are demonstrated in the [interleaved example](theme_space_agg.qmd) using `multi_aggregate()` and the [detailed discussion of 'read_and_agg()'](read_and_agg.qmd) and the [full workflow sequence](../workflows/workflow_overview.qmd), which uses `read_and_agg()` in clean workflows. Those functions include much of the machinery to ensure dimensional safety, catch errors, and manage sequential data manipulations. These notebooks provide detail on the critical aspect of specifying the aggregation sequences in terms of the levels and functions to apply.
 
-The other powerful user input is the foundation of the multidimensional aggregator- the sequencing lists. These are demonstrated in all the notebooks, but are perhaps most interesting in the [interleaved version](theme_space_agg.qmd). By default, only the final output is retained, but `saveintermediate = TRUE` saves a list of each step, which can be very useful.
+Additional detail specific to the aggregation over each dimension is provided in the [spatial](spatial_agg.qmd), [temporal](temporal_agg.qmd), and [value](theme_agg.qmd) notebooks. That said, some also demonstrate common arguments. For example, in addition to showing spatial aggregation, [the spatial aggregation notebook](spatial_agg.qmd) also works through a number of examples of how we can specify grouping, the columns to aggregate, and functions to use that are general across all the aggregation functions- spatial aggregation is just the example case.
 
-The data itself and output data are also controlled by the user (by necessity). For inputs, `multi_aggregate` expects the incoming data to be in memory. There is also a wrapper `read_and_agg` that takes paths as arguments and does the read-in of the data internally and then runs `multi_aggregate`. This is often a useful approach, allowing parallelisation, better memory management, and it is far easier to use paths in a config file of arguments. Outputs from `multi_aggregate` are R objects- a dataframe or a list- and are returned back to the calling environment. The `read_and_agg` wrapper, however, can both return R objects to the session `returnList = TRUE` and save to a file if `savepath = "path/to/outfile"` .
+# Limitations
 
-## Arguments and use-cases
+-   The is currently no way to specify *branched* (rather than factorial) sequences. For example, maybe we want the mean and max at step one, and then at step 2, we again want the mean and max, but only the mean of the mean and the max of the max. Currently, we would also get the (unwanted) max of the mean and mean of the max. There are two options as-is: first, use the factorial version and ignore or discard the outputs that are not wanted. This is probably easiest if there aren't too many. The second is to use two (or more) aggregation sequences, i.e. one that is mean, mean and the other that is max, max. Aggregation tends to be fast, so this is likely to be fine, and will save memory for big datasets.
 
-We show the aggregation happening in multiple notebooks, [spatial_agg.qmd](spatial_agg.qmd), [theme_agg.qmd](theme_agg.qmd), and [theme_space_agg.qmd](theme_space_agg.qmd). These focus on different aspects, but there are valuable demonstrations of capacity in each. In addition to showing spatial aggregation, for example, [the spatial aggregation notebook](spatial_agg.qmd) also works through a number of examples of how we can specify grouping, the columns to aggregate, and functions to use that are general across all the aggregation functions- we just use the spatial aggregation for an example. The different `saveintermediate` and `namehistory` options are demonstrated in each of those notebooks, showing how we can access the stepwise aggregations or only the final result, and ensure we know the exact meaning of each value in the output.
+-   Different aggregation functions for different rows in the data are not available yet (e.g. mean of fish breeding, min of bird foraging).
 
-## Limitations
-
--   At the time of development, there was no temporally resolved output data, and so temporal aggregation is not yet available. This is very high on the priority list, and the framework is in place to do it.
-
--   Different aggregation functions for different rows in the data (e.g. mean of fish breeding, min of bird foraging) are not yet available
-
-<!-- -->
-
-```         
--   Multiple functions are possible per step, and different functions are possible for different steps
-
--   Different functions for different rows *within a step* requires mapping of what those functions should be, and this does not exist. Still, the capability to do this is very high on the priority list, and should not be too difficult.
-```
-
-::: {#dev-notes style="border: 2px solid gray; color: gray"}
-## Development notes
-
-I have assumed that we primarily have point data (gauges), rather than rasters, but handling rasters is a reasonably straightforward modification (and I have the code to do it elsewhere). Because of the current focus on gauges, I'm using `sf` primarily, but `stars` could be useful depending on where we get with input formats (netcdf etc) and higher-dimension data, or if we end up using rasters.
-
-Typically, aggregating (and some other operations) on \`sf\` dataframes with geometry is \*much\* slower than without. So I've put a heavy focus on safely stripping and re-adding geometry. This allows us to use dataframes that reference geometry without the geometry itself attached and only take the performance hit from geometry if it is needed.
-
-Spatial aggregation is inherently slow because of the geometric operations (specifically `sf::st_intersection`) but we've optimized the amount of intersecting and unpicked space where possible so nothing is slowed down by being spatial unless absolutely necessary (including the actual aggregation of the spatial data). We're doing the absolute minimum spatially-aware processing, and doing that in a way that early spatial processing does not slow down later non-spatial processing.
-:::

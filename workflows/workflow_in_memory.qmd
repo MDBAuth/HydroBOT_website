@@ -8,7 +8,7 @@ params:
 ```{r}
 #| include: false
 
-source('R/helpers.R')
+source("R/helpers.R")
 make_hydro_csv()
 ```
 
@@ -35,16 +35,16 @@ Here, we will use the example hydrographs that come with HydroBOT.
 
 ```{r}
 #| message: false
-hydro_dir <- system.file('extdata/testsmall/hydrographs', package = 'HydroBOT')
+hydro_dir <- system.file("extdata/testsmall/hydrographs", package = "HydroBOT")
 
-project_dir <- file.path('test_dir')
+project_dir <- file.path("test_dir")
 
 # Generated data
 # EWR outputs (will be created here in controller, read from here in aggregator)
-ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+ewr_results <- file.path(project_dir, "module_output", "EWR")
 
 # outputs of aggregator. There may be multiple modules
-agg_results <- file.path(project_dir, 'aggregator_output')
+agg_results <- file.path(project_dir, "aggregator_output")
 ```
 
 ## Controller
@@ -56,8 +56,8 @@ Here, we use a simple set of default arguments, see [controller](../controller/c
 To determine what to save and what to return to the active session, use `outputType` and `returnType`, respectively. Each of them can take a list of any of the EWR output options (see `?prep_run_save_ewrs()`). For this demonstration I'll not save anything and return `yearly` to the active session.
 
 ```{r}
-outputType <- list('none')
-returnType <- list('yearly') 
+outputType <- list("none")
+returnType <- list("yearly")
 ```
 
 ## Aggregator
@@ -69,8 +69,8 @@ To keep this simple, we use one aggregation list and the `read_and_agg` wrapper 
 We need to tell it the variable to aggregate, and any grouping variables other than time, themes, and spatial groups. Typically, `scenario` will be a grouper, but there may be others.
 
 ```{r}
-agg_var <- 'ewr_achieved'
-agg_groups <- 'scenario'
+agg_var <- "ewr_achieved"
+agg_groups <- "scenario"
 ```
 
 ### How to aggregate
@@ -84,23 +84,25 @@ Fundamentally, the aggregator needs paths and two lists
 Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps can be specified a range of different ways, see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
 
 ```{r}
+aggseq <- list(
+  all_time = "all_time",
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  sdl_units = sdl_units,
+  env_obj = c("ewr_code", "env_obj"),
+  Target = c("env_obj", "Target"),
+  mdb = basin,
+  target_5_year_2024 = c("Target", "target_5_year_2024")
+)
 
-aggseq <- list(all_time = 'all_time',
-               ewr_code = c('ewr_code_timing', 'ewr_code'),
-               sdl_units = sdl_units,
-               env_obj =  c('ewr_code', "env_obj"),
-               Target = c('env_obj', 'Target'),
-               mdb = basin,
-               target_5_year_2024 = c('Target', 'target_5_year_2024'))
-
-funseq <- list('ArithmeticMean', 
-               'CompensatingFactor',
-               'ArithmeticMean',
-               'ArithmeticMean',
-               'ArithmeticMean',
-               'SpatialWeightedMean',
-               'ArithmeticMean')
-
+funseq <- list(
+  "ArithmeticMean",
+  "CompensatingFactor",
+  "ArithmeticMean",
+  "ArithmeticMean",
+  "ArithmeticMean",
+  "SpatialWeightedMean",
+  "ArithmeticMean"
+)
 ```
 
 # Run HydroBOT
@@ -111,10 +113,12 @@ This is not actually run here for speed.
 
 ```{r}
 #| message: false
-ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                              output_parent_dir = project_dir, 
-                              outputType = outputType,
-                              returnType = returnType)
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  outputType = outputType,
+  returnType = returnType
+)
 ```
 
 ## Aggregator
@@ -123,21 +127,23 @@ Because the chunk above is not run, the needed EWR outputs are not available, bu
 
 ```{r}
 #| label: run-agg
-aggout <- read_and_agg(datpath = ewr_out, 
-             type = 'achievement',
-             geopath = bom_basin_gauges,
-             causalpath = causal_ewr,
-             groupers = 'scenario',
-             aggCols = 'ewr_achieved',
-             auto_ewr_PU = TRUE,
-             aggsequence = aggseq,
-             funsequence = funseq,
-             saveintermediate = TRUE,
-             namehistory = FALSE,
-             keepAllPolys = FALSE,
-             returnList = TRUE,
-             add_max = FALSE,
-             savepath = NULL)
+aggout <- read_and_agg(
+  datpath = ewr_out,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE,
+  savepath = NULL
+)
 ```
 
 # Quick check
@@ -150,19 +156,20 @@ But only if we returned the output- since the chunks above are not run, we skip 
 #| message: false
 
 map_example <- aggout$env_obj |>
-  dplyr::filter(env_obj == 'NF1') |> # Need to reduce dimensionality
-  plot_outcomes(outcome_col = 'ewr_achieved',
-                plot_type = 'map',
-                colorset = 'ewr_achieved',
-                pal_list = list('scico::berlin'),
-                facet_col = 'scenario',
-                facet_row = 'env_obj',
-                sceneorder = c('down4', 'base', 'up4'),
-                underlay_list = 'basin') +
-  ggplot2::theme(legend.position = 'bottom')
+  dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    sceneorder = c("down4", "base", "up4"),
+    underlay_list = "basin"
+  ) +
+  ggplot2::theme(legend.position = "bottom")
 
 map_example
-
 ```
 
 ```{r}

@@ -52,8 +52,8 @@ The shapefiles used to see what we're doing and do the selecting were produced w
 Set the data directory to make that easy to change. These should usually point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The [flow-scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling) sends them externally, which would be more typical.
 
 ```{r}
-scenario_dir <- 'more_scenarios'
-hydro_dir <- file.path(scenario_dir, 'hydrographs')
+scenario_dir <- "more_scenarios"
+hydro_dir <- file.path(scenario_dir, "hydrographs")
 ```
 
 ::: {#language style="color: gray"}
@@ -75,7 +75,7 @@ We use spatial datasets provided by [{HydroBOT}](https://github.com/MDBAuth/Hydr
 We need multiple catchments for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan.
 
 ```{r}
-catch_demo <- sdl_units |> 
+catch_demo <- sdl_units |>
   dplyr::filter(SWSDLName %in% c("Macquarie–Castlereagh", "Lachlan", "Namoi"))
 ```
 
@@ -128,12 +128,11 @@ length(ewr_demo_gauges)
 Need to categorise them so we know what to pull. Let's cut to just flow gauges for the demo for simplicity- scaling levels is less clear.
 
 ```{r}
-gauges_to_pull <- ewrs_in_pyewr |> 
-  filter(Gauge %in% ewr_demo_gauges & FlowLevelVolume == 'F') |> 
-  dplyr::select(Gauge) |> 
-  unique() |> 
+gauges_to_pull <- ewrs_in_pyewr |>
+  filter(Gauge %in% ewr_demo_gauges & FlowLevelVolume == "F") |>
+  dplyr::select(Gauge) |>
+  unique() |>
   pull()
-
 ```
 
 ### Get all the gauge data
@@ -141,24 +140,26 @@ gauges_to_pull <- ewrs_in_pyewr |>
 Now we have a list of gauges, we need their hydrographs. We need a reasonable time span to account for temporal variation, but not too long- this is a simple case. Let's choose 10 years.
 
 ```{r}
-starttime = lubridate::ymd(20000701)
-endtime = lubridate::ymd(20210630)
+starttime <- lubridate::ymd(20000701)
+endtime <- lubridate::ymd(20210630)
 ```
 
 Since some of those are flow and some are level, let's do two calls and bind. We could pmap, but this will be fine. It's tempting to just use flow.
 
 ```{r}
-demo_levs <- hydrogauge::get_ts_traces(portal = 'NSW', 
-                                      site_list = gauges_to_pull,
-                                      var_list = 141, # This is flow
-                                      start_time = starttime,
-                                      end_time = endtime)
+demo_levs <- hydrogauge::get_ts_traces(
+  portal = "NSW",
+  site_list = gauges_to_pull,
+  var_list = 141, # This is flow
+  start_time = starttime,
+  end_time = endtime
+)
 ```
 
 The azure boxes have old GDAL, which can't read WKT2. Need to fix, but in the meantime, [force with the crs number](https://github.com/r-spatial/sf/issues/1419).
 
 ```{r}
-if (grepl('npd-dat', Sys.info()['nodename'])) {
+if (grepl("npd-dat", Sys.info()["nodename"])) {
   st_crs(basin) <- 4283
   st_crs(catch_demo) <- 4283
   st_crs(demo_geo) <- 4283
@@ -170,11 +171,11 @@ if (grepl('npd-dat', Sys.info()['nodename'])) {
 Looks reasonable. Probably overkill for testing, but can do a cut down version too.
 
 ```{r}
-(ggplot() + 
-geom_sf(data = basin, fill = 'lightsteelblue') +
-geom_sf(data = catch_demo, mapping = aes(fill = SWSDLName)) +
-geom_sf(data = demo_geo, color = 'black') +
-scale_fill_brewer(type = 'qual', palette = 8))
+(ggplot() +
+  geom_sf(data = basin, fill = "lightsteelblue") +
+  geom_sf(data = catch_demo, mapping = aes(fill = SWSDLName)) +
+  geom_sf(data = demo_geo, color = "black") +
+  scale_fill_brewer(type = "qual", palette = 8))
 ```
 
 # Make test scenarios
@@ -192,16 +193,16 @@ This requries having a date column `Date` and other columns with gauge numbers f
 Set up the data structure
 
 ```{r}
-
-demo_flow <- demo_levs |> 
-dplyr::mutate(Date = lubridate::date(time)) |>
+demo_flow <- demo_levs |>
+  dplyr::mutate(Date = lubridate::date(time)) |>
   # append the gauge type
-  dplyr::mutate(site = paste0(site, '_flow')) |> 
-    dplyr::select(Date, value, site) |> 
-      tidyr::pivot_wider(id_cols = Date, 
-                         names_from = site, 
-                         values_from = value)
-
+  dplyr::mutate(site = paste0(site, "_flow")) |>
+  dplyr::select(Date, value, site) |>
+  tidyr::pivot_wider(
+    id_cols = Date,
+    names_from = site,
+    values_from = value
+  )
 ```
 
 Now we want to set up the 'scenarios' as multiplications and additions, as well as the directory structure.
@@ -209,25 +210,33 @@ Now we want to set up the 'scenarios' as multiplications and additions, as well 
 ```{r}
 multipliers <- c(1.1, 1.25, 1.5, 2)
 
-scenemults <- c(1/rev(multipliers), 1, multipliers)
+scenemults <- c(1 / rev(multipliers), 1, multipliers)
 
-scenenames <- c(paste0('climatedown', as.character(rev(multipliers))), 
-                'climatebase', 
-                paste0('climateup', as.character(multipliers))) |> 
-                stringr::str_replace('\\.', '_') # deals with the 1.x
+scenenames <- c(
+  paste0("climatedown", as.character(rev(multipliers))),
+  "climatebase",
+  paste0("climateup", as.character(multipliers))
+) |>
+  stringr::str_replace("\\.", "_") # deals with the 1.x
 
 adaptadds <- c(0, 250, 6500, 12000)
 
-adapttime <- 8 #months = Sep,Oct,Nov,Dec
+adapttime <- 8 # months = Sep,Oct,Nov,Dec
 
-sceneaddsnames <- c(paste0('adapt', as.character(adaptadds))) |> 
-  stringr::str_replace('\\.', '_')
+sceneaddsnames <- c(paste0("adapt", as.character(adaptadds))) |>
+  stringr::str_replace("\\.", "_")
 
-scenenames <- paste0(rep(scenenames,
-                         times = length(unique(adaptadds))), 
-                     stringr::str_sort(rep(sceneaddsnames,
-                                  times = length(unique(scenemults))), 
-                              numeric = TRUE))
+scenenames <- paste0(
+  rep(scenenames,
+    times = length(unique(adaptadds))
+  ),
+  stringr::str_sort(
+    rep(sceneaddsnames,
+      times = length(unique(scenemults))
+    ),
+    numeric = TRUE
+  )
+)
 
 scenemults <- rep(scenemults, times = length(unique(sceneaddsnames)))
 
@@ -235,7 +244,7 @@ sceneadds <- sort(rep(adaptadds, times = length(unique(scenemults))))
 
 sceneadapttimes <- rep(adapttime, times = length(scenenames))
 
-# Add in the MAX scenario 
+# Add in the MAX scenario
 scenenames <- c(scenenames, "MAX")
 scenemults <- c(scenemults, 0)
 sceneadds <- c(sceneadds, 500000)
@@ -248,13 +257,11 @@ check$sceneadapttimes <- sceneadapttimes
 
 # the full scenarios
 for (x in scenenames) {
-      scenedir = file.path(hydro_dir, x)
-    if (!dir.exists(scenedir)) {
-      dir.create(scenedir, recursive = TRUE)
-    }
-
+  scenedir <- file.path(hydro_dir, x)
+  if (!dir.exists(scenedir)) {
+    dir.create(scenedir, recursive = TRUE)
+  }
 }
-
 ```
 
 Create clean dataframes to save. Could be fancy with a function and a purr, but I'm just saving, so a simple loop should be fine. Though now that we have `check` there, a `purrr::pmap` would be the way to go.
@@ -262,24 +269,29 @@ Create clean dataframes to save. Could be fancy with a function and a purr, but 
 I'm not providing a HydroBOT function to *write* scenario metadata, since the scenarios will come from elsewhere. But we need it, so make some here (both inside and outside the directories, since we're not sure what the final form is yet).
 
 ```{r}
-
 if (params$REBUILD_DATA) {
   for (i in 1:length(scenenames)) {
-    demo_flow |> 
-      dplyr::mutate(across(-Date, \(x) x*scenemults[i])) |> 
+    demo_flow |>
+      dplyr::mutate(across(-Date, \(x) x * scenemults[i])) |>
       dplyr::mutate(across(-Date, \(x) ifelse(lubridate::month(Date) > sceneadapttimes[i],
-                                   x + sceneadds[i], x))) |> 
-      readr::write_csv(file.path(hydro_dir, scenenames[i], 
-                                 paste0(scenenames[i], '.csv')))
+        x + sceneadds[i], x
+      ))) |>
+      readr::write_csv(file.path(
+        hydro_dir, scenenames[i],
+        paste0(scenenames[i], ".csv")
+      ))
     # make JSON metadata
-    jsonlite::write_json(list(scenario_name = scenenames[i], 
-                            flow_multiplier = scenemults[i],
-                            flow_addition = sceneadds[i],
-                            flow_addition_time = sceneadapttimes[i]),
-                       path = file.path(hydro_dir, scenenames[i], 'metadata.json'))
+    jsonlite::write_json(
+      list(
+        scenario_name = scenenames[i],
+        flow_multiplier = scenemults[i],
+        flow_addition = sceneadds[i],
+        flow_addition_time = sceneadapttimes[i]
+      ),
+      path = file.path(hydro_dir, scenenames[i], "metadata.json")
+    )
   }
 }
-
 ```
 
 That set of hydrographs can now be used as starting data for a demonstration of HydroBOT proper.
@@ -287,14 +299,18 @@ That set of hydrographs can now be used as starting data for a demonstration of 
 Make some metadata for all scenarios too (both yaml and json for now).
 
 ```{r}
-scenario_meta <- list(scenario_name = scenenames,
-                      flow_multiplier = scenemults,
-                      flow_addition = sceneadds,
-                      flow_addition_time = sceneadapttimes)
+scenario_meta <- list(
+  scenario_name = scenenames,
+  flow_multiplier = scenemults,
+  flow_addition = sceneadds,
+  flow_addition_time = sceneadapttimes
+)
 # I don't know the format we'll be using, but this works to create yaml metadata
-yaml::write_yaml(scenario_meta, 
-                 file = file.path(hydro_dir, 'scenario_metadata.yml'))
+yaml::write_yaml(scenario_meta,
+  file = file.path(hydro_dir, "scenario_metadata.yml")
+)
 # and this does the same with JSON
-jsonlite::write_json(scenario_meta, 
-                     path = file.path(hydro_dir, 'scenario_metadata.json'))
+jsonlite::write_json(scenario_meta,
+  path = file.path(hydro_dir, "scenario_metadata.json")
+)
 ```

@@ -26,19 +26,21 @@ Fundamentally, `multi_aggregate` wraps `theme_aggregate` and `spatial_aggregate`
 
 For inputs, `multi_aggregate` expects the incoming data to be in memory and geographic, and prefers (but does not require) the edges defining theme relationships to be already calculated. There is also a wrapper `read_and_agg` that takes paths as arguments and does the read-in of the data internally, finds the edges, and then runs `multi_aggregate`. This is often a useful approach, allowing parallelisation, better memory management, and it is far easier to use paths in a config file of arguments.
 
+Multiple aggregations (e.g. calculating min and max) are factorial with the steps- if we aggregate with min and max at step 2 (generating two columns of aggregated data), then each of those columns is aggregated according to the step-3 aggregation, and so on. This can yield complex outputs with many unneeded sequences, and it is worth considering running separate aggregation sequences if there are many places with multiple aggregations, particularly if they occur early in the sequence.
+
 ## Demonstration setup
 
 First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
-project_dir <- file.path('more_scenarios')
-ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+project_dir <- file.path("more_scenarios")
+ewr_results <- file.path(project_dir, "module_output", "EWR")
 ```
 
 Where do we want the outputs to go? The `multi_aggregate` function we focus on here takes R objects as inputs and returns a dataframe or a list back to the session. But in practice, we will wrap that with `read_and_agg`, which takes paths as inputs and can both return R objects to the session `returnList = TRUE` and save to a file if `savepath = "path/to/outfile"` . The `aggregator_output` directory is not broken into module subdirectories, since it is possible we will want to aggregate across modules at the highest levels.
 
 ```{r}
-out_path <- file.path(project_dir, 'aggregator_output')
+out_path <- file.path(project_dir, "aggregator_output")
 ```
 
 ### Scenario information
@@ -46,20 +48,21 @@ out_path <- file.path(project_dir, 'aggregator_output')
 This will be attached to metadata, typically. For now, I'm just using it for diagnostic plots and the demonstration data is simple, so make it here.
 
 ```{r}
-
 multipliers <- c(1.1, 1.5, 2, 3, 4)
 
-scenemults <- c(1/rev(multipliers), 1, multipliers)
+scenemults <- c(1 / rev(multipliers), 1, multipliers)
 
-scenenames <- c(paste0('down', as.character(rev(multipliers))), 
-                'base', 
-                paste0('up', as.character(multipliers))) |> 
-  stringr::str_replace('\\.', '_')
+scenenames <- c(
+  paste0("down", as.character(rev(multipliers))),
+  "base",
+  paste0("up", as.character(multipliers))
+) |>
+  stringr::str_replace("\\.", "_")
 
 
 scenarios <- tibble::tibble(scenario = scenenames, delta = scenemults)
 
-scene_pal <- make_pal(unique(scenarios$scenario), palette = 'ggsci::nrc_npg', refvals = 'base', refcols = 'black')
+scene_pal <- make_pal(unique(scenarios$scenario), palette = "ggsci::nrc_npg", refvals = "base", refcols = "black")
 ```
 
 ## Data prep
@@ -69,7 +72,7 @@ To make the actual multi-aggregate loop general and only do one thing, dataprep 
 ```{r}
 #| message: false
 
-ewrdata <- prep_ewr_agg(ewr_results, type = 'summary', geopath = bom_basin_gauges)
+ewrdata <- prep_ewr_agg(ewr_results, type = "summary", geopath = bom_basin_gauges)
 ```
 
 We use `causal_ewrs` for causal relationships and spatial layers provided by {HydroBOT} to define the aggregation units.
@@ -85,37 +88,44 @@ Spatial aggregation should almost always be area-weighted after the data is in p
 *note the rlang::quo to make this work with dplyr 1.1 and above as in [syntax](aggregation_syntax.qmd).*
 
 ```{r}
+aggseq <- list(
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Specific_goal = c("env_obj", "Specific_goal"),
+  catchment = cewo_valleys,
+  Objective = c("Specific_goal", "Objective"),
+  mdb = basin,
+  target_5_year_2024 = c("Objective", "target_5_year_2024")
+)
 
-aggseq <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
-               env_obj =  c('ewr_code', "env_obj"),
-               sdl_units = sdl_units,
-               Specific_goal = c('env_obj', "Specific_goal"),
-               catchment = cewo_valleys,
-               Objective = c('Specific_goal', 'Objective'),
-               mdb = basin,
-               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
 
-
-funseq <- list(c('CompensatingFactor'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               c('ArithmeticMean'),
-               rlang::quo(list(wm = ~weighted.mean(., w = area, 
-                                        na.rm = TRUE))),
-               c('ArithmeticMean'),
-               
-               rlang::quo(list(wm = ~weighted.mean(., w = area, 
-                                    na.rm = TRUE))),
-               c('ArithmeticMean'))
-
+funseq <- list(
+  c("CompensatingFactor"),
+  c("ArithmeticMean"),
+  c("ArithmeticMean"),
+  c("ArithmeticMean"),
+  rlang::quo(list(wm = ~ weighted.mean(.,
+    w = area,
+    na.rm = TRUE
+  ))),
+  c("ArithmeticMean"),
+  rlang::quo(list(wm = ~ weighted.mean(.,
+    w = area,
+    na.rm = TRUE
+  ))),
+  c("ArithmeticMean")
+)
 ```
 
 The `multi_aggregate` function needs the edges, so calculate them just for the theme sequence (dropping the spatial steps). This can also happen automatically in `multi_aggregate` and, most importantly, `read_and_agg`, allowing us to run the code only by specifying parameters and without this sort of intermediate processing.
 
 ```{r}
 themeseq <- aggseq[purrr::map_lgl(aggseq, is.character)]
-ewr_edges <- make_edges(dflist = causal_ewr, 
-                         fromtos = themeseq)
+ewr_edges <- make_edges(
+  dflist = causal_ewr,
+  fromtos = themeseq
+)
 ```
 
 ## Aggregate
@@ -127,12 +137,14 @@ Now we do the aggregation. Note that we have been very [aggressive in handling s
 ```{r}
 #| message: false
 #| warning: false
-tsagg <- multi_aggregate(dat = ewrdata,
-                         causal_edges = ewr_edges,
-                         groupers = 'scenario',
-                         aggCols = 'ewr_achieved',
-                         aggsequence = aggseq,
-                         funsequence = funseq)
+tsagg <- multi_aggregate(
+  dat = ewrdata,
+  causal_edges = ewr_edges,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq
+)
 ```
 
 That saves only the final outcome, which is far cheaper for memory, but doesn't say how we got that answer.
@@ -144,21 +156,25 @@ tsagg
 We can do the exact same thing with characters instead of objects for the spatial units:
 
 ```{r}
-aggseq_c <- list(ewr_code = c('ewr_code_timing', 'ewr_code'),
-               env_obj =  c('ewr_code', "env_obj"),
-               sdl_units = "sdl_units",
-               Specific_goal = c('env_obj', "Specific_goal"),
-               catchment = "cewo_valleys",
-               Objective = c('Specific_goal', 'Objective'),
-               mdb = "basin",
-               target_5_year_2024 = c('Objective', 'target_5_year_2024'))
+aggseq_c <- list(
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = "sdl_units",
+  Specific_goal = c("env_obj", "Specific_goal"),
+  catchment = "cewo_valleys",
+  Objective = c("Specific_goal", "Objective"),
+  mdb = "basin",
+  target_5_year_2024 = c("Objective", "target_5_year_2024")
+)
 
-tsagg_c <- multi_aggregate(dat = ewrdata,
-                         causal_edges = ewr_edges,
-                         groupers = 'scenario',
-                         aggCols = 'ewr_achieved',
-                         aggsequence = aggseq,
-                         funsequence = funseq)
+tsagg_c <- multi_aggregate(
+  dat = ewrdata,
+  causal_edges = ewr_edges,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq
+)
 
 tsagg_c
 ```
@@ -172,15 +188,17 @@ Most often, we'll want to save the list of outcomes at each step- it allows us t
 ```{r}
 #| message: false
 #| warning: false
-allagg <- multi_aggregate(dat = ewrdata,
-                         causal_edges = ewr_edges,
-                         groupers = 'scenario',
-                         aggCols = 'ewr_achieved',
-                         aggsequence = aggseq,
-                         funsequence = funseq,
-                         saveintermediate = TRUE,
-                         namehistory = FALSE,
-                         keepAllPolys = FALSE)
+allagg <- multi_aggregate(
+  dat = ewrdata,
+  causal_edges = ewr_edges,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE
+)
 ```
 
 Now, we'll inspect each step, both as dataframes and maps. There are many other ways of plotting the outcome data available in the comparer. The goal here is simply to visualize what happens at each step along the way, so we make some quick maps.
@@ -206,19 +224,23 @@ There are many EWR codes, so just pick three haphazardly (LF1, BF1, and CF) and 
 ```{r}
 #| message: false
 allagg$ewr_code |>
-  dplyr::filter(ewr_code %in% c('LF1', 'BF1', 'CF')) %>%
-  dplyr::left_join(scenarios) %>% 
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'ewr_code',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'),
-                          underlay_list = list(underlay = sdl_units, 
-                                               underlay_pal = 'cornsilk'))
+  dplyr::filter(ewr_code %in% c("LF1", "BF1", "CF")) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "ewr_code",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "cornsilk"
+    )
+  )
 ```
 
 #### Sheet 3- env_obj
@@ -234,19 +256,23 @@ Again choosing three of the first codes, we see this is still gauged.
 ```{r}
 #| message: false
 allagg$env_obj |>
-  dplyr::filter(env_obj %in% c('EF1', 'WB1', 'NF1')) %>%
-  dplyr::left_join(scenarios) %>% 
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'env_obj',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'),
-                          underlay_list = list(underlay = sdl_units, 
-                                               underlay_pal = 'cornsilk'))
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "cornsilk"
+    )
+  )
 ```
 
 #### Sheet 4- sdl_units
@@ -262,19 +288,23 @@ Now we have aggregated the data above into sdl polygons.
 ```{r}
 #| message: false
 allagg$sdl_units |>
-  dplyr::filter(env_obj %in% c('EF1', 'WB1', 'NF1')) %>%
-  dplyr::left_join(scenarios) %>% 
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'env_obj',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'),
-                          underlay_list = list(underlay = sdl_units, 
-                                               underlay_pal = 'grey90'))
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "grey90"
+    )
+  )
 ```
 
 #### Sheet 5- Specific goal
@@ -290,21 +320,27 @@ Using fct_reorder. this is where info about the scenarios would come in handy as
 ```{r}
 #| message: false
 allagg$Specific_goal |>
-  dplyr::filter(Specific_goal %in% c('All recorded fish species', 
-                                     "Spoonbills", 
-                                     "Decompsition"))  %>% 
-  dplyr::left_join(scenarios) %>% 
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'Specific_goal',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'),
-                          underlay_list = list(underlay = sdl_units, 
-                                               underlay_pal = 'grey90'))
+  dplyr::filter(Specific_goal %in% c(
+    "All recorded fish species",
+    "Spoonbills",
+    "Decompsition"
+  )) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "Specific_goal",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "grey90"
+    )
+  )
 ```
 
 #### Sheet 6- Catchment
@@ -320,21 +356,27 @@ Now we can see that the aggregation has occurred into a different set of polygon
 ```{r}
 #| message: false
 allagg$catchment |>
-  dplyr::filter(Specific_goal %in% c('All recorded fish species', 
-                                     "Spoonbills", 
-                                     "Decompsition"))  %>% 
-  dplyr::left_join(scenarios) %>% 
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'Specific_goal',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'),
-                          underlay_list = list(underlay = cewo_valleys, 
-                                               underlay_pal = 'grey90'))
+  dplyr::filter(Specific_goal %in% c(
+    "All recorded fish species",
+    "Spoonbills",
+    "Decompsition"
+  )) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "Specific_goal",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = list(
+      underlay = cewo_valleys,
+      underlay_pal = "grey90"
+    )
+  )
 ```
 
 #### Sheet 7- Objective
@@ -350,21 +392,27 @@ We see that these are still in the catchments, but now the values are different 
 ```{r}
 #| message: false
 allagg$Objective |>
-  dplyr::filter(Objective %in% c('No loss of native fish species',
-                                 "Increase total waterbird abundance across all functional groups", 
-                                     "Support instream & floodplain productivity"))  %>% 
-  dplyr::left_join(scenarios) %>% 
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'Objective',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'),
-                          underlay_list = list(underlay = sdl_units, 
-                                               underlay_pal = 'grey90'))
+  dplyr::filter(Objective %in% c(
+    "No loss of native fish species",
+    "Increase total waterbird abundance across all functional groups",
+    "Support instream & floodplain productivity"
+  )) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "Objective",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "grey90"
+    )
+  )
 ```
 
 #### Sheet 8- Basin
@@ -380,19 +428,23 @@ We drop the underlay on the plots since we're now plotting the whole basin
 ```{r}
 #| message: false
 allagg$mdb |>
-  dplyr::filter(Objective %in% c('No loss of native fish species',
-                                 "Increase total waterbird abundance across all functional groups", 
-                                     "Support instream & floodplain productivity"))  %>% 
-  dplyr::left_join(scenarios) %>% 
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'Objective',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'))
+  dplyr::filter(Objective %in% c(
+    "No loss of native fish species",
+    "Increase total waterbird abundance across all functional groups",
+    "Support instream & floodplain productivity"
+  )) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "Objective",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2")
+  )
 ```
 
 #### Sheet 9- 5-year targets
@@ -408,19 +460,23 @@ And we're still at the basin, just plotting different outcomes.
 ```{r}
 #| message: false
 allagg$target_5_year_2024 |>
-  dplyr::filter(target_5_year_2024 %in% c('All known species detected annually', 
-                                          "Establish baseline data on the number and distribution of wetlands with breeding activity of flow-dependant frog species",
-                                          "Rates of fall does not exceed the 5th percentile of modelled natural rates during regulated water deliveries"))  %>% 
-  dplyr::left_join(scenarios) %>% 
-    plot_outcomes(y_col = 'ewr_achieved',
-                          x_col = 'map',
-                          colorgroups = NULL,
-                          colorset = 'ewr_achieved',
-                          pal_list = list('scico::berlin'),
-                          facet_col = 'scenario',
-                          facet_row = 'target_5_year_2024',
-                          scene_pal = scene_pal,
-                          sceneorder = c('down2', 'base', 'up2'))
+  dplyr::filter(target_5_year_2024 %in% c(
+    "All known species detected annually",
+    "Establish baseline data on the number and distribution of wetlands with breeding activity of flow-dependant frog species",
+    "Rates of fall does not exceed the 5th percentile of modelled natural rates during regulated water deliveries"
+  )) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "target_5_year_2024",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2")
+  )
 ```
 
 ## Simple inputs and saving
@@ -435,22 +491,26 @@ The `read_and_agg` function also saves metadata files (yaml and json) that allow
 #| lst-label: lst-save-out
 #| lst-cap: Path inputs and saving outputs with run_and_agg
 #| message: false
-if (params$REBUILD_DATA) {savep <- file.path(out_path)} else {savep <- NULL}
+if (params$REBUILD_DATA) {
+  savep <- file.path(out_path)
+} else {
+  savep <- NULL
+}
 
-ts_from_raa <- read_and_agg(datpath = ewr_results, 
-                            type = 'summary',
-                 geopath = bom_basin_gauges,
-                 causalpath = causal_ewr,
-                 groupers = c('scenario'),
-                 aggCols = 'ewr_achieved',
-                 aggsequence = aggseq,
-                 funsequence = funseq,
-                 namehistory = FALSE,
-                 saveintermediate = TRUE,
-                 returnList = TRUE,
-                 savepath = savep)
-
-
+ts_from_raa <- read_and_agg(
+  datpath = ewr_results,
+  type = "summary",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = c("scenario"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  namehistory = FALSE,
+  saveintermediate = TRUE,
+  returnList = TRUE,
+  savepath = savep
+)
 ```
 
 We can see that that produces the same list as `tsagg`
@@ -480,29 +540,32 @@ plan(multisession)
 # plan(sequential) # debug
 
 # get these from elsewhere, the whole point is to not read everything in. Should be able to extract from the paths (or the scenario metadata - better)
-allscenes <- list.files(ewr_results, recursive = TRUE) %>% 
-  dirname() %>% 
-  dirname() %>% 
+allscenes <- list.files(ewr_results, recursive = TRUE) %>%
+  dirname() %>%
+  dirname() %>%
   unique()
 
 # I think no longer needed now we have a package
 # passfuns <- unique(unlist(funseq))
 # passfuns <- unlist(passfuns[purrr::map_lgl(passfuns, is.character)])
 
-parAgg <- foreach(s = allscenes,
-                       .combine = dplyr::bind_rows) %dopar% {
-    
-    read_and_agg(datpath = ewr_results, type = 'summary',
-                 geopath = bom_basin_gauges,
-                 causalpath = causal_ewr,
-                 groupers = c('scenario'),
-                 aggCols = 'ewr_achieved',
-                 aggsequence = aggseq,
-                 funsequence = funseq,
-                 namehistory = TRUE,
-                 saveintermediate = FALSE,
-                 scenariofilter = s)
-  }
+parAgg <- foreach(
+  s = allscenes,
+  .combine = dplyr::bind_rows
+) %dopar% {
+  read_and_agg(
+    datpath = ewr_results, type = "summary",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = c("scenario"),
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq,
+    funsequence = funseq,
+    namehistory = TRUE,
+    saveintermediate = FALSE,
+    scenariofilter = s
+  )
+}
 
 parAgg
 ```

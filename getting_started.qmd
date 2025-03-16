@@ -22,16 +22,16 @@ Installation is slightly more complex than the usual `devtools::install_github(M
 # SSH- seems most stable
 
 devtools::install_git("git@github.com:MDBAuth/HydroBOT.git",
-                      ref = 'master', force = TRUE, upgrade = 'ask')
+  ref = "master", force = TRUE, upgrade = "ask"
+)
 
 # HTTPS- may work, if you have gitcreds and a PAT set up
 # activate the PAT
 gitcreds::gitcreds_get()
-renv::install('MDBAuth/HydroBOT')
+renv::install("MDBAuth/HydroBOT")
 
 # pak also requires a PAT
-pak::pkg_install('MDBAuth/HydroBOT')
-
+pak::pkg_install("MDBAuth/HydroBOT")
 ```
 
 Load the package

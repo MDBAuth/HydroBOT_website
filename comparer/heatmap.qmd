@@ -25,9 +25,9 @@ For a 1-d version, with variation in a single driver axis and outcomes on the y 
 As usual, we need paths to the data.
 
 ```{r}
-project_dir <- file.path('more_scenarios')
-hydro_dir = file.path(project_dir, 'hydrographs')
-agg_dir <- file.path(project_dir, 'aggregator_output')
+project_dir <- file.path("more_scenarios")
+hydro_dir <- file.path(project_dir, "hydrographs")
+agg_dir <- file.path(project_dir, "aggregator_output")
 ```
 
 ## Scenario information
@@ -35,9 +35,11 @@ agg_dir <- file.path(project_dir, 'aggregator_output')
 This should be auto-acquired from the dirs above. But while its format is still up in the air, I'm leaving it a bit more user-editable.
 
 ```{r}
-scenarios <- jsonlite::read_json(file.path(hydro_dir,
-                                           'scenario_metadata.json')) |> 
-  tibble::as_tibble() |> 
+scenarios <- jsonlite::read_json(file.path(
+  hydro_dir,
+  "scenario_metadata.json"
+)) |>
+  tibble::as_tibble() |>
   tidyr::unnest(cols = everything())
 ```
 
@@ -46,7 +48,7 @@ scenarios <- jsonlite::read_json(file.path(hydro_dir,
 We have a lot of hydrographs, so for this demonstration, we will often use a subset.
 
 ```{r}
-gauges_to_plot <- c('412002', '419001', '422028', '421001')
+gauges_to_plot <- c("412002", "419001", "422028", "421001")
 ```
 
 # Standard scenario appearance
@@ -55,9 +57,10 @@ We want to have a consistent look for the scenarios across the project, with a l
 
 ```{r}
 sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
-scene_pal <- make_pal(unique(scenarios$scenario_name), 
-                      palette = 'ggsci::nrc_npg', 
-                      refvals = 'base', refcols = 'black')
+scene_pal <- make_pal(unique(scenarios$scenario_name),
+  palette = "ggsci::nrc_npg",
+  refvals = "base", refcols = "black"
+)
 ```
 
 # Plot heatmaps
@@ -68,12 +71,13 @@ As an example
 
 ```{r}
 variables <- tidyr::expand_grid(Env_var1 = seq(-1, 4, 0.25), Env_var2 = seq(-30, 10, 2))
-variables <- variables %>% 
+variables <- variables %>%
   dplyr::mutate(Metric = Env_var1^2 + Env_var2)
 ```
 
 ```{r}
-ggplot(variables) + geom_raster(aes(x = Env_var1, y = Env_var2, fill = Metric)) +
+ggplot(variables) +
+  geom_raster(aes(x = Env_var1, y = Env_var2, fill = Metric)) +
   viridis::scale_fill_viridis()
 ```
 
@@ -86,14 +90,18 @@ scenariosamples <- bind_rows(samples, scenariotib)
 ```
 
 ```{r}
-heatexample <- ggplot() + 
-  geom_raster(data = variables,
-              aes(x = Env_var1, y = Env_var2, fill = Metric)) +
+heatexample <- ggplot() +
+  geom_raster(
+    data = variables,
+    aes(x = Env_var1, y = Env_var2, fill = Metric)
+  ) +
   viridis::scale_fill_viridis() +
-  geom_point(data = scenariosamples, 
-             aes(x = Env_var1, y = Env_var2, color = isscenario)) +
-  scale_color_manual(values = c('firebrick', 'magenta4')) +
-  guides(color = 'none') + 
+  geom_point(
+    data = scenariosamples,
+    aes(x = Env_var1, y = Env_var2, color = isscenario)
+  ) +
+  scale_color_manual(values = c("firebrick", "magenta4")) +
+  guides(color = "none") +
   theme_hydrobot()
 
 heatexample

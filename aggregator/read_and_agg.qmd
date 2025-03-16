@@ -1,0 +1,11 @@
+---
+title: "Read_and_agg in detail"
+---
+
+Placeholder
+
+This needs to get into what read and agg does that multi_aggregate doesn't. See [the interleaved example](theme_space_agg.qmd) for more detailed discussion of the stepwise interleaved aggregation itself.
+
+The input and output data differ depending on how far up the wrapper sequence we are. The most common interface, `read_and_agg()` that takes paths as arguments and does the read-in of the data internally, runs `multi_aggregate`, and handles saving of both outputs and metadata. The `multi_aggregate` function expects the incoming data to be in memory. Outputs from `multi_aggregate` are R objects- a dataframe or a list- and are returned back to the calling environment. The `read_and_agg` wrapper, however, can both return R objects to the session `returnList = TRUE` and save to a file if `savepath = "path/to/outfile"` .
+
+Need to say somethign about EWR assessment here.

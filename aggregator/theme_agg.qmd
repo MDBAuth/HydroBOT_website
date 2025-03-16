@@ -27,8 +27,8 @@ In practice, we expect to interleave spatial, temporal, and thematic aggregation
 The theme relationships in the causal network `causal_ewr` provide the links and structure of the theme scaling, while the values to be scaled come out of the modules. For this demonstration, we provide a set of paths to point to the input data, in this case the outputs from the EWR tool, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/HydroBOT).
 
 ```{r}
-project_dir <- file.path('more_scenarios')
-ewr_results <- file.path(project_dir, 'module_output', 'EWR')
+project_dir <- file.path("more_scenarios")
+ewr_results <- file.path(project_dir, "module_output", "EWR")
 ```
 
 Input data to `multi_aggregate` should be a dataframe (e.g. a dataframe of EWR outputs, `sf` of spatial outcomes). If we want to pass a path instead of a dataframe (as we might for large runs), we would use `read_and_agg`, which wraps `multi_aggregate`, demonstrated in the [interleaved notebook](theme_space_agg.qmd). Thus, for the demonstration, we pull in the data produced by the [demonstration controller](../controller/controller_ewr_wrapped.qmd) and contained in-repo at the `ewr_results` path using `get_ewr_output` below.
@@ -56,7 +56,7 @@ We typically would use `prep_ewr_agg` (and this is wrapped by `multi_aggregate`)
 We'll pull in the summary data to use for demonstration so we can use `multi_aggregate` directly. If we want to feed a path instead of a dataframe, we would need to use `read_and_agg`.
 
 ```{r}
-sumdat <- get_ewr_output(ewr_results, type = 'summary')
+sumdat <- get_ewr_output(ewr_results, type = "summary")
 # Would make it geographic:
 # sumdat <- prep_ewr_agg(ewr_results, type = 'summary', geopath = gpath)
 sumdat
@@ -66,7 +66,7 @@ There's an issue with `outputType = 'annual'` in the version of the EWR tool thi
 
 ```{r}
 #| eval: false
-anndat <- get_ewr_output(ewr_results, type = 'annual')
+anndat <- get_ewr_output(ewr_results, type = "annual")
 anndat
 ```
 
@@ -78,8 +78,8 @@ We'll choose an example gauge to make it easier to visualise the data.
 
 ```{r}
 # Dubbo is '421001', has 24 EWRs
-# Warren Weir is '421004', has 30 EWRs. 
-example_gauge <- '421001'
+# Warren Weir is '421004', has 30 EWRs.
+example_gauge <- "421001"
 ```
 
 ## Aggregation
@@ -89,17 +89,21 @@ As a demonstration, I've set a range of theme levels that hit all the theme rela
 I'm using `CompensatingFactor` as the aggregation function for the `ewr_code_timing` to `ewr_code` step here, assuming that passing either timing sub-code means the main code passes. A similar approach could be done if we want to lump the `ewr_code`s themselves, e.g. put EF4a,b,c,d into EF4. I use both `ArithmeticMean` and `LimitingFactor` for the 2nd and 3rd levels to demonstrate multiple aggregations and how the outputs from those steps get carried through subsequent steps.
 
 ```{r}
-aggseq <- list(c('ewr_code_timing', 'ewr_code'),
-               c('ewr_code', "env_obj"), 
-             c('env_obj', "Specific_goal"), 
-             c('Specific_goal', 'Objective'), 
-             c('Objective', 'target_5_year_2024'))
+aggseq <- list(
+  c("ewr_code_timing", "ewr_code"),
+  c("ewr_code", "env_obj"),
+  c("env_obj", "Specific_goal"),
+  c("Specific_goal", "Objective"),
+  c("Objective", "target_5_year_2024")
+)
 
-funseq <- list(c('CompensatingFactor'),
-               c('ArithmeticMean', 'LimitingFactor'),
-             c('ArithmeticMean', 'LimitingFactor'),
-             c('ArithmeticMean'),
-             c('ArithmeticMean'))
+funseq <- list(
+  c("CompensatingFactor"),
+  c("ArithmeticMean", "LimitingFactor"),
+  c("ArithmeticMean", "LimitingFactor"),
+  c("ArithmeticMean"),
+  c("ArithmeticMean")
+)
 ```
 
 The `groupers` and `aggCols` arguments can take a number of different formats- character vectors, bare column names and sometimes `tidyselect`, though this is more true in `theme_aggregate` and limited for `multi_aggregate` as discussed in the [syntax documentation](aggregation_syntax.qmd). This capability gives the user quite a few options for specifying the columns to use. The use of `selectcreator` makes it robust to nonexistent columns with `failmissing = FALSE`.
@@ -109,12 +113,14 @@ To create the aggregation, we provide the sequence lists created above, along wi
 ```{r}
 #| message: false
 #| warning: false
-simpleThemeAgg <- multi_aggregate(dat = sumdat,
-                         causal_edges = make_edges(causal_ewr, aggseq),
-                         groupers = c('scenario', 'gauge'),
-                         aggCols = 'ewr_achieved',
-                         aggsequence = aggseq,
-                         funsequence = funseq)
+simpleThemeAgg <- multi_aggregate(
+  dat = sumdat,
+  causal_edges = make_edges(causal_ewr, aggseq),
+  groupers = c("scenario", "gauge"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq
+)
 simpleThemeAgg
 ```
 
@@ -140,8 +146,8 @@ In the example above, we can feed the output data to `agg_names_to_cols` to put 
 
 ```{r}
 #| message: false
-#| 
-agg_names_to_cols(simpleThemeAgg, aggsequence = aggseq, funsequence = funseq, aggCols = 'ewr_achieved')
+#|
+agg_names_to_cols(simpleThemeAgg, aggsequence = aggseq, funsequence = funseq, aggCols = "ewr_achieved")
 ```
 
 In practice, what makes most sense is to use a switch (`namehistory = FALSE`) inside `multi_aggregate` to return this format.
@@ -149,13 +155,15 @@ In practice, what makes most sense is to use a switch (`namehistory = FALSE`) in
 ```{r}
 #| message: false
 
-simpleColHistory <-  multi_aggregate(dat = sumdat,
-                         causal_edges = make_edges(causal_ewr, aggseq),
-                         groupers = c('scenario', 'gauge'),
-                         aggCols = 'ewr_achieved',
-                         aggsequence = aggseq,
-                         funsequence = funseq,
-                         namehistory = FALSE)
+simpleColHistory <- multi_aggregate(
+  dat = sumdat,
+  causal_edges = make_edges(causal_ewr, aggseq),
+  groupers = c("scenario", "gauge"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  namehistory = FALSE
+)
 simpleColHistory
 ```
 
@@ -174,14 +182,18 @@ There are three main types of input EWR data (`summary`, `annual`, and `all`), b
 #| warning: false
 #| eval: false
 
-annualColHistory <-  multi_aggregate(dat = anndat,
-                                     causal_edges = make_edges(causal_ewr,
-                                                               aggseq),
-                                     groupers = c('scenario', 'gauge', 'year'),
-                                     aggCols = c('num_events', 'event_length'),
-                                     aggsequence = aggseq,
-                                     funsequence = funseq,
-                                     namehistory = FALSE)
+annualColHistory <- multi_aggregate(
+  dat = anndat,
+  causal_edges = make_edges(
+    causal_ewr,
+    aggseq
+  ),
+  groupers = c("scenario", "gauge", "year"),
+  aggCols = c("num_events", "event_length"),
+  aggsequence = aggseq,
+  funsequence = funseq,
+  namehistory = FALSE
+)
 annualColHistory
 ```
 
@@ -192,14 +204,16 @@ By default, we return only the final aggregation after stepping up the full sequ
 ```{r}
 #| message: false
 
-allsteps  <-  multi_aggregate(dat = sumdat,
-                         causal_edges = make_edges(causal_ewr, aggseq),
-                         groupers = c('scenario', 'gauge'),
-                         aggCols = 'ewr_achieved',
-                         aggsequence = aggseq,
-                         funsequence = funseq,
-                         saveintermediate = TRUE,
-                         namehistory = FALSE)
+allsteps <- multi_aggregate(
+  dat = sumdat,
+  causal_edges = make_edges(causal_ewr, aggseq),
+  groupers = c("scenario", "gauge"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 
 names(allsteps)
 ```
@@ -213,9 +227,10 @@ To keep this demonstration from becoming too unwieldy, we limit the edge creatio
 The first step is to generate the edges and nodes for the network we want to look at.
 
 ```{r}
-edges <- make_edges(causal_ewr, 
-                    fromtos = aggseq[2:length(aggseq)],
-                    gaugefilter = example_gauge)
+edges <- make_edges(causal_ewr,
+  fromtos = aggseq[2:length(aggseq)],
+  gaugefilter = example_gauge
+)
 
 nodes <- make_nodes(edges)
 ```
@@ -229,25 +244,29 @@ Now, extract the values we want from the aggregation and join them to the nodes.
 #| warning: false
 
 # need to grab the right set of aggregations if there are multiple at some stages
-whichaggs <- c('CompensatingFactor',
-               'ArithmeticMean',
-               'ArithmeticMean',
-               'ArithmeticMean',
-               'ArithmeticMean')
+whichaggs <- c(
+  "CompensatingFactor",
+  "ArithmeticMean",
+  "ArithmeticMean",
+  "ArithmeticMean",
+  "ArithmeticMean"
+)
 
 # What is the column that defines the value?
-valcol <- 'ewr_achieved'
+valcol <- "ewr_achieved"
 
 # Get the values for each node
 targetlevels <- names(allsteps)
-targetlevels[1] <- 'ewr_code_timing'
-aggvals <- extract_vals_causal(allsteps, whichaggs, valcol, 
-                               targetlevels = targetlevels)
+targetlevels[1] <- "ewr_code_timing"
+aggvals <- extract_vals_causal(allsteps, whichaggs, valcol,
+  targetlevels = targetlevels
+)
 
 # Cut off the ewr_code_timing- should really have a drop_step argument to just not return it? In the extract_vals_causal
-aggvals <- aggvals %>% dplyr::filter(NodeType != 'ewr_code_timing')
+aggvals <- aggvals %>% dplyr::filter(NodeType != "ewr_code_timing")
 # cut to relevant gauge, then remove- causes problems since node levels above env_obj aren't gauge-referenced
-aggvals <- aggvals %>% dplyr::filter(gauge == example_gauge) %>% 
+aggvals <- aggvals %>%
+  dplyr::filter(gauge == example_gauge) %>%
   dplyr::select(-gauge)
 
 # join to the nodes
@@ -259,13 +278,17 @@ Make the causal network plot with the nodes we chose and colour by the values we
 ```{r}
 #| label: fig-causal-base
 #| fig-cap: Causal network for baseline scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 1, dark purple is 0.
-aggNetwork <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
-                                        scenario == 'base'),
-                 edges = edges,
-                 edge_pal = 'black',
-                 node_pal = list(value = 'scico::tokyo'),
-                 node_colorset = 'ewr_achieved',
-                 render = FALSE)
+aggNetwork <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "base"
+  ),
+  edges = edges,
+  edge_pal = "black",
+  node_pal = list(value = "scico::tokyo"),
+  node_colorset = "ewr_achieved",
+  render = FALSE
+)
 
 DiagrammeR::render_graph(aggNetwork)
 ```
@@ -273,13 +296,17 @@ DiagrammeR::render_graph(aggNetwork)
 ```{r}
 #| label: fig-causal-up4
 #| fig-cap: Causal network for 4x scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 1, dark purple is 0.
-aggNetwork <- make_causal_plot(nodes = dplyr::filter(nodes_with_vals, 
-                                        scenario == 'up2'),
-                 edges = edges,
-                 edge_pal = 'black',
-                 node_pal = list(value = 'scico::tokyo'),
-                 node_colorset = 'ewr_achieved',
-                 render = FALSE)
+aggNetwork <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "up2"
+  ),
+  edges = edges,
+  edge_pal = "black",
+  node_pal = list(value = "scico::tokyo"),
+  node_colorset = "ewr_achieved",
+  render = FALSE
+)
 
 DiagrammeR::render_graph(aggNetwork)
 ```
@@ -293,11 +320,13 @@ event2 <- function(x) {
   mean(ifelse(x > 2, x, NA), na.rm = TRUE)
 }
 
-newfuns <- list(c('CompensatingFactor'),
-                  c('event2'),
-             c('event2'),
-             c('ArithmeticMean'),
-             c('ArithmeticMean'))
+newfuns <- list(
+  c("CompensatingFactor"),
+  c("event2"),
+  c("event2"),
+  c("ArithmeticMean"),
+  c("ArithmeticMean")
+)
 ```
 
 **This is currently turned off until we update to the new EWR without a bug in the annual results.**
@@ -306,13 +335,15 @@ newfuns <- list(c('CompensatingFactor'),
 #| message: false
 #| warning: false
 #| eval: false
-annualEv2 <-  multi_aggregate(dat = anndat,
-                         causal_edges = make_edges(causal_ewr, aggseq),
-                         groupers = c('scenario', 'gauge', 'year'),
-                         aggCols = 'event_length',
-                         aggsequence = aggseq,
-                         funsequence = newfuns,
-                         namehistory = FALSE)
+annualEv2 <- multi_aggregate(
+  dat = anndat,
+  causal_edges = make_edges(causal_ewr, aggseq),
+  groupers = c("scenario", "gauge", "year"),
+  aggCols = "event_length",
+  aggsequence = aggseq,
+  funsequence = newfuns,
+  namehistory = FALSE
+)
 # lots of NaN because many years and locations didn't have events > 2, so for ease of viewing, filter
 annualEv2 %>% dplyr::filter(!is.nan(event_length))
 ```
@@ -326,16 +357,18 @@ To only read-in the relevant data, we use the `read_and_agg` wrapper. The `gauge
 ```{r}
 #| message: false
 
-smallreadagg  <-  read_and_agg(datpath = ewr_results, type = 'summary',
-                               geopath = bom_basin_gauges,
-                               causalpath = causal_ewr,
-                               groupers = c('scenario', 'gauge'),
-                               aggCols = 'ewr_achieved',
-                               aggsequence = aggseq,
-                               funsequence = funseq,
-                               namehistory = FALSE, 
-                               gaugefilter = NULL,
-                               scenariofilter = 'base')
+smallreadagg <- read_and_agg(
+  datpath = ewr_results, type = "summary",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = c("scenario", "gauge"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  namehistory = FALSE,
+  gaugefilter = NULL,
+  scenariofilter = "base"
+)
 
 table(smallreadagg$gauge, smallreadagg$scenario)
 ```
@@ -346,15 +379,17 @@ The `read_and_agg` function is also helpful if we just want to use paths as argu
 
 ```{r}
 #| message: false
-readallsteps <- read_and_agg(datpath = ewr_results, type = 'summary',
-                             geopath = bom_basin_gauges,
-                             causalpath = causal_ewr,
-                             groupers = c('scenario', 'gauge'),
-                             aggCols = 'ewr_achieved',
-                             aggsequence = aggseq,
-                             funsequence = funseq,
-                             saveintermediate = TRUE,
-                             namehistory = FALSE)
+readallsteps <- read_and_agg(
+  datpath = ewr_results, type = "summary",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = c("scenario", "gauge"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 
 names(readallsteps)
 ```
@@ -379,26 +414,30 @@ library(doFuture)
 registerDoFuture()
 plan(multisession)
 
-allgauges <- 'all' # unique(simpleThemeAgg$gauge)
+allgauges <- "all" # unique(simpleThemeAgg$gauge)
 allscenes <- unique(simpleThemeAgg$scenario)
 
-parThemeAgg <- foreach(s = allscenes, 
-                       .combine = dplyr::bind_rows) %dopar% {
+parThemeAgg <- foreach(
+  s = allscenes,
+  .combine = dplyr::bind_rows
+) %dopar% {
   # If parallel over gauges
-  # foreach(g = allgauges, 
+  # foreach(g = allgauges,
   #         .combine = dplyr::bind_rows) %dopar% {
-            
-    read_and_agg(datpath = ewr_results, type = 'summary',
-                 geopath = bom_basin_gauges,
-                 causalpath = causal_ewr,
-                 groupers = c('scenario', 'gauge'),
-                 aggCols = 'ewr_achieved',
-                 aggsequence = aggseq,
-                 funsequence = funseq,
-                 namehistory = TRUE, 
-                 gaugefilter = NULL,
-                 scenariofilter = s)
-  }
+
+  read_and_agg(
+    datpath = ewr_results, type = "summary",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = c("scenario", "gauge"),
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq,
+    funsequence = funseq,
+    namehistory = TRUE,
+    gaugefilter = NULL,
+    scenariofilter = s
+  )
+}
 
 parThemeAgg
 ```

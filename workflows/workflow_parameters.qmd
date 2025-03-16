@@ -9,7 +9,7 @@ editor: visual
 
 ```{r}
 #| include: false
-source('R/helpers.R')
+source("R/helpers.R")
 make_hydro_csv()
 ```
 
@@ -126,15 +126,17 @@ These examples are set not to evaluate in normal use, but show different ways of
 This runs the toolkit using a yaml parameter file that modifies the default provided with HydroBOT.
 
 ```{r}
-run_hydrobot_params(yamlpath = file.path('workflows', 'params.yml'))
+run_hydrobot_params(yamlpath = file.path("workflows", "params.yml"))
 ```
 
 Passing arguments as text is tricky to get the yaml right for more than one argument, but it can be useful for command-line use, for example. Here, we demonstrate changing the `output_parent_dir` and the `namehistory`, noting that the number of spaces and newlines is critical to get it to work. In practice, this would need some tweaking to use with `Rscript` and extract the string from `commandArgs()` .
 
 ```{r}
 #| eval: false
-run_hydrobot_params(yamlpath = file.path('workflows', 'params.yml'),
-                    passed_args = "ewr:\n output_parent_dir: 'hydrobot_scenarios'\naggregation:\n namehistory: TRUE")
+run_hydrobot_params(
+  yamlpath = file.path("workflows", "params.yml"),
+  passed_args = "ewr:\n output_parent_dir: 'hydrobot_scenarios'\naggregation:\n namehistory: TRUE"
+)
 ```
 
 We can also pass arguments in a list from R, which is a bit easier syntax. Here, we use it to only run a subset of the scenarios and put the outputs in the same directory, as well as specify aggregation with an R file.
@@ -142,15 +144,15 @@ We can also pass arguments in a list from R, which is a bit easier syntax. Here,
 ```{r}
 #| eval: false
 run_hydrobot_params(list_args = list(
-                      ewr = list(
-                        output_parent_dir = 'hydrobot_scenarios/hydrographs/base',
-                        hydro_dir = 'hydrobot_scenarios/hydrographs/base'
-                      ),
-                      aggregation = list(
-                        aggregation_def = "workflows/params.R",
-                        auto_ewr_PU = TRUE
-                      )
-                    ))
+  ewr = list(
+    output_parent_dir = "hydrobot_scenarios/hydrographs/base",
+    hydro_dir = "hydrobot_scenarios/hydrographs/base"
+  ),
+  aggregation = list(
+    aggregation_def = "workflows/params.R",
+    auto_ewr_PU = TRUE
+  )
+))
 ```
 
 And finally, if the params are included in the parameters section of a Quarto notebook, they should get parsed. Quarto with R puts these in a list called `params`, so we could just pass that. Unfortunately, the `params` list in quarto isn't full-featured yaml, and can't do nested lists and does not currently work, but may work with `!r` syntax in Rmarkdown. This is likely to not be very useful.
@@ -166,7 +168,7 @@ The `prep_run_save_ewrs` and `read_and_agg` functions save metadata yaml files t
 
 ```{r}
 #| eval: false
-run_hydrobot_params(yamlpath = 'hydrobot_scenarios/aggregator_output/agg_metadata.yml')
+run_hydrobot_params(yamlpath = "hydrobot_scenarios/aggregator_output/agg_metadata.yml")
 ```
 
 ```{r}

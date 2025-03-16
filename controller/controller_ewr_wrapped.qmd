@@ -10,7 +10,7 @@ editor: visual
 ```{r}
 #| include: false
 
-source('R/helpers.R')
+source("R/helpers.R")
 make_hydro_csv()
 ```
 
@@ -39,8 +39,8 @@ Within the hydrograph directory, scenarios should be kept in separate folders, i
 It also works to point to a single scenario, as might be the case if HydroBOT runs off the end of a hydrology model that generates that scenario, e.g. `/hydrographs/scenario1`. This allows both targeting single scenarios for HydroBOT analysis, but also batching hydrology and HydroBOT together. By default, the saved data goes to `project_dir/module_output` automatically, though this can be changed, see the `output_parent_dir` and `output_subdir` arguments.
 
 ```{r}
-project_dir = file.path('hydrobot_scenarios')
-hydro_dir = file.path(project_dir, 'hydrographs')
+project_dir <- file.path("hydrobot_scenarios")
+hydro_dir <- file.path(project_dir, "hydrographs")
 ```
 
 ## Control output and return
@@ -64,8 +64,8 @@ To determine what to save and what to return to the active session, use `outputT
 (e.g. `returnType = list('summary', 'all')` in R. These have to be lists, not `c()` to work right when sent to Python. The easiest to work with in HydroBOT is `'yearly'`, as that allows assessment of the outcomes, but we will return `'summary'` here as well, as it is often nicer to look at as an EWR output.
 
 ```{r}
-  returnType <- list('yearly', 'summary')
-  outputType <- list('yearly', 'summary')
+returnType <- list("yearly", "summary")
+outputType <- list("yearly", "summary")
 ```
 
 # A simple run
@@ -76,10 +76,12 @@ The `prep_run_save_ewrs` function saves metadata files (yaml and json) that allo
 
 ```{r}
 #| message: false
-ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                                output_parent_dir = project_dir, 
-                                outputType = outputType, 
-                                returnType = returnType)
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  outputType = outputType,
+  returnType = returnType
+)
 ```
 
 Now we have a `summary` and `yearly` dataframes both in-memory (because of `returnType`) and saved (because of `outputType`).
@@ -101,11 +103,13 @@ The `prep_run_save_ewrs` function provides this parallelisation internally and s
 ```{r}
 #| message: false
 plan(multisession)
-ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                                output_parent_dir = project_dir, 
-                                outputType = outputType, 
-                                returnType = returnType,
-                              rparallel = TRUE)
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  outputType = outputType,
+  returnType = returnType,
+  rparallel = TRUE
+)
 ```
 
 ## Selected scenarios or extra files in scenarios
@@ -146,18 +150,20 @@ make_hydro_csv()
 ```
 
 ```{r}
-ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                                output_parent_dir = 'new_parent', 
-                                outputType = outputType, 
-                                returnType = returnType,
-                              rparallel = TRUE)
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = "new_parent",
+  outputType = outputType,
+  returnType = returnType,
+  rparallel = TRUE
+)
 ```
 
 ```{r}
 #| include: false
 
 # reset example dir
-unlink('new_parent', recursive = TRUE)
+unlink("new_parent", recursive = TRUE)
 withr::deferred_run()
 make_hydro_csv()
 ```
@@ -165,10 +171,12 @@ make_hydro_csv()
 If we only have access to a specific scenario, as might happen sometimes in batched jobs, we set both `hydro_dir` and `output_parent_dir` to that scenario, which puts the module output within the scenario folder. That makes onward processing with the aggregator a bit more difficult but sometimes it's all we can do.
 
 ```{r}
-ewr_out <- prep_run_save_ewrs(hydro_dir = 'hydrobot_scenarios/hydrographs/base', 
-                                output_parent_dir = 'hydrobot_scenarios/hydrographs/base', 
-                                outputType = outputType, 
-                                returnType = returnType)
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = "hydrobot_scenarios/hydrographs/base",
+  output_parent_dir = "hydrobot_scenarios/hydrographs/base",
+  outputType = outputType,
+  returnType = returnType
+)
 ```
 
 This yields
@@ -196,12 +204,14 @@ make_hydro_csv()
 It is sometimes the case that we want subdirectories within `module_output/EWR`. For example, maybe we want to retain results from an earlier run for reproducibility while updating either the arguments used or the EWR tool itself. In this case, we use the `output_subdir` argument, which simply adds the requested directory inside `module_output/EWR`:
 
 ```{r}
-ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                              output_parent_dir = project_dir,
-                              output_subdir = 'new_run',
-                              outputType = outputType, 
-                              returnType = returnType,
-                              rparallel = TRUE)
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  output_subdir = "new_run",
+  outputType = outputType,
+  returnType = returnType,
+  rparallel = TRUE
+)
 ```
 
 This yields:
@@ -239,13 +249,17 @@ In some cases, the scenario names or directory structures might be such that the
 For example, we can rename scenarios and only run a subset, as illustrated here to run the down4 and up4 scenarios and rename the scenarios to decrease and increase. We do still need a `hydro_dir` argument, as the paths in `scenarios` are assumed to be relative to that directory, and it's where metadata gets saved. That said, using a high-level location for `hydro_dir` would allow the paths to be essentially anywhere.
 
 ```{r}
-ewr_out <- prep_run_save_ewrs(hydro_dir = hydro_dir, 
-                              output_parent_dir = project_dir,
-                              scenarios = list(decrease = 'down4/down4.csv',
-                                               increase = 'up4/up4.csv'),
-                              outputType = outputType, 
-                              returnType = returnType,
-                              rparallel = TRUE)
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  scenarios = list(
+    decrease = "down4/down4.csv",
+    increase = "up4/up4.csv"
+  ),
+  outputType = outputType,
+  returnType = returnType,
+  rparallel = TRUE
+)
 ```
 
 ```{r}
