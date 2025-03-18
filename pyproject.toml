@@ -1,20 +1,15 @@
 [tool.poetry]
-name = "werp-toolkit-demo"
+name = "hydrobot-template"
 version = "0.1.0"
 description = ""
 authors = ["Galen Holt <53928785+galenholt@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
-packages = [{include = "HydroBOT_website"}]
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 py-ewr = "^2.3.7"
-geopandas = "^0.14.0"
-gitpython = "^3.1.40"
-plotnine = "^0.12.3"
-
-
 
 [build-system]
 requires = ["poetry-core"]
