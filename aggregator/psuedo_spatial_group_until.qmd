@@ -3,17 +3,129 @@ title: "Pseudo-spatial and group_until"
 format: html
 ---
 
-Placeholder for pseudo-spatial, group_until, and auto_ewr_PU.
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+make_ewr_output()
+```
 
-## auto_ewr_PU
+```{r}
+library(HydroBOT)
+```
+
+The nature of multi-step and multidimensional aggregation sometimes requires grouping only for part of the sequence (e.g. grouping by a column only relevant at some scales) or bypassing the automatic treatment of geographic data to do non-spatial joins or groupings of spatial data. We have introduced two arguments to `multi_aggregate()` and `read_and_agg()` to handle these issues, namely `group_until` and `pseudo_spatial`. The EWR-specific argument `auto_ewr_PU` manages these arguments according to best practices for the EWR tool outputs.
+
+## `group_until`
+
+By default, anything passed to the `groupers` argument is retained throughout the sequence, with the most common value being `'scenario'`. The `group_until` argument allows a list of groupers to be passed along with the stage to which they should be retained. The *names* of this list are column names in the data, and the values at each name specify the aggregation step to retain until. The step can be
+
+-   numeric index, e.g. `group_until = list(gauge = 2)` retains grouping by gauge in steps 1 and 2, but drops it in 3.
+
+-   character name of a step, e.g. if the `aggsequence` argument is `aggseq <- list( all_time = "all_time", ewr_code = c("ewr_code_timing", "ewr_code"), sdl_units = sdl_units)`, then `group_until = list(gauge = 'ewr_code'` would retain gauge groupings until the `ewr_code` step, but drop them when aggregating to `sdl_units`.
+
+-   A function that evaluates to TRUE or FALSE on the aggregation sequence. A common use here is `group_until = list(gauge = is_notpoint)`, which groups by the 'gauge' column until the data is no longer geographic points, but polygons.
+
+The list passed to `group_until` can have multiple entries, e.g. `group_until = list(gauge = is_notpoint, planning_unit_name = is_notpoint)` would retain both the 'gauge' and 'planning_unit_name' columns until the data is aggregated into polygons. The stages can differ for the items, though they do not in this example.
+
+## `pseudo_spatial`
+
+By default, the joins and groupings that happen in the aggregation sequence treat geographic data as geographic; they group by the spatial units. However, in some cases, we might want to do *nonspatial* groupings or joins of the data. The most common example arises because gauges can provide information to planning units or sdl units they are not located within, and so we need to link EWR outputs or other data at those gauges to those distant units (and sometimes multiple units). The `pseudo_spatial` argument allows these steps to happen non-spatially, and retains the spatial information of the level being joined/aggregated into.
+
+This argument should be set to the name or index of the aggregation step that should be performed nonspatially. A common example is `pseudo_spatial = 'sdl_units'` , though the numeric index for the `sdl_units` step would work as well.
+
+## An example
+
+In practice, use of `group_until` and `pseudo_spatial` often works like this:
+
+```{r}
+aggseq <- list(
+  all_time = "all_time",
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  sdl_units = sdl_units,
+  env_obj = c("ewr_code", "env_obj"),
+  mdb = basin
+)
+
+funseq <- list(
+  "ArithmeticMean",
+  "CompensatingFactor",
+  "ArithmeticMean",
+  "ArithmeticMean",
+  "SpatialWeightedMean"
+)
+```
+
+Grouping by SWSDLName, gauge, and planning_unit name columns is retained until the sdl_unit aggregation, specified in three different ways. Likewise, the aggregation into SDL units is done non-spatially.
+
+```{r}
+
+aggout <- read_and_agg(
+  datpath = 'hydrobot_scenarios/module_output/EWR',
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+      group_until = list(
+      SWSDLName = 3,
+      planning_unit_name = 'sdl_units',
+      gauge = is_notpoint
+    ),
+    pseudo_spatial = "sdl_units",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE
+)
+
+```
+
+## `auto_ewr_PU`
 
 The `auto_ewr_PU = TRUE` argument in \[read_and_agg()\] and \[multi_aggregate()\] is a shortcut to do known best-practices for EWR outputs. It sets any aggregations to planning units or sdl units to pseudo-spatial, since gauges informing those units may not be geographically located within them. It also uses `group_until` to hold their groupings and not accidentially collapse over them in preceding aggregation steps.
 
-Best practice is to be explicit, with the following arguments to \[read_and_agg()\] and \[multi_aggregate()\], but it is often faster to use `auto_ewr_PU = TRUE`.
+Best practice is to be explicit (as above), with the following arguments to \[read_and_agg()\] and \[multi_aggregate()\], but it is often faster to use `auto_ewr_PU = TRUE`.
 
 ``` r
 group_until = list(SWSDLName = is_notpoint, 
                    planning_unit_name = is_notpoint, 
                    gauge = is_notpoint),
 pseudo_spatial = 'sdl_units'
+```
+
+Using `auto_ewr_PU` to achieve the same results as above is done with this call, but note the messages about being explicit.
+
+```{r}
+aggout_auto <- read_and_agg(
+  datpath = 'hydrobot_scenarios/module_output/EWR',
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE
+)
+```
+
+And we see that those are the same
+
+```{r}
+all(aggout$sdl_units$ewr_achieved == aggout_auto$sdl_units$ewr_achieved)
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
 ```

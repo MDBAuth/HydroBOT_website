@@ -102,7 +102,7 @@ obj2poly2
 
 We can see we get the same result as `obj2poly` with different ways of specifying `aggCols` and `groupers`.
 
-There are times when we might want to send a vector of names, but ignore those not in the data. This typically occurs when there is a set of possible grouping variables but only some exist in a particular dataset, so they should be used if present and ignored if not. It fails by default, because in normal use datasets would match, but setting `failmissing = FALSE` allows it to pass. Here, the 'extra_grouper' column doesn't exist in the data and so is ignored.
+There are times when we might want to send a vector of names, but ignore those not in the data. This typically occurs when there is a set of possible grouping variables but only some exist in a particular dataset, so they should be used if present and ignored if not. It fails by default, because in normal use datasets would match, but setting `failmissing = FALSE` allows it to pass. Here, the 'extra_grouper' column doesn't exist in the data and so is ignored. The `failmissing` argument also applies to `aggCols`; if it is `TRUE`, `aggCols` can have values that are not column names in the data.
 
 We also now use only characters for groupers, but switch to tidyselect to specify aggCols.
 
@@ -123,7 +123,9 @@ obj2polyF
 
 ## Functions
 
-We can pass single bare aggregation function names, characters, or named lists defining functions with arguments (though this is fragile). Above, we have been specifying the function to apply as just a single bare function name. Now, we explore some other possibilities and capabilities of the aggregator.
+We can pass single bare aggregation function names, characters, or named lists defining functions with arguments (though this is fragile). We can also pass multiple functions to apply; for example we might want to calculate the mean, max, and min all at the same time.
+
+Above, we have been specifying the function to apply as just a single bare function name. Now, we explore some other possibilities and capabilities of the aggregator.
 
 Most simply, we can pass character names of functions instead of bare
 

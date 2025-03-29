@@ -30,6 +30,20 @@ make_hydro_nc <- function() {
   withr::defer_parent(unlink("hydrobot_scenarios", recursive = TRUE))
 }
 
+make_ewr_output <- function() {
+  project_dir <- file.path("hydrobot_scenarios")
+  hydro_dir <- file.path(project_dir, "hydrographs")
+
+  ewr_out <- HydroBOT::prep_run_save_ewrs(
+    hydro_dir = hydro_dir,
+    output_parent_dir = project_dir,
+    outputType = list('yearly'),
+    returnType = list('none')
+  )
+  # This destroys it once used
+  withr::defer_parent(unlink("hydrobot_scenarios", recursive = TRUE))
+}
+
 
 make_simpleyml <- function(renderfile = "auto") {
   if (renderfile == "auto") {

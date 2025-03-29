@@ -28,6 +28,8 @@ For inputs, `multi_aggregate` expects the incoming data to be in memory and geog
 
 Multiple aggregations (e.g. calculating min and max) are factorial with the steps- if we aggregate with min and max at step 2 (generating two columns of aggregated data), then each of those columns is aggregated according to the step-3 aggregation, and so on. This can yield complex outputs with many unneeded sequences, and it is worth considering running separate aggregation sequences if there are many places with multiple aggregations, particularly if they occur early in the sequence.
 
+
+
 ## Demonstration setup
 
 First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](../controller/controller_ewr_wrapped.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
@@ -575,3 +577,184 @@ That output is the same as `tsagg`, but now it's been read-in and processed in p
 ## Next steps
 
 We can now proceed to the comparer. We could use the `tsagg` list directly if we want to do all this processing in a single session, but what is more likely is that we'll read the data produced by `read_and_agg` and saved at `out_path` to read in to the comparer, so we do not have to re-run the aggregator every time we use the comparer.
+
+## From spatial
+
+The `multi_aggregate` function runs without spatial info until it reaches a step calling for spatial aggregation, at which point that data must be spatial. Beyond this requirement, `multi_aggregate` doesn't care what theme or spatial scale that input data is- e.g. we could give it Objectives already at the Catchment scale, and then use it to move up.
+
+
+We can use `multi_aggregate` to aggregate through a list of polygon sets, here sdl units to cewo valleys to the basin.
+
+First, set up a list of the spatial aggregation steps, defined by the polygon sets and aggregation functions. As usual, multiple aggregation functions can happen at each stage, and they can be characters or named lists with arguments (the weighted mean needs to be a default). Now, we're taking advantage of the auto-calculated area of each polygon chunk for the weighted mean.
+
+*note the rlang::quo to make this work with dplyr 1.1 and above as in [syntax](aggregation_syntax.qmd).*
+
+```{r}
+glist <- list(sdl_units = sdl_units, catchment = cewo_valleys, mdb = basin)
+
+funlist <- list(
+  c("ArithmeticMean", "LimitingFactor"),
+  rlang::quo(list(wm = ~ weighted.mean(., area, na.rm = TRUE))),
+  rlang::quo(list(wm = ~ weighted.mean(., area, na.rm = TRUE)))
+)
+```
+
+```{r}
+#| warning: false
+#| message: false
+multispat <- multi_aggregate(
+  dat = simpleThemeAgg,
+  causal_edges = themeedges,
+  groupers = c("scenario", "env_obj"),
+  aggCols = "ewr_achieved",
+  aggsequence = glist,
+  funsequence = funlist
+)
+```
+
+By default, that returns only the final outcome, here the basin scale and with the aggregation history in column names so we are sure of what the values represent @fig-final-stepwise-agg . That does not make a very readable legend, but we can rename it manually and tracking the meaning is very important.
+
+```{r}
+#| label: fig-final-stepwise-agg
+#| fig-cap: Final basin-scale results of aggregating EWR achieved with arithmetic mean to sdl units, then weighted-mean aggregation of SDL units into CEWO valleys and weighted means of CEWO valleys to the Basin.
+multispat %>%
+  filter(grepl("^NF[1-3]", env_obj)) %>%
+  ggplot() +
+  geom_sf(aes(fill = mdb_wm_catchment_wm_sdl_units_ArithmeticMean_env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved)) +
+  facet_grid(env_obj ~ scenario) +
+  theme(legend.position = "bottom")
+```
+
+### Saveintermediate and namehistory
+
+We might only want the final outcome as above, but we also might want all the steps (just as we did for the [theme](theme_agg.qmd). Making the history in columns keeps the names easier to use, though it uses more memory. I am going to do something I shouldn't here, and change the column 'env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved' to 'ewr_achieved'. That's for readability and because here we're using `namehistory = FALSE` to track the history in columns. If we were truly doing this analysis, the theme-axis aggregations in simpleThemeAgg would be included in the aggsequence, and so those steps would also be handled with aggsequence columns.
+
+```{r}
+#| message: false
+#| warning: false
+simpleclean <- simpleThemeAgg %>%
+  rename(ewr_achieved = env_obj_ArithmeticMean_ewr_code_CompensatingFactor_ewr_achieved)
+
+multispatb <- multi_aggregate(
+  dat = simpleclean,
+  causal_edges = themeedges,
+  groupers = c("scenario", "env_obj"),
+  aggCols = "ewr_achieved",
+  aggsequence = glist,
+  funsequence = funlist,
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
+```
+
+That final list item is scenario \* aggfun1\*aggfun2\*aggfun3\*env_obj long, e.g. it has a row for each scenario and env_obj by aggregation function, and the aggregation functions are factorial- both the aggregations at step 1 are subsequently aggregated at each of the following steps.
+
+```{r}
+length(unique(multispatb$mdb$scenario)) *
+  length(unique(multispatb$mdb$aggfun_1)) *
+  length(unique(multispatb$mdb$aggfun_2)) *
+  length(unique(multispatb$mdb$aggfun_3)) *
+  length(unique(multispatb$mdb$env_obj))
+
+nrow(multispatb$mdb)
+```
+
+Now we can more easily analyse the output, but it's bigger. The three spatial levels plus the input can all be mapped. We'll cut it down to a single env_obj for clarity and use the comparer standard plots, with a common set of limits. We have to choose one of the aggfun_1 values.
+
+```{r}
+l1 <- multispatb$simpleclean %>%
+  filter(grepl("^NF1", env_obj)) %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = "basin",
+    setLimits = c(0, 1)
+  )
+
+l2 <- multispatb$sdl_units %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = "basin",
+    setLimits = c(0, 1)
+  )
+
+l3 <- multispatb$catchment %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = "basin",
+    setLimits = c(0, 1)
+  )
+
+l4 <- multispatb$mdb %>%
+  filter(grepl("^NF1", env_obj) &
+    aggfun_1 == "ArithmeticMean") %>%
+  plot_outcomes(
+    y_col = "ewr_achieved",
+    x_col = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    scene_pal = scene_pal,
+    sceneorder = c("down2", "base", "up2"),
+    underlay_list = "basin",
+    setLimits = c(0, 1)
+  )
+```
+
+```{r}
+#| label: fig-allsteps
+#| fig-cap: Each step in spatial aggregation from gauge to SDL unit to catchment to basin, using arithmetic means of EWR achieved
+l1 / l2 / l3 / l4 + plot_layout(guides = "collect")
+```
+
+## Using `multi_aggregate` for one aggregation
+
+If we're only using one level of spatial aggregation and nothing else, there's typically no need for the `multi_aggregate` wrapper. That wrapper does work even for single steps though, and becomes almost essential for multi-step. We do have a bit less flexibility with how we specify arguments- `aggsequence` and `funsequence` need to be lists or characters (`funsequence` cannot be bare function names). Perhaps the biggest issue is that `tidyselect` in aggCols runs into issues because it gets used again inside `multi_aggregate`, and so `tidyselect` in the outer call collides with that. That could all be sorted out, but seems low priority- easier to just enforce characters for `aggCols` and lists or characters for the sequences.
+
+Typically we could use `namehistory = FALSE` to avoid the horrible long name with all the transforms in it, but there's no way for it to know the previous aggregation history when it's been done in pieces (as we say in the example above where I dangerously adjusted the name of `simpleThemeAgg` to make `multispatb`. A parsing function could handle this, but it's better to just do it all on one go anyway so this is low priority.
+
+As a quick example, here is a single-step spatial aggregation using `multi_aggregate`, not that we have slightly more restrictive specifications for `groupers`, `aggCols`, `aggsequence` and `funsequence`.
+
+```{r}
+#| message: false
+
+obj2polyM1 <- multi_aggregate(simpleThemeAgg,
+  causal_edges = themeedges,
+  groupers = c("scenario", "env_obj"),
+  aggCols = "ewr_achieved",
+  aggsequence = list(sdl_units = sdl_units),
+  funsequence = list(list(am = ~ ArithmeticMean(.))),
+  keepAllPolys = TRUE
+)
+
+obj2polyM1
+```
