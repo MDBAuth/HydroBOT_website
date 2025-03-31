@@ -97,6 +97,23 @@ Rebuilding data across the notebooks is done with params to avoid overwriting da
 
 The only documents with `REBUILD_DATA: TRUE` by default are the `provided_data/scenario_creation.qmd` notebook and the `workflows/workflow_save_steps.qmd`, to avoid having multiple notebooks rebuild the same data when we render the site. Because `quarto render` runs in alphabetical order, it is usually best to run those two files first manually so the data exists for all downstream uses.
 
+Many notebooks have an initial block with this (sometimes without `make_ewr_output()`) to build clean data,
+
+``` r
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+make_ewr_output()
+```
+
+and this to tear that down. That way they don't contaminate each other.
+
+``` r
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```
+
 ## Building website
 
 The `quarto.yml` project structure is set up to [build a website](https://quarto.org/docs/publishing/github-pages.html) using the `gh-pages` branch. The branch exists already, so publishing happens with `quarto publish gh-pages --no-browser` (because the site is private). Once public, `quarto publish gh-pages` should work.

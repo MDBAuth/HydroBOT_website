@@ -12,7 +12,8 @@ editor: visual
 #| include: false
 source("R/helpers.R")
 make_hydro_csv()
-make_ewr_output()
+# This isn't needed, we just do everything in-memory
+# make_ewr_output()
 ```
 
 ```{r}
@@ -23,9 +24,9 @@ library(ggplot2)
 library(patchwork)
 ```
 
-Aggregating data to larger spatial scales is a key requirement of the aggregator component of HydroBOT. To do this, we need to specify the larger units into which input data (typically in smaller spatial units) gets aggregated and the functions to use to do that aggregation. This aggregation needs to respect grouping, most obviously for scenarios, but we also need to keep theme groupings separated during spatial aggregation steps to ensure dimensional safety. Moroever, there is the [special case of *nonspatial* aggregation of spatial data](pseudo_spatial_group_until.qmd) where units at one scale may be relevant to other units they are not geographically related to (e.g. gauges providing information for distant SDL units). Finally, the spatial aggregator enforces recording of the aggregations to ensure the meaning of the data isn't lost. This results in column names like `spatial_ArithmeticMean_ewr_achieved`, which are cumbersome but can be dealt with more cleanly in `multi_aggregate` and with `agg_names_to_cols()`.
+Aggregating data to larger spatial scales is a key requirement of the aggregator component of HydroBOT. To do this spatially, we need to specify the larger units into which input data (typically in smaller spatial units) gets aggregated and the functions to use to do that aggregation. This aggregation needs to respect grouping, most obviously for scenarios, but we also need to keep theme groupings separated during spatial aggregation steps to ensure dimensional safety. Moroever, there is the [special case of *nonspatial* aggregation of spatial data](pseudo_spatial_group_until.qmd) where units at one scale may be relevant to other units they are not geographically related to (e.g. gauges providing information for distant SDL units). Finally, the spatial aggregator enforces recording of the aggregations to ensure the meaning of the data isn't lost. This results in column names like `spatial_ArithmeticMean_ewr_achieved`, which are cumbersome but ensure the data provenance is not lost. They can be dealt with more cleanly in `multi_aggregate` and with `agg_names_to_cols()`, which turn them into columns.
 
-Here, we explore the spatial aggregator, `spatial_aggregate`, in isolation to discuss its specific characteristics, though in practice it is typically used within `multi_aggregate` and `read_and_agg` which wrap `spatial_aggregate`, `temporal_aggregate`, and `theme_aggregate` to allow interleaved aggregation steps in a standardised format.
+Here, we explore the spatial aggregator, `spatial_aggregate`, in isolation to discuss its specific characteristics, though in practice it is typically used within `multi_aggregate` and `read_and_agg` which wrap `spatial_aggregate`, `temporal_aggregate`, and `theme_aggregate` to allow interleaved aggregation steps in a standardised format. See the [page for multi_aggregate](theme_space_agg.qmd) and [read_and_agg](read_and_agg.qmd) for more details.
 
 We often will want to only perform a single spatial aggregation (e.g. from gauges to sdl units), but there are instances where that isn't true- perhaps we want to aggregate from sdl units to states or the basin. Thus, multi-step spatial aggregation is possible, including the situation where aggregation units (polygons) are not nested, as would be the case for sdl units and states, for example.
 
@@ -60,7 +61,7 @@ ewr_out <- prep_run_save_ewrs(
 
 
 # This is just a simple prep step that is usually done internally to put the geographic coordinates on input data
-sumdat <- prep_ewr_agg(ewr_out, type = "achievement", 
+ewrdata <- prep_ewr_agg(ewr_out, type = "achievement", 
                        geopath = bom_basin_gauges)
 
 # This gets us to env_obj at the gauge over all time
@@ -71,14 +72,14 @@ preseq <- list(
   )
 
 funseq <- list(
-  'ArithmeticMean',
-  "CompensatingFactor",
-  "ArithmeticMean"
+  all_time = 'ArithmeticMean',
+  ewr_code = "CompensatingFactor",
+  env_obj = "ArithmeticMean"
 )
 
 # Do the aggregation to get env_obj at each gauge
 simpleThemeAgg <- multi_aggregate(
-  dat = sumdat,
+  dat = ewrdata,
   causal_edges = causal_ewr,
   groupers = c("scenario", "gauge"),
   aggCols = "ewr_achieved",
@@ -93,7 +94,7 @@ This provides a spatially-referenced (to gauge) theme-aggregated tibble to use t
 
 ## Spatial inputs (polygons)
 
-Spatial aggregation requires polygons to aggregate into, and we want the capability to do that several times. The user can read in any desired polygons with `sf::read_sf(path/to/polygon.shp)`, but here we use those provided in the standard set with {HydroBOT}. We'll use SDL units, catchments (from cewo), and the basin to show how the aggregation can have multiple steps with polygons that may not be nested (though care should be taken when that is the case).
+Spatial aggregation requires polygons to aggregate into, and we want the capability to do that several times. The user can read in any desired polygons with `sf::read_sf(path/to/polygon.shp)`, but here we use those provided in the standard set with {HydroBOT}. We'll use SDL units, catchments (from CEWO), and the basin to show how the aggregation can have multiple steps with polygons that may not be nested (though care should be taken when that is the case).
 
 # Examples
 
@@ -101,7 +102,7 @@ We'll now use that input data to demonstrate how to do the spatial aggregation, 
 
 ## Single aggregation
 
-We might just want to aggregate spatially once. We can do this simply by passing the input data (anything spatial, in this case `simpleThemeAgg`), a set of polygons, and providing a length-one `funlist`. In this simple case, we just use a bare function name, here the custom `ArithmeticMean` which is just a simple wrapper of `mean` with `na.rm = TRUE`. Any function can be passed this way, custom or in-built, provided it has a single argument. More complex situations are given below, and [different syntax is possible](aggregation_syntax.qmd).
+We might just want to aggregate spatially once. We can do this simply by passing the input data (anything spatial, in this case `simpleThemeAgg`), a set of polygons, and providing a `funlist`. In this simple case, we just use a bare function name, here the custom `ArithmeticMean` which is just a simple wrapper of `mean` with `na.rm = TRUE`. Any function can be passed this way, custom or in-built, provided it has a single argument. More complex situations are given below, and [different syntax is possible](aggregation_syntax.qmd).
 
 ::: callout-note
 The `funlist` argument here specifies the function(s) to use *at a single step*. It is thus not the same as the `funsequence` list of `multi_aggregate()`; instead being a single item in that list, though it may include multiple functions (e.g. the mean and max).
@@ -155,6 +156,7 @@ obj2poly_rename <- agg_names_to_cols(obj2poly,
                               aggsequence = c(names(preseq), 'sdl_units'), 
                               funsequence = c(funseq, 'ArithmeticMean'), 
                               aggCols = 'ewr_achieved')
+obj2poly_rename
 ```
 
 A quick plot shows the outcome. Because we have used the default `keepAllPolys = FALSE`, only the sdl units with data are here. See @sec-poly-retention for retaining them. For more plotting details, see the [plotting section](/comparer/comparer_overview.qmd). We'll simplify the names and choose a subset of the environmental objectives.
@@ -169,9 +171,59 @@ obj2poly_rename %>%
     colorgroups = NULL,
     colorset = "ewr_achieved",
     pal_list = list("scico::berlin"),
+    pal_direction = -1,
     facet_col = "env_obj",
     facet_row = "scenario",
     sceneorder = c("down4", "base", "up4")
+  )
+```
+
+## Multiple aggregations at a step
+
+If we give `funlist` more than one aggregation function, it calculates both. Here, we use the mean and median.
+
+```{r}
+
+medna <- function(x) {
+  median(x, na.rm = TRUE)
+}
+
+
+obj2poly_2 <- spatial_aggregate(
+  dat = simpleThemeAgg,
+  to_geo = sdl_units,
+  groupers = c("scenario", "env_obj"),
+  aggCols = ends_with("ewr_achieved"),
+  funlist = c('ArithmeticMean', 'medna'),
+  prefix = 'sdl_units_'
+)
+
+# we need a full sequence
+funseq2 <- funseq
+funseq2$sdl_units = list('ArithmeticMean', 'medna')
+
+obj2poly_2 <- agg_names_to_cols(obj2poly_2, 
+                              aggsequence = c(names(preseq), 'sdl_units'), 
+                              funsequence = funseq2, 
+                              aggCols = 'ewr_achieved')
+
+```
+
+And now we can compare what we get out of the different functions (just for the baseline scenario or we run out of dimensions).
+
+```{r}
+obj2poly_2 %>%
+  filter(scenario == 'base') |> 
+  filter(grepl("^EF[1-3]", env_obj)) %>%
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "env_obj",
+    facet_row = "aggfun_4"
   )
 ```
 
@@ -212,6 +264,7 @@ simplepolypoly |>
     colorgroups = NULL,
     colorset = "ewr_achieved",
     pal_list = list("scico::berlin"),
+    pal_direction = -1,
     facet_col = "env_obj",
     facet_row = "scenario",
     sceneorder = c("down4", "base", "up4")
@@ -327,6 +380,7 @@ nestedpolypoly |>
     colorgroups = NULL,
     colorset = "ewr_achieved",
     pal_list = list("scico::berlin"),
+    pal_direction = -1,
     facet_col = "env_obj",
     facet_row = "scenario",
     sceneorder = c("down4", "base", "up4")
@@ -362,13 +416,14 @@ obj2poly_rename %>%
     colorgroups = NULL,
     colorset = "ewr_achieved",
     pal_list = list("scico::berlin"),
+    pal_direction = -1,
     facet_col = "env_obj",
     facet_row = "scenario",
     sceneorder = c("down4", "base", "up4")
   )
 ```
 
-Now we have retained polygons without data. The default is `keepAllPolys = FALSE`. Another option for plotting though would be to use `FALSE` as earlier, and include an underlay. For more detail, see the [plotting](/comparer/comparer_overveiw.qmd).
+Now we have retained polygons without data. The default is `keepAllPolys = FALSE`. Another option for plotting though would be to use `FALSE` as earlier, and include an underlay. For more detail, see the [plotting](/comparer/comparer_overview.qmd).
 
 ```{r}
 obj2poly_rename %>%
@@ -381,6 +436,7 @@ obj2poly_rename %>%
     colorgroups = NULL,
     colorset = "ewr_achieved",
     pal_list = list("scico::berlin"),
+    pal_direction = -1,
     underlay_list = list(underlay = 'sdl_units', pal_list = 'azure'),
     facet_col = "env_obj",
     facet_row = "scenario",

@@ -2,4 +2,224 @@
 title: "Temporal aggregation"
 ---
 
-Placeholder, see the space and value versions
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+# This isn't needed, we just do everything in-memory
+# make_ewr_output()
+```
+
+```{r}
+#| message: false
+
+library(HydroBOT)
+library(dplyr)
+```
+
+# Overview
+
+Aggregating outcomes along the time dimension is a key requirement of HydroBOT. For example, we might want to combine EWR pass/fails assessed annually to a summary over the full timeseries, or to decadal groups, or similar.
+
+The input data is thus the data coming out of the response modules (e.g. EWR tool), which is then aggregated. This data can be the immediate product of the response models or any subsequent aggregations (e.g. following spatial or temporal aggregations), provided it includes a column defining the temporal information for each row (i.e. a date or POSIX*t column). The demonstrations here are all about the EWR outputs, but the aggregator is agnostic to the input data, provided the rows have temporal information.
+
+Here, we look specifically at how time-aggregation works at a single step, for its use in a sequence of aggregations along other dimensions, see [multi_aggregate](theme_space_agg.qmd) and [read_and_agg](read_and_agg.qmd).
+
+# Demonstration
+
+For this demonstration, we provide a set of paths to point to the input data, in this case the outputs from the EWR tool, created by [a controller notebook](/controller/controller_overview.qmd).
+
+```{r}
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, 'hydrographs')
+ewr_results <- file.path(project_dir, "module_output", "EWR")
+```
+
+## Data
+
+Input data to should be a dataframe (e.g. a dataframe of EWR outputs, `sf` object if they are spatial outcomes). If we want to pass a path instead of a dataframe (as we might for large runs), we would use `read_and_agg`, which wraps `multi_aggregate`, demonstrated in [its own notebook](read_and_agg.qmd). Thus, for the demonstration, we pull in the the EWR output produced from the HydroBOT-provided hydrographs (`system.file('extdata/testsmall/hydrographs', package = 'HydroBOT')`, which we have processed already here and are at the paths above.
+
+We'll pull in the data to use for demonstration so we can use `temporal_aggregate()` directly. If we want to feed a path instead of a dataframe, we would use `read_and_agg()`.
+
+The data comes in as a timeseries but at fine ecological detail and across several gauges. We will do a first-pass aggregation to Target groups and sdl units before the temporal aggregation for clarity.
+
+```{r}
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  outputType = list('none'),
+  returnType = list('yearly')
+)
+
+
+# This is just a simple prep step that is usually done internally to put the geographic coordinates on input data
+ewrdata <- prep_ewr_agg(ewr_out, type = "achievement", 
+                       geopath = bom_basin_gauges, add_max = FALSE)
+
+# This gets us to Target at the SDL unit every year
+preseq <- list(
+  env_obj = c("ewr_code_timing", "env_obj"),
+  sdl_units = sdl_units,
+  Target = c("env_obj", "Target")
+  )
+
+
+funseq <- list(
+  all_time = 'ArithmeticMean',
+  ewr_code = 'ArithmeticMean',
+  env_obj = 'ArithmeticMean'
+)
+
+# Do the aggregation to get output at each gauge averaged over time
+simpleAgg <- multi_aggregate(
+  dat = ewrdata,
+  causal_edges = causal_ewr,
+  groupers = c("scenario"),
+  auto_ewr_PU = TRUE,
+  aggCols = "ewr_achieved",
+  aggsequence = preseq,
+  funsequence = funseq
+)
+
+simpleAgg
+```
+
+And to confirm, that has retained years, though there are only 5 in the test data.
+
+```{r}
+unique(simpleAgg$date)
+```
+We can plot that data (for just one scenario) to better see what it looks like.
+
+```{r}
+
+
+simpleAgg |> 
+  agg_names_to_cols(aggsequence = names(preseq),
+                    funsequence = funseq,
+                    aggCols = 'ewr_achieved') |> 
+  filter(scenario == 'base') |> 
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_lab = "Arithmetic Mean",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "Target",
+    facet_row = "date"
+  )
+```
+
+# Examples
+
+Now, we can aggregate that in a few different ways to show how to operate along the time dimension. Because we are using `temporal_aggregate()` directly, the dimensional safety provided by `multi_aggregate()` is not present, and so we have to specify groupers. The `multi_aggregate()` function automatically handles this preservation, but `temporal_aggregate()` is more general, and does not make any assumptions about the grouping structure of the data. Thus, to keep the Target and SDL groupings (as we should, otherwise we're inadvertently aggregating over all of them), we need to add them to the groupers argument.
+
+::: callout-note
+The `funlist` argument here specifies the function(s) to use *at a single step*. It is thus not the same as the `funsequence` list of `multi_aggregate()`; instead being a single item in that list, though it may include multiple functions (e.g. the mean and max).
+:::
+
+## Collapse the full timeseries
+
+We often just want to simply get some summary over the full timeseries. It uses the special value `'all_time'` in `breaks` for simplicity, though specifying the start and end works as well. Think carefully though, it very well make more sense to weight this by recency or similar.
+
+```{r}
+full_period <- temporal_aggregate(simpleAgg, 
+                                  breaks = 'all_time',
+                                  groupers = c('scenario', 'SWSDLName', 'Target'),
+                                  aggCols = 'ewr_achieved',
+                                  funlist = 'ArithmeticMean')
+```
+
+Now we only have one value and have lost the date column
+```{r}
+full_period |> 
+  agg_names_to_cols(aggsequence = c(names(preseq), 'all_time'),
+                    funsequence = c(funseq, list('ArithmeticMean')),
+                    aggCols = 'ewr_achieved') |> 
+  filter(scenario == 'base') |> 
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_lab = "Arithmetic Mean",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "Target"
+  )
+```
+## Specified breaks
+
+We may want to specify breaks, which we can do by feeding times at the breakpoints. Here, we demonstrate with two-year intervals since the period is short, but these might be e.g. decades (if long) or seasonal (if fine-scaled data).
+
+```{r}
+time_breaks <- c('2014-01-01', '2016-01-01', '2018-01-01', '2020-01-01')
+tg <- lubridate::ymd(time_breaks)
+
+two_years <- temporal_aggregate(simpleAgg, 
+                                  breaks = tg,
+                                  groupers = c('scenario', 'SWSDLName', 'Target'),
+                                  aggCols = 'ewr_achieved',
+                                  funlist = 'ArithmeticMean')
+```
+
+And the plot
+
+```{r}
+two_years |> 
+  agg_names_to_cols(aggsequence = c(names(preseq), 'all_time'),
+                    funsequence = c(funseq, list('ArithmeticMean')),
+                    aggCols = 'ewr_achieved') |> 
+  filter(scenario == 'base') |> 
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_lab = "Arithmetic Mean",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "Target",
+    facet_row = 'date'
+  )
+```
+## Interval specifications
+
+The `temporal_aggregate()` function relies on `base::cut.POSIXt()` internally, and so can use the break specifications allowed there, where characters can be used to define lengths and units of the intervals. See `?base::cut.POSIXt` for more information. This can be very useful for sub-yearly aggregations (e.g. '2 months', 'quarter', etc), or with long timeseries allowing the use of things like '10 years'. Here we demonstrate with 3 years due to the short demonstration timeseries.
+
+```{r}
+three_years_cut <- temporal_aggregate(simpleAgg, 
+                                  breaks = '3 years',
+                                  groupers = c('scenario', 'SWSDLName', 'Target'),
+                                  aggCols = 'ewr_achieved',
+                                  funlist = 'ArithmeticMean')
+```
+
+And the plot
+
+```{r}
+three_years_cut |> 
+  agg_names_to_cols(aggsequence = c(names(preseq), 'all_time'),
+                    funsequence = c(funseq, list('ArithmeticMean')),
+                    aggCols = 'ewr_achieved') |> 
+  filter(scenario == 'base') |> 
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_lab = "Arithmetic Mean",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "Target",
+    facet_row = 'date'
+  )
+```
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```
+

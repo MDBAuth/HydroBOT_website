@@ -6,6 +6,207 @@ Placeholder
 
 This needs to get into what read and agg does that multi_aggregate doesn't. See [the interleaved example](theme_space_agg.qmd) for more detailed discussion of the stepwise interleaved aggregation itself.
 
+## Simple inputs and saving
+
+In practice, we often won't call `multi_aggregate` directly, but will use `read_and_agg` to run `multi_aggregate`, since it automates data read-in and processing and saving. To do the same analysis as above but using `read_and_agg`, we give it the path to the data instead of the data itself. Note also that the `geopath` and `causalpath` arguments can be objects or paths; we use objects here because they are provided with the {HydroBOT} package. We use `returnList` to return the output to the active session, and `savepath` to save an .rds file to `out_path` (but only if we're rebuilding data). The `aggsequence` here can use character specification for the spatial units, since this wraps `multi_aggregate`.
+
+The `read_and_agg` function also saves metadata files (yaml and json) that allows replication of this step with `run_hydrobot_params`. These files build on earlier steps if possible, including any available metadata from the modules.
+
+*Note*- to `readRDS` `sf` objects produced here, we need to have `sf` loaded in the reading script.
+
+```{r}
+#| lst-label: lst-save-out
+#| lst-cap: Path inputs and saving outputs with run_and_agg
+#| message: false
+if (params$REBUILD_DATA) {
+  savep <- file.path(out_path)
+} else {
+  savep <- NULL
+}
+
+ts_from_raa <- read_and_agg(
+  datpath = ewr_results,
+  type = "summary",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = c("scenario"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  namehistory = FALSE,
+  saveintermediate = TRUE,
+  returnList = TRUE,
+  savepath = savep
+)
+```
+
+We can see that that produces the same list as `tsagg`
+
+```{r}
+names(tsagg)
+names(ts_from_raa)
+```
+
+## Parallelization
+
+The [theme notebook](theme_agg.qmd), demonstrates potential parallelisation over gauges and scenarios from read-in onwards, which will likely be very useful once we're dealing with real scenarios. Once spatial aggregation occurs, parallelisation over gauges doesn't work, since their outcomes need to be aggregated together. That means in general, we are likely to run parallelisation over just scenarios, although there is certainly scope for clever chunking to allow parallelisation over space and time as well if that becomes necessary.
+
+::: {#par-combine-list style="border: 2px solid gray; color: gray"}
+Note: if we want to `saveintermediate = TRUE`, which we often do, we can't `.combine = bind_rows`, but would need to save a list of lists and then `bind_rows` at each list-level post-hoc with `purrr`. I have not established that as a function yet, but it is high priority as we settle on data formats and batching workflows.
+:::
+
+```{r}
+#| message: false
+#| warning: false
+
+library(foreach)
+library(doFuture)
+
+registerDoFuture()
+plan(multisession)
+# plan(sequential) # debug
+
+# get these from elsewhere, the whole point is to not read everything in. Should be able to extract from the paths (or the scenario metadata - better)
+allscenes <- list.files(ewr_results, recursive = TRUE) %>%
+  dirname() %>%
+  dirname() %>%
+  unique()
+
+# I think no longer needed now we have a package
+# passfuns <- unique(unlist(funseq))
+# passfuns <- unlist(passfuns[purrr::map_lgl(passfuns, is.character)])
+
+parAgg <- foreach(
+  s = allscenes,
+  .combine = dplyr::bind_rows
+) %dopar% {
+  read_and_agg(
+    datpath = ewr_results, type = "summary",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = c("scenario"),
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq,
+    funsequence = funseq,
+    namehistory = TRUE,
+    saveintermediate = FALSE,
+    scenariofilter = s
+  )
+}
+
+parAgg
+```
+
+That output is the same as `tsagg`, but now it's been read-in and processed in parallel over scenarios. As in the [theme situation](theme_agg.qmd), this toy example is slower, but should yield large speedups for larger jobs.
+
+Where do we want the outputs to go? The `multi_aggregate` function we focus on here takes R objects as inputs and returns a dataframe or a list back to the session. But in practice, we will wrap that with `read_and_agg`, which takes paths as inputs and can both return R objects to the session `returnList = TRUE` and save to a file if `savepath = "path/to/outfile"` . The `aggregator_output` directory is not broken into module subdirectories, since it is possible we will want to aggregate across modules at the highest levels.
+
+```{r}
+out_path <- file.path(project_dir, "aggregator_output")
+```
+
+### 
+
 The input and output data differ depending on how far up the wrapper sequence we are. The most common interface, `read_and_agg()` that takes paths as arguments and does the read-in of the data internally, runs `multi_aggregate`, and handles saving of both outputs and metadata. The `multi_aggregate` function expects the incoming data to be in memory. Outputs from `multi_aggregate` are R objects- a dataframe or a list- and are returned back to the calling environment. The `read_and_agg` wrapper, however, can both return R objects to the session `returnList = TRUE` and save to a file if `savepath = "path/to/outfile"` .
 
 Need to say somethign about EWR assessment here.
+
+## Gauge and scenario -filtering
+
+THIS IS OLD, update
+
+Reading in all of the EWR results across all gauges and scenarios could be massive, depending on the spatial scale and the number of scenarios, and so we might want to parallelise over gauges or scenarios. We also might only be interested in some subset for things like plotting. To address this, `get_ewr_output` has `gaugefilter` and `scenariofilter` arguments. This will is particularly useful once we have lots of data that doesn't fit in memory or want to parallel process - if we have *all* the data in memory already, we can just pipe it in through a filter (or filter the first argument), but if we read in in parallel from a path, we can greatly speed up processing.
+
+To only read-in the relevant data, we use the `read_and_agg` wrapper. The `gaugefilter` argument only works (currently) if there are separate files for each gauge. Once we settle on a data format, I will re-write the gaugefilter differently to only read the desired gauge from the file, though that won't be possible with interleaved spatial aggregation.
+
+```{r}
+#| message: false
+
+smallreadagg <- read_and_agg(
+  datpath = ewr_results, type = "summary",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = c("scenario", "gauge"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  namehistory = FALSE,
+  gaugefilter = NULL,
+  scenariofilter = "base"
+)
+
+table(smallreadagg$gauge, smallreadagg$scenario)
+```
+
+For a one-off that fits in memory, this is slower than filtering the data after it's in-memory, since the read-in happens first. The advantage comes when we don't want (or can't fit) all of the original data in memory, such as parallelisation over scenarios.
+
+The `read_and_agg` function is also helpful if we just want to use paths as arguments instead of reading the data in and then calling `multi_aggregate`. In that case, we might not use any `*filter` arguments, in which case it works just like `multi_aggregate`, but takes paths instead of objects as arguments. For example, saving all intermediate and no filtering can be done with the path to data `ewr_results`.
+
+```{r}
+#| message: false
+readallsteps <- read_and_agg(
+  datpath = ewr_results, type = "summary",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = c("scenario", "gauge"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
+
+names(readallsteps)
+```
+
+### Parallelisation
+
+OLD NEEDS COMPLETE OVERHAUL
+
+The gauge and scenario filtering gives an easy way to parallelise. I haven't written this into a function yet until we settle on how to use Azure batching. It will likely involve a wrapper around `read_and_agg`, but could be incorporated as parameters fed to `read_and_agg` itself. We demo how it works here. Parallelisation will not only speed up the processing, but because we can do the data reads inside the function, parallelisation over scenarios (and gauges, if not spatially-aggregating) avoids reading all the data in at once and so reduces unnecessary memory use.
+
+For this demonstration, we are getting the gauge and scenario lists from previously-read data, but in typical use they would be available from scenario metadata.
+
+::: {#future-export .border: .2px .solid .gray; .color: .gray} Note: `future` is supposed to handle the `.export` from the calling environment, and seems to do just fine with everything except the aggregation functions. That can happen with nested `foreach` inside functions, but I think here it might be happening because of the way we're using `{{}}` to pass an arbitrary set of functions. Easy enough to fix, by passing something to `.export`, but annoying. If we end up not using {future} for parallelisation on Azure, this will be moot. :::
+
+The example below performs the same processing as above to produce output identical to `simpleThemeAgg`, but done in parallel. This is slower for this small simple demonstration because of overhead, but has the potential to be much faster for larger jobs.
+
+We're not parallelizing over gauges here because we're unlikely to be able to do so with interleaved aggregation steps, but a nested loop would work if we are only aggregating in time or theme dimensions.
+
+```{r}
+#| message: false
+#| warning: false
+library(foreach)
+library(doFuture)
+registerDoFuture()
+plan(multisession)
+
+allgauges <- "all" # unique(simpleThemeAgg$gauge)
+allscenes <- unique(simpleThemeAgg$scenario)
+
+parThemeAgg <- foreach(
+  s = allscenes,
+  .combine = dplyr::bind_rows
+) %dopar% {
+  # If parallel over gauges
+  # foreach(g = allgauges,
+  #         .combine = dplyr::bind_rows) %dopar% {
+
+  read_and_agg(
+    datpath = ewr_results, type = "summary",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = c("scenario", "gauge"),
+    aggCols = "ewr_achieved",
+    aggsequence = aggseq,
+    funsequence = funseq,
+    namehistory = TRUE,
+    gaugefilter = NULL,
+    scenariofilter = s
+  )
+}
+
+parThemeAgg
+```
+
+If we're doing something here that is too big to return the full output (likely in practice), it would also be straightforward for the parallel loop to save the iterations and not return anything. Then we could read the output in in pieces into the comparer.

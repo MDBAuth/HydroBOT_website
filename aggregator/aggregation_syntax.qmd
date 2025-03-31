@@ -1,5 +1,5 @@
 ---
-title: "Grouping and function syntax"
+title: "Aggregation functions and grouping"
 author: "Galen Holt"
 format:
   html:
@@ -18,12 +18,9 @@ make_hydro_csv()
 library(HydroBOT)
 ```
 
-The aggregation functions have flexible syntax in some of their arguments, particularly for selecting grouping columns, the column(s) of values to aggregate, specification of aggregation functions, and the specification of spatial and temporal aggregation units. In general, these apply across the functions, though `multi_aggregate` has a bit less flexibility than the internal `spatial_aggregate`, `theme_aggregate`, `temporal_aggregate`, and `general_aggregate`, largely as a consequence of passing through the call stack. Here, we use primarily the example of `spatial_aggregate` to illustrate the different arguments, their syntax, and why we might use the different options.
-
-First, create test data as in the [spatial notebook](spatial_agg.qmd). This does some simple pre-aggregation in time and value dimensions to yield something easier to visualise.
+To prepare, we generate some EWR outputs to use as example data.
 
 ```{r}
-#| warning: false
 project_dir <- 'hydrobot_scenarios'
 hydro_dir <- file.path(project_dir, 'hydrographs')
 ewr_results <- file.path(project_dir, "module_output", "EWR")
@@ -39,6 +36,85 @@ ewr_out <- prep_run_save_ewrs(
 # This is just a simple prep step that is usually done internally to put the geographic coordinates on input data
 sumdat <- prep_ewr_agg(ewr_out, type = "achievement", 
                        geopath = bom_basin_gauges)
+```
+
+# User-set functions
+
+We have established a simple set of default aggregation functions (`ArithmeticMean()`, `GeometricMean()`, `LimitingFactor()`, `CompensatingFactor()`, and `SpatialWeightedMean()`), available in `default_agg_functions.R`. It is also possible to supply user-defined functions to include in `funsequence`. We can do this by specifying a new function and including it in the list given to `funsequence`. Some different syntax is provided below in @sec-funsyntax, but the best way is shown here, involving defining a function or functions and using it just as we would built-ins.
+
+We demonstrate here with a threshold function and a median. For example, we might want to know the mean of all values greater than 0 for some stages and use the median at others.
+
+```{r}
+mean_given_occurred <- function(x) {
+  mean(ifelse(x > 0, x, NA), na.rm = TRUE)
+}
+
+medna <- function(x) {
+  median(x, na.rm = TRUE)
+}
+
+aggseq <- list(
+  all_time = 'all_time',
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Target = c("env_obj", "Target")
+  )
+
+
+funseq <- list(
+  all_time = 'ArithmeticMean',
+  ewr_code = 'ArithmeticMean',
+  env_obj = 'mean_given_occurred',
+  sdl_units = 'medna',
+  Target = 'mean_given_occurred'
+)
+```
+
+Those changes are then reflected in the aggregation history and determine the aggregated values.
+
+```{r}
+#| message: false
+#| warning: false
+agged_custom_funs <- multi_aggregate(
+  dat = sumdat,
+  causal_edges = causal_ewr,
+  groupers = c("scenario"),
+  aggCols = "ewr_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  namehistory = FALSE
+)
+
+agged_custom_funs |> dplyr::filter(scenario != 'MAX')
+```
+
+We can plot them to double check it worked.
+
+```{r}
+agged_custom_funs |> 
+  dplyr::filter(scenario != 'MAX')  |>  
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_lab = "Arithmetic Mean",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "Target",
+    facet_row = "scenario",
+    sceneorder = c("down4", "base", "up4")
+)
+```
+
+# Nonstandard syntax
+
+The aggregation functions have flexible syntax in some of their arguments, particularly for selecting grouping columns, the column(s) of values to aggregate, specification of aggregation functions, and the specification of spatial and temporal aggregation units. In general, these apply across the functions, though `multi_aggregate` has a bit less flexibility than the internal `spatial_aggregate`, `theme_aggregate`, `temporal_aggregate`, and `general_aggregate`, largely as a consequence of passing through the call stack. Here, we use primarily the example of `spatial_aggregate` to illustrate the different arguments, their syntax, and why we might use the different options.
+
+First, create test data as in the [spatial notebook](spatial_agg.qmd). This does some simple pre-aggregation in time and value dimensions to yield something easier to visualise.
+
+```{r}
+#| warning: false
 
 # This gets us to env_obj at the gauge over all time
 preseq <- list(
@@ -121,7 +197,7 @@ obj2polyF <- spatial_aggregate(
 obj2polyF
 ```
 
-## Functions
+## Function specifications {#sec-funsyntax}
 
 We can pass single bare aggregation function names, characters, or named lists defining functions with arguments (though this is fragile). We can also pass multiple functions to apply; for example we might want to calculate the mean, max, and min all at the same time.
 
@@ -324,3 +400,7 @@ If using this method, the safest is to define the function, and then pass it to 
 :::
 
 In summary, we can pass single functions and their arguments in ellipses, complex lists of multiple functions using tilde-style anonymous functions, which can have vector arguments (as long as the vector is attached to the data), and lists of multiple function names. In general, the most robust method is to pre-define functions and pass them as character names.
+
+## Spatial information
+
+Spatial aggregation steps are specified with an `sf` object (polygons) or the name of the sf object, e.g. `sdl_units` or `"sdl_units"`. Allowing specification of spatial steps by character instead of object is a bit more fragile because it relies on `get("name_of_object")`, but allows the list to be wholly specified with characters. This both saves memory (potentially massively), and makes yaml parameter files (both input and output) *much* cleaner.
