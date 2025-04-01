@@ -81,7 +81,7 @@ Fundamentally, the aggregator needs paths and two lists
 
 -   sequence of aggregation functions (can be multiple per step)
 
-Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/theme_space_agg.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps can be specified a range of different ways, see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
+Here, I'm using an interleaved list of theme and spatial aggregations (see [the detailed docs](../aggregator/using_multi_aggregate.qmd) for more explanation), and applying only a single aggregation function at each step for simplicity. Those steps can be specified a range of different ways, see the [spatial](../aggregator/spatial_agg.qmd) and [theme](../aggregator/theme_agg.qmd) docs for more examples.
 
 ```{r}
 aggseq <- list(
@@ -148,7 +148,7 @@ aggout <- read_and_agg(
 
 # Quick check
 
-Plotting is considered in detail in the \[comparer\](../comparer/comparer_overview(), this is just a quick check to see that there is data. Code borrowed from [theme x space demo](../aggregator/theme_space_agg.qmd).
+Plotting is considered in detail in the \[comparer\](../comparer/comparer_overview(), this is just a quick check to see that there is data. Code borrowed from [theme x space demo](../aggregator/using_multi_aggregate.qmd).
 
 But only if we returned the output- since the chunks above are not run, we skip this as well.
 

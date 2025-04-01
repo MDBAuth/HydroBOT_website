@@ -67,12 +67,12 @@ aggout <- read_and_agg(
   causalpath = causal_ewr,
   groupers = "scenario",
   aggCols = "ewr_achieved",
-      group_until = list(
-      SWSDLName = 3,
-      planning_unit_name = 'sdl_units',
-      gauge = is_notpoint
-    ),
-    pseudo_spatial = "sdl_units",
+  group_until = list(
+    SWSDLName = 3,
+    planning_unit_name = 'sdl_units',
+    gauge = is_notpoint
+  ),
+  pseudo_spatial = "sdl_units",
   aggsequence = aggseq,
   funsequence = funseq,
   saveintermediate = TRUE,

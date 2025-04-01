@@ -79,7 +79,7 @@ Each of the components are discussed in more detail, with this detail used to mo
 
 -   [Aggregator](aggregator/aggregation_overview.qmd)
 
-    -   [Theme and Space](aggregator/theme_space_agg.qmd)
+    -   [Theme and Space](aggregator/using_multi_aggregate.qmd)
 
     -   [Theme alone with more options and plot examples](aggregator/theme_agg.qmd)
 

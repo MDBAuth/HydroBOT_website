@@ -38,7 +38,7 @@ The {HydroBOT} package also provides all necessary aggregation functions and han
 
 We begin this demonstration with `theme_aggregate()` itself. Because of the centrality of the causal network, and so multiple dependent levels of theme aggregation, we then move on to examples of multi-step theme aggregation using `multi_aggregate()`.
 
-In practice, we expect to interleave spatial, temporal, and thematic aggregation steps- perhaps it makes sense to aggregate along the theme axis to the `env_obj` scale at a gauge, then scale to the SDL unit, then aggregate to the `Objective`, scale, and then scale to the basin and long-term targets. We demonstrate such [interleaved aggregation](theme_space_agg.qmd) elsewhere, and here focus on demonstrating and understanding the meaning of aggregation along the theme axis and how to do it. Similar notebooks for [spatial aggregation](spatial_agg.qmd) and [temporal aggregation](temporal_agg.qmd) go into the detail along the spatial and temporal dimension.
+In practice, we expect to interleave spatial, temporal, and thematic aggregation steps- perhaps it makes sense to aggregate along the theme axis to the `env_obj` scale at a gauge, then scale to the SDL unit, then aggregate to the `Objective`, scale, and then scale to the basin and long-term targets. We demonstrate such [interleaved aggregation](using_multi_aggregate.qmd) elsewhere, and here focus on demonstrating and understanding the meaning of aggregation along the theme axis and how to do it. Similar notebooks for [spatial aggregation](spatial_agg.qmd) and [temporal aggregation](temporal_agg.qmd) go into the detail along the spatial and temporal dimension.
 
 # Demonstration
 
@@ -241,7 +241,6 @@ timing_obj_2 |>
 In general, `multi_aggregate()` can be used across theme, space, and temporal dimensions. But here, it is particularly helpful to allow multi-step aggregation along the theme dimension given the importance of the causal network for theme aggregation. To do that, we use the aggregations above with `savehistory = TRUE` and `namehistory = FALSE`.
 
 To create the aggregation, we provide the sequence lists created above, along with the causal links, defined by the `causal_edges` argument. Because the `make_edges()` function also takes a sequence of node types, we can usually just call `make_edges()` on the list of relationships and the desired set of theme levels. We can also just pass in `causal_edges = causal_ewr` (the list with all possible links), and `theme_aggregate()` will auto-generate the edges it needs. That's just a bit less efficient (the edges get generated each step instead of once).
-
 
 ```{r}
 #| message: false

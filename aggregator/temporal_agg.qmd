@@ -23,7 +23,7 @@ Aggregating outcomes along the time dimension is a key requirement of HydroBOT. 
 
 The input data is thus the data coming out of the response modules (e.g. EWR tool), which is then aggregated. This data can be the immediate product of the response models or any subsequent aggregations (e.g. following spatial or temporal aggregations), provided it includes a column defining the temporal information for each row (i.e. a date or POSIX*t column). The demonstrations here are all about the EWR outputs, but the aggregator is agnostic to the input data, provided the rows have temporal information.
 
-Here, we look specifically at how time-aggregation works at a single step, for its use in a sequence of aggregations along other dimensions, see [multi_aggregate](theme_space_agg.qmd) and [read_and_agg](read_and_agg.qmd).
+Here, we look specifically at how time-aggregation works at a single step, for its use in a sequence of aggregations along other dimensions, see [multi_aggregate](using_multi_aggregate.qmd) and [read_and_agg](read_and_agg.qmd).
 
 # Demonstration
 

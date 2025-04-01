@@ -64,7 +64,7 @@ website:
               text: "Spatial aggregation capability"
             - href: aggregator/theme_agg.qmd
               text: "Theme aggregation capability"
-            - href: aggregator/theme_space_agg.qmd
+            - href: aggregator/using_multi_aggregate.qmd
               text: "Multi-axis interleaved aggregation"
 
 

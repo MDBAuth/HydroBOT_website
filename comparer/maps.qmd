@@ -64,7 +64,7 @@ scene_pal <- make_pal(unique(scenarios$scenario_name),
 
 ## Choosing example data
 
-First, we read in the aggregated data. There is example data provided by HydroBOT (`agged_data` and `agged_data_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/theme_space_agg.qmd).
+First, we read in the aggregated data. There is example data provided by HydroBOT (`agged_data` and `agged_data_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/using_multi_aggregate.qmd).
 
 *Note*- to `readRDS` `sf` objects, we need to have `sf` loaded.
 

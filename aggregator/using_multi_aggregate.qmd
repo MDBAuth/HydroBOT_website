@@ -1,5 +1,5 @@
 ---
-title: "Aggregate Theme Space"
+title: "Aggregating over multiple dimensions"
 author: "Galen Holt"
 format:
   html:
@@ -680,7 +680,7 @@ state_agg |>
 
 ## User-passed functions {#sec-manual-functions}
 
-See the [aggregation syntax](aggregation_syntax.qmd) for a full treatment of the way functions can be specified. The most stable and best practice for specifying aggregation functions is to specify them as a named function, and supply that to the `funsequence`. Copying what's at that page, 
+See the [aggregation syntax](aggregation_syntax.qmd) for a full treatment of the way functions can be specified. The most stable and best practice for specifying aggregation functions is to specify them as a named function, and supply that to the `funsequence`. Copying what's at that page,
 
 We demonstrate here with a threshold function and a median. For example, we might want to know the mean of all values greater than 0 for some stages and use the median at others.
 
@@ -759,6 +759,156 @@ The `groupers` and `aggCols` arguments can take a number of different formats- c
 If we're only using one level of aggregation and nothing else, there may not be need for the `multi_aggregate()` wrapper, though in a formal analysis the safety provided by `multi_aggregate()` and even `read_and_agg()` are likely worth it. These wrappers do work even for single steps though. We do have a bit less flexibility with how we specify arguments, see [syntax documentation](aggregation_syntax.qmd).
 
 Typically we could use `namehistory = FALSE` to avoid the horrible long name with all the transforms in it, but there's no way for it to know the previous aggregation history when it's been done in pieces (as we do in each of the [theme](theme_agg.qmd), [spatial](spatial_agg.qmd), and [temporal](temporal_agg.qmd) examples. As we do in those examples, it is possible to use `agg_names_to_cols()` with the full sequence including the earlier steps to extract them.
+
+## Using un-integrated response models
+
+In some cases, response models may not yet be integrated into HydroBOT, or may not be able to be integrated (e.g. if they are proprietary or unscriptable). In these cases, we can still use `multi_aggregate()` for processing with the Aggregator and then Comparer. All we need is a dataframe. For aggregation along the theme, space, and time dimensions, it needs to have information about those dimensions (i.e. a time column, a geometry column, and a column matching something in its relevant causal network). It will typically have a 'scenario' column as well.
+
+### Setting up non-module data and relationships
+
+To demonstrate, we will create some dummy data in the Australian states.
+
+We need some values in different years.
+
+```{r}
+  # add a date column
+  state_inputs <- austates |>
+    dplyr::mutate(date = lubridate::ymd('20000101'))
+
+  # add some values
+  withr::with_seed(17,
+                   state_inputs <- state_inputs |>
+                     dplyr::mutate(value = runif(nrow(state_inputs)))
+  )
+
+  withr::with_seed(17,
+                   # add some more days, each with different values
+                   state_inputs <- purrr::map(0:10,
+                                              \(x) dplyr::mutate(state_inputs,
+                                                                 date = date + x,
+                                                                 value = value * rnorm(nrow(state_inputs),
+                                                                                       mean = x, sd = x/2))) |>
+                     dplyr::bind_rows()
+                   )
+```
+
+We need some scenarios too.
+
+```{r}
+  # add a scenario column, each with different values
+  state_inputs <- purrr::imap(letters[1:4],
+                              \(x,y) dplyr::mutate(state_inputs,
+                                            scenario = x,
+                                            value = value + y)) |>
+    dplyr::bind_rows()
+```
+
+We need some dummy 'theme' groupings and a network.
+
+```{r}
+  # add a theme-relevant column, each with different values
+  state_inputs <- purrr::imap(c("E", "F", "G", "H", "I", "J"),
+                              \(x,y) dplyr::mutate(state_inputs,
+                                            theme1 = x,
+                                            value = value + y)) |>
+    dplyr::bind_rows()
+
+# make a simple 'causal' network
+  state_theme <- tibble::tibble(theme1 = c("E", "F", "G", "H", "I", "J"),
+                                theme2 = c("vowel", "consonant", "consonant",
+                                           "consonant", "vowel", "consonant")) |> 
+    list()
+```
+
+And finally, we will provide a larger spatial unit to aggregate into, all of Australia (though this loses the islands).
+
+```{r}
+all_aus <- rnaturalearth::ne_countries(country = 'australia') |> 
+  dplyr::select(geounit)
+```
+
+### Using the Aggregator
+
+First, we set up some aggregation steps. Will just use means throughout.
+
+```{r}
+# This will aggregate into weeks, then to type, and then to the country.
+  ausseq <- list(
+    week = 'week',
+    theme2 = c('theme1', 'theme2'),
+    all_aus = all_aus
+  )
+
+  # just use mean, since there are no NA in the data.
+  ausfuns <- list(
+    week = 'mean',
+    type = 'mean',
+    all_aus = 'mean'
+  )
+```
+
+Do the aggregation
+
+```{r}
+  # Do the aggregation
+  ausagg <-  multi_aggregate(
+    dat = state_inputs,
+    causal_edges = state_theme,
+    groupers = "scenario",
+    aggCols = "value",
+    aggsequence = ausseq,
+    funsequence = ausfuns,
+    namehistory = FALSE,
+    saveintermediate = TRUE
+  )
+```
+
+Quick plots of a couple levels
+
+```{r}
+ausagg$week |> 
+  filter(theme1 == 'E') |> 
+    plot_outcomes(
+    outcome_col = "value",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "value",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "scenario",
+    facet_row = "date"
+  )
+```
+
+```{r}
+ausagg$theme2 |> 
+  filter(date == lubridate::ymd("2000-01-03")) |> 
+    plot_outcomes(
+    outcome_col = "value",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "value",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "scenario",
+    facet_row = "theme2"
+  )
+```
+
+```{r}
+ausagg$all_aus |> 
+  filter(date == lubridate::ymd("2000-01-03")) |> 
+    plot_outcomes(
+    outcome_col = "value",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "value",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "scenario",
+    facet_row = "theme2"
+  )
+```
 
 ```{r}
 #| include: false
