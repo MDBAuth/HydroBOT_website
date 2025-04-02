@@ -71,7 +71,7 @@ As an example
 
 ```{r}
 variables <- tidyr::expand_grid(Env_var1 = seq(-1, 4, 0.25), Env_var2 = seq(-30, 10, 2))
-variables <- variables %>%
+variables <- variables |>
   dplyr::mutate(Metric = Env_var1^2 + Env_var2)
 ```
 

@@ -140,7 +140,7 @@ SDL unit differences across all environmental objectives
 
 ```{r}
 #| label: bar
-catchcompare <- aggout$env_obj %>%
+catchcompare <- aggout$env_obj |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     colorset = "SWSDLName",

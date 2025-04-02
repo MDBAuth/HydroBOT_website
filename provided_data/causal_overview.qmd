@@ -33,7 +33,7 @@ nodes <- make_nodes(edges)
 make_causal_plot(filter(nodes, NodeType != "target_5_year_2024"),
   edges,
   render = FALSE
-) %>%
+) |>
   DiagrammeR::render_graph()
 ```
 

@@ -249,8 +249,8 @@ There are many EWR codes, so just pick three haphazardly (LF1, BF1, and CF) and 
 ```{r}
 #| message: false
 allagg$ewr_code |>
-  dplyr::filter(ewr_code %in% c("LF1", "BF1", "CF")) %>%
-  dplyr::left_join(scenarios) %>%
+  dplyr::filter(ewr_code %in% c("LF1", "BF1", "CF")) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -281,8 +281,8 @@ Again choosing three of the first codes, we see this is still gauged.
 ```{r}
 #| message: false
 allagg$env_obj |>
-  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
-  dplyr::left_join(scenarios) %>%
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -313,8 +313,8 @@ Now we have aggregated the data above into sdl polygons.
 ```{r}
 #| message: false
 allagg$sdl_units |>
-  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
-  dplyr::left_join(scenarios) %>%
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -349,8 +349,8 @@ allagg$Specific_goal |>
     "All recorded fish species",
     "Spoonbills",
     "Decompsition"
-  )) %>%
-  dplyr::left_join(scenarios) %>%
+  )) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -385,8 +385,8 @@ allagg$Objective |>
     "No loss of native fish species",
     "Increase total waterbird abundance across all functional groups",
     "Support instream & floodplain productivity"
-  )) %>%
-  dplyr::left_join(scenarios) %>%
+  )) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -421,8 +421,8 @@ allagg$basin |>
     "No loss of native fish species",
     "Increase total waterbird abundance across all functional groups",
     "Support instream & floodplain productivity"
-  )) %>%
-  dplyr::left_join(scenarios) %>%
+  )) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -453,8 +453,8 @@ allagg$target_5_year_2024 |>
     "All known species detected annually",
     "Establish baseline data on the number and distribution of wetlands with breeding activity of flow-dependant frog species",
     "Rates of fall does not exceed the 5th percentile of modelled natural rates during regulated water deliveries"
-  )) %>%
-  dplyr::left_join(scenarios) %>%
+  )) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -783,8 +783,8 @@ We'll show that worked for just one sheet (the sdl units).
 
 ```{r}
 allagg_interevent$sdl_units |>
-  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
-  dplyr::left_join(scenarios) %>%
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "interevent_achieved",
     plot_type = "map",

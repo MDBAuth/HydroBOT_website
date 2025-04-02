@@ -114,7 +114,7 @@ That's clearly a bit much, even just for a single gauge. One thing we could do w
 make_causal_plot(filter(nodes, NodeType != "target_5_year_2024"),
   edges,
   render = FALSE
-) %>%
+) |>
   DiagrammeR::render_graph()
 ```
 
@@ -125,7 +125,7 @@ One thing we're fairly likely to want to do is ask about the connections that re
 ```{r}
 make_causal_plot(nodes, edges,
   focalnodes = c("NF4", "Sloanes froglet"), render = FALSE
-) %>%
+) |>
   DiagrammeR::render_graph()
 ```
 
@@ -144,8 +144,8 @@ Edges we want to be able to have colour in a column, as it would be if it came i
 As a demonstration, let's add a `value` column to `edges` as a mock-up of HydroBOT outputs and plot according to that. I'll also use a continuous palette here rather than the default, since this is now a continuous variable. I'll use a smaller network to make things visible. Note that above we removed the 5-year targets from the `nodes` df, and here we use `edges` since we're already modifying it. Either approach can drop a set of nodes, though it's generally easier to use the nodes since nodes can appear in either the `from` or `to` of the edges.
 
 ```{r}
-edgewithvals <- edges %>%
-  filter(totype != "target_5_year_2024") %>%
+edgewithvals <- edges |>
+  filter(totype != "target_5_year_2024") |>
   mutate(value = rnorm(n()))
 
 make_causal_plot(nodes,
@@ -153,7 +153,7 @@ make_causal_plot(nodes,
   focalnodes = c("NF4", "Sloanes froglet"),
   edge_pal = list(value = "viridis::plasma"),
   edge_colorset = "value", render = FALSE
-) %>%
+) |>
   DiagrammeR::render_graph()
 ```
 
@@ -162,8 +162,8 @@ make_causal_plot(nodes,
 We can also colour the nodes by results. Here I've also set the edges just to a single color - feeding `edge_pal` or `node_pal` a single character value specifying a colour or a character vector of length `nrow` of the relevant dataframe will just insert those values and bypass the palettes. Again, I start by dummying up some 'HydroBOT results' in a `value` column. Examples where these values do come out of EWR results is in the [theme aggregation notebook](../aggregator/theme_agg.qmd) and the [overview presentation](../presentation/walkthrough_presentation.qmd).
 
 ```{r}
-nodewithvals <- nodes %>%
-  filter(NodeType != "target_5_year_2024") %>%
+nodewithvals <- nodes |>
+  filter(NodeType != "target_5_year_2024") |>
   mutate(value = rnorm(n()))
 
 make_causal_plot(nodewithvals,
@@ -172,7 +172,7 @@ make_causal_plot(nodewithvals,
   edge_pal = "black",
   node_pal = list(value = "scico::oslo"),
   node_colorset = "value", render = FALSE
-) %>%
+) |>
   DiagrammeR::render_graph()
 ```
 
@@ -200,7 +200,7 @@ make_causal_plot(nodes, edges,
   node_pal = node_list_c,
   node_colorgroups = "NodeType",
   node_colorset = "Name", render = FALSE
-) %>%
+) |>
   DiagrammeR::render_graph()
 ```
 
@@ -228,7 +228,7 @@ make_causal_plot(nodes, edges,
   node_pal = node_list_g,
   node_colorgroups = "NodeType",
   node_colorset = "werp", render = FALSE
-) %>%
+) |>
   DiagrammeR::render_graph()
 ```
 

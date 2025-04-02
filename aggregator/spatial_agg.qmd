@@ -161,8 +161,8 @@ obj2poly_rename
 A quick plot shows the outcome. Because we have used the default `keepAllPolys = FALSE`, only the sdl units with data are here. See @sec-poly-retention for retaining them. For more plotting details, see the [plotting section](/comparer/comparer_overview.qmd). We'll simplify the names and choose a subset of the environmental objectives.
 
 ```{r}
-obj2poly_rename %>%
-  filter(grepl("^EF[1-3]", env_obj)) %>%
+obj2poly_rename |>
+  filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -211,9 +211,9 @@ obj2poly_2 <- agg_names_to_cols(obj2poly_2,
 And now we can compare what we get out of the different functions (just for the baseline scenario or we run out of dimensions).
 
 ```{r}
-obj2poly_2 %>%
+obj2poly_2 |>
   filter(scenario == 'base') |> 
-  filter(grepl("^EF[1-3]", env_obj)) %>%
+  filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -254,8 +254,8 @@ simplepolypoly
 
 ```{r}
 simplepolypoly |> 
-  rename('ewr_achieved' = ends_with('ewr_achieved')) %>%
-  filter(grepl("^EF[1-3]", env_obj)) %>%
+  rename('ewr_achieved' = ends_with('ewr_achieved')) |>
+  filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -370,8 +370,8 @@ Even valleys with only a small part of an sdl_unit have values here, illustratin
 
 ```{r}
 nestedpolypoly |> 
-  rename('ewr_achieved' = ends_with('ewr_achieved')) %>%
-  filter(grepl("^EF[1-3]", env_obj)) %>%
+  rename('ewr_achieved' = ends_with('ewr_achieved')) |>
+  filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -405,9 +405,9 @@ obj2poly_keep
 ```
 
 ```{r}
-obj2poly_rename %>%
-  rename('ewr_achieved' = ends_with('ewr_achieved')) %>%
-  filter(grepl("^EF[1-3]", env_obj)) %>%
+obj2poly_rename |>
+  rename('ewr_achieved' = ends_with('ewr_achieved')) |>
+  filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -425,9 +425,9 @@ obj2poly_rename %>%
 Now we have retained polygons without data. The default is `keepAllPolys = FALSE`. Another option for plotting though would be to use `FALSE` as earlier, and include an underlay. For more detail, see the [plotting](/comparer/comparer_overview.qmd).
 
 ```{r}
-obj2poly_rename %>%
-  rename('ewr_achieved' = ends_with('ewr_achieved')) %>%
-  filter(grepl("^EF[1-3]", env_obj)) %>%
+obj2poly_rename |>
+  rename('ewr_achieved' = ends_with('ewr_achieved')) |>
+  filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",

@@ -18,3 +18,8 @@ These yaml files are fully-specified parameters files for running HydroBOT, alon
 :::
 
 In practice, with large jobs, the typical approach is often to run the response modules (EWR tool) and a default Aggregator as a large parallel job over scenarios, whether that parallelisation happens locally, on an HPC, Azure, or databricks. By saving out the results of each step, additional aggregations can be re-run in parallel with dedicated scripts without having to re-run the EWR tool, as adjustments need to be made to address the question of interest. The comparer is almost always run interactively in a notebook or notebooks for three reasons; first, comparisons across scenarios cannot be parallelised, second, comparisons tend to be fast relative to the processing steps in the controller and aggregator, and third, the comparison step is often quite interactive and iterative as relevant outputs are developed and adjusted to target the questions of interest. If a final, large, set of outputs is needed, such notebooks would still be used to settle on those outputs, and then re-run if needed, e.g. with updated input data.
+
+::: callout-tip
+If you want to supply your own spatial data, causal networks, or aggregation functions, see examples in the [aggregator section](/aggregator/using_multi_aggregate.qmd) for detail, and they would typically be done through [read_and_agg](/aggregator/read_and_agg.qmd) in the full workflow.
+:::
+

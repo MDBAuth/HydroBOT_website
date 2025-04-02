@@ -335,9 +335,9 @@ veclamfuns <- rlang::quo(list(
 ))
 
 # Not really meaningful, but weight by the number of gauges.
-wtgauge <- simpleThemeAgg %>%
-  dplyr::group_by(scenario, gauge) %>%
-  dplyr::mutate(wt = dplyr::n()) %>%
+wtgauge <- simpleThemeAgg |>
+  dplyr::group_by(scenario, gauge) |>
+  dplyr::mutate(wt = dplyr::n()) |>
   dplyr::ungroup()
 
 triplevec <- spatial_aggregate(

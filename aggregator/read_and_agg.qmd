@@ -146,8 +146,8 @@ We will only show one example sheet here.
 ```{r}
 #| message: false
 agged_dat$sdl_units |>
-  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
-  dplyr::left_join(scenarios) %>%
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",
@@ -308,8 +308,8 @@ And the map is similar but not identical (interevents are closely related to the
 ```{r}
 #| message: false
 agged_interevent$sdl_units |>
-  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
-  dplyr::left_join(scenarios) %>%
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) |>
+  dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "interevent_achieved",
     plot_type = "map",

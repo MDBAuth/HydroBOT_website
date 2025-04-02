@@ -178,13 +178,13 @@ scene_pal <- make_pal(unique(scenarios$scenario_name),
 ```{r}
 #| echo: false
 # make the super long names shorter but less useful.
-basin_to_plot <- agged_data$mdb %>%
-  dplyr::filter(!is.na(Objective)) %>%
-  dplyr::mutate(Objective = stringr::str_trunc(Objective, 15)) %>%
-  dplyr::group_by(scenario, Objective) %>%
-  dplyr::mutate(id = as.character(row_number())) %>%
-  dplyr::ungroup() %>%
-  dplyr::mutate(Objective = stringr::str_c(Objective, "_", id)) %>%
+basin_to_plot <- agged_data$mdb |>
+  dplyr::filter(!is.na(Objective)) |>
+  dplyr::mutate(Objective = stringr::str_trunc(Objective, 15)) |>
+  dplyr::group_by(scenario, Objective) |>
+  dplyr::mutate(id = as.character(row_number())) |>
+  dplyr::ungroup() |>
+  dplyr::mutate(Objective = stringr::str_c(Objective, "_", id)) |>
   dplyr::select(-id)
 
 # Create a grouping variable
@@ -248,10 +248,10 @@ SDL unit differences in all environmental objectives
 
 ```{r}
 #| echo: false
-catchcompare <- agged_data$sdl_units %>%
-  group_by(SWSDLName, scenario) %>%
-  summarise(ewr_achieved = sum(ewr_achieved, na.rm = TRUE)) %>%
-  ungroup() %>%
+catchcompare <- agged_data$sdl_units |>
+  group_by(SWSDLName, scenario) |>
+  summarise(ewr_achieved = sum(ewr_achieved, na.rm = TRUE)) |>
+  ungroup() |>
   plot_outcomes(
     y_col = "ewr_achieved",
     colorset = "SWSDLName",
@@ -436,7 +436,7 @@ gaugematch <- st_intersects(bom_basin_gauges[bom_basin_gauges$gauge == "421001",
 
 aggvals <- aggvals[as.vector(gaugematch), ] |>
   st_drop_geometry()
-# aggvals <- aggvals %>% dplyr::filter(gauge == '421001' | is.na(gauge)) %>%
+# aggvals <- aggvals |> dplyr::filter(gauge == '421001' | is.na(gauge)) |>
 #   dplyr::select(-gauge)
 
 # join to the nodes
