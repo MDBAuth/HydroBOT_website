@@ -23,7 +23,9 @@ library(ggplot2)
 
 ## Overview
 
-In practice, we often won't call `multi_aggregate()` directly, but will use `read_and_agg()` to run `multi_aggregate()`, since it automates data read-in, processing, parallelisation, metadata, and saving. This requires that the output of the response models is saved out, which is almost always the case for both recordkeeping and processing purposes. To do the same analyses as in the [multi aggregate example](using_multi_aggregate.qmd) but using `read_and_agg()`, we give it the path to the data instead of the data itself. If the directory contains multiple files, `read_and_agg()` provides capacity to operate over those files in parallel.
+The most common way to run the Aggregator is with `read_and_agg()`, which automates data read-in, processing, parallelisation, metadata, and saving. This requires that the output of the response models is saved out, which is almost always the case for both recordkeeping and processing purposes. This vastly simplifies automated, consistent running over many scenarios. 
+
+To do the same analyses as in the [multi aggregate example](using_multi_aggregate.qmd) but using `read_and_agg()`, we give it the path to the data instead of the data itself. If the directory contains multiple files, `read_and_agg()` provides capacity to operate over those files in parallel.
 
 ::: callout-important
 Subdirectories should represent scenarios, because scenario outcomes are not interdependent (should be compared, not combined). In contrast, other dimensions (e.g. location) *are* interdependent. If directories are not scenarios but separate units that should be aggregated, e.g. gauges which should be aggregated to basin, parallelisation will not work and many other steps will be more difficult. See [more information](/workflows/scenarios_and_directories.qmd).
@@ -171,7 +173,7 @@ For the run here, that yaml is at `"hydrobot_scenarios/aggregator_output/demo/ag
 
 ``` yaml
 
-{{< include hydrobot_scenarios/aggregator_output/demo/agg_metadata.yml >}}
+{{< include /hydrobot_scenarios/aggregator_output/demo/agg_metadata.yml >}}
 
 ```
 
@@ -267,25 +269,85 @@ agged_dat_new <- read_and_agg(
   add_max = FALSE
 )
 ```
+## Value to aggregate
 
-## Using un-integrated response models
-
-At present, there are small parts of `read_and_agg()` that are EWR-specific, and so integrating another response module would be necessary to use `read_and_agg()` for modules other than the EWR tool. However, this is possible with `multi_aggregate()` as demonstrated in [that notebook](using_multi_aggregate.qmd). 
+We have demonstrated everything here by aggregating EWR data with the `ewr_achieved` column. However, any numeric column can be aggregated, as we show in @sec-dummy-module for made up module outputs. Here, we also show aggregation on a different EWR metric, the achivement of interevent requirements: 
 
 ```{r}
-#| include: false
-austates <- rnaturalearth::ne_states(country = 'australia') |> 
-  dplyr::select(state = name, geometry)
+agged_interevent <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "interevent_achieved",
+  group_until = list(
+    SWSDLName = is_notpoint,
+    planning_unit_name = is_notpoint,
+    gauge = is_notpoint
+  ),
+  pseudo_spatial = "sdl_units",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  savepath = agg_results,
+  add_max = FALSE
+)
+```
+That has the same sheets as above
+
+```{r}
+names(agged_interevent)
 ```
 
+And the map is similar but not identical (interevents are closely related to the frequency, so this is not surprising).
+
 ```{r}
-#| include: false
+#| message: false
+agged_interevent$sdl_units |>
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    outcome_col = "interevent_achieved",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "interevent_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    sceneorder = c("down4", "base", "up4"),
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "grey90"
+    )
+  )
+```
+
+## Using un-integrated response models {#sec-dummy-module}
+
+In some cases, response models may not yet be integrated into HydroBOT, or may not be able to be integrated (e.g. if they are proprietary or unscriptable). In these cases, we can still use `read_and_agg()` for processing with the Aggregator and then Comparer. All we need is a csv of module outputs. For aggregation along the theme, space, and time dimensions, it needs to have information about those dimensions. It should have a column identified by `readr::read_csv()` as time, a column that matches a column in the causal network, and a column that matches a column in a spatial dataframe (sf object), as these last two are accomplished with joins. It will typically have a 'scenario' column as well. We will demonstrate here using `read_and_agg()` with the same examples used for `multi_aggregate()` as demonstrated in [that notebook](using_multi_aggregate.qmd). The difference here is that `read_and_agg()` has to read the files from disk, rather than recieve ready-prepared dataframes.  
+
+### Setup
+
+First, we create some dummy 'module' data, as in [the multi_aggregate example](using_multi_aggregate.qmd), but here we save it out.
+
+We need to know the spatial units to create the data:
+
+```{r}
+austates <- rnaturalearth::ne_states(country = 'australia') |> 
+  dplyr::select(state = name, geometry)
+
 all_aus <- rnaturalearth::ne_countries(country = 'australia') |> 
   dplyr::select(geounit)
 ```
 
+Then we create the data and save it out
+
 ```{r}
-#| include: false
 #| label: save-non-module
 
 # This is all copied from multi_aggregate except the last saving line.
@@ -341,16 +403,15 @@ all_aus <- rnaturalearth::ne_countries(country = 'australia') |>
   
 ```
 
+And we need a simple causal network.
+
 ```{r}
-#| include: false
 # make a simple 'causal' network
   state_theme <- tibble::tibble(theme1 = c("E", "F", "G", "H", "I", "J"),
                                 theme2 = c("vowel", "consonant", "consonant",
                                            "consonant", "vowel", "consonant")) |> 
     list()
 ```
-
-
 
 ### Using the Aggregator
 
@@ -372,20 +433,26 @@ First, we set up some aggregation steps. Will just use means throughout.
   )
 ```
 
-Do the aggregation
+Do the aggregation. Note that this warns about some built-in checks for the EWR module that are not relevant here.
 
 ```{r}
   # Do the aggregation
-  ausagg <-  multi_aggregate(
-    dat = state_inputs,
-    causal_edges = state_theme,
-    groupers = "scenario",
-    aggCols = "value",
+  ausagg <-  ausagg <- read_and_agg(
+  datpath = file.path(project_dir, 'module_output', 'fake_module'),
+  type = "everything",
+  geopath = austates,
+  causalpath = state_theme,
+  groupers = "scenario",
+  aggCols = "value",
     aggsequence = ausseq,
-    funsequence = ausfuns,
-    namehistory = FALSE,
-    saveintermediate = TRUE
-  )
+  funsequence = ausfuns,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE,
+  savepath = file.path(project_dir, 'aggregator_output', 'dummy')
+)
 ```
 
 Quick plots of a couple levels
@@ -437,19 +504,22 @@ ausagg$all_aus |>
 
 ## Gauge and scenario filtering
 
-We usually want to apply analyses to the full set of scenarios or gauges. However, sometimes we might only want a subset. Using the `gaugefilter` and `scenariofilter` arguments can provide this functionality, but is typically not recommended. 
+We usually want to apply analyses to the full set of scenarios or gauges. However, sometimes we might only want a subset. Using the `gaugefilter` and `scenariofilter` arguments can provide this functionality. Howevern this is a bit dangerous because they are simple regex on the filenames, and so are not actually specific to gauges or scenarios and are only named that way to make the regex simpler if multiple matches are desired. Moreover, if the files do not have a pattern, e.g. there are not filenames with gauge numbers in them and you try to send those numbers in `gaugefilter`, it will error. Since these examples do not have unique gauge files, we only use `scenariofilter`.  
 
 ```{r}
 #| message: false
 
 smallreadagg <- read_and_agg(
-  datpath = ewr_results, type = "summary",
+  datpath = ewr_results, 
+  type = "achievement",
   geopath = bom_basin_gauges,
   causalpath = causal_ewr,
   groupers = c("scenario", "gauge"),
   aggCols = "ewr_achieved",
   aggsequence = aggseq,
   funsequence = funseq,
+  auto_ewr_PU = TRUE,
+    add_max = FALSE,
   namehistory = FALSE,
   gaugefilter = NULL,
   scenariofilter = "base"
@@ -457,28 +527,6 @@ smallreadagg <- read_and_agg(
 
 table(smallreadagg$gauge, smallreadagg$scenario)
 ```
-
-For a one-off that fits in memory, this is slower than filtering the data after it's in-memory, since the read-in happens first. The advantage comes when we don't want (or can't fit) all of the original data in memory, such as parallelisation over scenarios.
-
-The `read_and_agg` function is also helpful if we just want to use paths as arguments instead of reading the data in and then calling `multi_aggregate`. In that case, we might not use any `*filter` arguments, in which case it works just like `multi_aggregate`, but takes paths instead of objects as arguments. For example, saving all intermediate and no filtering can be done with the path to data `ewr_results`.
-
-```{r}
-#| message: false
-readallsteps <- read_and_agg(
-  datpath = ewr_results, type = "summary",
-  geopath = bom_basin_gauges,
-  causalpath = causal_ewr,
-  groupers = c("scenario", "gauge"),
-  aggCols = "ewr_achieved",
-  aggsequence = aggseq,
-  funsequence = funseq,
-  saveintermediate = TRUE,
-  namehistory = FALSE
-)
-
-names(readallsteps)
-```
-
 
 ```{r}
 #| include: false

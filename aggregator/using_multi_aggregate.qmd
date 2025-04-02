@@ -87,9 +87,8 @@ ewr_out <- prep_run_save_ewrs(
 
 
 # This is just a simple prep step that is usually done internally to put the geographic coordinates on input data
-ewrdata <- prep_ewr_agg(ewr_out, type = "achievement", 
-                       geopath = bom_basin_gauges, 
-                       add_max = FALSE)
+ewrdata <- prep_ewr_output(ewr_out$yearly, type = 'achievement', add_max = FALSE)
+
 ```
 
 Initially, we use `causal_ewrs` for causal relationships and spatial layers provided by {HydroBOT} to define the aggregation units, and defined functions for the aggregations, though each of these can be manually specified (see @sec-manual-causal, @sec-manual-spatial, @sec-manual-functions).
@@ -760,7 +759,51 @@ If we're only using one level of aggregation and nothing else, there may not be 
 
 Typically we could use `namehistory = FALSE` to avoid the horrible long name with all the transforms in it, but there's no way for it to know the previous aggregation history when it's been done in pieces (as we do in each of the [theme](theme_agg.qmd), [spatial](spatial_agg.qmd), and [temporal](temporal_agg.qmd) examples. As we do in those examples, it is possible to use `agg_names_to_cols()` with the full sequence including the earlier steps to extract them.
 
-## Using un-integrated response models
+## Value to aggregate
+
+We have demonstrated everything here by aggregating EWR data with the `ewr_achieved` column. However, any numeric column can be aggregated, as we show in @sec-dummy-module for made up module outputs. Here, we also show aggregation on a different EWR metric, the achivement of interevent requirements:
+
+```{r}
+#| message: false
+#| warning: false
+allagg_interevent <- multi_aggregate(
+  dat = ewrdata,
+  causal_edges = causal_ewr,
+  groupers = "scenario",
+  aggCols = "interevent_achieved",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  auto_ewr_PU = TRUE,
+  namehistory = FALSE,
+  saveintermediate = TRUE
+)
+```
+
+We'll show that worked for just one sheet (the sdl units).
+
+```{r}
+allagg_interevent$sdl_units |>
+  dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) %>%
+  dplyr::left_join(scenarios) %>%
+  plot_outcomes(
+    outcome_col = "interevent_achieved",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "interevent_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "scenario",
+    facet_row = "env_obj",
+    sceneorder = c("down4", "base", "up4"),
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "grey90"
+    )
+  )
+```
+
+
+## Using un-integrated response models {#sec-dummy-module}
 
 In some cases, response models may not yet be integrated into HydroBOT, or may not be able to be integrated (e.g. if they are proprietary or unscriptable). In these cases, we can still use `multi_aggregate()` for processing with the Aggregator and then Comparer. All we need is a dataframe. For aggregation along the theme, space, and time dimensions, it needs to have information about those dimensions (i.e. a time column, a geometry column, and a column matching something in its relevant causal network). It will typically have a 'scenario' column as well.
 

@@ -68,8 +68,7 @@ ewr_out <- prep_run_save_ewrs(
 
 
 # This is just a simple prep step that is usually done internally to put the geographic coordinates on input data
-ewrdata <- prep_ewr_agg(ewr_out, type = "achievement", 
-                       geopath = bom_basin_gauges, add_max = FALSE)
+ewrdata <- prep_ewr_output(ewr_out$yearly, type = 'achievement', add_max = FALSE)
 
 # This gets us to env_obj at the gauge over all time
 preseq <- list(

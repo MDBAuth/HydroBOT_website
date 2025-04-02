@@ -6,6 +6,8 @@ project:
 
 format:
   html:
+    df-print: paged
+    code-link: true # Doesn't do anything for HydroBOT without either cran or pkgdown site, but still useful for external (especially {pkgname})
     embed-resources: true
 
 website:
