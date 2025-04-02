@@ -11,15 +11,19 @@ library(dplyr)
 library(sf)
 ```
 
+::: callout-note
+HydroBOT outputs are usually `sf` objects. To use any of their geographic properties (and prevent unexpected behaviour), we need to have `sf` loaded. This should happen automatically with `library(HydroBOT)`, but if HydroBOT is used with `::`, it may not be, and so for safety we use `library(sf)`.
+:::
+
 # Overview
 
-This notebook provides examples of creating bar plots, e.g. plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, scenario. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit and type of response.
+This notebook provides examples of creating bar plots, e.g. plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, the scenarios. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit or type of response.
 
 For a quantitative x-axis, we would typically use [line plots](../comparer/line_plots.qmd).
 
 # Demonstration setup
 
-As usual, we need paths to the data.
+As usual, we need paths to the data. We use the 'more scenarios' examples for all the plots, with processing as in the [website workflow](/workflows/run_hydrobot_website.qmd).
 
 ```{r}
 project_dir <- file.path("more_scenarios")
@@ -29,7 +33,9 @@ agg_dir <- file.path(project_dir, "aggregator_output")
 
 ## Scenario information
 
-This should be auto-acquired from the dirs above. But while its format is still up in the air, I'm leaving it a bit more user-editable.
+The 'scenarios' used here for examples are a factorial combination of multiplicative and additive changes to  flow, based on historical hydrographs.
+
+In an ideal world, scenario metadata would be auto-acquired from the directory defining the hydrographs. In practice, that's rarely available, but we can read it in here and make some small modifications for readability.
 
 ```{r}
 scenarios <- jsonlite::read_json(file.path(
@@ -37,179 +43,205 @@ scenarios <- jsonlite::read_json(file.path(
   "scenario_metadata.json"
 )) |>
   tibble::as_tibble() |>
-  tidyr::unnest(cols = everything())
+  tidyr::unnest(cols = everything()) |> 
+  dplyr::rename(scenario = scenario_name) |> 
+  dplyr::arrange(flow_addition, flow_multiplier) |> 
+  mutate(climate_code = LETTERS[1:n()], .by = flow_addition) |>
+  mutate(adapt_code = 1:n(), .by = flow_multiplier)
 ```
 
-## Subset for demo
-
-We have a lot of hydrographs, so for this demonstration, we will often use a subset.
+To scale flow, we apply nine flow multipliers, ranging from 0.5 to 2.0, to the historical hydrographs (SI @tbl-scenarios). We refer to these as 'climate' scenarios, reflecting a common representation where entire hydrographs might shift to represent climate change. To achieve pulsed change for each of the 'climate' scenarios, four flow additions were applied including 1) no addition (baseline), 2) addition of 250 ML/d, 3) addition of 6500 ML/d, and 4) addition of 12000 ML/d (@tbl-scenarios). These additional flows were added throughout the period of September to December. We refer to these scenarios as 'climate adaptations' because management options are often available in the form of altering water availability for short time periods through mechanisms like water releases, though the options here do not represent proposed actions. These scenarios should not be interpreted as potential climate impacts or adaptations, but instead as different ways flows might change (multiplicative or additive) and different magnitudes of change.
 
 ```{r}
-gauges_to_plot <- c("412002", "419001", "422028", "421001")
+#| label: tbl-scenarios
+#| width: 4
+#| tbl-cap: Demonstration scenarios are a factorial combination of 'climate' (scaled flow) and 'adaptation' (pulsed additions).
+#| message: false
+
+adapt_scenes <- scenarios |> 
+  filter(scenario != 'MAX') |> 
+  mutate(flow_addition = as.integer(flow_addition)) |> 
+  select(`Adaptation code` = adapt_code,
+         `Flow addition (ML/d)` = flow_addition) |>
+  distinct()
+
+climate_scenes <- scenarios |> 
+  filter(scenario != 'MAX') |> 
+  select(`Climate code` = climate_code,
+         `Flow multiplier` = flow_multiplier) |>
+  distinct()
+
+adapt_scenes <- adapt_scenes |> 
+  bind_rows(tibble(`Adaptation code` = rep(NA, nrow(climate_scenes) - 
+                                             nrow(adapt_scenes)),
+       `Flow addition (ML/d)` = rep(NA, nrow(climate_scenes) - 
+                                      nrow(adapt_scenes))))
+
+climate_scenes |> 
+               mutate(`Flow multiplier` = signif(`Flow multiplier`, 2)) |> 
+  bind_cols(adapt_scenes) |> 
+  flextable::flextable()  |> 
+  flextable::font(fontname = 'Calibri') |> 
+  flextable::fontsize(size = 10, part = 'all') |> 
+  flextable::set_table_properties(layout = "autofit", width = 1) |> 
+  flextable::vline(j = 2)
+
+```
+
+
+## Read in the data
+
+We read in the example data we will use for all plots.
+
+```{r}
+agged_data <- readRDS(file.path(agg_dir, "achievement_aggregated.rds"))
+```
+
+That has all the steps in the aggregation, but most of the plots here will only use a subset to demonstrate.
+
+To make visualisation easier, the SDL units data is given a grouping column that puts the many `env_obj` variables in groups defined by their first two letters, e.g. `EF` for Ecosystem Function. These correspond to the 'Target' level, but it can be useful to have the two groupings together for some examples.
+
+If we had used multiple aggregation functions at any step, we should filter down to the one we want here, but we only used one for this example.
+
+For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2). Thus, we make two small dataframes for our primary examples here.
+
+```{r}
+scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
+
+basin_to_plot <- agged_data$mdb |> 
+  dplyr::filter(scenario %in% scenarios_to_plot) |> 
+  dplyr::left_join(scenarios, by = 'scenario')
+
+# Create a grouping variable
+obj_sdl_to_plot <- agged_data$sdl_units |>
+    dplyr::filter(scenario %in% scenarios_to_plot) |> 
+  dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
+  dplyr::arrange(env_group, env_obj) |> 
+  dplyr::left_join(scenarios, by = 'scenario')
 ```
 
 # Standard scenario appearance
 
-We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {HydroBOT} package because they are project/analysis- specific.
+We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
+
+Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see @tbl-scenarios) rather than the names to make plots readable.
+
+There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`. 
 
 ```{r}
-sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
-scene_pal <- make_pal(unique(scenarios$scenario_name),
+sceneorder <- forcats::fct_reorder(basin_to_plot$scenario,
+                                   basin_to_plot$flow_multiplier)
+
+scene_pal <- make_pal(unique(basin_to_plot$climate_code),
   palette = "ggsci::nrc_npg",
-  refvals = "base", refcols = "black"
+  refvals = "E", refcols = "black"
 )
+
+scene_pal
 ```
 
 # Make bar plots
-
-## Choosing example data
-
-First, we read in the aggregated data and make a simple demonstration bar plot. There is example data provided by HydroBOT (`agg_theme_space` and `agg_theme_space_colsequence`), but to continue with the demonstration, we will use the aggregations created here in the [interleaved aggregation notebook](../aggregator/using_multi_aggregate.qmd).
-
-*Note*- to `readRDS` `sf` objects, we need to have `sf` loaded.
-
-```{r}
-agged_data <- readRDS(file.path(agg_dir, "summary_aggregated.rds"))
-```
-
-That has all the steps in the aggregation, so we'll choose one (the Objective theme scale at the basin spatial scale, `agged_data$mdb`) for the first set of plots and another (`agged_data$sdl_units` at the SDL unit scale and `env_obj` theme scale for the second set of plots. This finer scale lets us look at complicating factors like multiple spatial units and grouping outcomes.
-
-To make these examples more easily, we create some slightly simpler dataframes here for those examples, but this isn't really necessary- small data manipulations are easily piped in to `plot_outcomes`. The basin-scale needs a bit of cleanup because Objectives (and many of the other categories other than codes, e.g. yearly targets) are really long. We could fold them in the facet labels with `ggplot2::label_wrap_gen()`, but they're so long it blocks out the plots. Ideally, we would use descriptive short names for each, but that's a large manual job to assign them. For this demonstration, I'll just cut them off and make them unique, but we need a better solution. The SDL units data is given a grouping column that puts the many `env_obj` variables in groups defined by their first two letters, e.g. `EF` for Ecosystem Function.
-
-If we had used multiple aggregation functions at any step, we should filter down to the one we want here, but we only used one for this example.
-
-```{r}
-# make the super long names shorter but less useful.
-basin_to_plot <- agged_data$mdb |>
-  dplyr::filter(!is.na(Objective)) |>
-  dplyr::mutate(Objective = stringr::str_trunc(Objective, 15)) |>
-  dplyr::group_by(scenario, Objective) |>
-  dplyr::mutate(id = as.character(row_number())) |>
-  dplyr::ungroup() |>
-  dplyr::mutate(Objective = stringr::str_c(Objective, "_", id)) |>
-  dplyr::select(-id)
-
-# Create a grouping variable
-obj_sdl_to_plot <- agged_data$sdl_units |>
-  dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
-  dplyr::filter(!is.na(env_group)) |>
-  dplyr::arrange(env_group, env_obj)
-```
 
 ## Scenario fills
 
 ### Basin scale
 
-We can make plots looking at how scenarios differ for each of the outcome categories. This uses `facet_wrapper` to just wrap the single facet axis, looking at the basin scale and Objectives first. If we had more than one spatial unit, we would need to either filter to a target unit or facet by them. As with {ggplot2} itself, we tend to use `facet_wrap` for single-variable facetting and `facet_row` and `facet_grid` for specifying rows and columns, though here we use `facet_row` and `facet_col` to feed `facet_grid`. Plots at the basin scale are the simplest because we don't have to worry about different bars for different spatial units.
+We can make plots looking at how scenarios differ for each of the outcome categories for a simple case of only one outcome. This uses `facet_wrapper` to just wrap the single facet axis.
 
-The `colorset` argument is the column that determines color, while the `pal_list` defines those colors, here as a named `colors` object, but as we see below it can also be palette names. The `sceneorder` argument lets us explicitly set the order of the scenarios. This is typically easiest to have a `Factor` object with the scenarios and their orders, as here. But we can also just use a character vector (demonstrated later).
+The `colorset` argument is the column that determines color, while the `pal_list` defines those colors, here as a named `colors` object, but as we see below it can also be palette names. 
 
 ```{r}
 #| message: false
 plot_outcomes(basin_to_plot,
-  y_col = "ewr_achieved",
-  facet_wrapper = "Objective",
-  colorset = "scenario",
+  outcome_col = "ewr_achieved",
+  x_col = 'climate_code',
+  facet_wrapper = "Target",
+  colorset = "climate_code",
   pal_list = scene_pal,
   sceneorder = sceneorder
-) +
-  theme(axis.text.x = element_blank())
+)
 ```
 
-We retain the axis names as-is from the incoming dataframe, as they provide the true meaning of each value. But we can change them, either inside the `plot_outcomes` function or post-hoc. We can also set the `sceneorder` with a character vector if that's easier than setting up a Factor.
+HydroBOT retains the axis names as-is from the incoming dataframe, as they provide the true meaning of each value. But we can change them, either inside the `plot_outcomes()` function (here for y) or post-hoc with `ggplot2::labs()` (here for x). We can also set the `sceneorder` with a character vector if that's easier than setting up a Factor or if we want to change them around for some reason. Because the outputs of `plot_outcomes()` are just ggplot objects, changing the labels outside the function can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.
 
 ```{r}
 #| message: false
 plot_outcomes(basin_to_plot,
-  y_col = "ewr_achieved",
+  outcome_col = "ewr_achieved",
   y_lab = "Proportion Objectives\nAchieved",
-  x_lab = "Scenario",
+  x_col = 'climate_code',
   color_lab = "Scenario",
-  facet_wrapper = "Objective",
-  colorset = "scenario",
+  facet_wrapper = "Target",
+  colorset = "climate_code",
   pal_list = scene_pal,
-  sceneorder = c("down2", "down1_5", "down1_25", "down1_1", "base", "up1_1", "up1_25", "up1_5", "up2")
+  sceneorder = c('climateup2adapt0', 'climatebaseadapt0', 'climatedown2adapt0')
 ) +
-  theme(axis.text.x = element_blank())
+  labs(x = 'Scenario')
 ```
-
-Because these are just ggplot objects, we can also change the labels outside the function, which can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.
+Another approach is to put other groupings on the x-axis, and color by scenario. 
 
 ```{r}
 #| message: false
-scenebar <- plot_outcomes(basin_to_plot,
-  y_col = "ewr_achieved",
-  facet_wrapper = "Objective",
-  colorset = "scenario",
+plot_outcomes(basin_to_plot,
+  outcome_col = "ewr_achieved",
+  x_col = "Target",
+  colorset = "climate_code",
   pal_list = scene_pal,
   sceneorder = sceneorder
 )
-
-scenebar +
-  labs(x = NULL, y = "Proportion\nObjectives Achieved") +
-  theme(axis.text.x = element_blank())
 ```
 
-Another approach is to put the outcomes on the x-axis, and color by scenario. This requires using the special `scene_pal` argument currently instead of `pal_list`. This is a bit of a historical holdover and will be made more general.
+We can pass `position = 'dodge'` to use dodged bars for clearer comparisons, particularly accentuating the variation in sensitivity of the different outcomes to the scenarios.
 
 ```{r}
 #| message: false
 plot_outcomes(basin_to_plot,
-  y_col = "ewr_achieved",
-  x_col = "Objective",
-  colorset = "scenario",
-  scene_pal = scene_pal,
-  sceneorder = sceneorder
-)
-```
-
-Using dodged bars can allow clearer comparisons, particularly accentuating the variation in sensitivity of the different outcomes to the scenarios, though there are a lot of bars to try to read here.
-
-```{r}
-#| message: false
-plot_outcomes(basin_to_plot,
-  y_col = "ewr_achieved",
-  x_col = "Objective",
-  colorset = "scenario",
-  scene_pal = scene_pal,
+  outcome_col = "ewr_achieved",
+  x_col = "Target",
+  colorset = "climate_code",
+  pal_list = scene_pal,
   sceneorder = sceneorder,
-  position = "dodge"
+  position = 'dodge'
 )
 ```
 
 ### SDL units
 
-We can use the aggregation step of `env_obj` and SDL units to demonstrate plotting that not only addresses the outcomes for scenarios, but how they differ across space. I'll often use subsets of the `env_obj` codes here to keep the number of plots visible.
+We can use the aggregation step of `env_obj` and SDL units to demonstrate plotting that not only addresses the outcomes for scenarios, but how they differ across space.
 
-First, we look at how the different scenarios perform for the Ecosystem Function objectives in each SDL unit
+First, we look at how the different scenarios perform for the Ecosystem Function objectives in each SDL unit. We also use the `ggplot2` functionality to remove the x-axis label, since it is redundant with the color. 
+
+::: callout-tip
+Often when we have multiple dimensions, we'll want to do a simple filter to relevant subsets of the data for readability. When this filtering occurs, it is almost always a good idea to do it on the fly (as here), to avoid errors associated with losing track of data manipulations and instead start each figure with the full dataset. 
+:::
 
 ```{r}
 #| message: false
 obj_sdl_to_plot |>
   filter(grepl("^EF", env_obj)) |>
   plot_outcomes(
-    y_col = "ewr_achieved",
+    outcome_col = "ewr_achieved",
     facet_col = "env_obj",
     facet_row = "SWSDLName",
-    colorset = "scenario",
+    colorset = "climate_code",
     pal_list = scene_pal,
     sceneorder = sceneorder
   ) +
-  theme(axis.text.x = element_blank())
+  theme(axis.text.x = element_blank(), axis.title.x = element_blank())
 ```
 
-We address a few ways to handle groups of outcome variables, one of the simplest is to simply facet these plots by those groups, with all the outcomes in the group getting their own bars. This puts the objectives on x and colors by scenario, with the groups accentuated by facets. These can be stacked (`position = 'stack'`- the default) or dodged (demonstrated here).
+We address a few ways to handle groups of outcome variables, one of the simplest is to simply facet these plots by those groups, with all the outcomes in the group getting their own bars. This puts the theme levels on x and colors by scenario, with the groups accentuated by facets. These can be stacked (`position = 'stack'`- the default) or dodged (demonstrated here).
 
 ```{r}
 dodgefacet <- obj_sdl_to_plot |>
   plot_outcomes(
-    y_col = "ewr_achieved",
+    outcome_col = "ewr_achieved",
     x_col = "env_obj",
-    colorset = "scenario",
+    colorset = "climate_code",
     facet_row = "SWSDLName",
     facet_col = "env_group",
     scales = "free_x",
-    scene_pal = scene_pal,
+    pal_list = scene_pal,
     sceneorder = sceneorder,
     position = "dodge"
   )
@@ -220,26 +252,31 @@ dodgefacet + theme(legend.position = "bottom") +
 
 # Colors from outcomes
 
-Rather than facetting, we can stack each of the outcome categories (here, Objectives). To do this, we simply change the `colorset` to "Objective" instead of 'scenario' (the default `x_col` is scenario, so it remains on x). We also change the `pal_list` to a {paletteer} name, providing the palette from which to choose colors for each Objective. This yields a more compact plot that shows overall outcomes at the expense of making it harder to see what any particular objective is doing, particularly with many outcomes and long names. But with careful selection of a color palette and cleaner naming (or just far fewer categories), this could be a very useful approach.
+Rather than facetting, we can stack each of the outcome categories (here, Target groups). To do this, we simply change the `colorset` to "Target" instead of 'scenario' (the default `x_col` is scenario, so it remains on x, but it is generally better to specify it explicitly. This is especially true here, where the 'climate_code' column is a better description). We also change the `pal_list` to a {paletteer} name, providing the palette from which to choose colors for each Target. If we wanted to retain these colours across the project, we would define a palette for the Targets as we did above for scenarios.
+
+This yields a more compact plot (@fig-color-target) that shows overall outcomes without as much duplication. The stacking here of the `env_obj` outcomes in each group while coloring them all the same is itself a sort of simple aggregation. The approach next with `position = "dodge"` is generally better (@fig-sdl-dodge).
 
 ```{r}
 #| message: false
+#| label: fig-color-target
 plot_outcomes(basin_to_plot,
-  y_col = "ewr_achieved",
-  colorset = "Objective",
-  pal_list = list("scico::oslo"),
+  outcome_col = "ewr_achieved",
+  colorset = "Target",
+  pal_list = list("scico::tokyo"),
   sceneorder = sceneorder
 ) +
   guides(fill = guide_legend(ncol = 2)) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
-In another example of colors from other information in the data, when we have multiple spatial units we might color by them instead of coloring by outcome category. Here, we show how to color by SDL unit (SWSDLName) instead of `env_obj`. That still stacks the `env_obj` outcomes in each catchment, but coloring them all the same, and so is itself a sort of simple aggregation.
+In another example of colors from other information in the data, when we have multiple spatial units we might color by them instead of coloring by outcome category. Here, we show how to color by SDL unit (SWSDLName) instead of `env_obj`. We also explicitly use `x_col` to use climate code and not the full names.
 
 ```{r}
 #| message: false
+#| label: fig-sdl-dodge
 plot_outcomes(obj_sdl_to_plot,
-  y_col = "ewr_achieved",
+  outcome_col = "ewr_achieved",
+  x_col = 'climate_code',
   colorset = "SWSDLName",
   pal_list = list("ggsci::default_jama"),
   sceneorder = sceneorder
@@ -248,33 +285,33 @@ plot_outcomes(obj_sdl_to_plot,
 
 That shows that while all SDL units are affected by the changes in the flow, the Lachlan is less sensitive.
 
-We can also use `position = 'dodge'` to have side-by-side bars instead of stacked. Note that in this case, where we're coloring by SDL unit but there are many `env_obj` values, those `env_obj` no longer stack, and so we have to manually stack them by calculating their sum. This would not be the case if we were coloring by individual rows (`env_obj`)- see examples of that below.
+We can also use `position = 'dodge'` to have side-by-side bars instead of stacked (@fig-summed). Note that in this case, where we're coloring by SDL unit but there are many `env_obj` values, those `env_obj` no longer stack, and so we have to manually stack them by calculating their sum. This would not be the case if we were coloring by individual rows (`env_obj`)- see examples of that below.
 
 ```{r}
 #| message: false
-
+#| label: fig-summed
 obj_sdl_to_plot |>
   group_by(SWSDLName, scenario) |>
   summarise(ewr_achieved = sum(ewr_achieved, na.rm = TRUE)) |>
   ungroup() |>
   plot_outcomes(
-    y_col = "ewr_achieved",
+    outcome_col = "ewr_achieved",
     colorset = "SWSDLName",
-    pal_list = list("calecopal::lake"),
+    pal_list = list("ggsci::default_jama"),
     sceneorder = sceneorder,
     position = "dodge"
   )
 ```
 
-We are about to consider grouped colors as a way to assign different palettes to different groups. But a simpler way to show outcomes groups is to color by the groups directly if we don't care what the individual `env_obj`s are doing between them. This is very similar to the plots coloring by SDL unit above.
+If we have multiple levels of groupings, we can color by the groups directly if we don't care what the individual `env_obj`s are doing between them. This is very similar to the plots coloring by SDL unit above.
 
 ```{r}
 plot_outcomes(obj_sdl_to_plot,
-  y_col = "ewr_achieved",
+  outcome_col = "ewr_achieved",
+  x_col = 'climate_code',
   colorset = "env_group",
   pal_list = list("scico::berlin"),
   facet_col = "SWSDLName",
-  facet_row = ".",
   sceneorder = sceneorder
 ) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
@@ -282,7 +319,7 @@ plot_outcomes(obj_sdl_to_plot,
 
 ## Grouped colors
 
-We have the ability to assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](../provided_data/causal_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
+HydroBOT can assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](/provided_data/causal_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
 
 Achieving this requires specifying two columns- the `colorset`, as above, is the column that determines color. The `colorgroups` column specifies the groupings of those `colorset` values, and so what palette to use. Thus, the `pal_list` needs to be either length 1 (everything gets the same palette) or `length(unique(data$colorgroups))`. Note also that the `colorset` values must be unique to `colorgroups`- this cannot be a one-to-many mapping because each `colorset` value must get a color from a single palette defined by the `colorgroup` it is in.
 
@@ -301,18 +338,17 @@ env_pals <- list(
 )
 
 # need to facet by space sdl unit and give it the colorgroup argument to take multiple palettes
-sdl_stack <- obj_sdl_to_plot |>
+obj_sdl_to_plot |>
   plot_outcomes(
-    y_col = "ewr_achieved",
+    outcome_col = "ewr_achieved",
+    x_col = 'climate_code',
     colorgroups = "env_group",
     colorset = "env_obj",
     pal_list = env_pals,
     facet_col = "SWSDLName",
-    facet_row = ".",
-    sceneorder = sceneorder
-  )
-sdl_stack +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+    facet_row = "."
+  ) +
+  theme(legend.key.size = unit(0.5, 'cm'))
 ```
 
 Adding facetting by those groups can make that easier to read if the goal is to focus on changes within groups, but more plots.
@@ -322,15 +358,15 @@ Adding facetting by those groups can make that easier to read if the goal is to 
 
 obj_sdl_to_plot |>
   plot_outcomes(
-    y_col = "ewr_achieved",
+    outcome_col = "ewr_achieved",
+    x_col = 'climate_code',
     colorgroups = "env_group",
     colorset = "env_obj",
     pal_list = env_pals,
     facet_col = "SWSDLName",
-    facet_row = "env_group",
-    sceneorder = sceneorder
-  ) +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+    facet_row = "env_group"
+  ) + 
+  theme(legend.key.size = unit(0.5, 'cm'))
 ```
 
 We could also split those bars sideways instead of stack them, but that likely makes more sense if there are fewer categories than here. We again use `position = 'dodge'`, but now we don't need to sum because we're stacking each row already. I've flipped the facetting and taken advantage of the fact that these are just ggplot objects to remove the legend, making it very slightly easier to read (but harder to interpret). This gets very crowded with the full set of scenarios, so we can use the `scenariofilter` argument to cut it to just a few (here, base and multiply and divide by 1.5).
@@ -340,18 +376,16 @@ We could also split those bars sideways instead of stack them, but that likely m
 
 obj_sdl_to_plot |>
   plot_outcomes(
-    y_col = "ewr_achieved",
+    outcome_col = "ewr_achieved",
+    x_col = 'climate_code',
     colorgroups = "env_group",
     colorset = "env_obj",
     pal_list = env_pals,
-    facet_col = "env_group",
-    facet_row = "SWSDLName",
-    sceneorder = sceneorder,
-    scenariofilter = c("down1_5", "base", "up1_5"),
-    position = "dodge"
+    facet_col = "SWSDLName",
+    facet_row = "env_group",
+    position = 'dodge'
   ) +
-  theme(legend.position = "none") +
-  theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
+  theme(legend.key.size = unit(0.5, 'cm'))
 ```
 
 Another approach to groups of outcomes without the colors explicitly grouped is to not use `colorgroup`, but instead just facet by the group and give every `colorset` value a color from the same palette. Depending on the palette chosen and the breaks, this can be quicker, but will not accentuate groups as well.
@@ -360,17 +394,13 @@ Another approach to groups of outcomes without the colors explicitly grouped is 
 #| message: false
 obj_sdl_to_plot |>
   plot_outcomes(
-    y_col = "ewr_achieved",
+    outcome_col = "ewr_achieved",
     colorgroups = NULL,
     colorset = "env_obj",
     pal_list = list("scico::berlin"),
     facet_row = "SWSDLName",
     facet_col = "env_group",
-    scales = "free_x",
-    scene_x = FALSE,
-    scene_pal = scene_pal,
-    sceneorder = sceneorder,
-    scenariofilter = c("down1_5", "base", "up1_5")
+    scales = "free_x"
   ) +
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
@@ -379,7 +409,7 @@ These plots are interesting, but in typical use, the plots above using facets fo
 
 ## Manual color definition
 
-Though the above examples using {paletteer} palettes are the easiest way to specify coloring, we don't have to let the palettes auto-choose colors, and can instead pass `colors` objects, just as we do for scenarios. This can be particularly useful with small numbers of groups (defining too many colors is cumbersome- that's what palettes are for) when we want to control which is which. Just as with scenarios, we use `make_pal` . Here, we will use 'scico::berlin' as the base, but define several 'reference' values manually. This demonstration uses `includeRef = TRUE` so we *replace* the palette values with the refs, rather than choose them from the set of values with refs removed. This tends to yield better spread of colors (and lets us sometimes ref colors and sometimes not if we also used `returnUnref`). For example, maybe we want to sometimes really accentuate ecosystem function and native vegetation, but not in all plots.
+Though the above examples using {paletteer} palettes are the easiest way to specify coloring, we don't have to let the palettes auto-choose colors, and can instead pass `colors` objects, just as we do for scenarios. This can be particularly useful with small numbers of groups (defining too many colors is cumbersome- that's what palettes are for) when we want to control which is which. Just as with scenarios, we use `make_pal()`. Here, we will use `'scico::berlin'` as the base, but define several 'reference' values manually. This demonstration uses `includeRef = TRUE` so we *replace* the palette values with the refs, rather than choose them from the set of values with refs removed. This tends to yield better spread of colors (and lets us sometimes ref colors and sometimes not if we also used `returnUnref`). For example, maybe we want to sometimes really accentuate ecosystem function and native vegetation, but not in all plots.
 
 First, we create the palettes with and without the (garish) ref values.
 
@@ -396,7 +426,8 @@ Then we can create an accentuated plot sometimes, if, perhaps, we want to highli
 ```{r}
 #| message: false
 plot_outcomes(obj_sdl_to_plot,
-  y_col = "ewr_achieved",
+  outcome_col = "ewr_achieved",
+  x_col = 'climate_code',
   colorset = "env_group",
   pal_list = obj_pal$refcols,
   facet_col = "SWSDLName",
@@ -411,7 +442,8 @@ But for other plots maybe we don't want that accentuation and we can use the `un
 ```{r}
 #| message: false
 plot_outcomes(obj_sdl_to_plot,
-  y_col = "ewr_achieved",
+  outcome_col = "ewr_achieved",
+  x_col = 'climate_code',
   colorset = "env_group",
   pal_list = obj_pal$unrefcols,
   facet_col = "SWSDLName",

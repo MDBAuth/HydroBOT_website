@@ -1,32 +1,32 @@
 ---
 title: "Comparer overview"
 author: "Galen Holt"
-format:
-  html:
-    df-print: paged
-    code-link: true # Doesn't do anything without either cran or pkgdown site, but that's still kind of useful for external (especially {pkgname})
 editor: visual
 ---
 
-The Comparer really has two components- underlying functions and structure to perform comparisons and other analyses, and plotting (and other presentation types in future) capabilities to produce some standardized plots that capture important data visualisation.
+The Comparer has two components- underlying functions and structure to perform comparisons and other analyses, and plotting capabilities to produce some standardized plots that capture important data visualisation.
 
-There is quite a lot of flexibility built into all of the comparer, because different uses and different questions will require different outputs to assess, whether that means different scales of analysis, different types of plots, or different numerical comparisons. It is also likely that the desired outputs will change as we work through options.
+Most importantly for the plots implement through the `plot_outcomes()` function, the design philosophy is that an outcome to be plotted should be declared, and then however that outcome is presented (maps, bars, lines, etc), the necessary data transformations happen inside `plot_outcomes()`, and so greatly enhancing testing and rigour while reducing the errors associated with copy-pasting or inadvertently mis-specifying steps. Moreover, `plot_outcomes()` is dimensionally aware and throws warnings when data is being silently overplotted and so producing misleading results (and alerting the user to forgotten dimensions).
 
-While this is called the 'Comparer', it also contains other functionality related to analysis generally, and can produce plots that do not include comparisons, e.g. hydrograps to simply illustrate historical flows.
+There is quite a lot of flexibility built into all of the comparer, because different uses and different questions will require different outputs, whether that means different scales of analysis, different types of plots, or different numerical comparisons. Not only will these differ within projects, the act of finding an 'ideal' set of plots for any given project is necessarily iterative, and so the flexibility here provides the user with much control over that process.
 
-Nearly all plots of outcomes (e.g not hydrographs) are made with `plot_outcomes`, including [bars](bar_plots.qmd), [lines](line_plots.qmd), and [maps](maps.qmd). This is because at their foundation, they area all plotting a quantitative outcome with grouping of some sort. The data preparation is the same across all of them, as well as many of the arguments to `ggplot`. We may, though, eventually separate out the data preparation from the plots to make this function cleaner.
+While this is called the 'Comparer', it also contains other functionality related to analysis generally, and can produce plots that do not include comparisons, e.g. hydrographs to simply illustrate historical flows.
 
-Nearly all plots (with the current exception of the causal networks) are made in `ggplot2` and return `ggplot2` objects, which can easily be further modified. The plot functions here just wrap the ggplot2 to standardise appearance and data preparation. Though it can be annoying to not use `ggplot()` directly to make the plots, one **MAJOR** advantage of the plotting function here is that any data changes that clean it for a given plot aren't preserved, and so it's far easier to keep the data clean, know what the data is, and avoid accidental overwriting or mislabeling of data. If we consistently do the same changes with slight modification, we can write a function, e.g. `plot_prep` , avoiding lots of copy-paste and its attendant errors.
+Nearly all plots of outcomes are made with `plot_outcomes`, including [bars](bar_plots.qmd), [lines](line_plots.qmd), and [maps](maps.qmd). This is because at their foundation, they area all plotting a quantitative outcome with grouping of some sort. The data preparation is the same across all of them, as well as many of the arguments to `ggplot()`.
 
-There is clear opportunity for reactivity with nearly all plots, allowing a user to select plot types, any filtering (espcially for networks, spatial units, etc), and produces the plot.
+Nearly all plots (with the current exception of the causal networks) are made internally with `ggplot2` and return `ggplot2` objects, which can easily be further modified. The plot functions here wrap the ggplot2 to standardise appearance and data preparation and ensure dimensions are handled appropriately. Though it can be annoying to not use `ggplot()` directly to make the plots, one **MAJOR** advantage of the plotting function here is that any data changes that clean it for a given plot aren't preserved, and so it's far easier to keep the data clean, know what the data is, and avoid accidental overwriting or mislabeling of data. Further, the internal data manipulation remains the same whether the outcome is plotted as a y-axis, color, etc or the plot type changes.
+
+::: callout-note
+As should be clear, the intention here is *not* to define a small set of plots that are made every time, but instead to provide functions that allow a user to safely adjust plots to meet a variety of needs. That said, if a project does mature towards a standard set of plots *for that project*, these functions could clearly be incorporated into a dashboard or Shiny site. There is clear opportunity for reactivity with nearly all plots, allowing a user to select plot types, any filtering (espcially for networks, spatial units, etc), and produce the plot.
+:::
+
+::: callout-important
+Unlike calls to bare ggplot, *data-variable* names in arguments should generally be characters (e.g. when specifying the column name for the `outcome_col`). While the use of [data masking in the tidyverse](https://dplyr.tidyverse.org/articles/programming.html) can be incredibly useful for interactive work, it is cumbersome for programming and difficult to make stable. It has not been a high priority to make work here.
+:::
 
 # Comparisons
 
-Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes. It can also calculate comparison values and plot these. There are a few primary sorts of plots,
-
--   Input descriptions (e.g. [hydrographs](hydrographs.qmd))
-
--   Scaling descriptions (e.g. tiles showing how the aggregation proceeded)
+Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes, as well as aggregation sequences. It can do these comparisons visually (e.g. plotting raw values next to each other), but also calculate comparison values and plot these. There are a few primary sorts of plots,
 
 -   Quantitative outcome plots (values on y - 1d)
 
@@ -36,7 +36,8 @@ Nearly all analyses will be comparisons of some kind, and so the Comparer provid
 
     -   Timeseries
 
-        -   currently only [hydrographs](hydrographs.qmd), ongoing development for other variables
+        -   [hydrographs](hydrographs.qmd),
+        -   Write pages for other variables
 
 -   Quantitative outcome plots (values in color - 2d)
 
@@ -46,30 +47,28 @@ Nearly all analyses will be comparisons of some kind, and so the Comparer provid
 
     -   [Heatmaps](heatmap.qmd)
 
-Most but not all of these plots are currently implemented. Those that aren't (timeseries, better heatmaps) are high priority, but waiting for data formats and inputs to shape up a bit more. They will use the same underlying plot scaffolding and data preparation functions, and so be quick to implement.
-
 # Standardization
 
-The `plot_*` functions use a set of theming and color controls to maintain a standard look and calculation structure. These are described below. It is perhaps most important to know that these functions are also exposed to the user, and so these themes and standard approaches to appearance and baselining can be used for one-off ad-hoc plots. While the use of the `plot_*` functions automates much of this and keeps the environment clean and reduces errors in data management and plotting, we will sometimes just want to throw together a quick `ggplot` call, and these functions will be useful for that as well. An intermediate approach is to call `plot_prep`, which automates much of the colouring and `baseline_compare`ing, and then make ad-hoc plots with the resulting dataframe.
+The `plot_outcomes()` function allows the user to specify theming and color controls to maintain a standard look and calculation structure. More generally, {HydroBOT} provides some of this theming functionality with `theme_hydrobot()` and the ability to generate and manipulate color palettes. These are described below. It is perhaps most important to know that these functions are also exposed to the user, and so these themes and standard approaches to appearance and baselining can be used for one-off ad-hoc plots as well. In any particular project, a user should set up relevant, consistent, and standard color palettes, which can be used throughout and passed to `plot_outcomes()`.
+
+While the use of the `plot_outcomes()` function automates much of the processing and keeps the environment clean and reduces errors in data management and plotting, we will sometimes just want to throw together a quick `ggplot` call, where the theming and color control will still come in handy. An intermediate approach is to call `plot_prep()`, which automates much of the colouring, data manipulation, (including `baseline_compare()`ing), and then make ad-hoc plots with the resulting dataframe.
 
 ## Theme
 
-I have developed a `theme_hydrobot()` ggplot theme that we use to get a consistent look. We can build on this and change it as we go, as it is fairly simple at present. Additional `theme` arguments can be passed to it, if we want to change any of the other arguments in `ggplot2::theme()` on a per-plot basis. By default, `theme_hydrobot` is applied when making the plots inside `plot_outcomes` and `plot_hydrographs`, though it can be applied to any ggplot object.
+HydroBOT provides the `theme_hydrobot()` ggplot theme that we use to get a consistent look, but other themes can always be used post-hoc. Additional `theme` arguments can be passed to it, if we want to change any of the other arguments in `ggplot2::theme()` on a per-plot basis. By default, `theme_hydrobot` is applied when making the plots inside `plot_outcomes()`, though it can be applied to any ggplot object.
 
 ## Colour
 
-At present, I do not enforce a standard set of colors- they'll change between scenarios/projects and there are too many possibilities of what we might plot. I do provide default palettes for the plotting functions, but we will likely want to change them depending on what we plot. We could enforce palettes within projects, however, once the plots firm up. In general, colors can either be specified manually (usually with the help of `make_pal`) or with {paletteer} palettes because of the wide range of options with standard interface and ability to choose based on names. A good reference for the available palettes is [here](https://pmassicotte.github.io/paletteer_gallery), and demonstrations of both ways of specifying colors are throughout the examples, but specifically [bar plots](bar_plots.qmd).
+HydroBOT does not enforce a standard set of colors, instead, it provides the user the tools they need to achieve the color standardisations they need for a particular project or plot type. These color sets will change between scenarios/projects and there are too many possibilities of what we might plot. It is generally good practice to enforce palettes within projects, and HydroBOT provides the tools to do this. In general, colors can either be specified manually (usually with the help of `make_pal()` to generate named color objects) or with {paletteer} palettes because of the wide range of options with standard interface and ability to choose based on names. A good reference for the available palettes is [here](https://pmassicotte.github.io/paletteer_gallery), and demonstrations of color specification are throughout the examples, but specifically [bar plots](bar_plots.qmd).
 
-Though we do not enforce standard colors, we have established the infrastructure to set consistent colors within a project by using named color objects. This is particularly useful for scenarios, but also can be used for other qualitative categories. Quantitative outcomes (e.g. matching different palettes to outcome x vs y) is not handled automatically at present, but is left to the user. I expect that as a project proceeds and settles on desired outcomes, we will standardize color palettes for different outcome variables, scenarios, etc.
-
-There is some interesting ability to set colors within a single column based on different palettes, which can be a useful way to indicate grouping variables. This is available everywhere, but is best demonstrated in the [bar plots](bar_plots.qmd) and [causal plots](causal_plots.qmd).
+In some cases, we can set multiple levels of colors based on different palettes, which can be a useful way to indicate grouping variables. This is available everywhere, but is best demonstrated in the [bar plots](bar_plots.qmd) and [causal plots](causal_plots.qmd). Though it achieves a different purpose, there is also the ability to set separate color palettes for different spatial scales in the same [map](maps.qmd).
 
 ## Internal calculations and structure
 
-While the plots are the typical outputs of the Comparer, it has a set of useful functions for preparing data, including calculating values relative to a baseline (`baseline_compare`) using either default functions `difference` and `relative`, or with any user-supplied function.
+While plots are the typical outputs of the Comparer, it has a set of useful functions for preparing data, including calculating values relative to a baseline (`baseline_compare()`) using either default functions `difference` and `relative`, or with any user-supplied function.
 
-There is an internal function `plot_prep` that does all the data prep, including applying `baseline_compare`, finding colors, and setting established scenario orders. This keeps plots and the data processing consistent, and dramatically reduces the error-prone copy-pasting of data processing with minor changes for different plots. Instead, we can almost always feed the plotting functions the same set of clean data straight out of the aggregator, and just change the arguments to the plot functions.
+There is an internal function `plot_prep()` that does all the data prep, including applying `baseline_compare()`, finding colors, and setting established scenario orders. This keeps plots and the data processing consistent, and dramatically reduces the error-prone copy-pasting of data processing with minor changes for different plots. Instead, we can almost always feed the plotting functions the same set of clean data straight out of the aggregator, and just change the arguments to the plot functions.
 
-Baselining is available as a standalone function (`baseline_compare`) and can be done automatically in the `plot_*` functions. This capacity is demonstrated in all the plot examples, but in most detail in the [hydrographs notebook](hydrographs.qmd).
+Baselining is available as a standalone function (`baseline_compare()`) and can be done automatically in the `plot_outcomes()` (and `plot_prep()`) functions. This capacity is demonstrated in all the plot examples, but in most detail in the [hydrographs](hydrographs.qmd).
 
-One critical issue, particularly with complex data, is being unaware of overplotting values. The `plot_*` functions have internal checks that the number of rows of data matches the number of axes on which the data is plotted (including facets, colors, linetype, etc). This prevents things like plotting a map of `env_obj` data facetted only by `scenario`, and so each fill represents outcomes for all `env_obj`, which is meaningless but very easy to do. The exception is that points are allowed to overplot, though we can use the `position = 'position_jitter'` to avoid even that.
+One critical issue, particularly with complex data, is being unaware of silently overplotted values. The `plot_outcomes()` function has internal checks that the number of rows of data matches the number of axes on which the data is plotted (including facets, colors, linetype, etc). This prevents things like plotting a map of `env_obj` data facetted only by `scenario`, and so each fill represents outcomes for all `env_obj`, which is meaningless but very easy to do. The exception is that points are allowed to overplot, though we can use the `position = 'position_jitter'` argument to avoid that, as is typical with `ggplot()`.

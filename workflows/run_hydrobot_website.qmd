@@ -2,7 +2,8 @@
 title: "Build demo data"
 format: html
 params:
-  REBUILD_DATA: FALSE
+  REBUILD_EWR: FALSE
+  REBUILD_AGG: FALSE
 ---
 
 This notebook regenerates outputs for the demonstrations. We generally do not want to run it every time.
@@ -45,7 +46,7 @@ Using `rparallel = TRUE` for speed to parallelise over all scenarios.
 ```{r}
 #| message: false
 
-if (params$REBUILD_DATA) {
+if (params$REBUILD_EWR) {
   ewr_out <- prep_run_save_ewrs(
     hydro_dir = hydro_dir,
     output_parent_dir = project_dir,
@@ -57,39 +58,53 @@ if (params$REBUILD_DATA) {
 
 ## Aggregate
 
-Use a 'standard' aggregation sequence, as in [getting started](../getting_started.qmd).
+Use a 'standard' aggregation sequence, as in [getting started](/getting_started.qmd).
+
+Some of the example gauges provide information into other sdl units, but since we do not have full gauge coverage in those units, we clip to only those that are relevant.
+
+```{r}
+sdl_clip <- sdl_units |> 
+  filter(SWSDLName %in% c("Lachlan", "Namoi", "Macquarie-Castlereagh"))
+
+causal_clip <- causal_ewr
+
+causal_clip[1:2] <- causal_clip[1:2] |> 
+  purrr::map(\(x) filter(x, SWSDLName %in% c("Lachlan", "Namoi", "Macquarie-Castlereagh")))
+  
+```
+
 
 ```{r}
 aggseq <- list(
   all_time = "all_time",
   ewr_code = c("ewr_code_timing", "ewr_code"),
-  sdl_units = sdl_units,
   env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_clip,
   Target = c("env_obj", "Target"),
   mdb = basin,
   target_5_year_2024 = c("Target", "target_5_year_2024")
 )
 
 funseq <- list(
-  "ArithmeticMean",
-  "CompensatingFactor",
-  "ArithmeticMean",
-  "ArithmeticMean",
-  "ArithmeticMean",
-  "SpatialWeightedMean",
-  "ArithmeticMean"
+  all_time = "ArithmeticMean",
+  ewr_code = "CompensatingFactor",
+  env_obj = "ArithmeticMean",
+  sdl_units = "ArithmeticMean",
+  Target = "ArithmeticMean",
+  mdb = "SpatialWeightedMean",
+  target_5_year_2024 = "ArithmeticMean"
 )
 ```
 
 Be explicit instead of using `auto_ewr_PU`
 
 ```{r}
-if (params$REBUILD_DATA) {
+if (params$REBUILD_AGG) {
   aggout <- read_and_agg(
     datpath = ewr_results,
     type = "achievement",
     geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
+    causalpath = causal_clip,
     groupers = "scenario",
     aggCols = "ewr_achieved",
     group_until = list(
@@ -105,7 +120,8 @@ if (params$REBUILD_DATA) {
     keepAllPolys = FALSE,
     returnList = TRUE,
     savepath = agg_results,
-    rparallel = TRUE
+    rparallel = TRUE,
+    add_max = FALSE
   )
 }
 ```

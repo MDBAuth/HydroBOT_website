@@ -65,21 +65,21 @@ For this example, if any of the 'versions' of an EWR pass, say it passes in step
 aggseq <- list(
   all_time = "all_time",
   ewr_code = c("ewr_code_timing", "ewr_code"),
-  sdl_units = sdl_units,
   env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
   Target = c("env_obj", "Target"),
   mdb = basin,
   target_5_year_2024 = c("Target", "target_5_year_2024")
 )
 
 funseq <- list(
-  "ArithmeticMean",
-  "CompensatingFactor",
-  "ArithmeticMean",
-  "ArithmeticMean",
-  "ArithmeticMean",
-  "SpatialWeightedMean",
-  "ArithmeticMean"
+  all_time = "ArithmeticMean",
+  ewr_code = "CompensatingFactor",
+  env_obj = "ArithmeticMean",
+  sdl_units = "ArithmeticMean",
+  Target = "ArithmeticMean",
+  mdb = "SpatialWeightedMean",
+  target_5_year_2024 = "ArithmeticMean"
 )
 ```
 
