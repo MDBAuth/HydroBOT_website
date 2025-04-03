@@ -16,7 +16,7 @@ library(dplyr)
 library(ggplot2)
 ```
 
-In most of the demonstrations, we have used some of the named functions provided by {HydroBOT} or those that are provided by R itself. However, it is possible for a user to develop custom functions and use those as well in the `funsequence` of `multi_aggregate()` and `read_and_agg()` (and in some other functions as well like `baseline_compare()`. The most stable and best practice for specifying aggregation functions is to specify them as a named function, and supply that to the `funsequence`. See the [aggregation syntax](aggregation_syntax.qmd) for a full treatment of the way functions can be specified. We demonstrate here with the best-supported method for with `read_and_agg()`, since that is the most common situation, but it also works with [multi_aggregate](using_multi_aggregate).
+In most of the demonstrations, we have used some of the named functions provided by {HydroBOT} or those that are provided by R itself. However, it is possible for a user to develop custom functions and use those as well in the `funsequence` of `multi_aggregate()` and `read_and_agg()` (and in some other functions as well like `baseline_compare()` (see a [contrived example](/comparer/hydrographs.qmd)). The most stable and best practice for specifying aggregation functions is to specify them as a named function, and supply that to the `funsequence`. See the [aggregation syntax](aggregation_syntax.qmd) for a full treatment of the way functions can be specified. We demonstrate here with the best-supported method for with `read_and_agg()`, since that is the most common situation, but it also works with [multi_aggregate](using_multi_aggregate).
 
 As always, we need to point to the data.
 
@@ -29,7 +29,7 @@ agg_results <- file.path(project_dir, "aggregator_output", "demo")
 
 ## Defining functions
 
-We demonstrate here with a threshold function and a slightly-modified median with `na.rm = TRUE`. For example, we might want to know the mean of all values greater than 0 for some stages and use the median at others. 
+We demonstrate here with a threshold function and a slightly-modified median with `na.rm = TRUE`. For example, we might want to know the mean of all values greater than 0 for some stages and use the median at others.
 
 ```{r}
 mean_given_occurred <- function(x) {

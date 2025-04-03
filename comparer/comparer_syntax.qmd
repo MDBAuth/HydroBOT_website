@@ -18,6 +18,8 @@ Maps in particular can have under- and overlays, and so we use the `underlay_lis
 
 Smoothers and contours are both fitting functions, which may need additional arguments. These can be provided through the `smooth_arglist` and `contour_arglist` respectively, with demonstration in [line plots](line_plots.qmd) and [heatmaps](heatmaps.qmd).
 
+The `base_list` argument takes a list of arguments that get passed to `baseline_compare()`, allowing baselining to happen internally to `plot_outcomes()` and so avoiding carrying around extra dataframes of compared data. See the [hydrographs](hydrographs.qmd) for examples.
+
 ## Grouped colors
 
 Sometimes we might want to specify different palettes for different groups, so that we can distinguish both large groupings and the subsidiary parts. we use the `pal_list` as a list for this, in conjunction with `colorgroups`. See the [bar example](bars.qmd) and [causal networks](causal_plots.qmd).

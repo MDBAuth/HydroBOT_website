@@ -44,7 +44,6 @@ To make visualisation easier, the SDL units data is given a grouping column that
 If we had used multiple aggregation functions at any step, we should filter down to the one we want here, but we only used one for this example.
 
 ```{r}
-scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
 
 scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
   as_tibble()
@@ -86,9 +85,10 @@ qual_heatmap <- agged_data$Target |>
 
 qual_heatmap
 ```
+
 ## Quantitative axes
 
-Here, our scenarios are defined quantitatively, and so we can allow x and y to be quantitative. A key issue here is the spacing of the scenarios. We log-transform the axes to help a bit, but if this were a targetted output, even scenario spacing would be desirable. 
+Here, our scenarios are defined quantitatively, and so we can allow x and y to be quantitative. A key issue here is the spacing of the scenarios. We log-transform the axes to help a bit, but if this were a targetted output, even scenario spacing would be desirable.
 
 ```{r}
 # Quantitative axes- it's more informative, but uglier
@@ -115,6 +115,7 @@ quant_heatmap <- agged_data$Target |>
 
 quant_heatmap
 ```
+
 ## Interpolated raster
 
 We can try to fill in the missing locations by interpolating a raster using the `contour_arglist`, which passes arguments to `geom_raster` (if it contains 'interpolate') or `geom_contour` (if it does not). That helps, but the scenarios are still really too far apart, and so closer scenario spacing would be better.

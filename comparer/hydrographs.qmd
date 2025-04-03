@@ -16,7 +16,7 @@ library(dplyr)
 
 # Overview
 
-This notebook provides descriptive plots of the inputs to HydroBOT (hydrographs), as they are often necessary for understanding the outputs. Though these are plots of the inputs, they do still allow various sorts of comparisons, whether simple visual comparisons or calculated differences, relative flows, etc.
+This notebook provides descriptive plots of the inputs to HydroBOT (hydrographs), as they are often necessary for understanding the outputs. It also shows how `plot_outcomes()` is not restricted only to module outcomes, but is instead flexible enough to use nearly any dataframe with quantitative values. Though we plot the hydrographs here, this is the same approach as any other [line plot](lines.qmd). Though these are plots of the inputs, they do still allow various sorts of comparisons, whether simple visual comparisons or calculated differences, relative flows, etc.
 
 ## Demonstration setup
 
@@ -27,143 +27,170 @@ project_dir <- file.path("more_scenarios")
 hydro_dir <- file.path(project_dir, "hydrographs")
 ```
 
-## Scenario information
-
-Get scenario metadata. This will be auto-found later, but leaving here until it firms up.
+Get scenario metadata.
 
 ```{r}
-scenarios <- jsonlite::read_json(file.path(
-  hydro_dir,
-  "scenario_metadata.json"
-)) |>
-  tibble::as_tibble() |>
-  tidyr::unnest(cols = everything())
+scenarios <- yaml::read_yaml(file.path(hydro_dir, "scenario_metadata.yml")) |>
+  as_tibble()
 ```
 
-## Subset for demo
-
-We have a lot of hydrographs, so for this demonstration, we will often use a subset.
+We have a lot of hydrographs, so for this demonstration, we will often use a subset of gauges and scenarios.
 
 ```{r}
 gauges_to_plot <- c("412002", "419001", "422028", "421001")
+scenarios_to_plot <- c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0")
+
+scenarios <- scenarios |>
+  filter(scenario %in% scenarios_to_plot)
 ```
 
 # Standard scenario appearance
 
-We want to have a consistent look for the scenarios across the project, with a logical ordering and standard colors. In future, this will potentially be able to be parsed from metadata, but at present we will define these properties manually. They are not included in the {HydroBOT} package because they are project/analysis- specific.
+We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
+
+Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see @tbl-scenarios) rather than the names to make plots readable.
+
+There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`. 
 
 ```{r}
-sceneorder <- forcats::fct_reorder(scenarios$scenario_name, scenarios$flow_multiplier)
-scene_pal <- make_pal(unique(scenarios$scenario_name),
-  palette = "ggsci::nrc_npg",
-  refvals = "base", refcols = "black"
+sceneorder <- forcats::fct_reorder(
+  scenarios$scenario,
+  scenarios$flow_multiplier
 )
+
+scene_pal <- make_pal(unique(scenarios$climate_code),
+  palette = "ggsci::nrc_npg",
+  refvals = "E", refcols = "black"
+)
+
+scene_pal
+```
+
+We will also make a standard set of gauge colors
+```{r}
+gauge_pal <- make_pal(unique(gauges_to_plot),
+  palette = "nationalparkcolors::Denali"
+)
+gauge_pal
 ```
 
 # Plotting hydrographs
 
-We first read in the hydrographs, with a bit of standardised data processing. The `read_hydro` function knows about the standard data organisation format, and so pulls hydrographs from all scenarios.
+We first read in the hydrographs, with a bit of standardised data processing. The `read_hydro` function knows about the standard data organisation format, and so pulls hydrographs from all scenarios. The hydrographs are typically daily and so large. For simplicity here, we use the `scenariofilter` argument (which just does a regex on the filenames) to select a subset.
 
 ```{r}
-scenehydros <- read_hydro(hydro_dir, long = TRUE, format = "csv")
+scenehydros <- read_hydro(hydro_dir,
+  long = TRUE, format = "csv",
+  scenariofilter = scenarios_to_plot
+)
+
+scenehydros <- scenehydros |>
+  # these have EWR-specific _flow after the gauge name
+  mutate(gauge = stringr::str_remove_all(gauge, "_[a-z]*")) |>
+  # because gauges are not their own files, we have to filter them on read-in
+  filter(gauge %in% gauges_to_plot) |>
+  left_join(scenarios)
 ```
 
 Now, we can make a simple plot using the standard format and colors
 
 ```{r}
-plot_hydrographs(scenehydros,
-  gaugefilter = gauges_to_plot,
-  colors = scene_pal,
-  sceneorder = sceneorder
+plot_outcomes(scenehydros,
+  outcome_col = "flow",
+  outcome_lab = "Flow (ML/day)",
+  x_col = "Date",
+  colorset = "gauge",
+  color_lab = "Gauge ID:",
+  pal_list = gauge_pal,
+  facet_row = "climate_code",
+  facet_col = "gauge",
 )
 ```
 
-The `plot_hydrographs` function has a `scenariofilter` argument if we want to drop some scenarios, which also shows that the scenario colors stay consistent, even if some are missing. Further, we can access the `scales` argument from `ggplot2::facet_*` and `trans` arguments of of `ggplot2::cale_y_continuous` (though just for the y-axis).
+We can access the `scales` argument from `ggplot2::facet_*` and `trans` arguments of of `ggplot2::scale_y_continuous` if we want to change the look.
 
 ```{r}
-plot_hydrographs(scenehydros,
-  gaugefilter = gauges_to_plot,
-  colors = scene_pal,
-  scenariofilter = c("up2", "base", "down2"),
-  scales = "free_y", transy = "log10",
-  sceneorder = sceneorder
+plot_outcomes(scenehydros,
+  outcome_col = "flow",
+  outcome_lab = "Flow (ML/day)",
+  x_col = "Date",
+  colorset = "gauge",
+  color_lab = "Gauge ID:",
+  pal_list = gauge_pal,
+  facet_row = "climate_code",
+  facet_col = "gauge",
+  transy = "log10",
+  scales = "free_y"
 )
 ```
 
 # Baselining
 
-All plotting functions provide the ability to set a base level and calculate changes in the other levels. Here, we'll show how that works under the hood, though it is usually done directly in the `plot_*` call, as we show later.
+All plotting functions provide the ability to set a base level and calculate changes in the other levels. First, we'll show how that works under the hood, and then the more usual way directly in the `plot_outcomes()` call.
 
-The baseline can be either a scenario name or a scalar. We could potentially use something else like historical daily means, but that is not currently implemented, largely because it hasn't yet been necessary- one of the scenarios is always an obvious baseline.
+## How it works
 
-Internally, the `plot_*` functions call `baseline_compare`, but `baseline_compare` can be used externally as well (and is actually quite useful in a number of places to baseline long data).
+The baseline can be either a scenario name or a scalar. We could potentially use something else like historical daily means, but that is not currently implemented, largely because it hasn't yet been necessary- one of the scenarios is almost always an obvious baseline.
+
+Internally, the `plot_outcome()` function calls `baseline_compare()`, but `baseline_compare()` can be used externally as well (and is actually quite useful in a number of places to baseline long data).
 
 For example, we might want to calculate the difference between the modified scenarios and the `base` scenario. To do this, we simply pass in the data, the columns defining the groups `compare_col`, and the `base_lev`, that is, the value in `compare_col` that is the baseline situation. We also need to tell it which column contains the values, and the function `comp_fun` we want to use for the comparison. Here, we ask for the `difference` to the baseline provided by the base scenario.
+
+In short, this gets the difference of the 0.5x and 2x scenario compared to the historical. We use difference here because these are simple multiplicative scenarios, and so the `relative` comparison would be trivially 0.5 or 2. In general, though, relative change is often more appropriate.
 
 ```{r}
 dif_flow <- baseline_compare(scenehydros,
   compare_col = "scenario",
-  base_lev = "base",
+  base_lev = "climatebaseadapt0",
   values_col = "flow",
   comp_fun = difference,
   group_cols = c("Date", "gauge")
 )
 ```
 
-Now we can feed the dif_flow dataframe to `plot_hydrographs` directly. We see that, as expected, `base` is now a flat line at 0, while up2 and down2 go up and down, respectively.
+Now we can feed the dif_flow dataframe to `plot_outcomes()` directly. We see that, as expected, `base` is now a flat line at 0, while the 2x and 0.5x go up and down, respectively.
 
 ```{r}
-plot_hydrographs(dif_flow,
-  gaugefilter = gauges_to_plot,
-  y_col = "difference_flow",
-  colors = scene_pal,
-  sceneorder = sceneorder
+plot_outcomes(dif_flow,
+  outcome_col = "difference_flow",
+  outcome_lab = "Change in flow (ML/day)",
+  x_col = "Date",
+  colorset = "climate_code",
+  color_lab = "Scenario",
+  pal_list = scene_pal,
+  # facet_row = 'climate_code',
+  facet_col = "gauge"
 )
 ```
 
-In practice, we would typically let the baselining happen internally to the `plot_*` functions so we aren't carrying around and keeping track of a bunch of altered dataframes. To replicate the above plot, we only have to feed `plot_hydrographs` the `base_lev` and `comp_fun` arguments- it automatically uses the `scenario` column as the groupings. This is also true for `plot_outcomes`. If we want to do something more unusual with the baselining, we will need to do it external to the `plot_*` functions, at least until it becomes common enough for us to decide to incorporate the additional parsing.
+## Internal to plot_outcomes()
 
-We get a warning here about not being explicit about the `group_cols` argument to the baselining function, which just groups by everything non-numeric if that argument is not given. We can pass it since there are dots `…`, which we do in subsequent examples.
+In practice, we would typically let the baselining happen internally to the `plot_outcomes()` function so we aren't carrying around and keeping track of a bunch of altered dataframes. To replicate the above plot, we only have to feed `plot_outcomes()` the `base_lev` and `comp_fun` arguments in `base_list`. If we want to do something more unusual with the baselining, we will need to do it externally. We can though specify a custom function of x and y, here the *extremely* contrived `sqrtdif`.
 
-```{r}
-plot_hydrographs(scenehydros,
-  gaugefilter = gauges_to_plot,
-  colors = scene_pal,
-  base_lev = "base",
-  comp_fun = difference,
-  sceneorder = sceneorder
-)
-```
+::: callout-note
+We would get a warning here about not being explicit about the `group_cols` argument to the baselining function if it were not included, which just groups by everything non-numeric if that argument is not given.
+:::
 
-The other default comparison function is `relative` , which has an `add_eps` argument to pull zeros up a bit and avoid divide-by-0 infinities. This is a bit silly to use for this test case, since the test case was created multiplicatively, so all `down2` values are 0.5\*base and `up2` values are 2\*base, for example. Now we give the `group_cols` argument to the baseline function through the dots, just as we pass the `add_eps` argument.
-
-```{r}
-plot_hydrographs(scenehydros,
-  gaugefilter = gauges_to_plot,
-  y_col = "flow", colors = scene_pal,
-  base_lev = "base", comp_fun = relative,
-  add_eps = min(scenehydros$flow[scenehydros$flow > 0]) / 10,
-  group_cols = c("Date", "gauge"),
-  sceneorder = sceneorder
-)
-```
-
-Finally, as with other situations where we can pass functions, we can create a custom comparison function. The ability to pass anonymous functions in a list a la the aggregator is not yet implemented here. The two above are the logical functions to use, but for demonstration purposes, let's create a function that finds the square root of the absolute value of the difference.
+This automatically labels with a long but meaningful name.
 
 ```{r}
 sqrtdif <- function(x, y) {
   sqrt(abs(x - y))
 }
-```
 
-```{r}
-plot_hydrographs(scenehydros,
-  gaugefilter = gauges_to_plot,
-  colors = scene_pal,
-  base_lev = "base",
-  comp_fun = sqrtdif,
-  group_cols = c("Date", "gauge"),
-  sceneorder = sceneorder
+plot_outcomes(scenehydros,
+  outcome_col = "flow",
+  x_col = "Date",
+  colorset = "gauge",
+  color_lab = "Gauge ID:",
+  pal_list = gauge_pal,
+  base_list = list(
+    base_lev = "climatebaseadapt0",
+    values_col = "flow",
+    comp_fun = "sqrtdif",
+    group_cols = c("Date", "gauge")
+  ),
+  facet_col = "climate_code"
 )
 ```
 
@@ -175,13 +202,28 @@ lagdif <- function(x, y) {
 }
 ```
 
+We can change the `outcome_lab` as well, though to make sure information isn't lost, the baselining is appended.
 ```{r}
-plot_hydrographs(scenehydros,
-  gaugefilter = gauges_to_plot,
-  colors = scene_pal,
-  base_lev = "base",
-  comp_fun = lagdif,
-  group_cols = c("Date", "gauge"),
-  sceneorder = sceneorder
+lagplot <- plot_outcomes(scenehydros,
+  outcome_col = "flow",
+  outcome_lab = "Lagged flow difference",
+  x_col = "Date",
+  colorset = "gauge",
+  color_lab = "Gauge ID:",
+  pal_list = gauge_pal,
+  base_list = list(
+    base_lev = "climatebaseadapt0",
+    values_col = "flow",
+    comp_fun = "lagdif",
+    group_cols = c("Date", "gauge")
+  ),
+  facet_col = "climate_code"
 )
+
+lagplot
+```
+Because this is a ggplot object, we can change that y-label if we really don't want the explanation.
+
+```{r}
+lagplot + labs(y = "Lag 1 flow difference")
 ```

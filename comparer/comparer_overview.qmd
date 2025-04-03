@@ -10,7 +10,7 @@ Most importantly for the plots implement through the `plot_outcomes()` function,
 
 There is quite a lot of flexibility built into all of the comparer, because different uses and different questions will require different outputs, whether that means different scales of analysis, different types of plots, or different numerical comparisons. Not only will these differ within projects, the act of finding an 'ideal' set of plots for any given project is necessarily iterative, and so the flexibility here provides the user with much control over that process.
 
-While this is called the 'Comparer', it also contains other functionality related to analysis generally, and can produce plots that do not include comparisons, e.g. hydrographs to simply illustrate historical flows.
+While this is called the 'Comparer' and most plots use the function `plot_outcomes()`, it also contains other functionality related to analysis generally, and can produce plots that do not include comparisons or outcomes, e.g. [hydrographs](hydrographs.qmd) to simply illustrate historical flows.
 
 Nearly all plots of outcomes are made with `plot_outcomes`, including [bars](bar_plots.qmd), [lines](line_plots.qmd), heatmaps[heatmaps.qmd], and [maps](maps.qmd). This is because at their foundation, they area all plotting a quantitative outcome with grouping of some sort. The data preparation is the same across all of them, as well as many of the arguments to `ggplot()`.
 
