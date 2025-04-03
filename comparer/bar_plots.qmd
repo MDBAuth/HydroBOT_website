@@ -11,10 +11,6 @@ library(dplyr)
 library(sf)
 ```
 
-::: callout-note
-HydroBOT outputs are usually `sf` objects. To use any of their geographic properties (and prevent unexpected behaviour), we need to have `sf` loaded. This should happen automatically with `library(HydroBOT)`, but if HydroBOT is used with `::`, it may not be, and so for safety we use `library(sf)`.
-:::
-
 # Overview
 
 This notebook provides examples of creating bar plots, e.g. plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, the scenarios. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit or type of response.
