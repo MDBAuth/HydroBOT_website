@@ -1,0 +1,170 @@
+---
+title: "User-provided causal networks"
+author: "Galen Holt"
+---
+
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+make_ewr_output()
+```
+
+```{r}
+#| message: false
+library(HydroBOT)
+library(dplyr)
+library(ggplot2)
+```
+
+In most of the demonstrations, we have used the `HydroBOT::causal_ewr` causal networks. However, the causal network is an argument to `multi_aggregate()` and `read_and_agg()`, and so it is possible for the user to pass arbitrary networks. Here, we demonstrate how to pass a causal network that isn't provided by HydroBOT. We do that here with `read_and_agg()`, since that is the most common situation, but it also works with [multi_aggregate](using_multi_aggregate).
+
+### Setup
+
+As always, we need to point to the data and set up aggregation sequences.
+
+```{r}
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, 'hydrographs')
+ewr_results <- file.path(project_dir, "module_output", "EWR")
+agg_results <- file.path(project_dir, "aggregator_output", "demo")
+```
+
+```{r}
+aggseq <- list(
+  all_time = 'all_time',
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Specific_goal = c("env_obj", "Specific_goal"),
+  Objective = c("Specific_goal", "Objective"),
+  basin = basin,
+  target_5_year_2024 = c("Objective", "target_5_year_2024")
+)
+
+funseq <- list(
+  all_time = 'ArithmeticMean',
+  ewr_code = "CompensatingFactor",
+  env_obj = "ArithmeticMean",
+  sdl_units = "ArithmeticMean",
+  Specific_goal = "ArithmeticMean",
+  Objective = "ArithmeticMean",
+  basin = 'SpatialWeightedMean',
+  target_5_year_2024 = "ArithmeticMean"
+  )
+```
+
+## Network from EWR tool
+
+One use that is likely to be common is to extract the (sometimes newer, but less tested) causal networks from the EWR tool with `get_causal_ewr()`.
+
+```{r}
+agg_ewr_causal <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = get_causal_ewr(),
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  group_until = list(
+    SWSDLName = is_notpoint,
+    planning_unit_name = is_notpoint,
+    gauge = is_notpoint
+  ),
+  pseudo_spatial = "sdl_units",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  savepath = agg_results,
+  add_max = FALSE
+)
+```
+
+## Arbitrary network 
+
+It is also possible to use any arbitrary network with the needed links (columns). Here, we make up a very simple one. See `causal_ewr` for needed structure; the main key is it needs to be a list of dataframe(s).
+
+```{r}
+fakegroups <- c('a', 'b', 'c')
+fake_causal <- tibble::tibble(ewr_code_timing = unique(agg_ewr_causal$agg_input$ewr_code_timing),
+                              fake_group = sample(fakegroups,
+                                                  length(unique(agg_ewr_causal$agg_input$ewr_code_timing)), 
+                                                  replace = TRUE))
+```
+
+```{r}
+aggseq_fakecausal <- list(
+  all_time = 'all_time',
+  fake_group = c("ewr_code_timing", "fake_group"),
+  sdl_units = sdl_units
+)
+
+funseq_fakecausal <- list(
+  all_time = 'ArithmeticMean',
+  fake_group = "CompensatingFactor",
+  sdl_units = "ArithmeticMean"
+  )
+```
+
+```{r}
+# fake_causal_agg <- multi_aggregate(   
+#   dat = ewrdata,      
+#   causal_edges = list(fake_causal),   
+#   groupers = "scenario",   
+#   aggCols = "ewr_achieved",
+#   aggsequence = aggseq_fakecausal,   
+#   funsequence = funseq_fakecausal,
+#   auto_ewr_PU = TRUE,
+#   namehistory = FALSE) 
+
+fake_causal_agg <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = list(fake_causal),
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  group_until = list(
+    SWSDLName = is_notpoint,
+    planning_unit_name = is_notpoint,
+    gauge = is_notpoint
+  ),
+  pseudo_spatial = "sdl_units",
+  aggsequence = aggseq_fakecausal,
+  funsequence = funseq_fakecausal,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  savepath = agg_results,
+  add_max = FALSE
+)
+
+fake_causal_agg
+```
+
+And a quick plot of the random groupings implied there.
+
+```{r}
+fake_causal_agg$sdl_units |> 
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "scenario",
+    facet_row = "fake_group",
+    sceneorder = c("down4", "base", "up4")
+  )
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```

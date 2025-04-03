@@ -211,6 +211,7 @@ Now we want to set up the 'scenarios' as multiplications and additions, as well 
 multipliers <- c(1.1, 1.25, 1.5, 2)
 
 scenemults <- c(1 / rev(multipliers), 1, multipliers)
+climate_code <- LETTERS[1:length(scenemults)]
 
 scenenames <- c(
   paste0("climatedown", as.character(rev(multipliers))),
@@ -220,6 +221,7 @@ scenenames <- c(
   stringr::str_replace("\\.", "_") # deals with the 1.x
 
 adaptadds <- c(0, 250, 6500, 12000)
+adapt_code <- 1:length(adaptadds)
 
 adapttime <- 8 # months = Sep,Oct,Nov,Dec
 
@@ -239,16 +241,23 @@ scenenames <- paste0(
 )
 
 scenemults <- rep(scenemults, times = length(unique(sceneaddsnames)))
+climate_code <- rep(climate_code, times = length(unique(sceneaddsnames)))
 
 sceneadds <- sort(rep(adaptadds, times = length(unique(scenemults))))
-
+adapt_code <- sort(rep(adapt_code, times = length(unique(scenemults))))
 sceneadapttimes <- rep(adapttime, times = length(scenenames))
+
+scenario_code <- paste0(climate_code, adapt_code)
+
 
 # Add in the MAX scenario
 scenenames <- c(scenenames, "MAX")
 scenemults <- c(scenemults, 0)
 sceneadds <- c(sceneadds, 500000)
 sceneadapttimes <- c(sceneadapttimes, 0)
+climate_code <- c(climate_code, 'MAX')
+adapt_code <- c(adapt_code, Inf)
+scenario_code <- c(scenario_code, 'MAX')
 
 check <- data.frame(scenenames = scenenames)
 check$scenemults <- scenemults
@@ -300,11 +309,15 @@ Make some metadata for all scenarios too (both yaml and json for now).
 
 ```{r}
 scenario_meta <- list(
-  scenario_name = scenenames,
+  scenario = scenenames,
   flow_multiplier = scenemults,
   flow_addition = sceneadds,
-  flow_addition_time = sceneadapttimes
+  flow_addition_time = sceneadapttimes,
+  climate_code = climate_code,
+  adapt_code = adapt_code,
+  scenario_code = scenario_code
 )
+
 # I don't know the format we'll be using, but this works to create yaml metadata
 yaml::write_yaml(scenario_meta,
   file = file.path(hydro_dir, "scenario_metadata.yml")

@@ -802,7 +802,6 @@ allagg_interevent$sdl_units |>
   )
 ```
 
-
 ## Using un-integrated response models {#sec-dummy-module}
 
 In some cases, response models may not yet be integrated into HydroBOT, or may not be able to be integrated (e.g. if they are proprietary or unscriptable). In these cases, we can still use `multi_aggregate()` for processing with the Aggregator and then Comparer. All we need is a dataframe. For aggregation along the theme, space, and time dimensions, it needs to have information about those dimensions (i.e. a time column, a geometry column, and a column matching something in its relevant causal network). It will typically have a 'scenario' column as well.

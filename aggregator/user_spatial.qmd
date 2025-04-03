@@ -1,0 +1,98 @@
+---
+title: "User-provided spatial data"
+---
+
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+make_ewr_output()
+```
+
+```{r}
+#| message: false
+library(HydroBOT)
+library(dplyr)
+library(ggplot2)
+```
+
+In most of the demonstrations, we have used the spatial data provided by {HydroBOT}. However, spatial data is an argument to `multi_aggregate()` and `read_and_agg()`, and so it is possible for the user to pass arbitrary spatial datasets. as {sf} objects. The only requirement is that they are `sf` objects with a `geometry` column. To demonstrate, we'll download Australian states and aggregate into those. We do that here with `read_and_agg()`, since that is the most common situation, but it also works with [multi_aggregate](using_multi_aggregate).
+
+As always, we need to point to the data.
+
+```{r}
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, 'hydrographs')
+ewr_results <- file.path(project_dir, "module_output", "EWR")
+agg_results <- file.path(project_dir, "aggregator_output", "demo")
+```
+
+## New spatial units
+
+```{r}
+austates <- rnaturalearth::ne_states(country = 'australia') |> 
+  dplyr::select(state = name, geometry)
+```
+
+We'll set `keepAllPolys = TRUE` since the data is all in NSW and we want to show that the other states are there.
+
+```{r}
+aggseq_states <- list(
+  all_time = 'all_time',
+  env_obj = c("ewr_code_timing", "env_obj"),
+  Target = c("env_obj", 'Target'),
+  state = austates
+)
+
+funseq_states <- list(
+  all_time = 'ArithmeticMean',
+  env_obj = 'ArithmeticMean',
+  Target = 'ArithmeticMean',
+  state = 'ArithmeticMean'
+)
+
+state_agg <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  group_until = list(
+    SWSDLName = is_notpoint,
+    planning_unit_name = is_notpoint,
+    gauge = is_notpoint
+  ),
+  aggsequence = aggseq_states,
+  funsequence = funseq_states,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = TRUE,
+  returnList = TRUE,
+  add_max = FALSE
+)
+
+state_agg
+```
+
+And a quick plot of that to see the different spatial units (though this example is all in New South Wales so other states have no data).
+
+```{r}
+state_agg$state |> 
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    pal_direction = -1,
+    facet_col = "scenario",
+    facet_row = "Target",
+    sceneorder = c("down4", "base", "up4")
+  )
+```
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```

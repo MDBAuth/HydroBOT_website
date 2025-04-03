@@ -31,64 +31,6 @@ hydro_dir <- file.path(project_dir, "hydrographs")
 agg_dir <- file.path(project_dir, "aggregator_output")
 ```
 
-## Scenario information
-
-The 'scenarios' used here for examples are a factorial combination of multiplicative and additive changes to  flow, based on historical hydrographs.
-
-In an ideal world, scenario metadata would be auto-acquired from the directory defining the hydrographs. In practice, that's rarely available, but we can read it in here and make some small modifications for readability.
-
-```{r}
-scenarios <- jsonlite::read_json(file.path(
-  hydro_dir,
-  "scenario_metadata.json"
-)) |>
-  tibble::as_tibble() |>
-  tidyr::unnest(cols = everything()) |> 
-  dplyr::rename(scenario = scenario_name) |> 
-  dplyr::arrange(flow_addition, flow_multiplier) |> 
-  mutate(climate_code = LETTERS[1:n()], .by = flow_addition) |>
-  mutate(adapt_code = 1:n(), .by = flow_multiplier)
-```
-
-To scale flow, we apply nine flow multipliers, ranging from 0.5 to 2.0, to the historical hydrographs (SI @tbl-scenarios). We refer to these as 'climate' scenarios, reflecting a common representation where entire hydrographs might shift to represent climate change. To achieve pulsed change for each of the 'climate' scenarios, four flow additions were applied including 1) no addition (baseline), 2) addition of 250 ML/d, 3) addition of 6500 ML/d, and 4) addition of 12000 ML/d (@tbl-scenarios). These additional flows were added throughout the period of September to December. We refer to these scenarios as 'climate adaptations' because management options are often available in the form of altering water availability for short time periods through mechanisms like water releases, though the options here do not represent proposed actions. These scenarios should not be interpreted as potential climate impacts or adaptations, but instead as different ways flows might change (multiplicative or additive) and different magnitudes of change.
-
-```{r}
-#| label: tbl-scenarios
-#| width: 4
-#| tbl-cap: Demonstration scenarios are a factorial combination of 'climate' (scaled flow) and 'adaptation' (pulsed additions).
-#| message: false
-
-adapt_scenes <- scenarios |> 
-  filter(scenario != 'MAX') |> 
-  mutate(flow_addition = as.integer(flow_addition)) |> 
-  select(`Adaptation code` = adapt_code,
-         `Flow addition (ML/d)` = flow_addition) |>
-  distinct()
-
-climate_scenes <- scenarios |> 
-  filter(scenario != 'MAX') |> 
-  select(`Climate code` = climate_code,
-         `Flow multiplier` = flow_multiplier) |>
-  distinct()
-
-adapt_scenes <- adapt_scenes |> 
-  bind_rows(tibble(`Adaptation code` = rep(NA, nrow(climate_scenes) - 
-                                             nrow(adapt_scenes)),
-       `Flow addition (ML/d)` = rep(NA, nrow(climate_scenes) - 
-                                      nrow(adapt_scenes))))
-
-climate_scenes |> 
-               mutate(`Flow multiplier` = signif(`Flow multiplier`, 2)) |> 
-  bind_cols(adapt_scenes) |> 
-  flextable::flextable()  |> 
-  flextable::font(fontname = 'Calibri') |> 
-  flextable::fontsize(size = 10, part = 'all') |> 
-  flextable::set_table_properties(layout = "autofit", width = 1) |> 
-  flextable::vline(j = 2)
-
-```
-
-
 ## Read in the data
 
 We read in the example data we will use for all plots.
@@ -107,6 +49,9 @@ For simplicity here, we will only look at a small selection of the scenarios (mu
 
 ```{r}
 scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
+
+scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
+  as_tibble()
 
 basin_to_plot <- agged_data$mdb |> 
   dplyr::filter(scenario %in% scenarios_to_plot) |> 

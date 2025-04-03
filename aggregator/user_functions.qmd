@@ -1,0 +1,118 @@
+---
+title: "User-provided functions"
+---
+
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+make_ewr_output()
+```
+
+```{r}
+#| message: false
+library(HydroBOT)
+library(dplyr)
+library(ggplot2)
+```
+
+In most of the demonstrations, we have used some of the named functions provided by {HydroBOT} or those that are provided by R itself. However, it is possible for a user to develop custom functions and use those as well in the `funsequence` of `multi_aggregate()` and `read_and_agg()` (and in some other functions as well like `baseline_compare()`. The most stable and best practice for specifying aggregation functions is to specify them as a named function, and supply that to the `funsequence`. See the [aggregation syntax](aggregation_syntax.qmd) for a full treatment of the way functions can be specified. We demonstrate here with the best-supported method for with `read_and_agg()`, since that is the most common situation, but it also works with [multi_aggregate](using_multi_aggregate).
+
+As always, we need to point to the data.
+
+```{r}
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, 'hydrographs')
+ewr_results <- file.path(project_dir, "module_output", "EWR")
+agg_results <- file.path(project_dir, "aggregator_output", "demo")
+```
+
+## Defining functions
+
+We demonstrate here with a threshold function and a slightly-modified median with `na.rm = TRUE`. For example, we might want to know the mean of all values greater than 0 for some stages and use the median at others. 
+
+```{r}
+mean_given_occurred <- function(x) {
+  mean(ifelse(x > 0, x, NA), na.rm = TRUE)
+}
+
+medna <- function(x) {
+  median(x, na.rm = TRUE)
+}
+```
+
+Now we can put those in the `funsequence`:
+
+```{r}
+aggseq_funs <- list(
+  all_time = 'all_time',
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Target = c("env_obj", "Target")
+  )
+
+
+funseq_funs <- list(
+  all_time = 'ArithmeticMean',
+  ewr_code = 'ArithmeticMean',
+  env_obj = 'mean_given_occurred',
+  sdl_units = 'medna',
+  Target = 'mean_given_occurred'
+)
+```
+
+Those changes are then reflected in the aggregation history and determine the aggregated values.
+
+```{r}
+#| message: false
+#| warning: false
+
+agged_custom_funs <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  group_until = list(
+    SWSDLName = is_notpoint,
+    planning_unit_name = is_notpoint,
+    gauge = is_notpoint
+  ),
+  pseudo_spatial = "sdl_units",
+  aggsequence = aggseq_funs,
+  funsequence = funseq_funs,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  savepath = agg_results,
+  add_max = FALSE
+)
+
+```
+
+We can plot them to double check it worked.
+
+```{r}
+agged_custom_funs$Target |> 
+  dplyr::filter(scenario != 'MAX')  |>  
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_lab = "Arithmetic Mean",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::berlin"),
+    facet_col = "Target",
+    facet_row = "scenario",
+    sceneorder = c("down4", "base", "up4")
+)
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```

@@ -6,7 +6,7 @@ editor: visual
 ---
 
 ::: callout-tip
-If you just want to see an example of how the Aggregator typically works in practice, see [here](read_and_agg.qmd), and [here for its use in a full workflow](/workflows/workflow_overview().
+If you just want to see an example of how the Aggregator typically works in practice, see [here](read_and_agg.qmd), and \[here for its use in a full workflow\](/workflows/workflow_overview().
 :::
 
 Incoming data from modules is typically very granular in many dimensions (as it should be if the modules are modelling data near the scale of processes). However, this means that there are thousands of different outcomes across the basin and through time. To make that useful for anything other than targeted local planning, we need to scale up in space, time, and along the 'value' dimension (causal network). For example, scaling along the value dimension involves modelling how flow requirements influence fish spawning which influence fish populations which contribute to overall environmental success.
@@ -30,6 +30,8 @@ This is not to say that setting up an aggregation sequence does not require thou
 ## Flexibility and consistency
 
 Users need to be able to conduct summaries in a number of ways, and so the aggregation functions allow a wide range of summary functions to provide this needed flexibility. Within the aggregators, particularly `multi_aggregate` and `read_and_agg`, these aggregations are done consistently and produce standard outputs with standard formats. Intermediate data manipulations are handled internally, and so the user can feed raw module output data and an aggregation sequence and receive clean output data, without having to manage many intermediate data groupings and summaries that are liable to introduce errors and differences between runs. By enforcing a consistent format for specifying the aggregations, it is easier to see what is being *aggregated*, rather than what is being *grouped* which greatly reduces the complexity of calls and and makes forgetting grouping levels much more difficult.
+
+While HydroBOT provides useful connections to modules, spatial data and causal networks, as well as aggregation fucntions, it also has the flexibility for uers to provide their own [causal networks](user_causal.qmd), [spatial information](user_spatial.qmd), and [aggregation functions](user_functions.qmd). Moreover, aggregation can happen on [arbitrary input data, possibly from unincorporated modules](user_module.qmd). See those pages for more detail using `read_and_agg()`, along with doing the same in [multi_aggregate()](using_multi_aggregate.qmd).
 
 ## Dimensional safety
 
