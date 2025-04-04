@@ -22,7 +22,7 @@ library(dplyr)
 
 As in the [theme aggregation example](../aggregator/theme_agg.qmd), we can color the nodes in a causal network by outcome values.
 
-Here, we show those outcomes on the causal network, though there are [many other causal network plots](../provided_data/causal_plots.qmd) we can make to describe the network itself.
+Here, we show those outcomes on the causal network, though there are [many other causal network plots](../provided_data/causal_descriptive_plots.qmd) we can make to describe the network itself.
 
 ## Setup
 
@@ -76,7 +76,6 @@ To keep this demonstration from becoming too unwieldy, we limit the edge creatio
 example_gauge <- "421001"
 ```
 
-
 The first step is to generate the edges and nodes for the network we want to look at.
 
 ```{r}
@@ -115,6 +114,10 @@ nodes_with_vals <- dplyr::left_join(nodes, aggvals)
 
 Now we can make the causal network plot with the nodes we chose and colour them by the values we've just attached to them from the aggregation. At present, it is easiest to make separate plots per scenario or other grouping ( @fig-causal-base , @fig-causal-up4, @fig-causal-down4 ). For example, in the increased watering scenario, we see more light colours, and so better performance across the range of outcomes. Further network outputs are provided in the Comparer.
 
+::: callout-tip
+Causal networks render fine in notebooks, but often fail to on export. The trick is to save them as objects and explicitly call `Diagrammer::render_graph()`.
+:::
+
 ```{r}
 #| label: fig-causal-base
 #| fig-cap: Causal network for baseline scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 0, dark blue is 1.
@@ -136,7 +139,7 @@ DiagrammeR::render_graph(aggNetwork_base)
 ```
 
 ```{r}
-#| label: fig-causal-down
+#| label: fig-causal-down4
 #| fig-cap: Causal network for the 0.25x scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 0, dark blue is 1.
 aggNetwork_down <- make_causal_plot(
   nodes = dplyr::filter(
@@ -154,7 +157,6 @@ aggNetwork_down <- make_causal_plot(
 
 DiagrammeR::render_graph(aggNetwork_down)
 ```
-
 
 ```{r}
 #| label: fig-causal-up4
@@ -200,7 +202,7 @@ basenodes <- nodes_with_vals |>
 Now make the networks.
 
 ::: callout-tip
-Causal networks look good in html, but often do not export well. The trick is to use `save = TRUE` and specify a `savedir` and `savename`. This will save them as vector objects and so retain some quality.
+Causal networks look good in html, but often do not export well. The trick is to use `save = TRUE` and specify a `savedir` and `savename`. This will save them as vector objects and so retain quality.
 :::
 
 ```{r}
@@ -213,16 +215,16 @@ aggNetworkdown_rel <- basenodes |>
                  edge_pal = 'black',
                  node_pal = list(value = 'ggthemes::Orange-Blue-White Diverging'),
                  node_colorset = 'logrel_ewr_achieved',
-                 render = TRUE,
+                 render = FALSE,
                  setLimits = c(min(basenodes$logrel_ewr_achieved),
                                0,
                                max(basenodes$logrel_ewr_achieved)),
                  save = TRUE,
                  savedir = tempdir(),
                  savename = 'aggNetworkdown_rel')
+
+DiagrammeR::render_graph(aggNetworkdown_rel)
 ```
-
-
 
 ```{r}
 #| label: fig-causalrel-up4
@@ -234,7 +236,7 @@ aggNetworkup_rel <- basenodes |>
                  edge_pal = 'black',
                  node_pal = list(value = 'ggthemes::Orange-Blue-White Diverging'),
                  node_colorset = 'logrel_ewr_achieved',
-                 render = TRUE,
+                 render = FALSE,
                  setLimits = c(min(basenodes$logrel_ewr_achieved),
                                0,
                                max(basenodes$logrel_ewr_achieved)),
@@ -242,8 +244,9 @@ aggNetworkup_rel <- basenodes |>
                  savedir = tempdir(),
                  savename = 'aggNetworkup_rel')
 
-```
+DiagrammeR::render_graph(aggNetworkup_rel)
 
+```
 
 ```{r}
 #| include: false

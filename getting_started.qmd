@@ -19,10 +19,10 @@ Installation is slightly more complex than the usual `devtools::install_github(M
 #| eval: false
 
 # GITHUB INSTALL
-# SSH- seems most stable
+# SSH- seems most stable, but sometimes git2r loses its ssh ability and so use `git = 'external'`
 
 devtools::install_git("git@github.com:MDBAuth/HydroBOT.git",
-  ref = "master", force = TRUE, upgrade = "ask"
+  ref = "master", force = TRUE, upgrade = "ask", git = 'external'
 )
 
 # HTTPS- may work, if you have gitcreds and a PAT set up

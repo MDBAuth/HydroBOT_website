@@ -6,7 +6,7 @@ Most of the arguments to `plot_outcomes()` are relatively straightforward, and c
 
 ## outcome_col
 
-A key difference between `plot_outcomes()` and more typical plotting functions, e.g. `ggplot()` is the use of the `outcome_col` argument. This treats the outcome of interest as a special value, which may need data processing to occur (baselining, scaling, etc), as it is fundamentally the value of interest, wherever it gets plotted. It allows that processing to occur consistently to that column whether it is plotted on the y-axis (e.g. [bars](bar_plots.qmd) or [points and lines](line_plots.qmd)) or as color in [maps](maps.qmd) or [heatmaps](heatmaps.qmd). The placement of this `outcome_col` is then controlled by `plot_type`, which is `"2d"` by default and puts it on x, but also might be `heatmap` or `map`, which makes it a color.
+A key difference between `plot_outcomes()` and more typical plotting functions, e.g. `ggplot()` is the use of the `outcome_col` argument. This treats the outcome of interest as a special value, which may need data processing to occur (baselining, scaling, etc), as it is fundamentally the value of interest, wherever it gets plotted. It allows that processing to occur consistently to that column whether it is plotted on the y-axis (e.g. [bars](bar_plots.qmd) or [points and lines](line_plots.qmd)) or as color in [maps](maps.qmd) or [heatmaps](heatmap.qmd). The placement of this `outcome_col` is then controlled by `plot_type`, which is `"2d"` by default and puts it on x, but also might be `heatmap` or `map`, which makes it a color.
 
 ## Consistent limits
 
@@ -16,10 +16,10 @@ We often need to control limits for visual consistency across plots or to ensure
 
 Maps in particular can have under- and overlays, and so we use the `underlay_list` and `overlay_list` lists to specify how this works, with much more detail and examples in the [maps demonstration](maps.qmd).
 
-Smoothers and contours are both fitting functions, which may need additional arguments. These can be provided through the `smooth_arglist` and `contour_arglist` respectively, with demonstration in [line plots](line_plots.qmd) and [heatmaps](heatmaps.qmd).
+Smoothers and contours are both fitting functions, which may need additional arguments. These can be provided through the `smooth_arglist` and `contour_arglist` respectively, with demonstration in [line plots](line_plots.qmd) and [heatmaps](heatmap.qmd).
 
 The `base_list` argument takes a list of arguments that get passed to `baseline_compare()`, allowing baselining to happen internally to `plot_outcomes()` and so avoiding carrying around extra dataframes of compared data. See the [hydrographs](hydrographs.qmd) for examples.
 
 ## Grouped colors
 
-Sometimes we might want to specify different palettes for different groups, so that we can distinguish both large groupings and the subsidiary parts. we use the `pal_list` as a list for this, in conjunction with `colorgroups`. See the [bar example](bars.qmd) and [causal networks](causal_plots.qmd).
+Sometimes we might want to specify different palettes for different groups, so that we can distinguish both large groupings and the subsidiary parts. we use the `pal_list` as a list for this, in conjunction with `colorgroups`. See the [bar example](bar_plots.qmd) and [causal networks](causal_plots.qmd).

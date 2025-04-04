@@ -1,0 +1,65 @@
+scenarios:
+  scenario_name:
+  - down4
+  - base
+  - up4
+  flow_multiplier:
+  - 0.25
+  - 1.0
+  - 4.0
+ewr:
+  output_parent_dir: hydrobot_scenarios
+  hydro_dir: hydrobot_scenarios/hydrographs
+  output_path: hydrobot_scenarios/module_output/EWR
+  model_format: Standard time-series
+  outputType: yearly
+  returnType: none
+  finish_time: 2025-04-04 15:44:05 AEDT
+  status: yes
+  ewr_version: py-ewr 2.3.7
+  HydroBOT_version: 0.2.2.9020
+aggregation:
+  datpath: hydrobot_scenarios/module_output/EWR
+  type: achievement
+  groupers: scenario
+  group_until:
+    SWSDLName: 4
+    planning_unit_name: 4
+    gauge: 4
+  pseudo_spatial: sdl_units
+  aggCols: ewr_achieved
+  aggsequence:
+    all_time: all_time
+    ewr_code:
+    - ewr_code_timing
+    - ewr_code
+    env_obj:
+    - ewr_code
+    - env_obj
+    sdl_units: sdl_units
+    Specific_goal:
+    - env_obj
+    - Specific_goal
+    Objective:
+    - Specific_goal
+    - Objective
+    basin: basin
+    target_5_year_2024:
+    - Objective
+    - target_5_year_2024
+  funsequence:
+    all_time: ArithmeticMean
+    ewr_code: CompensatingFactor
+    env_obj: ArithmeticMean
+    sdl_units: ArithmeticMean
+    Specific_goal: ArithmeticMean
+    Objective: ArithmeticMean
+    basin: SpatialWeightedMean
+    target_5_year_2024: ArithmeticMean
+  namehistory: no
+  keepAllPolys: no
+  auto_ewr_PU: no
+  returnList: yes
+  finish_time: 2025-04-04 15:44:11 AEDT
+  status: yes
+  HydroBOT_version: 0.2.2.9020

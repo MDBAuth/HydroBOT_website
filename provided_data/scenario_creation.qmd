@@ -8,7 +8,7 @@ format:
 editor: visual
 engine: knitr
 params:
-  REBUILD_DATA: TRUE
+  REBUILD_DATA: FALSE
 ---
 
 ```{r}
@@ -19,7 +19,6 @@ library(hydrogauge)
 library(ggplot2)
 library(sf)
 library(dplyr)
-library(reticulate) # Not strictly necessary but allows easier referencing of objects
 ```
 
 # Overview
@@ -59,7 +58,7 @@ hydro_dir <- file.path(scenario_dir, "hydrographs")
 ::: {#language style="color: gray"}
 ## Language note
 
-This notebook was originally built using only python, and there is an unmaintained python-only version available by contacting the authors. Using Python makes a lot of sense because the underlying data here uses python packages. I've moved the active version of this notebook to R, however, when HydroBOT became an R package and the [flow scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling) ended up using R gauge pullers. There is still some remaining python in here (pulling gauges and some minor EWR functions). This notebook provides an example of how to mix R and python code chunks, which we do fairly frequently.
+This notebook was originally built using only python, and there is an unmaintained python-only version available by contacting the authors. I've moved the active version of this notebook to R, however, when HydroBOT became an R package and the [flow scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling) ended up using R gauge pullers. There is still some remaining python in here (pulling gauges and some minor EWR functions). This notebook provides an example of how to mix R and python code chunks, which we do fairly frequently.
 
 We can access python objects in R with `py$objectname`and access R objects in python with `r.objectname` .
 
@@ -76,7 +75,7 @@ We need multiple catchments for demos, so let's use the Macquarie, Castlereagh, 
 
 ```{r}
 catch_demo <- sdl_units |>
-  dplyr::filter(SWSDLName %in% c("Macquarie–Castlereagh", "Lachlan", "Namoi"))
+  dplyr::filter(SWSDLName %in% c("Macquarie-Castlereagh", "Lachlan", "Namoi"))
 ```
 
 ## Get relevant gauges
@@ -147,13 +146,16 @@ endtime <- lubridate::ymd(20210630)
 Since some of those are flow and some are level, let's do two calls and bind. We could pmap, but this will be fine. It's tempting to just use flow.
 
 ```{r}
-demo_levs <- hydrogauge::get_ts_traces(
+if (params$REBUILD_DATA) {
+  demo_levs <- hydrogauge::get_ts_traces(
   portal = "NSW",
   site_list = gauges_to_pull,
   var_list = 141, # This is flow
   start_time = starttime,
   end_time = endtime
 )
+}
+
 ```
 
 The azure boxes have old GDAL, which can't read WKT2. Need to fix, but in the meantime, [force with the crs number](https://github.com/r-spatial/sf/issues/1419).
@@ -162,7 +164,7 @@ The azure boxes have old GDAL, which can't read WKT2. Need to fix, but in the me
 if (grepl("npd-dat", Sys.info()["nodename"])) {
   st_crs(basin) <- 4283
   st_crs(catch_demo) <- 4283
-  st_crs(demo_geo) <- 4283
+  st_crs(demo_gauges) <- 4283
 }
 ```
 
@@ -174,7 +176,7 @@ Looks reasonable. Probably overkill for testing, but can do a cut down version t
 (ggplot() +
   geom_sf(data = basin, fill = "lightsteelblue") +
   geom_sf(data = catch_demo, mapping = aes(fill = SWSDLName)) +
-  geom_sf(data = demo_geo, color = "black") +
+  geom_sf(data = demo_gauges, color = "black") +
   scale_fill_brewer(type = "qual", palette = 8))
 ```
 
@@ -193,6 +195,7 @@ This requries having a date column `Date` and other columns with gauge numbers f
 Set up the data structure
 
 ```{r}
+if (params$REBUILD_DATA) {
 demo_flow <- demo_levs |>
   dplyr::mutate(Date = lubridate::date(time)) |>
   # append the gauge type
@@ -203,6 +206,7 @@ demo_flow <- demo_levs |>
     names_from = site,
     values_from = value
   )
+}
 ```
 
 Now we want to set up the 'scenarios' as multiplications and additions, as well as the directory structure.
@@ -327,3 +331,4 @@ jsonlite::write_json(scenario_meta,
   path = file.path(hydro_dir, "scenario_metadata.json")
 )
 ```
+

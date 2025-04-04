@@ -49,7 +49,7 @@ For simplicity here, we will only look at a small selection of the scenarios (mu
 scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
 
 scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
-  as_tibble()
+  tibble::as_tibble()
 
 basin_to_plot <- agged_data$mdb |> 
   dplyr::filter(scenario %in% scenarios_to_plot) |> 
@@ -67,9 +67,9 @@ obj_sdl_to_plot <- agged_data$sdl_units |>
 
 We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
 
-Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see @tbl-scenarios) rather than the names to make plots readable.
+Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the [codes defining the scenarios](comparer_overview.qmd) rather than the names to make plots readable.
 
-There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`. 
+There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
 ```{r}
 sceneorder <- forcats::fct_reorder(basin_to_plot$scenario,
@@ -101,6 +101,7 @@ obj_sdl_to_plot |>
     facet_row = "climate_code"
     )
 ```
+
 ## Simple background and foreground
 
 We can add a polygon with no mapped aesthetics to the background and foreground using `underlay_list` and `overlay_list`. Here, we add the basin shape behind the data and the gauges used originally.
@@ -132,12 +133,13 @@ obj_sdl_to_plot |>
                         overlay_pal = 'firebrick')
   )
 ```
+
 ## Other spatial units
 
 We used the sdl units (an intermediate aggregation level) above, but any geometric levels will work. First, we show with gauges as the focal spatial unit, e.g. before any spatial aggregation has occurred (but there has been both temporal and theme).
 
 ::: callout-important
-If we attempt to run this as-is, it shows the value of `plot_outcomes()` for catching unintentional overplotting. The filtering to just NF1 is an attempt to only plot one value, but there are hidden and easily missed doubled gauges in this data. Because in the EWR tool some gauges inform several different planning units, there are more than one line for those gauges. `plot_outcomes()` catches this and forces us to deal with it. 
+If we attempt to run this as-is, it shows the value of `plot_outcomes()` for catching unintentional overplotting. The filtering to just NF1 is an attempt to only plot one value, but there are hidden and easily missed doubled gauges in this data. Because in the EWR tool some gauges inform several different planning units, there are more than one line for those gauges. `plot_outcomes()` catches this and forces us to deal with it.
 :::
 
 ```{r}
@@ -162,7 +164,7 @@ agged_data$env_obj |> # for readability
   ggplot2::theme(legend.position = "bottom")
 ```
 
-The 'real' fix of that issue would be to filter to a particular planning unit we wanted or investigate in more granular detail. But here, we just want a simple demonstration of plotting points, so we simply filter to the first record for each gauge. 
+The 'real' fix of that issue would be to filter to a particular planning unit we wanted or investigate in more granular detail. But here, we just want a simple demonstration of plotting points, so we simply filter to the first record for each gauge.
 
 ```{r}
 env_obj_to_plot <- agged_data$env_obj |> # for readability
@@ -172,7 +174,6 @@ env_obj_to_plot <- agged_data$env_obj |> # for readability
   filter(!duplicated(gauge)) |> 
   ungroup()
 ```
-
 
 ```{r}
 env_obj_to_plot |> 
@@ -192,6 +193,7 @@ env_obj_to_plot |>
   ) +
   ggplot2::theme(legend.position = "bottom")
 ```
+
 We can also plot the basin-scale outcomes (rather than just the shape as above).
 
 ```{r}
@@ -210,12 +212,11 @@ basin_to_plot |>
 
 ## Multiple *informative* layers
 
-In their most simple sense, underlays and overlays can be used to simply add spatial information (the basin or country, the gauge locations). In more complex cases though, information can be plotted in multiple layers.
-The choice of a 'primary' layer from which other layers are underlays or overlays can be a bit arbitrary, since each layer can plot outcome data, but the 'primary' layer has access to a few more processing options. It typically makes the most sense to choose a primary layer to address a targeted question and choose the under/overlays to add context.  
+In their most simple sense, underlays and overlays can be used to simply add spatial information (the basin or country, the gauge locations). In more complex cases though, information can be plotted in multiple layers. The choice of a 'primary' layer from which other layers are underlays or overlays can be a bit arbitrary, since each layer can plot outcome data, but the 'primary' layer has access to a few more processing options. It typically makes the most sense to choose a primary layer to address a targeted question and choose the under/overlays to add context.
 
 ### Underlays
 
-While we can't have informative fill in multiple layers ({ggplot2} won't allow multiple fills), we *can* have informative fill in polygons underlying point (gauge) data, because the points use `color`, not `fill`. 
+While we can't have informative fill in multiple layers ({ggplot2} won't allow multiple fills), we *can* have informative fill in polygons underlying point (gauge) data, because the points use `color`, not `fill`.
 
 First, we include a fill in the underlay for SDL unit name (e.g. not a data fill, but still informative) by simply replacing the single color in `underlay_pal` with a {paletteer} palette. It is hard to find palettes for the full set of catchments. We use a qualitative palette here. Using a continuous palette (e.g. `grDevices::Purple-Yellow`) works OK as well, but the colors aren't very well spatially-separated.
 
@@ -260,6 +261,7 @@ env_obj_to_plot |>
     ) +
   ggplot2::theme(legend.position = "bottom")
 ```
+
 While the aggregation isn't as obvious here, it is easier to see the different levels:
 
 ```{r}
@@ -281,7 +283,7 @@ env_obj_to_plot |>
   ggplot2::theme(legend.position = "bottom")
 ```
 
-We can also have multiple levels of underlay polygons (e.g. if we want the basin under sdl units), and can use a fill palette in one of them (@fig-multiunderlays) by using a list of lists for `underlay_list`. A similar approach also works for overlays (@fig-multioverlays). And as we've seen above (@fig-underover), we can have both underlays and overlays. 
+We can also have multiple levels of underlay polygons (e.g. if we want the basin under sdl units), and can use a fill palette in one of them (@fig-multiunderlays) by using a list of lists for `underlay_list`. A similar approach also works for overlays (@fig-multioverlays). And as we've seen above (@fig-underover), we can have both underlays and overlays.
 
 ```{r}
 #| label: fig-multiunderlays
@@ -313,7 +315,7 @@ env_obj_to_plot |>
 
 Above, we used the gauge layer as 'primary', and included the sdl units or basin as underlays. We can also overlay, here with the sdl layer as 'primary'.
 
-We start with a single color overlay to show where gauges are. This is the *full set of BOM gauges*, not just those that went into the aggregation (i.e. are in the EWR tool), which are the ones shown above (@fig-underover). 
+We start with a single color overlay to show where gauges are. This is the *full set of BOM gauges*, not just those that went into the aggregation (i.e. are in the EWR tool), which are the ones shown above (@fig-underover).
 
 ::: callout-tip
 We also show here the use of `clip`, which auto-clips the under or overlay data to the primary layer, and the use of just an {sf} object name for `underlay_list = "basin"` as shorthand when we don't want to specify any visual properties.
@@ -366,6 +368,7 @@ obj_sdl_to_plot |>
   ) +
   ggplot2::theme(legend.position = "bottom")
 ```
+
 Like underlays (@fig-multiunderlays), we can have multiple levels of overlays (@fig-multioverlays) by using a list of lists for `overlay_list`. And as we've seen above (@fig-underover), we can have both underlays and overlays.
 
 Here, we demonstrate a primary layer at the basin scale, overlay the sdl units with empty fill so we can see their locations, and then put gauges on with informative values.

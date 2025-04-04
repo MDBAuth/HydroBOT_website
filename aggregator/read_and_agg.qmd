@@ -175,7 +175,7 @@ For the run here, that yaml is at `"hydrobot_scenarios/aggregator_output/demo/ag
 
 ``` yaml
 
-{{< include /hydrobot_scenarios/aggregator_output/demo/agg_metadata.yml >}}
+{{< include /agg_metadata.yml >}}
 ```
 
 ## Parallelization

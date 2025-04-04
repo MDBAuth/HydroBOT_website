@@ -13,29 +13,31 @@ website:
       contents:
         - index.qmd
 
-        - section: "Provided data"
+        - section: "Provided spatial data"
           contents:
             - href: provided_data/spatial_data.qmd
               text: "Spatial data"
 
-
-    - title: "Scenario creation"
+    - title: "Workflows"
       contents:
-        - provided_data/scenario_creation.qmd
+        - workflows/workflow_overview.qmd
+        - workflows/scenarios_and_directories.qmd
 
-    - title: "Causal networks"
-      contents:
-        - provided_data/causal_overview.qmd
-
-        - section: "Creation and manipulation"
+        - section: "Example workflows"
           contents:
-            - href: provided_data/causal_manipulation.qmd
-              text: "Building and manipulating causal networks"
+            - href: workflows/workflow_save_steps.qmd
+              text: "Saving steps"
+            - href: workflows/workflow_in_memory.qmd
+              text: "In-memory"
+            - href: workflows/workflow_parameters.qmd
+              text: "From parameters"
 
-        - section: "Visualisation"
+        - section: "Examples"
           contents:
-            - href: provided_data/causal_plots.qmd
-              text: "Plotting causal networks"
+            - href: presentation/walkthrough_presentation.qmd
+              text: "Walkthrough presentation"
+            - href: workflows/run_hydrobot_website.qmd
+              text: "To create this website"
 
     - title: "Controller"
       contents:
@@ -49,29 +51,49 @@ website:
               text: "Detailed step through"
 
 
-    - title: "Aggregation"
+    - title: "Aggregator"
       contents:
         - aggregator/aggregation_overview.qmd
-        - aggregator/aggregation_syntax.qmd
+        - section: "Main use"
+          contents:
+            - href: aggregator/read_and_agg.qmd
+              text: "Using with read and agg (primary)"
 
-        - section: "Simple demonstration"
+        - section: "Syntax and details"
+          contents:
+            - href: aggregator/aggregation_syntax.qmd
+              text: "Aggregation syntax"
+            - href: aggregator/pseudo_spatial_group_until.qmd
+              text: "Unusual grouping requirements"
+            - href: aggregator/using_multi_aggregate.qmd
+              text: "Multi-axis interleaved aggregation"
+            - href: aggregator/user_causal.qmd
+              text: "User-supplied causal networks"
+            - href: aggregator/user_functions.qmd
+              text: "User-supplied functions"
+            - href: aggregator/user_spatial.qmd
+              text: "User-supplied spatial data"
+            - href: aggregator/user_module.qmd
+              text: "User-supplied modules"
+
+        - section: "Dimensions"
           contents:
             - href: aggregator/spatial_agg.qmd
               text: "Spatial aggregation capability"
             - href: aggregator/theme_agg.qmd
               text: "Theme aggregation capability"
+            - href: aggregator/temporal_agg.qmd
+              text: "Temporal aggregation"
             - href: aggregator/using_multi_aggregate.qmd
-              text: "Multi-axis interleaved aggregation"
+              text: "Multi-step interleaved aggregation"
 
 
     - title: "Comparer"
       contents:
         - comparer/comparer_overview.qmd
 
-        - section: "Simple demonstration"
+        - section: "Plot types"
           contents:
-            - href: comparer/hydrographs.qmd
-              text: "Hydrographs and baselining"
             - href: comparer/bar_plots.qmd
               text: "Bar plots (qual x)"
             - href: comparer/line_plots.qmd
@@ -81,22 +103,33 @@ website:
             - href: comparer/causal_plots.qmd
               text: "Outcomes on causal networks"
             - href: comparer/heatmap.qmd
-              text: "Heatmaps"
-
-
-    - title: "Workflows"
-      contents:
-        - workflows/workflow_overview.qmd
-
-        - section: "Simple demonstration"
+              text: "Surfaces (heatmaps and contours)"
+            - href: comparer/hydrographs.qmd
+              text: "Hydrographs"
+        - section: "Syntax and details"
           contents:
-            - href: workflows/workflow_save_steps.qmd
-              text: "Saving steps"
-            - href: workflows/workflow_in_memory.qmd
-              text: "In-memory"
-            - href: workflows/workflow_parameters.qmd
-              text: "From parameters"
-            - href: presentation/walkthrough_presentation.qmd
-              text: "Walkthrough presentation"
+            - href: comparer/comparer_syntax.qmd
+              text: "Comparer syntax"
+            - href: comparer/setting_limits.qmd
+              text: "Setting limits"
 
+    - title: "Provided data and Causal networks"
+      contents:
+        - provided_data/data_overview.qmd
 
+        - section: "Causal networks"
+          contents:
+            - href: provided_data/causal_overview.qmd
+              text: "Causal network overview"
+            - href: provided_data/causal_manipulation.qmd
+              text: "Building and manipulating causal networks"
+            - href: provided_data/causal_descriptive_plots.qmd
+              text: "Plotting causal networks"
+        - section: "Spatial data"
+          contents:
+            - href: provided_data/spatial_data.qmd
+              text: "Spatial data"
+        - section: "Example scenarios"
+          contents:
+            - href: provided_data/scenario_creation.qmd
+              text: "Example scenario information and creation"

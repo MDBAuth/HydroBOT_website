@@ -49,7 +49,7 @@ For simplicity here, we will only look at a small selection of the scenarios (mu
 scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
 
 scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
-  as_tibble()
+  tibble::as_tibble()
 
 basin_to_plot <- agged_data$mdb |> 
   dplyr::filter(scenario %in% scenarios_to_plot) |> 
@@ -67,9 +67,9 @@ obj_sdl_to_plot <- agged_data$sdl_units |>
 
 We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
 
-Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see @tbl-scenarios) rather than the names to make plots readable.
+Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
 
-There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`. 
+There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
 ```{r}
 sceneorder <- forcats::fct_reorder(scenarios$scenario,
@@ -110,10 +110,10 @@ sdl_line
 
 We might not care so much about individual outcomes, but about their groupings, and we can plot those in color for each env_obj, according to the larger grouping it is part of by changing `colorset = 'env_group'`. We need to use `point_group` here to separate out the points for each `env_obj`, since several will belong to each `env_group`.
 
-This plot also demonstrates the use of some additional arguments. We're also using `transx` to log the x-axis, which is particularly appropriate for the multiplicative flow scaling in this demonstration. We also log the y-axis with `transoutcome` since we're using a `base_list` to baseline (with `comp_fun = relative` to look at the multiplicative shift in each env_obj to baseline). We're using various `*_lab` arguments to adjust the labelling. 
+This plot also demonstrates the use of some additional arguments. We're also using `transx` to log the x-axis, which is particularly appropriate for the multiplicative flow scaling in this demonstration. We also log the y-axis with `transoutcome` since we're using a `base_list` to baseline (with `comp_fun = relative` to look at the multiplicative shift in each env_obj to baseline). We're using various `*_lab` arguments to adjust the labelling.
 
-:::callout-tip
-When we want to transform the y-axis and the outcome is on y, we need to use `transoutcome` instead of `transoutcome`. That is because the consistent processing of the outcome variable needs to be treated differently than y for plots like [heatmaps](heatmaps.qmd) and [maps](maps.qmd).
+::: callout-tip
+When we want to transform the y-axis and the outcome is on y, we need to use `transoutcome` instead of `transoutcome`. That is because the consistent processing of the outcome variable needs to be treated differently than y for plots like [heatmaps](heatmap.qmd) and [maps](maps.qmd).
 :::
 
 ::: callout-important
@@ -148,7 +148,7 @@ sdl_line_options <- obj_sdl_to_plot |>
 sdl_line_options
 ```
 
-We can also give the groups different palettes, as demonstrated more completely in the [bar plots](bar_plots.qmd) and [causal networks](/provided_data/causal_plots.qmd). Now, we don't need `point_group` anymore, since the colors are assigned to the unique `env_obj`s.
+We can also give the groups different palettes, as demonstrated more completely in the [bar plots](bar_plots.qmd) and [causal networks](/provided_data/causal_descriptive_plots.qmd). Now, we don't need `point_group` anymore, since the colors are assigned to the unique `env_obj`s.
 
 ```{r}
 #| label: fig-env-grouped
@@ -254,7 +254,7 @@ sdl_line_sdl <- obj_sdl_to_plot |>
 sdl_line_sdl
 ```
 
-## Smoothing (fit lines) {@sec-smoothers}
+## Smoothing (fit lines) {#sec-smoothers}
 
 We can use smoothing to fit lines through multiple points, e.g. if we want to group data in some way- maybe use it to put a line through the color groups and ignore individual levels. We demonstrate here using them to illustrate unique outcomes, as well as more typical uses as lines of best fit that aggregate over a number of outcomes.
 
@@ -350,9 +350,9 @@ obj_sdl_to_plot |>
     )
 ```
 
-### Fit multiple points {@sec-smooth-multiple}
+### Fit multiple points {#sec-smooth-multiple}
 
-Fitting lines is most often associated with things like regression and loess smoothing, where we use it to aggregate over a number of datapoints to find the line of best fit. We can do that here, simply by not having all points accounted for across the facetting, `point_group`, and `colorset`. 
+Fitting lines is most often associated with things like regression and loess smoothing, where we use it to aggregate over a number of datapoints to find the line of best fit. We can do that here, simply by not having all points accounted for across the facetting, `point_group`, and `colorset`.
 
 ::: callout-note
 `group_cols` in `base_list` should still include unique values, because `group_cols` determines the baselining (e.g. what gets compared), not the plot groupings.

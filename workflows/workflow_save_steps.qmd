@@ -83,7 +83,7 @@ funseq <- list(
 )
 ```
 
-Run the aggregation. Use the `auto_ewr_PU` shortcut to auto-specify some needed grouping for EWR outputs (see [here](../aggregator/psuedo_spatial_group_until.qmd) for more detail).
+Run the aggregation. Use the `auto_ewr_PU` shortcut to auto-specify some needed grouping for EWR outputs (see [here](../aggregator/pseudo_spatial_group_until.qmd) for more detail).
 
 Read the messages. Most of these are saying it's more explicit to avoid `auto_ewr_PU = TRUE`, but there are also messages saying that the causal network is missing links.
 

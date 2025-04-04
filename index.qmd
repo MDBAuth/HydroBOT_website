@@ -95,7 +95,7 @@ Each of the components are discussed in more detail, with this detail used to mo
 
 HydroBOT relies on external information in three main ways. First, it uses externally-defined response models, currently the [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool). It also requires causal networks to link those outputs to larger-scale values. Finally, it requires the input scenarios, without which it would have nothing to model from.
 
--   [Causal networks](provided_data/causal_plots.qmd)
+-   [Causal networks](provided_data/causal_descriptive_plots.qmd)
 
     -   Causal networks are needed for aggregation and comparison, but are not part of the flow *per se*.
 

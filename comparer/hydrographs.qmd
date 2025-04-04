@@ -31,7 +31,7 @@ Get scenario metadata.
 
 ```{r}
 scenarios <- yaml::read_yaml(file.path(hydro_dir, "scenario_metadata.yml")) |>
-  as_tibble()
+  tibble::as_tibble()
 ```
 
 We have a lot of hydrographs, so for this demonstration, we will often use a subset of gauges and scenarios.
@@ -48,9 +48,9 @@ scenarios <- scenarios |>
 
 We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
 
-Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see @tbl-scenarios) rather than the names to make plots readable.
+Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
 
-There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`. 
+There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
 ```{r}
 sceneorder <- forcats::fct_reorder(
@@ -67,6 +67,7 @@ scene_pal
 ```
 
 We will also make a standard set of gauge colors
+
 ```{r}
 gauge_pal <- make_pal(unique(gauges_to_plot),
   palette = "nationalparkcolors::Denali"
@@ -203,6 +204,7 @@ lagdif <- function(x, y) {
 ```
 
 We can change the `outcome_lab` as well, though to make sure information isn't lost, the baselining is appended.
+
 ```{r}
 lagplot <- plot_outcomes(scenehydros,
   outcome_col = "flow",
@@ -222,6 +224,7 @@ lagplot <- plot_outcomes(scenehydros,
 
 lagplot
 ```
+
 Because this is a ggplot object, we can change that y-label if we really don't want the explanation.
 
 ```{r}

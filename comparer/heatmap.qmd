@@ -46,7 +46,7 @@ If we had used multiple aggregation functions at any step, we should filter down
 ```{r}
 
 scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
-  as_tibble()
+  tibble::as_tibble()
 
 # join the scenario information to each of those sheets
 agged_data <- agged_data |>

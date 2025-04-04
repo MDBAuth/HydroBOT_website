@@ -47,7 +47,7 @@ For simplicity here, we will only look at a small selection of the scenarios (mu
 scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
 
 scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
-  as_tibble()
+  tibble::as_tibble()
 
 basin_to_plot <- agged_data$mdb |> 
   dplyr::filter(scenario %in% scenarios_to_plot) |> 
@@ -65,9 +65,9 @@ obj_sdl_to_plot <- agged_data$sdl_units |>
 
 We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
 
-Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see @tbl-scenarios) rather than the names to make plots readable.
+Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
 
-There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`. 
+There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
 ```{r}
 sceneorder <- forcats::fct_reorder(basin_to_plot$scenario,
@@ -89,7 +89,7 @@ scene_pal
 
 We can make plots looking at how scenarios differ for each of the outcome categories for a simple case of only one outcome. This uses `facet_wrapper` to just wrap the single facet axis.
 
-The `colorset` argument is the column that determines color, while the `pal_list` defines those colors, here as a named `colors` object, but as we see below it can also be palette names. 
+The `colorset` argument is the column that determines color, while the `pal_list` defines those colors, here as a named `colors` object, but as we see below it can also be palette names.
 
 ```{r}
 #| message: false
@@ -119,7 +119,8 @@ plot_outcomes(basin_to_plot,
 ) +
   labs(x = 'Scenario')
 ```
-Another approach is to put other groupings on the x-axis, and color by scenario. 
+
+Another approach is to put other groupings on the x-axis, and color by scenario.
 
 ```{r}
 #| message: false
@@ -150,10 +151,10 @@ plot_outcomes(basin_to_plot,
 
 We can use the aggregation step of `env_obj` and SDL units to demonstrate plotting that not only addresses the outcomes for scenarios, but how they differ across space.
 
-First, we look at how the different scenarios perform for the Ecosystem Function objectives in each SDL unit. We also use the `ggplot2` functionality to remove the x-axis label, since it is redundant with the color. 
+First, we look at how the different scenarios perform for the Ecosystem Function objectives in each SDL unit. We also use the `ggplot2` functionality to remove the x-axis label, since it is redundant with the color.
 
 ::: callout-tip
-Often when we have multiple dimensions, we'll want to do a simple filter to relevant subsets of the data for readability. When this filtering occurs, it is almost always a good idea to do it on the fly (as here), to avoid errors associated with losing track of data manipulations and instead start each figure with the full dataset. 
+Often when we have multiple dimensions, we'll want to do a simple filter to relevant subsets of the data for readability. When this filtering occurs, it is almost always a good idea to do it on the fly (as here), to avoid errors associated with losing track of data manipulations and instead start each figure with the full dataset.
 :::
 
 ```{r}
@@ -260,7 +261,7 @@ plot_outcomes(obj_sdl_to_plot,
 
 ## Grouped colors
 
-HydroBOT can assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](/provided_data/causal_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
+HydroBOT can assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](/provided_data/causal_descriptive_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
 
 Achieving this requires specifying two columns- the `colorset`, as above, is the column that determines color. The `colorgroups` column specifies the groupings of those `colorset` values, and so what palette to use. Thus, the `pal_list` needs to be either length 1 (everything gets the same palette) or `length(unique(data$colorgroups))`. Note also that the `colorset` values must be unique to `colorgroups`- this cannot be a one-to-many mapping because each `colorset` value must get a color from a single palette defined by the `colorgroup` it is in.
 

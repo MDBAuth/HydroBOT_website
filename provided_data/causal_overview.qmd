@@ -12,7 +12,7 @@ bibliography: references.bib
 
 Causal networks are models that describe the relationships between climate, adaptation options and outcomes for environmental, cultural, social, and economic values and assets (that is, the elements of the quadruple bottom line) (adapted from [@peeters2022]). They include the links which form the basis of the Driver-indicator-response models (e.g. EWR tool: hydrology to indicators), in addition to the links that connect indicators to objectives that are defined for key values.
 
-Causal networks can [show many relationships and outcomes](causal_plots.qmd). To illustrate here, we show the links between EWRs (hydrologic indicators), proximate environmental objectives, larger-scale objectives, and finally broad-based ecological groupings.
+Causal networks can [show many relationships and outcomes](causal_descriptive_plots.qmd). To illustrate here, we show the links between EWRs (hydrologic indicators), proximate environmental objectives, larger-scale objectives, and finally broad-based ecological groupings.
 
 ```{r}
 #| echo: false
@@ -47,7 +47,7 @@ The causal networks enables 1) visual representation of the complex inter-relati
 
 ### In HydroBOT
 
-HydroBOT provides various functions for [creation and manipulation](causal_manipulation.qmd) of causal networks, depending on what needs to be plotted or investigated, and the [causal plots](causal_plots.qmd) page provides some examples of various ways they can be visualised with HydroBOT.
+HydroBOT provides various functions for [creation and manipulation](causal_manipulation.qmd) of causal networks, depending on what needs to be plotted or investigated, and the [causal plots](/comparer/causal_plots.qmd) page provides some examples of various ways they can be visualised with HydroBOT.
 
 HydroBOT provides the causal network for the EWR tool in the `HydroBOT::causal_ewr` data. Until recently, this was the only source. More recently (early 2025), the EWR tool itself provides its own causal networks. These are brought over to HydroBOT and become `HydroBOT::causal_ewr` after testing. This process happens frequently, but if there is any question about whether the networks are current, the network in the installed version of `py-ewr` can be accessed with `HydroBOT::get_causal_ewr()`.
 

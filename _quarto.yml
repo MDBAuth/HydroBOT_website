@@ -34,7 +34,7 @@ website:
       - href: comparer/comparer_overview.qmd
         text: Comparer
       - href: provided_data/data_overview.qmd
-        text: Provided data
+        text: Provided data and Causal networks
     right:
       - icon: github
         href: https://github.com/MDBAuth/HydroBOT_website

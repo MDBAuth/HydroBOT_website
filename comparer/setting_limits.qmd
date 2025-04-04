@@ -47,14 +47,29 @@ To make visualization easier, the SDL units data is given a grouping column that
 
 If we had used multiple aggregation functions at any step, we should filter down to the one we want here, but we only used one for this example.
 
-For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2). Thus, we make two small dataframes for our primary examples here.
+For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2). 
 
 ```{r}
 scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
 
 scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
-  as_tibble()
+  tibble::as_tibble() |> 
+  dplyr::filter(scenario %in% scenarios_to_plot)
 
+sceneorder <- forcats::fct_reorder(scenarios$scenario,
+                                   scenarios$flow_multiplier)
+
+scene_pal <- make_pal(unique(scenarios$climate_code),
+  palette = "ggsci::nrc_npg",
+  refvals = "E", refcols = "black"
+)
+
+scene_pal
+```
+
+We make two small dataframes for our primary examples here.
+
+```{r}
 basin_to_plot <- agged_data$mdb |> 
   dplyr::filter(scenario %in% scenarios_to_plot) |> 
   dplyr::left_join(scenarios, by = 'scenario')
@@ -79,8 +94,7 @@ plot_outcomes(basin_to_plot,
   x_col = 'climate_code',
   facet_wrapper = "Target",
   colorset = "climate_code",
-  pal_list = scene_pal,
-  sceneorder = sceneorder
+  pal_list = scene_pal
 ) +
   ggtitle("Default limits")
 
@@ -90,7 +104,6 @@ limit_bar <- plot_outcomes(basin_to_plot,
   facet_wrapper = "Target",
   colorset = "climate_code",
   pal_list = scene_pal,
-  sceneorder = sceneorder,
   setLimits = c(0,1)
 ) +
   ggtitle("Limits at full range")
@@ -99,6 +112,7 @@ limit_bar <- plot_outcomes(basin_to_plot,
 orig_bar + limit_bar +
   plot_layout(guides = 'collect') & theme(legend.position = 'bottom')
 ```
+
 We might also do that if we for some reason weren't using facetting, but making plots separately. Here, we just choose limits that encompass the range of both groups, but do not go all the way to 1.
 
 ```{r}
@@ -109,8 +123,7 @@ plot_outcomes(
   x_col = 'climate_code',
   facet_wrapper = "Target",
   colorset = "climate_code",
-  pal_list = scene_pal,
-  sceneorder = sceneorder
+  pal_list = scene_pal
 ) +
   ggtitle("Default fish limits")
 
@@ -121,8 +134,7 @@ plot_outcomes(
   x_col = 'climate_code',
   facet_wrapper = "Target",
   colorset = "climate_code",
-  pal_list = scene_pal,
-  sceneorder = sceneorder
+  pal_list = scene_pal
 ) +
   ggtitle("Default bird limits")
 
@@ -134,7 +146,6 @@ limit_bar_fish <- basin_to_plot |>
   facet_wrapper = "Target",
   colorset = "climate_code",
   pal_list = scene_pal,
-  sceneorder = sceneorder,
   setLimits = c(0,0.6)
 ) +
   ggtitle("Adjusted fish limits")
@@ -147,7 +158,6 @@ limit_bar_bird <- basin_to_plot |>
   facet_wrapper = "Target",
   colorset = "climate_code",
   pal_list = scene_pal,
-  sceneorder = sceneorder,
   setLimits = c(0,0.6)
 ) +
   ggtitle("Adjusted bird limits")
@@ -157,6 +167,7 @@ limit_bar_bird <- basin_to_plot |>
   plot_layout(guides = 'collect')
 
 ```
+
 # Color limits
 
 We can do similar things for color values on a continuous scale, here demonstrated for some simple basin-scale plots.
@@ -193,6 +204,7 @@ limit_basin <- basin_to_plot |>
 
 orig_basin + limit_basin
 ```
+
 For colors, not only is it valuable to set limits for consistency across plots or for showing the full possible range of the data, it also can be critical for setting midpoints, whether to indicate e.g. 0.5 or to use diverging color palettes with baselining.
 
 A single value to `setLimits` changes the midpoint while leaving the limits auto-adjusted. Here, we use this to set the midpoint of the raw (non-baselined data) to 0.5.
@@ -237,7 +249,7 @@ basin_to_plot |>
 
 HydroBOT auto-sets the midpoint to 0 if `difference` is used and 1 if `relative` and using `transoutcome = 'log10'` (as is typically appropriate for multiplicative changes). But the user can change these if they want a different midpoint, want to adjust the endpoints, or use a different function and so need to set it themselves.
 
-For the auto with difference, we use a diverging palette and get 
+For the auto with difference, we use a diverging palette and get
 
 ```{r}
 basin_to_plot |>
@@ -257,7 +269,9 @@ basin_to_plot |>
     )
   )
 ```
+
 And for relative
+
 ```{r}
 basin_to_plot |>
   filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
@@ -278,8 +292,8 @@ basin_to_plot |>
     transoutcome = "log10",
   )
 ```
-We might need to do that manually if we don't use a built-in function, and we also might want to set the limits in addition to the midpoint. So, for example, we write a new difference function, which does not trip the flags to auto-set limits and centers. We can then adjust it using just the center and let it auto-calculate the top and bottom. 
 
+We might need to do that manually if we don't use a built-in function, and we also might want to set the limits in addition to the midpoint. So, for example, we write a new difference function, which does not trip the flags to auto-set limits and centers. We can then adjust it using just the center and let it auto-calculate the top and bottom.
 
 ```{r}
 
@@ -347,5 +361,3 @@ basin_to_plot |>
     )
   )
 ```
-
-
