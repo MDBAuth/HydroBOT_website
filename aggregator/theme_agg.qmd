@@ -277,7 +277,7 @@ theme_steps <- multi_aggregate(
 
 ### Causal plot
 
-By returning values at each stage, we can map those to colour (and later size) in a causal network. Here, we map the values of the aggregation to node color. To do this, we follow the `make_causal_plot()` approach of making edges and nodes, and then use a join to attach the value to each node.
+By returning values at each stage, we can map those to colour in a causal network. Here, we map the values of the aggregation to node color. To do this, we follow the `make_causal_plot()` approach of making edges and nodes, and then use a join to attach the value to each node.
 
 To keep this demonstration from becoming too unwieldy, we limit the edge creation to a single gauge, and so filter the theme aggregations accordingly (or just rely on the join to drop).
 

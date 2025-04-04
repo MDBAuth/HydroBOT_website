@@ -15,7 +15,7 @@ library(dplyr)
 
 # Plots of causal networks
 
-This document demonstrates and discusses the causal network plotting code. There are many reasons to present causal networks, each of which likely will require different characteristic plots. This develops some of the foundational work needed to allow a flexible range of those uses. Causal networks are inherently complex, and there are different aspects we might want to accentuate, and some capability we need to prune/focus them. Thus, {HydroBOT} provides a number of helper functions and plotting options.
+There are many reasons to present causal networks, each of which likely will require different characteristic plots. This develops some of the foundational work needed to allow a flexible range of those uses. Causal networks are inherently complex, and there are different aspects we might want to accentuate, and some capability we need to prune/focus them. Thus, {HydroBOT} provides a number of helper functions and plotting options.
 
 -   Why plot causal networks?
 

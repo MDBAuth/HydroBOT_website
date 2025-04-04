@@ -1,10 +1,252 @@
 ---
-title: "Causal network outcomes"
+title: "Causal network plots"
 author: "Galen Holt"
 ---
 
-As we showed in the [theme aggregation example](../aggregator/theme_agg.qmd), we can color the nodes in a causal network by outcome values. That is perhaps the best place to see the use of causal networks for outcomes- using the interleaved example data is less clearly relevant, since spatial scale changes as well, though it can be done. Integrating these plots with the more general approach of `plot_outcomes` is high on the priority list.
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+# This isn't needed, we just do everything in-memory
+make_ewr_output()
+```
 
-There are [many other causal network plots](../provided_data/causal_plots.qmd) we can make but those in the [theme aggregation example](../aggregator/theme_agg.qmd), target outcomes, rather than adjusting other aesthetics of the network for other reasons, such as altering color by level.
+```{r}
+#| message: false
 
-*We should be able to change size as well*. And we can color the edges, but that's less clear what the meaning is.
+library(HydroBOT)
+library(dplyr)
+```
+
+# Overview
+
+As in the [theme aggregation example](../aggregator/theme_agg.qmd), we can color the nodes in a causal network by outcome values.
+
+Here, we show those outcomes on the causal network, though there are [many other causal network plots](../provided_data/causal_plots.qmd) we can make to describe the network itself.
+
+## Setup
+
+As always, we need the input data
+
+```{r}
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, 'hydrographs')
+ewr_results <- file.path(project_dir, "module_output", "EWR")
+```
+
+For simplicity, we just do aggregations along the theme dimension, since otherwise the nodes can incorporate different spatial scales at different steps, which can be misleading. So here we use `read_and_agg()` to do that aggregation.
+
+```{r}
+#| message: false
+#| warning: false
+aggseq <- list(all_time = 'all_time',
+               ewr_code = c('ewr_code_timing', 'ewr_code'),
+               env_obj =  c('ewr_code', "env_obj"),
+               Target = c('env_obj', 'Target'))
+
+funseq <- list('ArithmeticMean', 
+               'CompensatingFactor',
+               'ArithmeticMean',
+               'ArithmeticMean')
+
+agged_theme <- read_and_agg(datpath = ewr_results, 
+           type = 'achievement',
+           geopath = bom_basin_gauges,
+           causalpath = causal_ewr,
+           groupers = 'scenario',
+           aggCols = 'ewr_achieved',
+           auto_ewr_PU = TRUE,
+           aggsequence = aggseq,
+           funsequence = funseq,
+           saveintermediate = TRUE,
+           namehistory = FALSE,
+           keepAllPolys = FALSE,
+           returnList = TRUE,
+           add_max = FALSE)
+
+```
+
+## Causal plot
+
+By returning values at each stage, we can map those to colour in a causal network. Here, we map the values of the aggregation to node color. To do this, we follow the `make_causal_plot()` approach of making edges and nodes, and then use a join to attach the value to each node.
+
+To keep this demonstration from becoming too unwieldy, we limit the edge creation to a single gauge, and so filter the theme aggregations accordingly (or just rely on the join to drop).
+
+```{r}
+example_gauge <- "421001"
+```
+
+
+The first step is to generate the edges and nodes for the network we want to look at.
+
+```{r}
+
+edges <- make_edges(causal_ewr,
+  fromtos = aggseq[2:length(aggseq)],
+  gaugefilter = example_gauge
+)
+
+nodes <- make_nodes(edges)
+```
+
+Now, extract the values we want from the aggregation and join them to the nodes.
+
+```{r}
+#| message: false
+#| warning: false
+
+# Get the values for each node
+aggvals <- extract_vals_causal(agged_theme,
+                               whichaggs = funseq, # Since only one agg function at each step
+                               valcol = 'ewr_achieved',
+                               targetlevels = names(aggseq)[2:length(aggseq)]) # don't use the first one, it's time at _timing 
+
+
+# filter to a single gauge. Multiple gauges should have separate networks or otherwise split the gauge-specific nodes. And include the larger scales pertaining to that gauge.
+
+# if we stay within the gauge, and just do value, this works
+aggvals <- aggvals |> 
+  filter(gauge == example_gauge) |> 
+  st_drop_geometry()
+
+# join to the nodes
+nodes_with_vals <- dplyr::left_join(nodes, aggvals)
+```
+
+Now we can make the causal network plot with the nodes we chose and colour them by the values we've just attached to them from the aggregation. At present, it is easiest to make separate plots per scenario or other grouping ( @fig-causal-base , @fig-causal-up4, @fig-causal-down4 ). For example, in the increased watering scenario, we see more light colours, and so better performance across the range of outcomes. Further network outputs are provided in the Comparer.
+
+```{r}
+#| label: fig-causal-base
+#| fig-cap: Causal network for baseline scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 0, dark blue is 1.
+aggNetwork_base <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "base"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "ewr_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_base)
+```
+
+```{r}
+#| label: fig-causal-down
+#| fig-cap: Causal network for the 0.25x scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step. Light yellow is 0, dark blue is 1.
+aggNetwork_down <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "down4"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "ewr_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_down)
+```
+
+
+```{r}
+#| label: fig-causal-up4
+#| fig-cap: Causal network for 4x scenario at example gauge, coloured by proportion passing at each node, e.g. Arithmetic Means at every step.Light yellow is 0, dark blue is 1.
+aggNetwork_4 <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "up4"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "ewr_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_4)
+```
+
+### Baselined data
+
+We can also baseline the data and then plot those changes on the network.
+
+::: callout-caution
+The causal network defines how *values* at one level are linked to *values* at others. It is these values that propagate through the network. Comparisons do *not* propagate through the network. Thus, plotting them on the network shows only how each node is compared across scenarios, not how those comparisons propagate through the network (they don't, and because they are often nonlinear, the outcome would be highly misleading if they did). The links in this case show the existence of relationships, but are not appropriate to interpret as causal models as they are for the values themselves.
+:::
+
+```{r}
+# pre-filter to make plotting simpler
+basenodes <- nodes_with_vals |> 
+  filter(gauge == example_gauge) |> 
+  baseline_compare(compare_col = 'scenario', 
+                   base_lev = 'base',
+                   values_col = 'ewr_achieved',
+                   group_cols = c('Name', 'NodeType', 'nodeorder'),
+                   comp_fun = 'relative',
+                   add_eps = 0.01) |>
+  mutate(logrel_ewr_achieved = log(relative_ewr_achieved))
+```
+
+Now make the networks.
+
+::: callout-tip
+Causal networks look good in html, but often do not export well. The trick is to use `save = TRUE` and specify a `savedir` and `savename`. This will save them as vector objects and so retain some quality.
+:::
+
+```{r}
+#| label: fig-causalrel-down4
+#| fig-cap: Relative change between the 0.25x scenario and baseline for each node in the causal network. Blue indicates increases, white is no change, and orange is decrease.
+#| 
+aggNetworkdown_rel <- basenodes |>
+  dplyr::filter(scenario == 'down4') |>
+  make_causal_plot(edges = edges,
+                 edge_pal = 'black',
+                 node_pal = list(value = 'ggthemes::Orange-Blue-White Diverging'),
+                 node_colorset = 'logrel_ewr_achieved',
+                 render = TRUE,
+                 setLimits = c(min(basenodes$logrel_ewr_achieved),
+                               0,
+                               max(basenodes$logrel_ewr_achieved)),
+                 save = TRUE,
+                 savedir = tempdir(),
+                 savename = 'aggNetworkdown_rel')
+```
+
+
+
+```{r}
+#| label: fig-causalrel-up4
+#| fig-cap: Relative change between the 4x scenario and baseline for each node in the causal network. Blue indicates increases, white is no change, and orange is decrease.
+#| 
+aggNetworkup_rel <- basenodes |>
+  dplyr::filter(scenario == 'up4') |>
+  make_causal_plot(edges = edges,
+                 edge_pal = 'black',
+                 node_pal = list(value = 'ggthemes::Orange-Blue-White Diverging'),
+                 node_colorset = 'logrel_ewr_achieved',
+                 render = TRUE,
+                 setLimits = c(min(basenodes$logrel_ewr_achieved),
+                               0,
+                               max(basenodes$logrel_ewr_achieved)),
+                 save = TRUE,
+                 savedir = tempdir(),
+                 savename = 'aggNetworkup_rel')
+
+```
+
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```

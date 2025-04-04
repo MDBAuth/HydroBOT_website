@@ -13,6 +13,6 @@ For example
 
 -   `make_edges`
 
--   The pruning function `find_realted_nodes`
+-   The pruning function `find_related_nodes`
 
 -   others
