@@ -1,1 +1,1 @@
-Sitemap: https://MDBAuth.github.io/WERP_toolkit_demo/sitemap.xml
+Sitemap: https://MDBAuth.github.io/HydroBOT_website/sitemap.xml
