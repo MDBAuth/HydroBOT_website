@@ -10,7 +10,7 @@ A key difference between `plot_outcomes()` and more typical plotting functions, 
 
 ## Consistent limits
 
-We often need to control limits for visual consistency across plots or to ensure things like midpoints of color ramps are appropriate. The `setLimits` argument allows us to do all of those for the values in `outcome_col`. It behaves differently depending on length, making it worth for setting ranges but also e.g. midpoints of diverging axes.
+We often need to control limits for visual consistency across plots or to ensure things like midpoints of color ramps are appropriate. The `setLimits` argument allows us to do all of those for the values in `outcome_col`. It behaves differently depending on length, making it worth for setting ranges but also e.g. midpoints of diverging axes. In addition, it is used internally when data is baselined to set appropriate breaks (especially for diverging color ramps, see [maps example](maps.qmd)).
 
 ## List-arguments for complex plots
 
