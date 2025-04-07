@@ -104,7 +104,7 @@ simpleAgg |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "ewr_achieved",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::lapaz"),
     pal_direction = -1,
     facet_col = "Target",
     facet_row = "date"
@@ -145,7 +145,7 @@ full_period |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "ewr_achieved",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::lapaz"),
     pal_direction = -1,
     facet_col = "Target"
   )
@@ -180,7 +180,7 @@ two_years |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "ewr_achieved",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::lapaz"),
     pal_direction = -1,
     facet_col = "Target",
     facet_row = 'date'
@@ -213,7 +213,7 @@ three_years_cut |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "ewr_achieved",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::lapaz"),
     pal_direction = -1,
     facet_col = "Target",
     facet_row = 'date'

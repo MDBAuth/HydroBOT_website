@@ -155,7 +155,7 @@ fake_causal_agg$sdl_units |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "ewr_achieved",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::lapaz"),
     pal_direction = -1,
     facet_col = "scenario",
     facet_row = "fake_group",

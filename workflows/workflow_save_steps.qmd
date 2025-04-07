@@ -123,7 +123,8 @@ map_example <- aggout$env_obj |>
     outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::lapaz"),
+    pal_direction = -1,
     facet_col = "scenario",
     facet_row = "env_obj",
     sceneorder = c("down4", "base", "up4"),
@@ -157,3 +158,4 @@ catchcompare
 #| label: cleanup
 withr::deferred_run()
 ```
+

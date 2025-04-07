@@ -205,7 +205,7 @@ limit_basin <- basin_to_plot |>
 orig_basin + limit_basin
 ```
 
-For colors, not only is it valuable to set limits for consistency across plots or for showing the full possible range of the data, it also can be critical for setting midpoints, whether to indicate e.g. 0.5 or to use diverging color palettes with baselining.
+For colors, not only is it valuable to set limits for consistency across plots or for showing the full possible range of the data, it also can be critical for setting midpoints, whether to indicate e.g. 0.5 or to use diverging color palettes with baselining (and so for the examples below, we use a diverging palette).
 
 A single value to `setLimits` changes the midpoint while leaving the limits auto-adjusted. Here, we use this to set the midpoint of the raw (non-baselined data) to 0.5.
 
