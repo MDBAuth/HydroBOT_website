@@ -84,7 +84,7 @@ state_agg$state |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "ewr_achieved",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::lapaz"),
     pal_direction = -1,
     facet_col = "scenario",
     facet_row = "Target",

@@ -145,7 +145,7 @@ ausagg$week |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "value",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::bamako"),
     pal_direction = -1,
     facet_col = "scenario",
     facet_row = "date"
@@ -160,7 +160,7 @@ ausagg$theme2 |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "value",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::bamako"),
     pal_direction = -1,
     facet_col = "scenario",
     facet_row = "theme2"
@@ -175,7 +175,7 @@ ausagg$all_aus |>
     plot_type = "map",
     colorgroups = NULL,
     colorset = "value",
-    pal_list = list("scico::berlin"),
+    pal_list = list("scico::bamako"),
     pal_direction = -1,
     facet_col = "scenario",
     facet_row = "theme2"

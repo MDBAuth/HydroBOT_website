@@ -25,6 +25,8 @@ website:
     left:
       - href: getting_started.qmd
         text: Get started
+      - href: https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html
+        text: Reference
       - href: workflows/workflow_overview.qmd
         text: Workflows
       - href: controller/controller_overview.qmd
