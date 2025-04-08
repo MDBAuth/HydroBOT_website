@@ -6067,7 +6067,7 @@ window.onload = function() {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../aggregator/aggregation_syntax.html">Syntax and details</a></li><li class="breadcrumb-item"><a href="../aggregator/using_multi_aggregate.html">Multi-axis interleaved aggregation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../aggregator/spatial_agg.html">Dimensions</a></li><li class="breadcrumb-item"><a href="../aggregator/using_multi_aggregate.html">Multi-step interleaved aggregation</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -6117,12 +6117,6 @@ window.onload = function() {
   <div class="sidebar-item-container"> 
   <a href="../aggregator/pseudo_spatial_group_until.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Unusual grouping requirements</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../aggregator/using_multi_aggregate.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Multi-axis interleaved aggregation</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -6180,7 +6174,7 @@ window.onload = function() {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../aggregator/using_multi_aggregate.html" class="sidebar-item-text sidebar-link">
+  <a href="../aggregator/using_multi_aggregate.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Multi-step interleaved aggregation</span></a>
   </div>
 </li>
@@ -6234,7 +6228,7 @@ window.onload = function() {
   </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../aggregator/aggregation_syntax.html">Syntax and details</a></li><li class="breadcrumb-item"><a href="../aggregator/using_multi_aggregate.html">Multi-axis interleaved aggregation</a></li></ol></nav><div class="quarto-title">
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../aggregator/spatial_agg.html">Dimensions</a></li><li class="breadcrumb-item"><a href="../aggregator/using_multi_aggregate.html">Multi-step interleaved aggregation</a></li></ol></nav><div class="quarto-title">
 <h1 class="title">Aggregating over multiple dimensions</h1>
 </div>
 
@@ -6853,7 +6847,7 @@ Caution
 <pre><code>[1] &quot;target_5_year_2024_ArithmeticMean_Objective_ArithmeticMean_Specific_goal_LimitingFactor_env_obj_LimitingFactor_ewr_code_CompensatingFactor_all_time_ArithmeticMean_ewr_achieved&quot;</code></pre>
 </div>
 </div>
-<p>This says the values in this column are the <code>5-year targets</code>, calculated as the arithmetic mean of <code>Objectives</code>, which were the arithmetic mean of <code>Specific goals</code>, which were calculated from <code>env_obj</code> as limiting factors, which were obtained from the <code>ewr_code</code> as limiting factors, with those were calculated from the <code>ewr_code_timing</code> as compensating factors, which were calculated from the time-average of the original data.</p>
+<p>This says the values in this column are the <code>5-year targets</code>, calculated as the arithmetic mean of <code>Objectives</code>, which were the arithmetic mean of <code>Specific goal</code>, which were calculated from <code>env_obj</code> as limiting factors, which were obtained from the <code>ewr_code</code> as limiting factors, with those were calculated from the <code>ewr_code_timing</code> as compensating factors, which were calculated from the time-average of the original data.</p>
 <p>It may be easier to think about the meaning of the names from the other direction- <code>ewr_achieved</code> were aggregated from the yearly to the full timeseries as an average, and then <code>ewr_code_timing</code> into <code>ewr_code</code> as Compensating Factors, then into <code>env_obj</code> as limiting factors- for the <code>env_obj</code> to pass, all <code>ewr_code</code>s contributing to it must pass. Then the <code>env_obj</code>s were aggregated into <code>Specific_goal</code>, again as limiting factors, so to meet a goal, all contributing <code>env_obj</code> must pass. Those <code>Specific_goal</code>s were then aggregated into <code>Objectives</code> with the arithmetic mean, so the value for an <code>Objective</code> is then the average of the contributing <code>Specific_goal</code>s. Similarly, the 5-year targets were obtained by averaging the <code>Objective</code>s contributing to them.</p>
 <p>A different way to track the aggregations is possible by including them in columns instead of the names. This takes more memory, but can be clearer and makes subsequent uses easier in many cases. In the example above, we can feed the output data to <code>agg_names_to_cols</code> to put the history in columns instead of names.</p>
 <div class="cell">
