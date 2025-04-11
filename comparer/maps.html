@@ -6027,7 +6027,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6050,10 +6050,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6207,7 +6211,7 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -6252,12 +6256,12 @@ window.onload = function() {
 </section></section><section id="standard-scenario-appearance" class="level1"><h1>Standard scenario appearance</h1>
 <p>We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the <code>.Rprofile</code>, if desired.</p>
 <p>Here, we use the special arguments <code>refvals</code> and <code>refcols</code> to make a color palette from a standard {paletter} option (“ggsci::nrc_npg”) while setting a specific level to a specified value. We will use the <a href="../comparer/comparer_overview.html">codes defining the scenarios</a> rather than the names to make plots readable.</p>
-<p>There is a <code>sceneorder</code> argument to <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code> that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates <em>only</em> on a column named ‘scenario’, though, so if other columns need to be ordered they should be made factors before feeding to <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code>.</p>
+<p>There is a <code>sceneorder</code> argument to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates <em>only</em> on a column named ‘scenario’, though, so if other columns need to be ordered they should be made factors before feeding to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sceneorder</span> <span class="op">&lt;-</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">basin_to_plot</span><span class="op">$</span><span class="va">scenario</span>,</span>
 <span>                                   <span class="va">basin_to_plot</span><span class="op">$</span><span class="va">flow_multiplier</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">scene_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_pal.html">make_pal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">basin_to_plot</span><span class="op">$</span><span class="va">climate_code</span><span class="op">)</span>,</span>
+<span><span class="va">scene_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_pal.html">make_pal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">basin_to_plot</span><span class="op">$</span><span class="va">climate_code</span><span class="op">)</span>,</span>
 <span>  palette <span class="op">=</span> <span class="st">&quot;ggsci::nrc_npg&quot;</span>,</span>
 <span>  refvals <span class="op">=</span> <span class="st">&quot;E&quot;</span>, refcols <span class="op">=</span> <span class="st">&quot;black&quot;</span></span>
 <span><span class="op">)</span></span>
@@ -6273,7 +6277,7 @@ black #E64B35FF #4DBBD5FF </code></pre>
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_group</span> <span class="op">==</span> <span class="st">&quot;WB&quot;</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion EWR\nachieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6301,7 +6305,7 @@ black #E64B35FF #4DBBD5FF </code></pre>
 <span></span>
 <span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_group</span> <span class="op">==</span> <span class="st">&quot;WB&quot;</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion EWR\nachieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6340,14 +6344,14 @@ Important
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>If we attempt to run this as-is, it shows the value of <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code> for catching unintentional overplotting. The filtering to just NF1 is an attempt to only plot one value, but there are hidden and easily missed doubled gauges in this data. Because in the EWR tool some gauges inform several different planning units, there are more than one line for those gauges. <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code> catches this and forces us to deal with it.</p>
+<p>If we attempt to run this as-is, it shows the value of <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> for catching unintentional overplotting. The filtering to just NF1 is an attempt to only plot one value, but there are hidden and easily missed doubled gauges in this data. Because in the EWR tool some gauges inform several different planning units, there are more than one line for those gauges. <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> catches this and forces us to deal with it.</p>
 </div>
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_data</span><span class="op">$</span><span class="va">env_obj</span> <span class="op">|&gt;</span> <span class="co"># for readability</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_obj</span> <span class="op">==</span> <span class="st">&quot;NF1&quot;</span> <span class="op">&amp;</span> </span>
 <span>                  <span class="va">scenario</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="va">scenarios_to_plot</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Arithmetic Mean&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6381,7 +6385,7 @@ do you need more facetting or filtering?</code></pre>
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">env_obj_to_plot</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Arithmetic Mean&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6406,7 +6410,7 @@ do you need more facetting or filtering?</code></pre>
 <p>We can also plot the basin-scale outcomes (rather than just the shape as above).</p>
 <div class="cell">
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basin_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion EWR\nachieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6430,7 +6434,7 @@ do you need more facetting or filtering?</code></pre>
 <p>First, we include a fill in the underlay for SDL unit name (e.g. not a data fill, but still informative) by simply replacing the single color in <code>underlay_pal</code> with a {paletteer} palette. It is hard to find palettes for the full set of catchments. We use a qualitative palette here. Using a continuous palette (e.g. <code>grDevices::Purple-Yellow</code>) works OK as well, but the colors aren’t very well spatially-separated.</p>
 <div class="cell">
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">env_obj_to_plot</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;All arithmetic mean&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6457,7 +6461,7 @@ do you need more facetting or filtering?</code></pre>
 <p>We can use a continuous variable on the underlay fill, but have to be careful to choose palettes that don’t mask each other. It is very tempting to put e.g. gauges under sdl units and color by the same palette to show the effect of the aggregation, but that is often confusing given the similarity in color (and noting that because here we have to eliminate some planning units to plot the gauges, the full set of aggregated gauge values is not shown).</p>
 <div class="cell">
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">env_obj_to_plot</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6482,7 +6486,7 @@ do you need more facetting or filtering?</code></pre>
 <p>While the aggregation isn’t as obvious here, it is easier to see the different levels:</p>
 <div class="cell">
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">env_obj_to_plot</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6507,7 +6511,7 @@ do you need more facetting or filtering?</code></pre>
 <p>We can also have multiple levels of underlay polygons (e.g. if we want the basin under sdl units), and can use a fill palette in one of them (<a href="#fig-multiunderlays" class="quarto-xref">Figure 2</a>) by using a list of lists for <code>underlay_list</code>. A similar approach also works for overlays (<a href="#fig-multioverlays" class="quarto-xref">Figure 3</a>). And as we’ve seen above (<a href="#fig-underover" class="quarto-xref">Figure 1</a>), we can have both underlays and overlays.</p>
 <div class="cell">
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">env_obj_to_plot</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6558,7 +6562,7 @@ Tip
 <div class="cell">
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_obj</span> <span class="op">==</span> <span class="st">&quot;NF1&quot;</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6586,7 +6590,7 @@ Tip
 <div class="cell">
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_obj</span> <span class="op">==</span> <span class="st">&quot;NF1&quot;</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6616,7 +6620,7 @@ Tip
 <p>Here, we demonstrate a primary layer at the basin scale, overlay the sdl units with empty fill so we can see their locations, and then put gauges on with informative values.</p>
 <div class="cell">
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basin_to_plot</span> <span class="op">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6650,7 +6654,7 @@ Figure 3
 <div class="cell">
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_group</span> <span class="op">==</span> <span class="st">&quot;WB&quot;</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6676,7 +6680,7 @@ Figure 3
 <div class="cell">
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_group</span> <span class="op">==</span> <span class="st">&quot;WB&quot;</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="co"># Need to reduce dimensionality</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span>  <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -6938,7 +6942,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -7269,7 +7273,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

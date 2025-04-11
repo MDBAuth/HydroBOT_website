@@ -6026,7 +6026,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6049,10 +6049,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6221,7 +6225,7 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="overview" class="level1"><h1>Overview</h1>
@@ -6237,10 +6241,10 @@ window.onload = function() {
 </div>
 <section id="data" class="level2"><h2 class="anchored" data-anchor-id="data">Data</h2>
 <p>Input data to should be a dataframe (e.g. a dataframe of EWR outputs, <code>sf</code> object if they are spatial outcomes). If we want to pass a path instead of a dataframe (as we might for large runs), we would use <code>read_and_agg</code>, which wraps <code>multi_aggregate</code>, demonstrated in <a href="../aggregator/read_and_agg.html">its own notebook</a>. Thus, for the demonstration, we pull in the the EWR output produced from the HydroBOT-provided hydrographs (<code>system.file(&#39;extdata/testsmall/hydrographs&#39;, package = &#39;HydroBOT&#39;)</code>, which we have processed already here and are at the paths above.</p>
-<p>We’ll pull in the data to use for demonstration so we can use <code><a href="https://rdrr.io/pkg/HydroBOT/man/temporal_aggregate.html">temporal_aggregate()</a></code> directly. If we want to feed a path instead of a dataframe, we would use <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code>.</p>
+<p>We’ll pull in the data to use for demonstration so we can use <code><a href="https://galenholt.github.io/HydroBOT/reference/temporal_aggregate.html">temporal_aggregate()</a></code> directly. If we want to feed a path instead of a dataframe, we would use <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code>.</p>
 <p>The data comes in as a timeseries but at fine ecological detail and across several gauges. We will do a first-pass aggregation to Target groups and sdl units before the temporal aggregation for clarity.</p>
 <div class="cell">
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="va">project_dir</span>,</span>
 <span>  outputType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&#39;none&#39;</span><span class="op">)</span>,</span>
@@ -6249,7 +6253,7 @@ window.onload = function() {
 <span></span>
 <span></span>
 <span><span class="co"># This is just a simple prep step that is usually done internally to put the geographic coordinates on input data</span></span>
-<span><span class="va">ewrdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_ewr_output.html">prep_ewr_output</a></span><span class="op">(</span><span class="va">ewr_out</span><span class="op">$</span><span class="va">yearly</span>, type <span class="op">=</span> <span class="st">&#39;achievement&#39;</span>, add_max <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="va">ewrdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_ewr_output.html">prep_ewr_output</a></span><span class="op">(</span><span class="va">ewr_out</span><span class="op">$</span><span class="va">yearly</span>, type <span class="op">=</span> <span class="st">&#39;achievement&#39;</span>, add_max <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># This gets us to Target at the SDL unit every year</span></span>
 <span><span class="va">preseq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
@@ -6266,7 +6270,7 @@ window.onload = function() {
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Do the aggregation to get output at each gauge averaged over time</span></span>
-<span><span class="va">simpleAgg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/multi_aggregate.html">multi_aggregate</a></span><span class="op">(</span></span>
+<span><span class="va">simpleAgg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">ewrdata</span>,</span>
 <span>  causal_edges <span class="op">=</span> <span class="va">causal_ewr</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span><span class="op">)</span>,</span>
@@ -6309,11 +6313,11 @@ window.onload = function() {
 <p>We can plot that data (for just one scenario) to better see what it looks like.</p>
 <div class="cell">
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">simpleAgg</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span>aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span>aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>,</span>
 <span>                    funsequence <span class="op">=</span> <span class="va">funseq</span>,</span>
 <span>                    aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">==</span> <span class="st">&#39;base&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Arithmetic Mean&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6332,7 +6336,7 @@ window.onload = function() {
 </div>
 </div>
 </section></section><section id="examples" class="level1"><h1>Examples</h1>
-<p>Now, we can aggregate that in a few different ways to show how to operate along the time dimension. Because we are using <code><a href="https://rdrr.io/pkg/HydroBOT/man/temporal_aggregate.html">temporal_aggregate()</a></code> directly, the dimensional safety provided by <code><a href="https://rdrr.io/pkg/HydroBOT/man/multi_aggregate.html">multi_aggregate()</a></code> is not present, and so we have to specify groupers. The <code><a href="https://rdrr.io/pkg/HydroBOT/man/multi_aggregate.html">multi_aggregate()</a></code> function automatically handles this preservation, but <code><a href="https://rdrr.io/pkg/HydroBOT/man/temporal_aggregate.html">temporal_aggregate()</a></code> is more general, and does not make any assumptions about the grouping structure of the data. Thus, to keep the Target and SDL groupings (as we should, otherwise we’re inadvertently aggregating over all of them), we need to add them to the groupers argument.</p>
+<p>Now, we can aggregate that in a few different ways to show how to operate along the time dimension. Because we are using <code><a href="https://galenholt.github.io/HydroBOT/reference/temporal_aggregate.html">temporal_aggregate()</a></code> directly, the dimensional safety provided by <code><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate()</a></code> is not present, and so we have to specify groupers. The <code><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate()</a></code> function automatically handles this preservation, but <code><a href="https://galenholt.github.io/HydroBOT/reference/temporal_aggregate.html">temporal_aggregate()</a></code> is more general, and does not make any assumptions about the grouping structure of the data. Thus, to keep the Target and SDL groupings (as we should, otherwise we’re inadvertently aggregating over all of them), we need to add them to the groupers argument.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -6343,13 +6347,13 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <code>funlist</code> argument here specifies the function(s) to use <em>at a single step</em>. It is thus not the same as the <code>funsequence</code> list of <code><a href="https://rdrr.io/pkg/HydroBOT/man/multi_aggregate.html">multi_aggregate()</a></code>; instead being a single item in that list, though it may include multiple functions (e.g. the mean and max).</p>
+<p>The <code>funlist</code> argument here specifies the function(s) to use <em>at a single step</em>. It is thus not the same as the <code>funsequence</code> list of <code><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate()</a></code>; instead being a single item in that list, though it may include multiple functions (e.g. the mean and max).</p>
 </div>
 </div>
 <section id="collapse-the-full-timeseries" class="level2"><h2 class="anchored" data-anchor-id="collapse-the-full-timeseries">Collapse the full timeseries</h2>
 <p>We often just want to simply get some summary over the full timeseries. It uses the special value <code>&#39;all_time&#39;</code> in <code>breaks</code> for simplicity, though specifying the start and end works as well. Think carefully though, it very well make more sense to weight this by recency or similar.</p>
 <div class="cell">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">full_period</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/temporal_aggregate.html">temporal_aggregate</a></span><span class="op">(</span><span class="va">simpleAgg</span>, </span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">full_period</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/temporal_aggregate.html">temporal_aggregate</a></span><span class="op">(</span><span class="va">simpleAgg</span>, </span>
 <span>                                  breaks <span class="op">=</span> <span class="st">&#39;all_time&#39;</span>,</span>
 <span>                                  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&#39;scenario&#39;</span>, <span class="st">&#39;SWSDLName&#39;</span>, <span class="st">&#39;Target&#39;</span><span class="op">)</span>,</span>
 <span>                                  aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span>,</span>
@@ -6358,11 +6362,11 @@ Note
 <p>Now we only have one value and have lost the date column</p>
 <div class="cell">
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">full_period</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span>aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&#39;all_time&#39;</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span>aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&#39;all_time&#39;</span><span class="op">)</span>,</span>
 <span>                    funsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">funseq</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&#39;ArithmeticMean&#39;</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                    aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">==</span> <span class="st">&#39;base&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Arithmetic Mean&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6385,7 +6389,7 @@ Note
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">time_breaks</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&#39;2014-01-01&#39;</span>, <span class="st">&#39;2016-01-01&#39;</span>, <span class="st">&#39;2018-01-01&#39;</span>, <span class="st">&#39;2020-01-01&#39;</span><span class="op">)</span></span>
 <span><span class="va">tg</span> <span class="op">&lt;-</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html">ymd</a></span><span class="op">(</span><span class="va">time_breaks</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">two_years</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/temporal_aggregate.html">temporal_aggregate</a></span><span class="op">(</span><span class="va">simpleAgg</span>, </span>
+<span><span class="va">two_years</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/temporal_aggregate.html">temporal_aggregate</a></span><span class="op">(</span><span class="va">simpleAgg</span>, </span>
 <span>                                  breaks <span class="op">=</span> <span class="va">tg</span>,</span>
 <span>                                  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&#39;scenario&#39;</span>, <span class="st">&#39;SWSDLName&#39;</span>, <span class="st">&#39;Target&#39;</span><span class="op">)</span>,</span>
 <span>                                  aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span>,</span>
@@ -6394,11 +6398,11 @@ Note
 <p>And the plot</p>
 <div class="cell">
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">two_years</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span>aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&#39;all_time&#39;</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span>aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&#39;all_time&#39;</span><span class="op">)</span>,</span>
 <span>                    funsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">funseq</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&#39;ArithmeticMean&#39;</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                    aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">==</span> <span class="st">&#39;base&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Arithmetic Mean&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6417,9 +6421,9 @@ Note
 </div>
 </div>
 </section><section id="interval-specifications" class="level2"><h2 class="anchored" data-anchor-id="interval-specifications">Interval specifications</h2>
-<p>The <code><a href="https://rdrr.io/pkg/HydroBOT/man/temporal_aggregate.html">temporal_aggregate()</a></code> function relies on <code><a href="https://rdrr.io/r/base/cut.POSIXt.html">base::cut.POSIXt()</a></code> internally, and so can use the break specifications allowed there, where characters can be used to define lengths and units of the intervals. See <code><a href="https://rdrr.io/r/base/cut.POSIXt.html">?base::cut.POSIXt</a></code> for more information. This can be very useful for sub-yearly aggregations (e.g. ‘2 months’, ‘quarter’, etc), or with long timeseries allowing the use of things like ‘10 years’. Here we demonstrate with 3 years due to the short demonstration timeseries.</p>
+<p>The <code><a href="https://galenholt.github.io/HydroBOT/reference/temporal_aggregate.html">temporal_aggregate()</a></code> function relies on <code><a href="https://rdrr.io/r/base/cut.POSIXt.html">base::cut.POSIXt()</a></code> internally, and so can use the break specifications allowed there, where characters can be used to define lengths and units of the intervals. See <code><a href="https://rdrr.io/r/base/cut.POSIXt.html">?base::cut.POSIXt</a></code> for more information. This can be very useful for sub-yearly aggregations (e.g. ‘2 months’, ‘quarter’, etc), or with long timeseries allowing the use of things like ‘10 years’. Here we demonstrate with 3 years due to the short demonstration timeseries.</p>
 <div class="cell">
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">three_years_cut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/temporal_aggregate.html">temporal_aggregate</a></span><span class="op">(</span><span class="va">simpleAgg</span>, </span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">three_years_cut</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/temporal_aggregate.html">temporal_aggregate</a></span><span class="op">(</span><span class="va">simpleAgg</span>, </span>
 <span>                                  breaks <span class="op">=</span> <span class="st">&#39;3 years&#39;</span>,</span>
 <span>                                  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&#39;scenario&#39;</span>, <span class="st">&#39;SWSDLName&#39;</span>, <span class="st">&#39;Target&#39;</span><span class="op">)</span>,</span>
 <span>                                  aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span>,</span>
@@ -6428,11 +6432,11 @@ Note
 <p>And the plot</p>
 <div class="cell">
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">three_years_cut</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span>aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&#39;all_time&#39;</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span>aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&#39;all_time&#39;</span><span class="op">)</span>,</span>
 <span>                    funsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">funseq</span>, <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&#39;ArithmeticMean&#39;</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>                    aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">==</span> <span class="st">&#39;base&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Arithmetic Mean&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6688,7 +6692,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -7019,7 +7023,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

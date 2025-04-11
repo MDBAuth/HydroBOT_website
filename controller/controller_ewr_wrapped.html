@@ -6027,7 +6027,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6050,10 +6050,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6164,7 +6168,7 @@ window.onload = function() {
 
 </header><p>Load the package</p>
 <div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org">future</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The controller primarily sets the paths to scenarios, calls the modules, and saves the output and metadata. In normal use, we set the directory and any other needed parameters (e.g. desired saving formats, parallelisation), and the controller functions auto-generate the folder structure, run the ewr, and output the results. This can be taken up a level to the <a href="../workflows/workflow_overview.html">combined workflow</a>, where the controller and subsequent steps are all run at once. A <a href="../controller/controller_ewr_stepthrough.html">detailed stepthrough</a> of what happens in the controller is also available, useful to see what is happening under the hood.</p>
@@ -6210,7 +6214,7 @@ Tip
 <p>The above is all user parameters. All the formatting, running, and saving is then handled by <code>prep_run_save_ewrs</code>. See <a href="../controller/controller_ewr_stepthrough.html">stepthrough</a> for an expanded version to see (some) of what this does internally.</p>
 <p>The <code>prep_run_save_ewrs</code> function saves metadata files (yaml and json) that allows replication of this step with <code>run_hydrobot_params</code>. These metadata files build on earlier steps if possible, including any available metadata from scenarios.</p>
 <div class="cell">
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="va">project_dir</span>,</span>
 <span>  outputType <span class="op">=</span> <span class="va">outputType</span>,</span>
@@ -6234,7 +6238,7 @@ Tip
 <p>The <code>prep_run_save_ewrs</code> function provides this parallelisation internally and seamlessly, provided the user has the suggested package <a href="https://github.com/DavisVaughan/furrr">furrr</a> (and its dependency, <a href="https://future.futureverse.org">future</a>). In that case, parallelising is as easy as setting a <code><a href="https://future.futureverse.org/reference/plan.html">future::plan</a></code> and the argument <code>rparallel = TRUE</code>;</p>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html">plan</a></span><span class="op">(</span><span class="va">multisession</span><span class="op">)</span></span>
-<span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="va">project_dir</span>,</span>
 <span>  outputType <span class="op">=</span> <span class="va">outputType</span>,</span>
@@ -6258,7 +6262,7 @@ Tip
 <p>Changing <code>output_parent_dir</code> often happens for two reasons; either we want to save the modules somewhere other than the folder with the hydrographs, or we are forced to save them <em>inside</em> the relevant hydrograph folder, as might happen in remote batched runs that only have access to single directories.</p>
 <p>Since we always have to set <code>output_parent_dir</code>, the first case just involves setting it to something that does not contain the hydrographs, e.g.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="st">&quot;new_parent&quot;</span>,</span>
 <span>  outputType <span class="op">=</span> <span class="va">outputType</span>,</span>
@@ -6268,7 +6272,7 @@ Tip
 </div>
 <p>If we only have access to a specific scenario, as might happen sometimes in batched jobs, we set both <code>hydro_dir</code> and <code>output_parent_dir</code> to that scenario, which puts the module output within the scenario folder. That makes onward processing with the aggregator a bit more difficult but sometimes it’s all we can do.</p>
 <div class="cell">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="st">&quot;hydrobot_scenarios/hydrographs/base&quot;</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="st">&quot;hydrobot_scenarios/hydrographs/base&quot;</span>,</span>
 <span>  outputType <span class="op">=</span> <span class="va">outputType</span>,</span>
@@ -6286,7 +6290,7 @@ Tip
 </section><section id="subdirectories" class="level3"><h3 class="anchored" data-anchor-id="subdirectories">Subdirectories</h3>
 <p>It is sometimes the case that we want subdirectories within <code>module_output/EWR</code>. For example, maybe we want to retain results from an earlier run for reproducibility while updating either the arguments used or the EWR tool itself. In this case, we use the <code>output_subdir</code> argument, which simply adds the requested directory inside <code>module_output/EWR</code>:</p>
 <div class="cell">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="va">project_dir</span>,</span>
 <span>  output_subdir <span class="op">=</span> <span class="st">&quot;new_run&quot;</span>,</span>
@@ -6319,7 +6323,7 @@ Tip
 <p>In some cases, the scenario names or directory structures might be such that they cannot reasonably be inferred from the directories, or more granular control is needed over the subset of scenarios to run. In this case, the <code>scenarios</code> argument allows passing in a named list of paths, with the names being scenario names and the paths the paths to the files. This then bypasses all the path and scenario inference, giving the user direct control.</p>
 <p>For example, we can rename scenarios and only run a subset, as illustrated here to run the down4 and up4 scenarios and rename the scenarios to decrease and increase. We do still need a <code>hydro_dir</code> argument, as the paths in <code>scenarios</code> are assumed to be relative to that directory, and it’s where metadata gets saved. That said, using a high-level location for <code>hydro_dir</code> would allow the paths to be essentially anywhere.</p>
 <div class="cell">
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="va">project_dir</span>,</span>
 <span>  scenarios <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
@@ -6573,7 +6577,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -6904,7 +6908,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

@@ -6027,7 +6027,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6050,10 +6050,14 @@ window.onload = function() {
     <a class="nav-link active" href="../provided_data/data_overview.html" aria-current="page"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6067,7 +6071,7 @@ window.onload = function() {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../provided_data/scenario_creation.html">Example scenarios</a></li><li class="breadcrumb-item"><a href="../provided_data/scenario_creation.html">Example scenario information and creation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../demo_scenarios.html">Example scenarios</a></li><li class="breadcrumb-item"><a href="../provided_data/scenario_creation.html">Example scenario information and creation</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -6138,6 +6142,12 @@ window.onload = function() {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../demo_scenarios.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scenarios used for demonstrations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../provided_data/scenario_creation.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Example scenario information and creation</span></a>
   </div>
@@ -6186,7 +6196,7 @@ window.onload = function() {
   </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../provided_data/scenario_creation.html">Example scenarios</a></li><li class="breadcrumb-item"><a href="../provided_data/scenario_creation.html">Example scenario information and creation</a></li></ol></nav><div class="quarto-title">
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../demo_scenarios.html">Example scenarios</a></li><li class="breadcrumb-item"><a href="../provided_data/scenario_creation.html">Example scenario information and creation</a></li></ol></nav><div class="quarto-title">
 <h1 class="title">Creating simple scenarios</h1>
 </div>
 
@@ -6208,7 +6218,7 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/galenholt/hydrogauge/">hydrogauge</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span></span>
@@ -6243,7 +6253,7 @@ window.onload = function() {
 </section>
 </div>
 <section id="spatial-datasets" class="level2"><h2 class="anchored" data-anchor-id="spatial-datasets">Spatial datasets</h2>
-<p>We use spatial datasets provided by <a href="https://github.com/MDBAuth/HydroBOT">{HydroBOT}</a>, which creates a standard set in <code>data_creation/spatial_data_creation.qmd</code>. These are visualised in <a href="../provided_data/spatial_data.html">a separate notebook</a>. Relevant to this scenario creation, we are interested in the gauges, (<code><a href="https://rdrr.io/pkg/HydroBOT/man/bom_basin_gauges.html">HydroBOT::bom_basin_gauges</a></code>) since this is what were contained in the EWR tool. We use the <code>sdl_units</code> dataset to obtain a subset of gauges for these simple scenarios. Relevant to the case study- the original polygon used was the Macquarie-Castlereagh in the resource_plan_areas, though we seem to use sdl units elsewhere, so I’ll use them here.</p>
+<p>We use spatial datasets provided by <a href="https://github.com/galenholt/HydroBOT">{HydroBOT}</a>, which creates a standard set in <code>data_creation/spatial_data_creation.qmd</code>. These are visualised in <a href="../provided_data/spatial_data.html">a separate notebook</a>. Relevant to this scenario creation, we are interested in the gauges, (<code><a href="https://galenholt.github.io/HydroBOT/reference/bom_basin_gauges.html">HydroBOT::bom_basin_gauges</a></code>) since this is what were contained in the EWR tool. We use the <code>sdl_units</code> dataset to obtain a subset of gauges for these simple scenarios. Relevant to the case study- the original polygon used was the Macquarie-Castlereagh in the resource_plan_areas, though we seem to use sdl units elsewhere, so I’ll use them here.</p>
 </section></section><section id="subset-the-gauges" class="level1"><h1>Subset the gauges</h1>
 <p>We need multiple catchments for demos, so let’s use the Macquarie, Castlereagh, Namoi, Lachlan.</p>
 <div class="cell">
@@ -6276,7 +6286,7 @@ all geometries</code></pre>
 <p>We have the list of gauges, but now we need to cut the list down to those in the EWR tool. There’s not any point in pulling gauges that do not appear later in HydroBOT.</p>
 <p>Which gauges are actually in the EWR tool?</p>
 <div class="cell">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewrs_in_pyewr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/get_ewr_table.html">get_ewr_table</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewrs_in_pyewr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/get_ewr_table.html">get_ewr_table</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>What are those gauges, and which are in both the ewr and the desired catchments?</p>
 <p>The way that works everywhere but vscode- this seems universal though</p>
@@ -6712,7 +6722,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -7043,7 +7053,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

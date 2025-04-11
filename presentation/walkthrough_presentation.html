@@ -444,7 +444,7 @@
 </div>
 <ul>
 <li><p>Many options we could set</p></li>
-<li><p>See options at <a href="https://special-disco-eyonrvy.pages.github.io/" target="_blank">github pages site</a> for <a href="https://github.com/MDBAuth/HydroBOT_website" target="_blank">HydroBOT_website</a></p></li>
+<li><p>See options at <a href="https://mdbauth.github.io/HydroBOT_website/" target="_blank">HydroBOT_website</a></p></li>
 <li><p>Can run with minimal arguments</p></li>
 </ul>
 </section>
@@ -1084,7 +1084,7 @@
       }
         var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
         var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+          var filterRegex = new RegExp('/' + window.location.host + '/');
         var isInternal = (href) => {
             return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
         }

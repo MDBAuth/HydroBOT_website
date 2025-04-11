@@ -6027,7 +6027,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6050,10 +6050,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6211,7 +6215,7 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -6255,12 +6259,12 @@ window.onload = function() {
 </section></section><section id="standard-scenario-appearance" class="level1"><h1>Standard scenario appearance</h1>
 <p>We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the <code>.Rprofile</code>, if desired.</p>
 <p>Here, we use the special arguments <code>refvals</code> and <code>refcols</code> to make a color palette from a standard {paletter} option (“ggsci::nrc_npg”) while setting a specific level to a specified value. We will use the codes (see <a href="../comparer/comparer_overview.html">scenario definitions</a>) rather than the names to make plots readable.</p>
-<p>There is a <code>sceneorder</code> argument to <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code> that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates <em>only</em> on a column named ‘scenario’, though, so if other columns need to be ordered they should be made factors before feeding to <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code>.</p>
+<p>There is a <code>sceneorder</code> argument to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates <em>only</em> on a column named ‘scenario’, though, so if other columns need to be ordered they should be made factors before feeding to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sceneorder</span> <span class="op">&lt;-</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">basin_to_plot</span><span class="op">$</span><span class="va">scenario</span>,</span>
 <span>                                   <span class="va">basin_to_plot</span><span class="op">$</span><span class="va">flow_multiplier</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">scene_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_pal.html">make_pal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">basin_to_plot</span><span class="op">$</span><span class="va">climate_code</span><span class="op">)</span>,</span>
+<span><span class="va">scene_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_pal.html">make_pal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">basin_to_plot</span><span class="op">$</span><span class="va">climate_code</span><span class="op">)</span>,</span>
 <span>  palette <span class="op">=</span> <span class="st">&quot;ggsci::nrc_npg&quot;</span>,</span>
 <span>  refvals <span class="op">=</span> <span class="st">&quot;E&quot;</span>, refcols <span class="op">=</span> <span class="st">&quot;black&quot;</span></span>
 <span><span class="op">)</span></span>
@@ -6277,7 +6281,7 @@ black #E64B35FF #4DBBD5FF </code></pre>
 <p>We can make plots looking at how scenarios differ for each of the outcome categories for a simple case of only one outcome. This uses <code>facet_wrapper</code> to just wrap the single facet axis.</p>
 <p>The <code>colorset</code> argument is the column that determines color, while the <code>pal_list</code> defines those colors, here as a named <code>colors</code> object, but as we see below it can also be palette names.</p>
 <div class="cell">
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
 <span>  facet_wrapper <span class="op">=</span> <span class="st">&quot;Target&quot;</span>,</span>
@@ -6292,9 +6296,9 @@ black #E64B35FF #4DBBD5FF </code></pre>
 </div>
 </div>
 </div>
-<p>HydroBOT retains the axis names as-is from the incoming dataframe, as they provide the true meaning of each value. But we can change them, either inside the <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code> function (here for y) or post-hoc with <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggplot2::labs()</a></code> (here for x). We can also set the <code>sceneorder</code> with a character vector if that’s easier than setting up a Factor or if we want to change them around for some reason. Because the outputs of <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code> are just ggplot objects, changing the labels outside the function can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.</p>
+<p>HydroBOT retains the axis names as-is from the incoming dataframe, as they provide the true meaning of each value. But we can change them, either inside the <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> function (here for y) or post-hoc with <code><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggplot2::labs()</a></code> (here for x). We can also set the <code>sceneorder</code> with a character vector if that’s easier than setting up a Factor or if we want to change them around for some reason. Because the outputs of <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> are just ggplot objects, changing the labels outside the function can be very useful for checking that each axis is in fact what we think it is before giving it clean labels.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  y_lab <span class="op">=</span> <span class="st">&quot;Proportion Objectives\nAchieved&quot;</span>,</span>
 <span>  x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
@@ -6314,7 +6318,7 @@ black #E64B35FF #4DBBD5FF </code></pre>
 </div>
 <p>Another approach is to put other groupings on the x-axis, and color by scenario.</p>
 <div class="cell">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  x_col <span class="op">=</span> <span class="st">&quot;Target&quot;</span>,</span>
 <span>  colorset <span class="op">=</span> <span class="st">&quot;climate_code&quot;</span>,</span>
@@ -6330,7 +6334,7 @@ black #E64B35FF #4DBBD5FF </code></pre>
 </div>
 <p>We can pass <code>position = &#39;dodge&#39;</code> to use dodged bars for clearer comparisons, particularly accentuating the variation in sensitivity of the different outcomes to the scenarios.</p>
 <div class="cell">
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  x_col <span class="op">=</span> <span class="st">&quot;Target&quot;</span>,</span>
 <span>  colorset <span class="op">=</span> <span class="st">&quot;climate_code&quot;</span>,</span>
@@ -6364,7 +6368,7 @@ Tip
 <div class="cell">
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">&quot;^EF&quot;</span>, <span class="va">env_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    facet_col <span class="op">=</span> <span class="st">&quot;env_obj&quot;</span>,</span>
 <span>    facet_row <span class="op">=</span> <span class="st">&quot;SWSDLName&quot;</span>,</span>
@@ -6383,7 +6387,7 @@ Tip
 <p>We address a few ways to handle groups of outcome variables, one of the simplest is to simply facet these plots by those groups, with all the outcomes in the group getting their own bars. This puts the theme levels on x and colors by scenario, with the groups accentuated by facets. These can be stacked (<code>position = &#39;stack&#39;</code>- the default) or dodged (demonstrated here).</p>
 <div class="cell">
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">dodgefacet</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;env_obj&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;climate_code&quot;</span>,</span>
@@ -6408,7 +6412,7 @@ Tip
 <p>Rather than facetting, we can stack each of the outcome categories (here, Target groups). To do this, we simply change the <code>colorset</code> to “Target” instead of ‘scenario’ (the default <code>x_col</code> is scenario, so it remains on x, but it is generally better to specify it explicitly. This is especially true here, where the ‘climate_code’ column is a better description). We also change the <code>pal_list</code> to a {paletteer} name, providing the palette from which to choose colors for each Target. If we wanted to retain these colours across the project, we would define a palette for the Targets as we did above for scenarios.</p>
 <p>This yields a more compact plot (<a href="#fig-color-target" class="quarto-xref">Figure 1</a>) that shows overall outcomes without as much duplication. The stacking here of the <code>env_obj</code> outcomes in each group while coloring them all the same is itself a sort of simple aggregation. The approach next with <code>position = &quot;dodge&quot;</code> is generally better (<a href="#fig-sdl-dodge" class="quarto-xref">Figure 2</a>).</p>
 <div class="cell">
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">basin_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  colorset <span class="op">=</span> <span class="st">&quot;Target&quot;</span>,</span>
 <span>  pal_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&quot;scico::tokyo&quot;</span><span class="op">)</span>,</span>
@@ -6429,7 +6433,7 @@ Figure 1
 </div>
 <p>In another example of colors from other information in the data, when we have multiple spatial units we might color by them instead of coloring by outcome category. Here, we show how to color by SDL unit (SWSDLName) instead of <code>env_obj</code>. We also explicitly use <code>x_col</code> to use climate code and not the full names.</p>
 <div class="cell">
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span>,</span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
 <span>  colorset <span class="op">=</span> <span class="st">&quot;SWSDLName&quot;</span>,</span>
@@ -6454,7 +6458,7 @@ Figure 2
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">SWSDLName</span>, <span class="va">scenario</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>ewr_achieved <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">ewr_achieved</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;SWSDLName&quot;</span>,</span>
 <span>    pal_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&quot;ggsci::default_jama&quot;</span><span class="op">)</span>,</span>
@@ -6474,7 +6478,7 @@ Figure 3
 </div>
 <p>If we have multiple levels of groupings, we can color by the groups directly if we don’t care what the individual <code>env_obj</code>s are doing between them. This is very similar to the plots coloring by SDL unit above.</p>
 <div class="cell">
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span>,</span>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
 <span>  colorset <span class="op">=</span> <span class="st">&quot;env_group&quot;</span>,</span>
@@ -6506,7 +6510,7 @@ Figure 3
 <span></span>
 <span><span class="co"># need to facet by space sdl unit and give it the colorgroup argument to take multiple palettes</span></span>
 <span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="st">&quot;env_group&quot;</span>,</span>
@@ -6526,7 +6530,7 @@ Figure 3
 <p>Adding facetting by those groups can make that easier to read if the goal is to focus on changes within groups, but more plots.</p>
 <div class="cell">
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="st">&quot;env_group&quot;</span>,</span>
@@ -6546,7 +6550,7 @@ Figure 3
 <p>We could also split those bars sideways instead of stack them, but that likely makes more sense if there are fewer categories than here. We again use <code>position = &#39;dodge&#39;</code>, but now we don’t need to sum because we’re stacking each row already. I’ve flipped the facetting and taken advantage of the fact that these are just ggplot objects to remove the legend, making it very slightly easier to read (but harder to interpret). This gets very crowded with the full set of scenarios, so we can use the <code>scenariofilter</code> argument to cut it to just a few (here, base and multiply and divide by 1.5).</p>
 <div class="cell">
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="st">&quot;env_group&quot;</span>,</span>
@@ -6567,7 +6571,7 @@ Figure 3
 <p>Another approach to groups of outcomes without the colors explicitly grouped is to not use <code>colorgroup</code>, but instead just facet by the group and give every <code>colorset</code> value a color from the same palette. Depending on the palette chosen and the breaks, this can be quicker, but will not accentuate groups as well.</p>
 <div class="cell">
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;env_obj&quot;</span>,</span>
@@ -6586,10 +6590,10 @@ Figure 3
 </div>
 <p>These plots are interesting, but in typical use, the plots above using facets for the groups or coloring by the groups themselves are likely to be easier to read, unless we really are interested in this level of granularity. Whatever approach we choose for a given plot, accentuating the differences between outcome groups can be a powerful interpretation tool.</p>
 </section><section id="manual-color-definition" class="level2"><h2 class="anchored" data-anchor-id="manual-color-definition">Manual color definition</h2>
-<p>Though the above examples using {paletteer} palettes are the easiest way to specify coloring, we don’t have to let the palettes auto-choose colors, and can instead pass <code>colors</code> objects, just as we do for scenarios. This can be particularly useful with small numbers of groups (defining too many colors is cumbersome- that’s what palettes are for) when we want to control which is which. Just as with scenarios, we use <code><a href="https://rdrr.io/pkg/HydroBOT/man/make_pal.html">make_pal()</a></code>. Here, we will use <code>&#39;scico::berlin&#39;</code> as the base, but define several ‘reference’ values manually. This demonstration uses <code>includeRef = TRUE</code> so we <em>replace</em> the palette values with the refs, rather than choose them from the set of values with refs removed. This tends to yield better spread of colors (and lets us sometimes ref colors and sometimes not if we also used <code>returnUnref</code>). For example, maybe we want to sometimes really accentuate ecosystem function and native vegetation, but not in all plots.</p>
+<p>Though the above examples using {paletteer} palettes are the easiest way to specify coloring, we don’t have to let the palettes auto-choose colors, and can instead pass <code>colors</code> objects, just as we do for scenarios. This can be particularly useful with small numbers of groups (defining too many colors is cumbersome- that’s what palettes are for) when we want to control which is which. Just as with scenarios, we use <code><a href="https://galenholt.github.io/HydroBOT/reference/make_pal.html">make_pal()</a></code>. Here, we will use <code>&#39;scico::berlin&#39;</code> as the base, but define several ‘reference’ values manually. This demonstration uses <code>includeRef = TRUE</code> so we <em>replace</em> the palette values with the refs, rather than choose them from the set of values with refs removed. This tends to yield better spread of colors (and lets us sometimes ref colors and sometimes not if we also used <code>returnUnref</code>). For example, maybe we want to sometimes really accentuate ecosystem function and native vegetation, but not in all plots.</p>
 <p>First, we create the palettes with and without the (garish) ref values.</p>
 <div class="cell">
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_pal.html">make_pal</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_pal.html">make_pal</a></span><span class="op">(</span></span>
 <span>  levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span><span class="op">$</span><span class="va">env_group</span><span class="op">)</span>,</span>
 <span>  palette <span class="op">=</span> <span class="st">&quot;scico::lisbon&quot;</span>,</span>
 <span>  refvals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;EF&quot;</span>, <span class="st">&quot;NV&quot;</span><span class="op">)</span>, refcols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;purple&quot;</span>, <span class="st">&quot;orange&quot;</span><span class="op">)</span>, includeRef <span class="op">=</span> <span class="cn">TRUE</span>, returnUnref <span class="op">=</span> <span class="cn">TRUE</span></span>
@@ -6597,7 +6601,7 @@ Figure 3
 </div>
 <p>Then we can create an accentuated plot sometimes, if, perhaps, we want to highlight how EF performed.</p>
 <div class="cell">
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span>,</span>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
 <span>  colorset <span class="op">=</span> <span class="st">&quot;env_group&quot;</span>,</span>
@@ -6616,7 +6620,7 @@ Figure 3
 </div>
 <p>But for other plots maybe we don’t want that accentuation and we can use the <code>unrefcols</code> to retain the standard coloring- note that ‘NF’, ‘OS’, and ‘WB’ colors are unchanged.</p>
 <div class="cell">
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span>,</span>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span><span class="va">obj_sdl_to_plot</span>,</span>
 <span>  outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  x_col <span class="op">=</span> <span class="st">&#39;climate_code&#39;</span>,</span>
 <span>  colorset <span class="op">=</span> <span class="st">&quot;env_group&quot;</span>,</span>
@@ -6871,7 +6875,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -7202,7 +7206,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

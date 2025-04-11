@@ -6027,7 +6027,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6050,10 +6050,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6229,13 +6233,13 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="overview" class="level2"><h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>The most common way to run the Aggregator is with <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code>, which automates data read-in, processing, parallelisation, metadata, and saving. This requires that the output of the response models is saved out, which is almost always the case for both recordkeeping and processing purposes. This vastly simplifies automated, consistent running over many scenarios.</p>
-<p>To do the same analyses as in the <a href="../aggregator/using_multi_aggregate.html">multi aggregate example</a> but using <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code>, we give it the path to the data instead of the data itself. If the directory contains multiple files, <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code> provides capacity to operate over those files in parallel.</p>
+<p>The most common way to run the Aggregator is with <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code>, which automates data read-in, processing, parallelisation, metadata, and saving. This requires that the output of the response models is saved out, which is almost always the case for both recordkeeping and processing purposes. This vastly simplifies automated, consistent running over many scenarios.</p>
+<p>To do the same analyses as in the <a href="../aggregator/using_multi_aggregate.html">multi aggregate example</a> but using <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code>, we give it the path to the data instead of the data itself. If the directory contains multiple files, <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> provides capacity to operate over those files in parallel.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -6250,7 +6254,7 @@ Important
 </div>
 </div>
 <p>We can return output to the active session with <code>returnList</code> and use <code>savepath</code> to save a .rds file. In most cases, we would save outputs so developing and adjusting Comparer outputs does not rely on re-running the aggregations.</p>
-<p>The <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code> function saves metadata files (yaml and json) that allows replication of this step with <code><a href="https://rdrr.io/pkg/HydroBOT/man/run_hydrobot_params.html">run_hydrobot_params()</a></code>, see <a href="../workflows/workflow_parameters.html">here</a>. These files build on metadata from earlier steps if possible, including any available metadata from the Controller about module parameters and the scenarios.</p>
+<p>The <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> function saves metadata files (yaml and json) that allows replication of this step with <code><a href="https://galenholt.github.io/HydroBOT/reference/run_hydrobot_params.html">run_hydrobot_params()</a></code>, see <a href="../workflows/workflow_parameters.html">here</a>. These files build on metadata from earlier steps if possible, including any available metadata from the Controller about module parameters and the scenarios.</p>
 </section><section id="demonstration" class="level2"><h2 class="anchored" data-anchor-id="demonstration">Demonstration</h2>
 <p>Here, we perform the same set of aggregations as the primary example for <a href="../aggregator/using_multi_aggregate.html">multi_aggregate</a>, but do so from the paths to the EWR outputs and note differences. See that notebook for much more detail about how aggregation itself works.</p>
 <section id="directories" class="level3"><h3 class="anchored" data-anchor-id="directories">Directories</h3>
@@ -6287,7 +6291,7 @@ Important
 <span></span>
 <span><span class="va">scenarios</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>scenario <span class="op">=</span> <span class="va">scenenames</span>, delta <span class="op">=</span> <span class="va">scenemults</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">scene_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_pal.html">make_pal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">$</span><span class="va">scenario</span><span class="op">)</span>, palette <span class="op">=</span> <span class="st">&quot;ggsci::nrc_npg&quot;</span>, refvals <span class="op">=</span> <span class="st">&quot;base&quot;</span>, refcols <span class="op">=</span> <span class="st">&quot;black&quot;</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">scene_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_pal.html">make_pal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">$</span><span class="va">scenario</span><span class="op">)</span>, palette <span class="op">=</span> <span class="st">&quot;ggsci::nrc_npg&quot;</span>, refvals <span class="op">=</span> <span class="st">&quot;base&quot;</span>, refcols <span class="op">=</span> <span class="st">&quot;black&quot;</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="aggregation-sequences" class="level3"><h3 class="anchored" data-anchor-id="aggregation-sequences">Aggregation sequences</h3>
 <p>We use the same examples as in <a href="../aggregator/using_multi_aggregate.html">multi_aggregate</a>. These cover all three dimensions. It begins temporal (all_time), then has two theme aggregations (ewr_code and env_obj), then spatial to sdl_units, two more theme-dimension (Specific_goal, Objective), a spatially-weighted aggregation to the basin, and finally to the theme level of 5-year management targets.</p>
@@ -6315,9 +6319,9 @@ Important
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="do-the-aggregation" class="level3"><h3 class="anchored" data-anchor-id="do-the-aggregation">Do the aggregation</h3>
-<p>Now, we use <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code> to read the data in, aggregate it, and save it out. We also return it here for making some simple example plots. Rather than using <code>auto_ewr_PU = TRUE</code>, we use <code>group_until</code> and <code>pseudo_spatial</code> as defined in more detail <a href="../aggregator/pseudo_spatial_group_until.html">elsewhere</a>.</p>
+<p>Now, we use <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> to read the data in, aggregate it, and save it out. We also return it here for making some simple example plots. Rather than using <code>auto_ewr_PU = TRUE</code>, we use <code>group_until</code> and <code>pseudo_spatial</code> as defined in more detail <a href="../aggregator/pseudo_spatial_group_until.html">elsewhere</a>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_dat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
 <span>  datpath <span class="op">=</span> <span class="va">ewr_results</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
@@ -6362,7 +6366,7 @@ Important
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_dat</span><span class="op">$</span><span class="va">sdl_units</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_obj</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;EF1&quot;</span>, <span class="st">&quot;WB1&quot;</span>, <span class="st">&quot;NF1&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -6385,7 +6389,7 @@ Important
 </div>
 </div>
 </section></section><section id="metadata" class="level2"><h2 class="anchored" data-anchor-id="metadata">Metadata</h2>
-<p>A key advantage of <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code> is that it records metadata for data provenance (which is also <a href="../workflows/workflow_parameters.html">runnable</a>).</p>
+<p>A key advantage of <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> is that it records metadata for data provenance (which is also <a href="../workflows/workflow_parameters.html">runnable</a>).</p>
 <p>For the run here, that yaml is at <code>&quot;hydrobot_scenarios/aggregator_output/demo/agg_metadata.yml&quot;</code>, and contains the following information:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">scenarios</span><span class="kw">:</span></span>
@@ -6454,11 +6458,11 @@ Important
 <span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">status</span><span class="kw">:</span><span class="at"> </span><span class="ch">yes</span></span>
 <span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">HydroBOT_version</span><span class="kw">:</span><span class="at"> </span><span class="fl">0.2.2.9020</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section><section id="parallelization" class="level2"><h2 class="anchored" data-anchor-id="parallelization">Parallelization</h2>
-<p>Since aggregation should happen along the theme, space, and time dimensions, but not scenarios, we can process in parallel over scenarios. The <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code> function provides this parallelisation internally and seamlessly, provided the user has the suggested package {furrr} (and its dependency, {future}). In that case, parallelising is as easy as setting a <code><a href="https://future.futureverse.org/reference/plan.html">future::plan</a></code> and the argument <code>rparallel = TRUE</code>. The exact same run as above can be done in parallel as follows:</p>
+<p>Since aggregation should happen along the theme, space, and time dimensions, but not scenarios, we can process in parallel over scenarios. The <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> function provides this parallelisation internally and seamlessly, provided the user has the suggested package {furrr} (and its dependency, {future}). In that case, parallelising is as easy as setting a <code><a href="https://future.futureverse.org/reference/plan.html">future::plan</a></code> and the argument <code>rparallel = TRUE</code>. The exact same run as above can be done in parallel as follows:</p>
 <div class="cell">
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">future</span><span class="fu">::</span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html">plan</a></span><span class="op">(</span><span class="fu">future</span><span class="fu">::</span><span class="va"><a href="https://future.futureverse.org/reference/multisession.html">multisession</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">agged_dat_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<span><span class="va">agged_dat_p</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
 <span>  datpath <span class="op">=</span> <span class="va">ewr_results</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
@@ -6484,7 +6488,7 @@ Important
 </div>
 <p>That output is the same as earlier, but now it’s been read-in and processed in parallel over scenarios. This toy example is only marginally faster, but parallelisation yields large speedups for larger jobs. Because scenarios run independently, massive parallelisation is possible, up to one scenario per core. Speedups can be very large, even on local machines, but are particularly useful on HPCs.</p>
 </section><section id="user-provided-components" class="level2"><h2 class="anchored" data-anchor-id="user-provided-components">User-provided components</h2>
-<p>Users can provide their own <a href="../aggregator/user_causal.html">causal networks</a>, <a href="../aggregator/user_spatial.html">spatial information</a>, and <a href="../aggregator/user_functions.html">aggregation functions</a>. Moreover, aggregation can happen on <a href="../aggregator/user_module.html">arbitrary input data, possibly from unincorporated modules</a>. See those pages for more detail using <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code>, along with doing the same in <a href="../aggregator/using_multi_aggregate.html">multi_aggregate()</a>.</p>
+<p>Users can provide their own <a href="../aggregator/user_causal.html">causal networks</a>, <a href="../aggregator/user_spatial.html">spatial information</a>, and <a href="../aggregator/user_functions.html">aggregation functions</a>. Moreover, aggregation can happen on <a href="../aggregator/user_module.html">arbitrary input data, possibly from unincorporated modules</a>. See those pages for more detail using <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code>, along with doing the same in <a href="../aggregator/using_multi_aggregate.html">multi_aggregate()</a>.</p>
 </section><section id="sub-directories-and-multiple-aggsequences" class="level2"><h2 class="anchored" data-anchor-id="sub-directories-and-multiple-aggsequences">Sub-directories and multiple aggsequences</h2>
 <p>Sometimes we might want multiple aggregation sequences to address different parts of a question, or to compare the impact of aggregation itself. Doing that is as simple as creating the multiple aggregation sequences, and typically saving them to a different directory, from which they can be read for the comparer.</p>
 <p>For example, if we wanted to aggregate to Targets (Native fish, Waterbirds, etc) instead of the Objectives and long-run targets for the same EWR output as above, and also use different aggregation functions, we could set up new sequences. Here, we also call the spatial data as characters and define our own Median function, as explained in more detail <a href="../aggregator/aggregation_syntax.html">here</a> and <a href="../aggregator/using_multi_aggregate.html">here</a>.</p>
@@ -6513,7 +6517,7 @@ Important
 </div>
 <p>Then, to avoid overwriting the earlier version, since in this example we would want to look at both sets of aggregations, we change the <code>savepath</code> argument (along with <code>aggsequence</code> and <code>funsequence</code>:</p>
 <div class="cell">
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_dat_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_dat_new</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
 <span>  datpath <span class="op">=</span> <span class="va">ewr_results</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
@@ -6543,7 +6547,7 @@ Important
 </section><section id="value-to-aggregate" class="level2"><h2 class="anchored" data-anchor-id="value-to-aggregate">Value to aggregate</h2>
 <p>We have demonstrated everything here by aggregating EWR data with the <code>ewr_achieved</code> column. However, any numeric column can be aggregated, as we <a href="../aggregator/user_module.html">show for made up module outputs</a>. Here, we also show aggregation on a different EWR metric, the achivement of interevent requirements:</p>
 <div class="cell">
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_interevent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_interevent</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
 <span>  datpath <span class="op">=</span> <span class="va">ewr_results</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
@@ -6588,7 +6592,7 @@ Important
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_interevent</span><span class="op">$</span><span class="va">sdl_units</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_obj</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;EF1&quot;</span>, <span class="st">&quot;WB1&quot;</span>, <span class="st">&quot;NF1&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;interevent_achieved&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -6613,7 +6617,7 @@ Important
 </section><section id="gauge-and-scenario-filtering" class="level2"><h2 class="anchored" data-anchor-id="gauge-and-scenario-filtering">Gauge and scenario filtering</h2>
 <p>We usually want to apply analyses to the full set of scenarios or gauges. However, sometimes we might only want a subset. Using the <code>gaugefilter</code> and <code>scenariofilter</code> arguments can provide this functionality. Howevern this is a bit dangerous because they are simple regex on the filenames, and so are not actually specific to gauges or scenarios and are only named that way to make the regex simpler if multiple matches are desired. Moreover, if the files do not have a pattern, e.g. there are not filenames with gauge numbers in them and you try to send those numbers in <code>gaugefilter</code>, it will error. Since these examples do not have unique gauge files, we only use <code>scenariofilter</code>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">smallreadagg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">smallreadagg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
 <span>  datpath <span class="op">=</span> <span class="va">ewr_results</span>, </span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
@@ -6898,7 +6902,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -7229,7 +7233,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

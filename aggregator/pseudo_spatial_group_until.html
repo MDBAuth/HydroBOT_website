@@ -6026,7 +6026,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6049,10 +6049,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6210,7 +6214,7 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: sf</code></pre>
 </div>
@@ -6218,7 +6222,7 @@ window.onload = function() {
 <pre><code>Linking to GEOS 3.13.0, GDAL 3.10.1, PROJ 9.5.1; sf_use_s2() is TRUE</code></pre>
 </div>
 </div>
-<p>The nature of multi-step and multidimensional aggregation sometimes requires grouping only for part of the sequence (e.g. grouping by a column only relevant at some scales) or bypassing the automatic treatment of geographic data to do non-spatial joins or groupings of spatial data. We have introduced two arguments to <code><a href="https://rdrr.io/pkg/HydroBOT/man/multi_aggregate.html">multi_aggregate()</a></code> and <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code> to handle these issues, namely <code>group_until</code> and <code>pseudo_spatial</code>. The EWR-specific argument <code>auto_ewr_PU</code> manages these arguments according to best practices for the EWR tool outputs.</p>
+<p>The nature of multi-step and multidimensional aggregation sometimes requires grouping only for part of the sequence (e.g. grouping by a column only relevant at some scales) or bypassing the automatic treatment of geographic data to do non-spatial joins or groupings of spatial data. We have introduced two arguments to <code><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate()</a></code> and <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> to handle these issues, namely <code>group_until</code> and <code>pseudo_spatial</code>. The EWR-specific argument <code>auto_ewr_PU</code> manages these arguments according to best practices for the EWR tool outputs.</p>
 <section id="group_until" class="level2"><h2 class="anchored" data-anchor-id="group_until"><code>group_until</code></h2>
 <p>By default, anything passed to the <code>groupers</code> argument is retained throughout the sequence, with the most common value being <code>&#39;scenario&#39;</code>. The <code>group_until</code> argument allows a list of groupers to be passed along with the stage to which they should be retained. The <em>names</em> of this list are column names in the data, and the values at each name specify the aggregation step to retain until. The step can be</p>
 <ul>
@@ -6251,7 +6255,7 @@ window.onload = function() {
 </div>
 <p>Grouping by SWSDLName, gauge, and planning_unit name columns is retained until the sdl_unit aggregation, specified in three different ways. Likewise, the aggregation into SDL units is done non-spatially.</p>
 <div class="cell">
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">aggout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">aggout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
 <span>  datpath <span class="op">=</span> <span class="st">&#39;hydrobot_scenarios/module_output/EWR&#39;</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
@@ -6286,7 +6290,7 @@ window.onload = function() {
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>pseudo_spatial <span class="ot">=</span> <span class="st">&#39;sdl_units&#39;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Using <code>auto_ewr_PU</code> to achieve the same results as above is done with this call, but note the messages about being explicit.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">aggout_auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">aggout_auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
 <span>  datpath <span class="op">=</span> <span class="st">&#39;hydrobot_scenarios/module_output/EWR&#39;</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
@@ -6569,7 +6573,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -6900,7 +6904,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

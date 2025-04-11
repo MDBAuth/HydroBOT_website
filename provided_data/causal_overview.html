@@ -7244,7 +7244,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -7267,10 +7267,14 @@ window.onload = function() {
     <a class="nav-link active" href="../provided_data/data_overview.html" aria-current="page"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -7355,6 +7359,12 @@ window.onload = function() {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../demo_scenarios.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scenarios used for demonstrations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../provided_data/scenario_creation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Example scenario information and creation</span></a>
   </div>
@@ -7418,7 +7428,7 @@ window.onload = function() {
 <p>The causal networks enables 1) visual representation of the complex inter-relationships between scenario inputs (hydrographs) and river-related outcomes and 2) assessment of outcomes aggregated along the <a href="../aggregator/theme_agg.html">thematic dimension</a>. The former, aids transparency, elucidating the targets and causal relationships behind the Driver-indicator-response models and is a useful device for communication about HydroBOT and its outputs. The latter, allows outcomes to be assessed for individual (or sets of) environmental objectives, target groups, long-term targets, or at the level of the quadruple bottom line to identify synergies and trade-offs among values. </p>
 </section><section id="in-hydrobot" class="level3"><h3 class="anchored" data-anchor-id="in-hydrobot">In HydroBOT</h3>
 <p>HydroBOT provides various functions for <a href="../provided_data/causal_manipulation.html">creation and manipulation</a> of causal networks, depending on what needs to be plotted or investigated, and the <a href="../comparer/causal_plots.html">causal plots</a> page provides some examples of various ways they can be visualised with HydroBOT.</p>
-<p>HydroBOT provides the causal network for the EWR tool in the <code><a href="https://rdrr.io/pkg/HydroBOT/man/causal_ewr.html">HydroBOT::causal_ewr</a></code> data. Until recently, this was the only source. More recently (early 2025), the EWR tool itself provides its own causal networks. These are brought over to HydroBOT and become <code><a href="https://rdrr.io/pkg/HydroBOT/man/causal_ewr.html">HydroBOT::causal_ewr</a></code> after testing. This process happens frequently, but if there is any question about whether the networks are current, the network in the installed version of <code>py-ewr</code> can be accessed with <code><a href="https://rdrr.io/pkg/HydroBOT/man/get_causal_ewr.html">HydroBOT::get_causal_ewr()</a></code>.</p>
+<p>HydroBOT provides the causal network for the EWR tool in the <code><a href="https://galenholt.github.io/HydroBOT/reference/causal_ewr.html">HydroBOT::causal_ewr</a></code> data. Until recently, this was the only source. More recently (early 2025), the EWR tool itself provides its own causal networks. These are brought over to HydroBOT and become <code><a href="https://galenholt.github.io/HydroBOT/reference/causal_ewr.html">HydroBOT::causal_ewr</a></code> after testing. This process happens frequently, but if there is any question about whether the networks are current, the network in the installed version of <code>py-ewr</code> can be accessed with <code><a href="https://galenholt.github.io/HydroBOT/reference/get_causal_ewr.html">HydroBOT::get_causal_ewr()</a></code>.</p>
 <p>Other networks can be supplied by the user to all functions that require them. In this case, the network requirements are to be a data frame or list of dataframes with the relevant mapping between levels and any other grouping variables. I.e. there might be columns for spatial units if the network varies in space, and then the ‘level1’ column might contain several rows with different values that all have the same value in the ‘level2’ column. See the structure of <code>causal_ewr</code> for an example.</p>
 
 
@@ -7663,7 +7673,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -7994,7 +8004,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

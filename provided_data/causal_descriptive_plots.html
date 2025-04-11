@@ -7258,7 +7258,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -7281,10 +7281,14 @@ window.onload = function() {
     <a class="nav-link active" href="../provided_data/data_overview.html" aria-current="page"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -7369,6 +7373,12 @@ window.onload = function() {
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">
 <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../demo_scenarios.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Scenarios used for demonstrations</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../provided_data/scenario_creation.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Example scenario information and creation</span></a>
   </div>
@@ -7431,7 +7441,7 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>There are many reasons to present causal networks, which we might want to visualise in different ways. Causal networks are inherently complex, and there are different aspects we might want to accentuate, and some capability we need to prune/focus them. Thus, {HydroBOT} provides a number of helper functions and plotting options.</p>
@@ -7465,7 +7475,7 @@ window.onload = function() {
 <li>
 <p>We need to have the general ability to make edges and nodes available for other uses, e.g. aggregations</p>
 <ol type="1">
-<li>{HydroBOT} exports <code><a href="https://rdrr.io/pkg/HydroBOT/man/make_edges.html">make_edges()</a></code> and <code><a href="https://rdrr.io/pkg/HydroBOT/man/make_nodes.html">make_nodes()</a></code>, along with some other network-manipulation functions</li>
+<li>{HydroBOT} exports <code><a href="https://galenholt.github.io/HydroBOT/reference/make_edges.html">make_edges()</a></code> and <code><a href="https://galenholt.github.io/HydroBOT/reference/make_nodes.html">make_nodes()</a></code>, along with some other network-manipulation functions</li>
 </ol>
 </li>
 </ol>
@@ -7474,7 +7484,7 @@ window.onload = function() {
 <p>The <code>edges</code> dataframe contains all pairwise links between nodes in <code>from</code> and <code>to</code> columns. To get that, we need to pass it dataframes specifying links. There will often be multiple datasets, reflecting the differing scales of the nodes (as in the <code>causal_ewrs</code> list provided by {HydroBOT}). These dataframes may include many columns of potential nodes, e.g. they might provide the mapping for several steps in the network. Thus, we need to provide the node columns we actually want to map and their directionality- what are the ‘from-to’ pairings. We may want to filter to only some subset of nodes; for example we may only be interested in the environmental objectives related to waterbirds. While we demonstrate this here for <code>causal_ewr</code>, as long as the from-to groupings are available, any arbitrary dataframe specifying the groupings can be used as a causal network, allowing <a href="../aggregator/user_causal.html">users to specify their own</a>.</p>
 <p>As an example, we can make the relationships present at gauge 409025 linking EWRs to environmental objectives, environmental objectives to specific goals, Specific goals to Targets, and environmental objectives to 5-year targets. There are many more possible connections to include in the <code>fromtos</code>, which to include will depend on the questions being asked.</p>
 <div class="cell">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_edges.html">make_edges</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">edges</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_edges.html">make_edges</a></span><span class="op">(</span></span>
 <span>  dflist <span class="op">=</span> <span class="va">causal_ewr</span>,</span>
 <span>  fromtos <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;ewr_code&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
@@ -7494,11 +7504,11 @@ window.onload = function() {
 </div>
 </div>
 </div>
-<p>There’s also the opportunity to filter the specific nodes to include with <code>fromfilter</code> and <code>tofilter</code>. This allows things like filtering the particular nodes within those node categories (e.g. <code>env_obj</code>s related to waterbirds). However, it is typically better to use <code><a href="https://rdrr.io/pkg/HydroBOT/man/find_related_nodes.html">find_related_nodes()</a></code> <em>after</em> creation of the network, as that does network-aware filtering.</p>
+<p>There’s also the opportunity to filter the specific nodes to include with <code>fromfilter</code> and <code>tofilter</code>. This allows things like filtering the particular nodes within those node categories (e.g. <code>env_obj</code>s related to waterbirds). However, it is typically better to use <code><a href="https://galenholt.github.io/HydroBOT/reference/find_related_nodes.html">find_related_nodes()</a></code> <em>after</em> creation of the network, as that does network-aware filtering.</p>
 </section><section id="construct-node-dataframe" class="level3"><h3 class="anchored" data-anchor-id="construct-node-dataframe">Construct node dataframe</h3>
-<p>The node dataframe defines the ‘boxes’. The simplest way to make it is to extract it from the edges. Basically, we just grab all the nodes that are in either the <code>from</code> or <code>to</code> columns of the <code>edges</code> df. The <code><a href="https://rdrr.io/pkg/HydroBOT/man/make_nodes.html">make_nodes()</a></code> function does a bit more than just get unique node values from the <code>edges</code> df, it also attaches a column specifying the node order, reflecting their sequence in the causal network. There is a default sequence specified for WERP EWRs, but others can be specified with the <code>typeorder</code> argument.</p>
+<p>The node dataframe defines the ‘boxes’. The simplest way to make it is to extract it from the edges. Basically, we just grab all the nodes that are in either the <code>from</code> or <code>to</code> columns of the <code>edges</code> df. The <code><a href="https://galenholt.github.io/HydroBOT/reference/make_nodes.html">make_nodes()</a></code> function does a bit more than just get unique node values from the <code>edges</code> df, it also attaches a column specifying the node order, reflecting their sequence in the causal network. There is a default sequence specified for WERP EWRs, but others can be specified with the <code>typeorder</code> argument.</p>
 <div class="cell">
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nodes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_nodes.html">make_nodes</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nodes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_nodes.html">make_nodes</a></span><span class="op">(</span><span class="va">edges</span><span class="op">)</span></span>
 <span><span class="va">nodes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
@@ -7510,8 +7520,8 @@ window.onload = function() {
 </div>
 <p>We can now create a minimal plot before digging back in to demo some options under the hood.</p>
 </section></section><section id="plotting-networks" class="level1"><h1>Plotting networks</h1>
-<p>Plotting takes these dataframes, adds some attributes, and generates the plots. We use <code><a href="https://rdrr.io/pkg/HydroBOT/man/make_causal_plot.html">make_causal_plot()</a></code> for this, which is mostly a wrapper and cleanup around functions to do final filtering of the data (<code><a href="https://rdrr.io/pkg/HydroBOT/man/find_related_nodes.html">find_related_nodes()</a></code>), attach attributes/aesthetics (<code>node_plot_atts``()</code> and <code>causal_colors_general``()</code>), and construct the plot itself using {DiagrammeR}. There are also some switches around saving and printing.</p>
-<p>We will look under the hood at those later (<a href="#more-options">More options</a>)- there’s quite a bit of functionality there to do things like isolate relevant parts of the network, colour within node groups or by the <a href="../comparer/causal_plots.html">outcomes of HydroBOT</a> zs(e.g. change in relationships between scenarios or native fish populations).</p>
+<p>Plotting takes these dataframes, adds some attributes, and generates the plots. We use <code><a href="https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html">make_causal_plot()</a></code> for this, which is mostly a wrapper and cleanup around functions to do final filtering of the data (<code><a href="https://galenholt.github.io/HydroBOT/reference/find_related_nodes.html">find_related_nodes()</a></code>), attach attributes/aesthetics (<code>node_plot_atts``()</code> and <code>causal_colors_general``()</code>), and construct the plot itself using {DiagrammeR}. There are also some switches around saving and printing.</p>
+<p>We will look under the hood at those later (<a href="#more-options">More options</a>)- there’s quite a bit of functionality there to do things like isolate relevant parts of the network, colour within node groups or by the <a href="../comparer/causal_plots.html">outcomes of HydroBOT</a> (e.g. change in relationships between scenarios or native fish populations).</p>
 <p>First, let’s just make a simple plot of the network. By default it saves the network to an object so we can modify/use it later. We can turn that off (<code>returnnetwork = FALSE</code>), along with switches for whether to render in place and/or save as png and pdf (<code>save = TRUE</code>). If <code>render = TRUE</code>, it renders in place just fine when using as a notebook, but doesn’t get picked up when the quarto renders to html (and pdf etc). So for these demonstrations, we’ll use a two-step process of returning the network and then rendering it.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -7527,7 +7537,7 @@ Tip
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">default_network</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">edges</span>, render <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">default_network</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">edges</span>, render <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu">DiagrammeR</span><span class="fu">::</span><span class="fu"><a href="https://rich-iannone.github.io/DiagrammeR/reference/render_graph.html">render_graph</a></span><span class="op">(</span><span class="va">default_network</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div class="grViz html-widget html-fill-item" id="htmlwidget-2f4666c4b0062c79e13f" style="width:100%;height:464px;"></div>
@@ -7536,7 +7546,7 @@ Tip
 </div>
 <p>That’s clearly a bit much, even just for a single gauge. One thing we could do would be to drop the 5-year nodes, (now piping the network straight to <code>render_graph</code> to avoid clutter). We do this drop simply here by filtering the <code>nodes</code> dataframe. Without those nodes available, the relevant parts of the network just get dropped.</p>
 <div class="cell">
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">NodeType</span> <span class="op">!=</span> <span class="st">&quot;target_5_year_2024&quot;</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">NodeType</span> <span class="op">!=</span> <span class="st">&quot;target_5_year_2024&quot;</span><span class="op">)</span>,</span>
 <span>  <span class="va">edges</span>,</span>
 <span>  render <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -7547,9 +7557,9 @@ Tip
 </div>
 </div>
 <section id="node-relevant-network" class="level2"><h2 class="anchored" data-anchor-id="node-relevant-network">Node-relevant network</h2>
-<p>One common need is to ask about the connections that relate to a node or a small set of nodes. To do that, we need to be able to traverse the network upstream and downstream, using the <code>focalnodes</code> argument, which calls the <code><a href="https://rdrr.io/pkg/HydroBOT/man/find_related_nodes.html">find_related_nodes()</a></code> function. This is a more complete network restructuring than just filtering a target level, as we did above, because it traces the full network and only returns nodes at any level that relate to the targets. Now we can include the 5-year targets again because we’ve reduce the nodes. Note that the <code>focalnodes</code> don’t have to be related to each other or at the same level- <code><a href="https://rdrr.io/pkg/HydroBOT/man/find_related_nodes.html">find_related_nodes()</a></code> prunes the network to all connections involving all the <code>focalnodes</code>.</p>
+<p>One common need is to ask about the connections that relate to a node or a small set of nodes. To do that, we need to be able to traverse the network upstream and downstream, using the <code>focalnodes</code> argument, which calls the <code><a href="https://galenholt.github.io/HydroBOT/reference/find_related_nodes.html">find_related_nodes()</a></code> function. This is a more complete network restructuring than just filtering a target level, as we did above, because it traces the full network and only returns nodes at any level that relate to the targets. Now we can include the 5-year targets again because we’ve reduce the nodes. Note that the <code>focalnodes</code> don’t have to be related to each other or at the same level- <code><a href="https://galenholt.github.io/HydroBOT/reference/find_related_nodes.html">find_related_nodes()</a></code> prunes the network to all connections involving all the <code>focalnodes</code>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">edges</span>,</span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">edges</span>,</span>
 <span>  focalnodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;NF4&quot;</span>, <span class="st">&quot;Sloanes froglet&quot;</span><span class="op">)</span>, render <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">DiagrammeR</span><span class="fu">::</span><span class="fu"><a href="https://rich-iannone.github.io/DiagrammeR/reference/render_graph.html">render_graph</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -7570,7 +7580,7 @@ Tip
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">totype</span> <span class="op">!=</span> <span class="st">&quot;target_5_year_2024&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>,</span>
+<span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>,</span>
 <span>  <span class="va">edgewithvals</span>,</span>
 <span>  focalnodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;NF4&quot;</span>, <span class="st">&quot;Sloanes froglet&quot;</span><span class="op">)</span>,</span>
 <span>  edge_pal <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>value <span class="op">=</span> <span class="st">&quot;viridis::plasma&quot;</span><span class="op">)</span>,</span>
@@ -7589,7 +7599,7 @@ Tip
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">NodeType</span> <span class="op">!=</span> <span class="st">&quot;target_5_year_2024&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodewithvals</span>,</span>
+<span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodewithvals</span>,</span>
 <span>  <span class="va">edges</span>,</span>
 <span>  focalnodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;NF4&quot;</span>, <span class="st">&quot;Sloanes froglet&quot;</span><span class="op">)</span>,</span>
 <span>  edge_pal <span class="op">=</span> <span class="st">&quot;black&quot;</span>,</span>
@@ -7603,7 +7613,7 @@ Tip
 </div>
 </div>
 </section></section><section id="colour-within-node-groups" class="level3"><h3 class="anchored" data-anchor-id="colour-within-node-groups">Colour within node groups</h3>
-<p>We might want to use different colour palettes within the different node groups, but colour the nodes themselves within them, similar to other examples with <a href="../comparer/bar_plots.html">bar plots</a> and <a href="../comparer/line_plots.html">lines</a>. To do that, we set the <code>*_pal</code> arguments as named lists of palettes, and also pass <code>*_colorgroups</code> arguments so it knows how to split the data into those palettes. This parallels the use in <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code> for other plot types, where <code>colorgroups</code> is the groups that get the palette, while <code>colorset</code> are the individual units within each group that receive colors from the respective palette, see the <a href="../comparer/comparer_syntax.html">comparer syntax</a>. Here, we demonstrate with nodes and plot the whole network so we can see what’s happening.</p>
+<p>We might want to use different colour palettes within the different node groups, but colour the nodes themselves within them, similar to other examples with <a href="../comparer/bar_plots.html">bar plots</a> and <a href="../comparer/line_plots.html">lines</a>. To do that, we set the <code>*_pal</code> arguments as named lists of palettes, and also pass <code>*_colorgroups</code> arguments so it knows how to split the data into those palettes. This parallels the use in <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> for other plot types, where <code>colorgroups</code> is the groups that get the palette, while <code>colorset</code> are the individual units within each group that receive colors from the respective palette, see the <a href="../comparer/comparer_syntax.html">comparer syntax</a>. Here, we demonstrate with nodes and plot the whole network so we can see what’s happening.</p>
 <p>First, set the list of palettes. This could be set by default for the project, along with other default colors.</p>
 <div class="cell">
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">node_list_c</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
@@ -7616,7 +7626,7 @@ Tip
 </div>
 <p>Then, make the network</p>
 <div class="cell">
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">edges</span>,</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">edges</span>,</span>
 <span>  edge_pal <span class="op">=</span> <span class="st">&quot;black&quot;</span>,</span>
 <span>  node_pal <span class="op">=</span> <span class="va">node_list_c</span>,</span>
 <span>  node_colorgroups <span class="op">=</span> <span class="st">&quot;NodeType&quot;</span>,</span>
@@ -7642,7 +7652,7 @@ Tip
 </div>
 <p>This lets us set the within-node_colorgroups palettes. The <code>node_colorset = &#39;werp&#39;</code> just creates a new column in the data that gives rows values we want (e.g. the first two letters of the ewr_codes), which are then used to choose colors from that particular palette. It’s a way to have fewer colors (and more meaningful colors) <em>within</em> the colorgroups.</p>
 <div class="cell">
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">edges</span>,</span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_causal_plot.html">make_causal_plot</a></span><span class="op">(</span><span class="va">nodes</span>, <span class="va">edges</span>,</span>
 <span>  edge_pal <span class="op">=</span> <span class="st">&quot;black&quot;</span>,</span>
 <span>  node_pal <span class="op">=</span> <span class="va">node_list_g</span>,</span>
 <span>  node_colorgroups <span class="op">=</span> <span class="st">&quot;NodeType&quot;</span>,</span>
@@ -7895,7 +7905,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -8226,7 +8236,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

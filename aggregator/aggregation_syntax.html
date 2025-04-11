@@ -6027,7 +6027,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6050,10 +6050,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6230,7 +6234,7 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>To prepare, we generate some EWR outputs to use as example data.</p>
 <div class="cell">
@@ -6238,7 +6242,7 @@ window.onload = function() {
 <span><span class="va">hydro_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="st">&#39;hydrographs&#39;</span><span class="op">)</span></span>
 <span><span class="va">ewr_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="st">&quot;module_output&quot;</span>, <span class="st">&quot;EWR&quot;</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="va">project_dir</span>,</span>
 <span>  outputType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&#39;none&#39;</span><span class="op">)</span>,</span>
@@ -6251,10 +6255,10 @@ window.onload = function() {
 • Index Date invalid</code></pre>
 </div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># This is just a simple prep step that is usually done internally to put the geographic coordinates on input data</span></span>
-<span><span class="va">sumdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/prep_ewr_output.html">prep_ewr_output</a></span><span class="op">(</span><span class="va">ewr_out</span><span class="op">$</span><span class="va">yearly</span>, type <span class="op">=</span> <span class="st">&#39;achievement&#39;</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">sumdat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_ewr_output.html">prep_ewr_output</a></span><span class="op">(</span><span class="va">ewr_out</span><span class="op">$</span><span class="va">yearly</span>, type <span class="op">=</span> <span class="st">&#39;achievement&#39;</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="user-set-functions" class="level1"><h1>User-set functions</h1>
-<p>We have established a simple set of default aggregation functions (<code><a href="https://rdrr.io/pkg/HydroBOT/man/ArithmeticMean.html">ArithmeticMean()</a></code>, <code><a href="https://rdrr.io/pkg/HydroBOT/man/GeometricMean.html">GeometricMean()</a></code>, <code><a href="https://rdrr.io/pkg/HydroBOT/man/LimitingFactor.html">LimitingFactor()</a></code>, <code><a href="https://rdrr.io/pkg/HydroBOT/man/CompensatingFactor.html">CompensatingFactor()</a></code>, and <code><a href="https://rdrr.io/pkg/HydroBOT/man/SpatialWeightedMean.html">SpatialWeightedMean()</a></code>), available in <code>default_agg_functions.R</code>. It is also possible to supply user-defined functions to include in <code>funsequence</code>. We can do this by specifying a new function and including it in the list given to <code>funsequence</code>. Some different syntax is provided below in <a href="#sec-funsyntax" class="quarto-xref">Section 2.2</a>, but the best way is shown here, involving defining a function or functions and using it just as we would built-ins.</p>
+<p>We have established a simple set of default aggregation functions (<code><a href="https://galenholt.github.io/HydroBOT/reference/ArithmeticMean.html">ArithmeticMean()</a></code>, <code><a href="https://galenholt.github.io/HydroBOT/reference/GeometricMean.html">GeometricMean()</a></code>, <code><a href="https://galenholt.github.io/HydroBOT/reference/LimitingFactor.html">LimitingFactor()</a></code>, <code><a href="https://galenholt.github.io/HydroBOT/reference/CompensatingFactor.html">CompensatingFactor()</a></code>, and <code><a href="https://galenholt.github.io/HydroBOT/reference/SpatialWeightedMean.html">SpatialWeightedMean()</a></code>), available in <code>default_agg_functions.R</code>. It is also possible to supply user-defined functions to include in <code>funsequence</code>. We can do this by specifying a new function and including it in the list given to <code>funsequence</code>. Some different syntax is provided below in <a href="#sec-funsyntax" class="quarto-xref">Section 2.2</a>, but the best way is shown here, involving defining a function or functions and using it just as we would built-ins.</p>
 <p>We demonstrate here with a threshold function and a median. For example, we might want to know the mean of all values greater than 0 for some stages and use the median at others.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">mean_given_occurred</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="op">{</span></span>
@@ -6284,7 +6288,7 @@ window.onload = function() {
 </div>
 <p>Those changes are then reflected in the aggregation history and determine the aggregated values.</p>
 <div class="cell">
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_custom_funs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/multi_aggregate.html">multi_aggregate</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_custom_funs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">sumdat</span>,</span>
 <span>  causal_edges <span class="op">=</span> <span class="va">causal_ewr</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span><span class="op">)</span>,</span>
@@ -6307,7 +6311,7 @@ window.onload = function() {
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_custom_funs</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">!=</span> <span class="st">&#39;MAX&#39;</span><span class="op">)</span>  <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Arithmetic Mean&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
@@ -6344,7 +6348,7 @@ window.onload = function() {
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Do the aggregation to get env_obj at each gauge</span></span>
-<span><span class="va">simpleThemeAgg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/multi_aggregate.html">multi_aggregate</a></span><span class="op">(</span></span>
+<span><span class="va">simpleThemeAgg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">sumdat</span>,</span>
 <span>  causal_edges <span class="op">=</span> <span class="va">causal_ewr</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;gauge&quot;</span><span class="op">)</span>,</span>
@@ -6390,12 +6394,12 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>We need to specify <code>env_obj</code> as a grouper here because we are using <code><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate()</a></code> directly; in normal use with <code><a href="https://rdrr.io/pkg/HydroBOT/man/multi_aggregate.html">multi_aggregate()</a></code> or <code><a href="https://rdrr.io/pkg/HydroBOT/man/read_and_agg.html">read_and_agg()</a></code> the dimensional safety will enforce that grouping in the value dimension while doing spatial aggregation.</p>
+<p>We need to specify <code>env_obj</code> as a grouper here because we are using <code><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate()</a></code> directly; in normal use with <code><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate()</a></code> or <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> the dimensional safety will enforce that grouping in the value dimension while doing spatial aggregation.</p>
 </div>
 </div>
 <p>This throws warnings about its meaning for the EWRs; since the point here is to demonstrate functionality, we will not print them.</p>
 <div class="cell">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2poly2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2poly2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">simpleThemeAgg</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu">starts_with</span><span class="op">(</span><span class="st">&quot;sce&quot;</span><span class="op">)</span>, <span class="va">env_obj</span><span class="op">)</span>,</span>
@@ -6417,7 +6421,7 @@ Note
 <p>There are times when we might want to send a vector of names, but ignore those not in the data. This typically occurs when there is a set of possible grouping variables but only some exist in a particular dataset, so they should be used if present and ignored if not. It fails by default, because in normal use datasets would match, but setting <code>failmissing = FALSE</code> allows it to pass. Here, the ‘extra_grouper’ column doesn’t exist in the data and so is ignored. The <code>failmissing</code> argument also applies to <code>aggCols</code>; if it is <code>TRUE</code>, <code>aggCols</code> can have values that are not column names in the data.</p>
 <p>We also now use only characters for groupers, but switch to tidyselect to specify aggCols.</p>
 <div class="cell">
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2polyF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2polyF</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">simpleThemeAgg</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span>, <span class="st">&quot;extra_grouper&quot;</span><span class="op">)</span>,</span>
@@ -6440,7 +6444,7 @@ Note
 <p>Above, we have been specifying the function to apply as just a single bare function name. Now, we explore some other possibilities and capabilities of the aggregator.</p>
 <p>Most simply, we can pass character names of functions instead of bare</p>
 <div class="cell">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">doublesimplechar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">doublesimplechar</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">simpleThemeAgg</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
@@ -6462,7 +6466,7 @@ Note
 <div class="cell">
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">simplefuns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;ArithmeticMean&quot;</span>, <span class="st">&quot;GeometricMean&quot;</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">doublesimplec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<span><span class="va">doublesimplec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">simpleThemeAgg</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
@@ -6495,7 +6499,7 @@ Note
 </div>
 <p>We can also use anonymous (lambda) functions in a list. This example is trivial, but it becomes useful (though still rarely a good idea in production) in the next section. It <em>does not</em> work with more modern <code>\(x)</code> lambda functions. Given the fragility of this approach, it has not been a high priority to get working.</p>
 <div class="cell">
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">lambda1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">simpleThemeAgg</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
@@ -6517,7 +6521,7 @@ Note
 <p>There are three primary ways to specify function arguments- using <code>...</code> in <code>spatial_aggregate</code>, writing a wrapper function with the arguments specified (e.g. see <code>ArithmeticMean</code>, which is just <code>mean(x, na.rm = TRUE)</code>), or using anonymous functions with <code>~</code> syntax in a named list. The simplest version is to use <code>…</code>, but this really only works in simple cases, like passing <code>na.rm = TRUE</code>. It <em>does</em> work for multiple functions, but starts getting convoluted and unclear if they don’t share arguments or there are many arguments. Thus, <em>the best option is to specify a custom function, and pass it</em>.</p>
 <p>Here, we pass <code>na.rm = TRUE</code> to both <code>mean</code> and <code>sd</code> using <code>...</code>.</p>
 <div class="cell">
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">singlearg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">singlearg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">simpleThemeAgg</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="st">&quot;scenario&quot;</span>,</span>
@@ -6543,7 +6547,7 @@ Note
 <span>  sdna <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/sd.html">sd</a></span><span class="op">(</span><span class="va">.</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">doublelam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<span><span class="va">doublelam</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">simpleThemeAgg</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
@@ -6596,7 +6600,7 @@ Caution
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>wt <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">triplevec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<span><span class="va">triplevec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">wtgauge</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
@@ -6624,7 +6628,7 @@ Caution
 <span><span class="va">wt2list</span> <span class="op">&lt;-</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html">quo</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>wt2 <span class="op">=</span> <span class="op">~</span> <span class="fu">wt2</span><span class="op">(</span><span class="va">.</span>, <span class="va">wt</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span><span class="va">vecnamedfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
+<span><span class="va">vecnamedfun</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/spatial_aggregate.html">spatial_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">wtgauge</span>,</span>
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
@@ -6645,8 +6649,8 @@ Caution
 </div>
 </section><section id="sec-area-exception" class="level3"><h3 class="anchored" data-anchor-id="sec-area-exception">The ‘area’ exception and HydroBOT</h3>
 <p>The only exception to attaching vector arguments are situations where the needed vector arguments depend on both sets of from and to data/polygons, and so can’t be pre-attached. Moreover, in a HydroBOT workflow, there is limited ability to pre-attach columns (though it is possible with additional development).</p>
-<p>However, area-weighting is almost always needed, and so <code><a href="https://rdrr.io/pkg/HydroBOT/man/spatial_joiner.html">spatial_joiner()</a></code> when polygons are present. This means HydroBOT data at polygon scales should always have an <code>area</code> column available for weighting.</p>
-<p>If specifying a custom function to use this area column (which will often be the case), the trick is to use <code>.data$area</code> in the function definition. This bypasses the need to use <code><a href="https://rlang.r-lib.org/reference/defusing-advanced.html">rlang::quo</a></code>, as it makes the argument explicitly a data-variable. See <code><a href="https://rdrr.io/pkg/HydroBOT/man/SpatialWeightedMean.html">HydroBOT::SpatialWeightedMean</a></code>, which is just</p>
+<p>However, area-weighting is almost always needed, and so <code>spatial_joiner()</code> when polygons are present. This means HydroBOT data at polygon scales should always have an <code>area</code> column available for weighting.</p>
+<p>If specifying a custom function to use this area column (which will often be the case), the trick is to use <code>.data$area</code> in the function definition. This bypasses the need to use <code><a href="https://rlang.r-lib.org/reference/defusing-advanced.html">rlang::quo</a></code>, as it makes the argument explicitly a data-variable. See <code><a href="https://galenholt.github.io/HydroBOT/reference/SpatialWeightedMean.html">HydroBOT::SpatialWeightedMean</a></code>, which is just</p>
 <div class="cell">
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">SpatialWeightedMean</span> <span class="op">&lt;-</span> <span class="kw">function</span> <span class="op">(</span><span class="va">x</span>, <span class="va">na.rm</span> <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span>
 <span><span class="op">{</span></span>
@@ -6907,7 +6911,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -7238,7 +7242,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

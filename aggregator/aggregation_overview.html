@@ -4733,7 +4733,7 @@ vertical-align: -.125em;
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -4756,10 +4756,14 @@ vertical-align: -.125em;
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -4985,7 +4989,7 @@ Note
 <section id="flexibility-and-consistency" class="level2">
 <h2 class="anchored" data-anchor-id="flexibility-and-consistency">Flexibility and consistency</h2>
 <p>Users need to be able to conduct summaries in a number of ways, and so the aggregation functions allow a wide range of summary functions to provide this needed flexibility. Within the aggregators, particularly <code>multi_aggregate</code> and <code>read_and_agg</code>, these aggregations are done consistently and produce standard outputs with standard formats. Intermediate data manipulations are handled internally, and so the user can feed raw module output data and an aggregation sequence and receive clean output data, without having to manage many intermediate data groupings and summaries that are liable to introduce errors and differences between runs. By enforcing a consistent format for specifying the aggregations, it is easier to see what is being <em>aggregated</em>, rather than what is being <em>grouped</em> which greatly reduces the complexity of calls and and makes forgetting grouping levels much more difficult.</p>
-<p>While HydroBOT provides useful connections to modules, spatial data and causal networks, as well as aggregation fucntions, it also has the flexibility for uers to provide their own <a href="../aggregator/user_causal.html">causal networks</a>, <a href="../aggregator/user_spatial.html">spatial information</a>, and <a href="../aggregator/user_functions.html">aggregation functions</a>. Moreover, aggregation can happen on <a href="../aggregator/user_module.html">arbitrary input data, possibly from unincorporated modules</a>. See those pages for more detail using <code>read_and_agg()</code>, along with doing the same in <a href="../aggregator/using_multi_aggregate.html">multi_aggregate()</a>.</p>
+<p>While HydroBOT provides useful connections to modules, spatial data and causal networks, as well as aggregation functions, it also has the flexibility for users to provide their own <a href="../aggregator/user_causal.html">causal networks</a>, <a href="../aggregator/user_spatial.html">spatial information</a>, and <a href="../aggregator/user_functions.html">aggregation functions</a>. Moreover, aggregation can happen on <a href="../aggregator/user_module.html">arbitrary input data, possibly from unincorporated modules</a>. See those pages for more detail using <code>read_and_agg()</code>, along with doing the same in <a href="../aggregator/using_multi_aggregate.html">multi_aggregate()</a>.</p>
 </section>
 <section id="dimensional-safety" class="level2">
 <h2 class="anchored" data-anchor-id="dimensional-safety">Dimensional safety</h2>
@@ -5269,7 +5273,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -5601,7 +5605,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <footer class="footer">
   <div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

@@ -6027,7 +6027,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6050,10 +6050,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6210,7 +6214,7 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -6255,12 +6259,12 @@ window.onload = function() {
 </section></section><section id="standard-scenario-appearance" class="level1"><h1>Standard scenario appearance</h1>
 <p>We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the <code>.Rprofile</code>, if desired.</p>
 <p>Here, we use the special arguments <code>refvals</code> and <code>refcols</code> to make a color palette from a standard {paletter} option (“ggsci::nrc_npg”) while setting a specific level to a specified value. We will use the codes (see <a href="../comparer/comparer_overview.html">scenario definitions</a>) rather than the names to make plots readable.</p>
-<p>There is a <code>sceneorder</code> argument to <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code> that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates <em>only</em> on a column named ‘scenario’, though, so if other columns need to be ordered they should be made factors before feeding to <code><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes()</a></code>.</p>
+<p>There is a <code>sceneorder</code> argument to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates <em>only</em> on a column named ‘scenario’, though, so if other columns need to be ordered they should be made factors before feeding to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sceneorder</span> <span class="op">&lt;-</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">$</span><span class="va">scenario</span>,</span>
 <span>                                   <span class="va">scenarios</span><span class="op">$</span><span class="va">flow_multiplier</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">scene_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/make_pal.html">make_pal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">$</span><span class="va">climate_code</span><span class="op">)</span>,</span>
+<span><span class="va">scene_pal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/make_pal.html">make_pal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">$</span><span class="va">climate_code</span><span class="op">)</span>,</span>
 <span>  palette <span class="op">=</span> <span class="st">&quot;ggsci::nrc_npg&quot;</span>,</span>
 <span>  refvals <span class="op">=</span> <span class="st">&quot;E&quot;</span>, refcols <span class="op">=</span> <span class="st">&quot;black&quot;</span></span>
 <span><span class="op">)</span></span>
@@ -6278,7 +6282,7 @@ black #E64B35FF #4DBBD5FF #00A087FF #3C5488FF #F39B7FFF #8491B4FF #91D1C2FF #DC0
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_line</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">adapt_code</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -6327,7 +6331,7 @@ Important
 <p>Scientifically, one important thing to note here is that the range on y (0-10) is much greater than the range on x (0.3 - 3), and so (unsurprisingly), some outcomes are disproportionately impacted by flow. Other outcome values are less than the relative shift in flow, and so there are others that are disproportionately insensitive. These disproportionate responses also depend on whether flows decrease or increase- they are not symmetric.</p>
 <div class="cell">
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_line_options</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6367,7 +6371,7 @@ Important
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">sdl_line_groups</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6401,7 +6405,7 @@ Figure 1: Change in proportion of environmental objectives met in each scenario
 <p>That’s fairly complex, so we can facet it, as we did with the <a href="../comparer/bar_plots.html">bars</a> to make the individual <code>env_obj</code>s easier to see.</p>
 <div class="cell">
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_line_groups_facet</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6447,7 +6451,7 @@ Figure 2: Change in proportion of environmental objectives met in each scenario
 <div class="cell">
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_line_sdl</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
 <span>  <span class="co"># filter(env_group == &quot;EF&quot;) |&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6486,7 +6490,7 @@ Figure 3: Change in proportion of environmental objectives met in each scenario
 <p>With unique points, this just fits a single curved line through each <code>env_obj</code>. Recapitulating the above, we color here from SDL unit.</p>
 <div class="cell">
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_smooth_sdl</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6517,7 +6521,7 @@ Figure 3: Change in proportion of environmental objectives met in each scenario
 <p>And we can do the same for environmental groupings. This makes much more sense as an analysis if we fit the line through the group, as we do in <a href="#sec-smooth-multiple" class="quarto-xref">Section 4.2.2</a>. We use <code>zero_adjust = &#39;auto&#39;</code> to adjust values off zero for the log transform of y.</p>
 <div class="cell">
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_smooth_groups</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6550,7 +6554,7 @@ Figure 3: Change in proportion of environmental objectives met in each scenario
 <p>Using <code>method = &#39;lm&#39;</code> in <code>smooth_arglist</code> yields a linear fit (and any other <code>method</code> accepted by <code><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">ggplot2::geom_smooth()</a></code> should work). It does not recapitulate the simple lines above, however, because it fits the line through all the scenario data points, rather than simply joining them together. I have passed <code>se = FALSE</code> to <code><a href="https://ggplot2.tidyverse.org/reference/geom_smooth.html">ggplot2::geom_smooth()</a></code> here because with unique groups the standard errors are enormous. Again, this is a bit contrived unless we want to look for a trend for each outcome at this level. A more typical way of looking at things would be to look at the trend across lots of values within some group, <a href="#sec-smooth-multiple" class="quarto-xref">Section 4.2.2</a>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>    <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>        outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>        x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>        y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6595,7 +6599,7 @@ Note
 <p>We use a small <code>add_eps</code> to avoid zeros and allow all data to be relativised and plotted.</p>
 <div class="cell">
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_fit_sdl</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6630,7 +6634,7 @@ Figure 4: Change in proportion of environmental objectives met in each scenario
 <p>We can make a very similar plot, looking at the environmental groups, a smooth fit of <a href="#fig-env-grouped" class="quarto-xref">Figure 1</a> . We use a <code>position</code> argument (which passes to {ggplot2}, and so has the same syntax) to see overplotted points, and an <code>add_eps</code> to avoid zeros to relativise and plot all the data.</p>
 <div class="cell">
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_fit_groups</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6668,7 +6672,7 @@ Figure 5: Change in proportion of environmental objectives met in each scenario
 <p>A linear fit of the SDL units ( <a href="#fig-sdl-colors-lm" class="quarto-xref">Figure 6</a> ) is one example of how this might work. It is useful to know here that deviations from a 1:1 line on logged axes as here means that the outcomes are responding disproportionately more (steeper) or less (shallower) than the underlying changes to flow.</p>
 <div class="cell">
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sdl_lm_sdl</span> <span class="op">&lt;-</span> <span class="va">obj_sdl_to_plot</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    x_col <span class="op">=</span> <span class="st">&quot;flow_multiplier&quot;</span>,</span>
 <span>    y_lab <span class="op">=</span> <span class="st">&quot;Proportion met&quot;</span>,</span>
@@ -6938,7 +6942,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -7269,7 +7273,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">

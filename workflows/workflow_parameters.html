@@ -6026,7 +6026,7 @@ window.onload = function() {
 <span class="menu-text">Get started</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html"> 
+    <a class="nav-link" href="https://galenholt.github.io/HydroBOT/reference/index.html"> 
 <span class="menu-text">Reference</span></a>
   </li>  
   <li class="nav-item">
@@ -6049,10 +6049,14 @@ window.onload = function() {
     <a class="nav-link" href="../provided_data/data_overview.html"> 
 <span class="menu-text">Provided data and Causal networks</span></a>
   </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../modules/module_overview.html"> 
+<span class="menu-text">Modules</span></a>
+  </li>  
 </ul>
 <ul class="navbar-nav navbar-nav-scroll ms-auto">
 <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT_website"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -6189,7 +6193,7 @@ window.onload = function() {
 <p>We have the ability to have a default params file, a second params file that tweaks those defaults, as well as include params in Quarto header yaml. These different options are all used here.</p>
 <p>Load the package</p>
 <div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://laughing-adventure-8jypg4z.pages.github.io/">HydroBOT</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="structure-of-params-files-and-arguments" class="level2"><h2 class="anchored" data-anchor-id="structure-of-params-files-and-arguments">Structure of params files and arguments</h2>
 <p>The <code>run_hydrobot_params</code> function takes four arguments: <code>yamlpath</code>, which is a path to a yaml params file, <code>passed_args</code> which can come from the command line, <code>list_args</code>, and <code>defaults</code>, which is another yaml file. This two-yaml approach lets us set most of the params in common across all runs, and only modify a subset with the <code>yamlpath</code> file or <code>passed_args</code>.</p>
@@ -6275,7 +6279,7 @@ Note
 <p>These examples are set not to evaluate in normal use, but show different ways of running the parameters.</p>
 <p>This runs the toolkit using a yaml parameter file that modifies the default provided with HydroBOT.</p>
 <div class="cell">
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span>yamlpath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="st">&quot;workflows&quot;</span>, <span class="st">&quot;params.yml&quot;</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span>yamlpath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="st">&quot;workflows&quot;</span>, <span class="st">&quot;params.yml&quot;</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>! Unmatched links in causal network
 • 17 from ewr_code to env_obj
@@ -6287,14 +6291,14 @@ Note
 </div>
 <p>Passing arguments as text is tricky to get the yaml right for more than one argument, but it can be useful for command-line use, for example. Here, we demonstrate changing the <code>output_parent_dir</code> and the <code>namehistory</code>, noting that the number of spaces and newlines is critical to get it to work. In practice, this would need some tweaking to use with <code>Rscript</code> and extract the string from <code><a href="https://rdrr.io/r/base/commandArgs.html">commandArgs()</a></code> .</p>
 <div class="cell">
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span></span>
 <span>  yamlpath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="st">&quot;workflows&quot;</span>, <span class="st">&quot;params.yml&quot;</span><span class="op">)</span>,</span>
 <span>  passed_args <span class="op">=</span> <span class="st">&quot;ewr:\n output_parent_dir: &#39;hydrobot_scenarios&#39;\naggregation:\n namehistory: TRUE&quot;</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>We can also pass arguments in a list from R, which is a bit easier syntax. Here, we use it to only run a subset of the scenarios and put the outputs in the same directory, as well as specify aggregation with an R file.</p>
 <div class="cell">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span>list_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span>list_args <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>  ewr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>    output_parent_dir <span class="op">=</span> <span class="st">&quot;hydrobot_scenarios/hydrographs/base&quot;</span>,</span>
 <span>    hydro_dir <span class="op">=</span> <span class="st">&quot;hydrobot_scenarios/hydrographs/base&quot;</span></span>
@@ -6307,12 +6311,12 @@ Note
 </div>
 <p>And finally, if the params are included in the parameters section of a Quarto notebook, they should get parsed. Quarto with R puts these in a list called <code>params</code>, so we could just pass that. Unfortunately, the <code>params</code> list in quarto isn’t full-featured yaml, and can’t do nested lists and does not currently work, but may work with <code>!r</code> syntax in Rmarkdown. This is likely to not be very useful.</p>
 <div class="cell">
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span>list_args <span class="op">=</span> <span class="va">params</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span>list_args <span class="op">=</span> <span class="va">params</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="replication" class="level2"><h2 class="anchored" data-anchor-id="replication">Replication</h2>
 <p>The <code>prep_run_save_ewrs</code> and <code>read_and_agg</code> functions save metadata yaml files that are fully-specified parameters files. Thus, to replicate runs, we can run from the final yaml (after the aggregator), as it has all preceding steps.</p>
 <div class="cell">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/HydroBOT/man/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span>yamlpath <span class="op">=</span> <span class="st">&quot;hydrobot_scenarios/aggregator_output/agg_metadata.yml&quot;</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/run_hydrobot_params.html">run_hydrobot_params</a></span><span class="op">(</span>yamlpath <span class="op">=</span> <span class="st">&quot;hydrobot_scenarios/aggregator_output/agg_metadata.yml&quot;</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
@@ -6552,7 +6556,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
+      var filterRegex = new RegExp('/' + window.location.host + '/');
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
@@ -6883,7 +6887,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/MDBAuth/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">
