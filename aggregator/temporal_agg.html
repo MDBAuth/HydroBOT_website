@@ -6229,7 +6229,7 @@ window.onload = function() {
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="overview" class="level1"><h1>Overview</h1>
-<p>Aggregating outcomes along the time dimension is a key requirement of HydroBOT. For example, we might want to combine EWR pass/fails assessed annually to a summary over the full timeseries, or to decadal groups, or similar.</p>
+<p>Aggregating outcomes along the time dimension is a key requirement of HydroBOT. For example, we might want to combine EWR pass/fails assessed annually to a summary over the full timeseries, or to decadal groups, or similar. If the data remains temporal, even if fewer timesteps, it is possible to examine <a href="../comparer/timeseries.html">timeseries</a>.</p>
 <p>The input data is thus the data coming out of the response modules (e.g. EWR tool), which is then aggregated. This data can be the immediate product of the response models or any subsequent aggregations (e.g. following spatial or temporal aggregations), provided it includes a column defining the temporal information for each row (i.e. a date or POSIX*t column). The demonstrations here are all about the EWR outputs, but the aggregator is agnostic to the input data, provided the rows have temporal information.</p>
 <p>Here, we look specifically at how time-aggregation works at a single step, for its use in a sequence of aggregations along other dimensions, see <a href="../aggregator/using_multi_aggregate.html">multi_aggregate</a> and <a href="../aggregator/read_and_agg.html">read_and_agg</a>.</p>
 </section><section id="demonstration" class="level1"><h1>Demonstration</h1>
@@ -6692,7 +6692,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

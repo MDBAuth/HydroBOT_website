@@ -6286,7 +6286,7 @@ Note
 <section id="scenario-information" class="level3"><h3 class="anchored" data-anchor-id="scenario-information">Scenario information</h3>
 <p>This will be attached to metadata, typically. For this demonstration, we just use it for plot clarity and the data is simple.</p>
 <div class="cell">
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">multipliers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1.1</span>, <span class="fl">1.5</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">multipliers</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">4</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">scenemults</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html">rev</a></span><span class="op">(</span><span class="va">multipliers</span><span class="op">)</span>, <span class="fl">1</span>, <span class="va">multipliers</span><span class="op">)</span></span>
 <span></span>
@@ -6376,12 +6376,25 @@ Tip
 </div>
 <section id="return-only-final" class="level3"><h3 class="anchored" data-anchor-id="return-only-final">Return only final</h3>
 <p>The default option is to return only the final outcome, which is far cheaper for memory, but doesn’t say how we got that answer.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>HydroBOT can aggregate more than one column at a time if they use the same aggregation sequence. We demonstrate that here, with <code>aggCols = c(&quot;frequency_achieved&quot;, &quot;ewr_achieved&quot;)</code> . We could also include any other outcome column if desired.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">tsagg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate</a></span><span class="op">(</span></span>
 <span>  dat <span class="op">=</span> <span class="va">ewrdata</span>,</span>
 <span>  causal_edges <span class="op">=</span> <span class="va">causal_ewr</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="st">&quot;scenario&quot;</span>,</span>
-<span>  aggCols <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
+<span>  aggCols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span>, <span class="st">&quot;frequency_achieved&quot;</span><span class="op">)</span>,</span>
 <span>  aggsequence <span class="op">=</span> <span class="va">aggseq</span>,</span>
 <span>  funsequence <span class="op">=</span> <span class="va">funseq</span>,</span>
 <span>  auto_ewr_PU <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -7578,7 +7591,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

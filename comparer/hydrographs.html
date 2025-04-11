@@ -6114,6 +6114,12 @@ window.onload = function() {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../comparer/timeseries.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Timeseries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../comparer/causal_plots.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Outcomes on causal networks</span></a>
   </div>
@@ -6232,7 +6238,7 @@ window.onload = function() {
 </section></section><section id="standard-scenario-appearance" class="level1"><h1>Standard scenario appearance</h1>
 <p>We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the <code>.Rprofile</code>, if desired.</p>
 <p>Here, we use the special arguments <code>refvals</code> and <code>refcols</code> to make a color palette from a standard {paletter} option (“ggsci::nrc_npg”) while setting a specific level to a specified value. We will use the codes (see <a href="../comparer/comparer_overview.html">scenario definitions</a>) rather than the names to make plots readable.</p>
-<p>There is a <code>sceneorder</code> argument to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the sceneorder here. It operates <em>only</em> on a column named ‘scenario’, though, so if other columns need to be ordered they should be made factors before feeding to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code>.</p>
+<p>There is a <code>sceneorder</code> argument to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code> that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the <code>sceneorder</code> argument here. It operates <em>only</em> on a column named ‘scenario’, though, so if other columns need to be ordered they should be made factors before feeding to <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sceneorder</span> <span class="op">&lt;-</span> <span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_reorder.html">fct_reorder</a></span><span class="op">(</span></span>
 <span>  <span class="va">scenarios</span><span class="op">$</span><span class="va">scenario</span>,</span>
@@ -6701,7 +6707,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

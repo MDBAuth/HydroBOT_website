@@ -7352,6 +7352,12 @@ window.onload = function() {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../workflows/ewr_ratios.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EWR frequency ratio</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../modules/integrating_new.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Integrating a new model</span></a>
   </div>
@@ -7375,7 +7381,13 @@ window.onload = function() {
 <li><a href="#ewr-definitions" id="toc-ewr-definitions" class="nav-link active" data-scroll-target="#ewr-definitions">EWR definitions</a></li>
   <li><a href="#ecological-relationships" id="toc-ecological-relationships" class="nav-link" data-scroll-target="#ecological-relationships">Ecological relationships</a></li>
   <li><a href="#spatial-context" id="toc-spatial-context" class="nav-link" data-scroll-target="#spatial-context">Spatial context</a></li>
-  <li><a href="#ewr-tool-and-hydrobot" id="toc-ewr-tool-and-hydrobot" class="nav-link" data-scroll-target="#ewr-tool-and-hydrobot">EWR tool and HydroBOT</a></li>
+  <li>
+<a href="#ewr-tool-and-hydrobot" id="toc-ewr-tool-and-hydrobot" class="nav-link" data-scroll-target="#ewr-tool-and-hydrobot">EWR tool and HydroBOT</a>
+  <ul class="collapse">
+<li><a href="#ewr-helpers-in-hydrobot" id="toc-ewr-helpers-in-hydrobot" class="nav-link" data-scroll-target="#ewr-helpers-in-hydrobot">EWR helpers in HydroBOT</a></li>
+  <li><a href="#ewr-assessment" id="toc-ewr-assessment" class="nav-link" data-scroll-target="#ewr-assessment">EWR assessment</a></li>
+  </ul>
+</li>
   </ul></nav>
     </div>
 <!-- main -->
@@ -7495,10 +7507,52 @@ Figure 2: Gauges in the EWR tool (points) superimposed on SDL units (a) and pla
 </section><section id="ewr-tool-and-hydrobot" class="level2"><h2 class="anchored" data-anchor-id="ewr-tool-and-hydrobot">EWR tool and HydroBOT</h2>
 <p>HydroBOT analyses proceed by feeding the EWR tool a set of hydrographs, which then get run through the EWR tool. The outputs are then processed by the Aggregator and Comparer. These approaches form the core of the demonstrations on this website, as most examples are easiest with the real examples we can run through the included EWR tool module.</p>
 <p>While the EWR tool can pull hydrographs on the fly, it uses a different set of functions to do so than those it uses to process scenarios and modeled data. Thus, HydroBOT tends to run saved hydrographs representing scenarios. If purely historical data will be run, it is easiest to pre-download it with e.g. <a href="https://github.com/galenholt/hydrogauge">hydrogauge</a> (R) or the <a href="https://pypi.org/project/mdba-gauge-getter/">mdba gauge-getter</a> (Python).</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>For an example workflow to assess ratios of EWR achievement across scenarios (the ‘frequency ratio’ but also a ratio of achievement based on frequency <em>and</em> interevents), see <a href="../workflows/ewr_ratios.html">here</a>.</p>
+</div>
+</div>
+<section id="ewr-helpers-in-hydrobot" class="level3"><h3 class="anchored" data-anchor-id="ewr-helpers-in-hydrobot">EWR helpers in HydroBOT</h3>
+<p>HydroBOT provides some useful functions to access information about the EWR tool and clean it up:</p>
+<ul>
+<li><p><code><a href="https://galenholt.github.io/HydroBOT/reference/get_ewr_version.html">get_ewr_version()</a></code> obtains the currently installed version of py-ewr</p></li>
+<li>
+<p><code><a href="https://galenholt.github.io/HydroBOT/reference/get_causal_ewr.html">get_causal_ewr()</a></code> obtains the causal network from py-ewr</p>
+<ul>
+<li>Also see the HydroBOT data <code>causal_ewr</code>
+</li>
+</ul>
+</li>
+<li><p><code><a href="https://galenholt.github.io/HydroBOT/reference/get_ewr_gauges.html">get_ewr_gauges()</a></code> obtains the gauges used by py-ewr</p></li>
+<li><p><code><a href="https://galenholt.github.io/HydroBOT/reference/get_ewr_table.html">get_ewr_table()</a></code> obtains the ‘parameter sheet’ in py-ewr</p></li>
+<li><p><code><a href="https://galenholt.github.io/HydroBOT/reference/assess_ewr_achievement.html">assess_ewr_achievement()</a></code> assesses the yearly ‘events’ returned by py-ewr according to frequency and interevent requirements, allowing analysis of the raw events as well as those additional requirements</p></li>
+<li>
+<p><code><a href="https://galenholt.github.io/HydroBOT/reference/cleanewrs.html">cleanewrs()</a></code> a simple text cleaner of the EWR outputs</p>
+<ul>
+<li>There are a number of more specific cleaners not discussed here, see the <a href="https://galenholt.github.io/HydroBOT/reference/#module-helpers">function reference</a>.</li>
+</ul>
+</li>
+</ul></section><section id="ewr-assessment" class="level3"><h3 class="anchored" data-anchor-id="ewr-assessment">EWR assessment</h3>
+<p>The EWR tool py-ewr has potentially several output files. The standard one to use with HydroBOT is the <code>yearly</code> output, which returns one row per year per EWR. The key outcome column is <code>event_years</code>, which indicates whether the discharge, timing, and duration of flows met that EWR in that year. HydroBOT then can perform some further assessment, checking whether those yearly achievements met frequency and interevent requirements. This assessment (done by <code><a href="https://galenholt.github.io/HydroBOT/reference/assess_ewr_achievement.html">assess_ewr_achievement()</a></code>, which gets called when the <code>type = &#39;achievement&#39;</code> argument is used in <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> or other EWR-read-in functions (e.g. <code><a href="https://galenholt.github.io/HydroBOT/reference/prep_ewr_output.html">prep_ewr_output()</a></code>), returns three new ‘achievement’ columns in addition to the <code>event_years</code> column which is also passed through:</p>
+<ul>
+<li><p><code>frequency_achieved</code>- did the <code>event_years</code> meet target frequencies?</p></li>
+<li><p><code>interevent_achieved</code>- was the interevent period below or equal to the maximum interevent period?</p></li>
+<li><p><code>ewr_achieved</code>- were both the frequency and interevent conditions met?</p></li>
+</ul>
+<p>HydroBOT checks the frequency conditions with a 10-year lookback window for each year, and so if, for example, an EWR must have a frequency of 0.8, it asks whether it has been met in 8 of the most recent 10 years, rather than 80% of the entire timeseries. Thus, we can obtain an ‘achievement’ value for each year and avoid potentially major issues caused by patterns within the timeseries that would otherwise be masked. This reflects the reality of the system as well- whether the frequency of an event has been sufficient is a property of the years up to each year, not the whole series. I.e. these are not <em>aggregations</em>, but <em>assessments of condition</em>.</p>
+<p>If temporal aggregtion is desired over the timeseries, these yearly assessments should then be aggregated with the <a href="../aggregator/aggregation_overview.html">aggregator</a>. This aggregation can proceed with the user’s choice of outcome columns; <code>event_years</code>, <code>frequency_achieved</code>, <code>interevent_achieved</code>, or <code>ewr_achieved</code>.</p>
 
 
 
-</section><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+</section></section><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
 <div id="ref-dew2020" class="csl-entry" role="listitem">
 DEW. 2020. <span>“Long-Term Environmental Watering Plan for the South Australian River Murray Water Resource Plan Area.”</span>
 </div>
@@ -7741,7 +7795,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }

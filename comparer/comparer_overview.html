@@ -6187,6 +6187,12 @@ window.onload = function() {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../comparer/timeseries.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Timeseries</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../comparer/causal_plots.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Outcomes on causal networks</span></a>
   </div>
@@ -6274,7 +6280,7 @@ window.onload = function() {
 <p>Most importantly for the plots implement through the <code>plot_outcomes()</code> function, the design philosophy is that an outcome to be plotted should be declared, and then however that outcome is presented (maps, bars, lines, etc), the necessary data transformations happen inside <code>plot_outcomes()</code>, and so greatly enhancing testing and rigour while reducing the errors associated with copy-pasting or inadvertently mis-specifying steps. Moreover, <code>plot_outcomes()</code> is dimensionally aware and throws warnings when data is being silently overplotted and so producing misleading results (and alerting the user to forgotten dimensions).</p>
 <p>There is quite a lot of flexibility built into all of the comparer, because different uses and different questions will require different outputs, whether that means different scales of analysis, different types of plots, or different numerical comparisons. Not only will these differ within projects, the act of finding an ‘ideal’ set of plots for any given project is necessarily iterative, and so the flexibility here provides the user with much control over that process.</p>
 <p>While this is called the ‘Comparer’ and most plots use the function <code>plot_outcomes()</code>, it also contains other functionality related to analysis generally, and can produce plots that do not include comparisons or outcomes, e.g. <a href="../comparer/hydrographs.html">hydrographs</a> to simply illustrate historical flows.</p>
-<p>Nearly all plots of outcomes are made with <code>plot_outcomes</code>, including <a href="../comparer/bar_plots.html">bars</a>, <a href="../comparer/line_plots.html">lines</a>, <a href="../comparer/heatmap.html">heatmaps</a>, and <a href="../comparer/maps.html">maps</a>. This is because at their foundation, they area all plotting a quantitative outcome with grouping of some sort. The data preparation is the same across all of them, as well as many of the arguments to <code>ggplot()</code>.</p>
+<p>Nearly all plots of outcomes are made with <code>plot_outcomes</code>, including <a href="../comparer/bar_plots.html">bars</a>, <a href="../comparer/line_plots.html">lines</a> (including <a href="../comparer/timeseries.html">timeseries</a>), <a href="../comparer/heatmap.html">heatmaps</a>, and <a href="../comparer/maps.html">maps</a>. This is because at their foundation, they area all plotting a quantitative outcome with grouping of some sort. The data preparation is the same across all of them, as well as many of the arguments to <code>ggplot()</code>.</p>
 <p>Nearly all plots (with the current exception of the causal networks) are made internally with <code>ggplot2</code> and return <code>ggplot2</code> objects, which can easily be further modified. The plot functions here wrap the ggplot2 to standardise appearance and data preparation and ensure dimensions are handled appropriately. Though it can be annoying to not use <code>ggplot()</code> directly to make the plots, one <strong>MAJOR</strong> advantage of the plotting function here is that any data changes that clean it for a given plot aren’t preserved, and so it’s far easier to keep the data clean, know what the data is, and avoid accidental overwriting or mislabeling of data. Further, the internal data manipulation remains the same whether the outcome is plotted as a y-axis, color, etc or the plot type changes.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -6303,25 +6309,24 @@ Important
 </div>
 </div>
 <section id="comparisons" class="level1"><h1>Comparisons</h1>
-<p>Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes, as well as aggregation sequences. It can do these comparisons visually (e.g. plotting raw values next to each other), but also calculate comparison values and plot these. There are a few primary sorts of plots,</p>
+<p>Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes, as well as aggregation sequences. It can do these comparisons visually (e.g. plotting raw values next to each other), but also calculate comparison values and plot these. There are a few primary sorts of plots, all of which focus on plotting quantitative outcomes.</p>
 <ul>
 <li>
-<p>Quantitative outcome plots (values on y - 1d)</p>
+<p>Quantitative outcome values on y</p>
 <ul>
 <li><p><a href="../comparer/bar_plots.html">Bar</a></p></li>
 <li><p><a href="../comparer/line_plots.html">Line</a></p></li>
 <li>
-<p>Timeseries</p>
+<p><a href="../comparer/timeseries.html">Timeseries</a></p>
 <ul>
-<li>
-<a href="../comparer/hydrographs.html">hydrographs</a>,</li>
-<li>Write pages for other variables</li>
+<li><a href="../comparer/hydrographs.html">hydrographs</a></li>
+<li><a href="../comparer/timeseries.html">outcomes</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li>
-<p>Quantitative outcome plots (values in color - 2d)</p>
+<p>Quantitative outcome values as colour</p>
 <ul>
 <li><p><a href="../comparer/maps.html">Maps</a></p></li>
 <li><p><a href="../provided_data/causal_descriptive_plots.html">Causal networks</a></p></li>
@@ -6695,7 +6700,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   }
     var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
     var mailtoRegex = new RegExp(/^mailto:/);
-      var filterRegex = new RegExp('/' + window.location.host + '/');
+      var filterRegex = new RegExp("https:\/\/MDBAuth\.github\.io\/HydroBOT_website\/");
     var isInternal = (href) => {
         return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
     }
