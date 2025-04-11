@@ -13,6 +13,7 @@ website:
       contents:
         - index.qmd
         - demo_scenarios.qmd
+        - modules/ewr_overview.qmd
 
     - title: "Reference"
       contents:

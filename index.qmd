@@ -62,7 +62,7 @@ Users should consider the various capabilities demonstrated here, and then devel
 ::: callout-note
 ## Website examples
 
-The majority of the examples on this website are developed with a simple set of hydrological scenarios and model ecological responses to them with the [Environmental Water Requirements (EWR) Tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool models hydrological indicators, which are then translated through causal networks to assess their impact on varying levels of ecological outcomes and management targets. Please see additional detail about the [scenarios](demo_scenarios.qmd) and the [EWR tool and associated outcome levels](/modules/ewr_overview.qmd).
+The majority of the examples on this website are developed with a simple set of hydrological scenarios and model ecological responses to them with the [Environmental Water Requirements (EWR) Tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool models hydrological indicators, which are then translated through causal networks to assess their impact on varying levels of ecological outcomes and management targets. Please see additional detail about the [scenarios](demo_scenarios.qmd) and the [EWR tool and associated outcome levels](/modules/ewr_overview.qmd), particularly for information about terminology and context of the examples presented here.
 :::
 
 ## Workflow
@@ -107,7 +107,7 @@ In use, HydroBOT expects that scenario hydrographs are available and the causal 
 
 ## Development
 
-See the [repo readme](https://github.com/MDBAuth/HydroBOT) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/galenholt/HydroBOT) repo for development of the package itself.
+See the [repo readme](https://github.com/MDBAuth/HydroBOT) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/galenholt/HydroBOT) for development of the package itself.
 
 ## Acknowledgements
 
