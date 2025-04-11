@@ -18,6 +18,10 @@ website:
       contents:
         - href: https://galenholt.github.io/HydroBOT/reference/index.html
 
+    - title: "Reference"
+      contents:
+        - href: https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html
+
     - title: "Workflows"
       contents:
         - workflows/workflow_overview.qmd
