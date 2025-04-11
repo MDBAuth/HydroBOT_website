@@ -1,0 +1,25 @@
+---
+title: "EWR interevent statistics"
+---
+
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+```
+
+```{r}
+library(HydroBOT)
+library(dplyr)
+```
+
+The MDBA has proposed a number of interevent statistics. Here, we quickly demonstrate their calculations with HydroBOT, noting where there are small discrepancies that could easily be fixed up.
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+
+```
+
+

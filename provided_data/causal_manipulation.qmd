@@ -3,16 +3,26 @@ title: "Causal network functions"
 author: "Galen Holt"
 ---
 
-# Purpose
+HydroBOT provides several helpers to build and manipulate causal networks. This page points to others where this is explored in more detail.
 
-This document will cover the functions provided by {HydroBOT} to interact with and manipulate causal networks.
+## Structure of causal networks
 
-For example
+At their core, the causal networks need to be defined as a list of dataframe(s) with different levels in columns, such that each row gives a unique pairing between related levels. For example, if small group 'a' maps to big group 'A' and big group 'C', while small group 'b' maps to big group 'B' and big group 'C', we would need a dataframe that looks like this:
 
--   `make_nodes`
+```{r}
+#| echo: false
+tibble::tibble(small = c('a', 'a', 'b', 'b'),
+               big = c('A', 'C', 'B', 'C'))
+```
 
--   `make_edges`
+For examples of preexisting complex causal networks, see the `causal_ewr` provided data, which is a list of three dataframes to avoid excessive data duplication. For examples of creating and providing your own causal network, see the [examples of user-provided networks](/aggregator/user_causal.qmd).
 
--   The pruning function `find_related_nodes`
+## Causal network manipulation
 
--   others
+Building the causal network from the dataframe uses the `make_nodes()` and `make_edges()` functions, with more demonstration in the [descriptive plots](causal_descriptive_plots.qmd).
+
+Networks can be pruned in a network-aware way to isolate all parts of a network related to a node or nodes with `find_related_nodes()` , again shown in the [descriptive plots](causal_descriptive_plots.qmd).
+
+## Plotting
+
+There are some causal-network specific plotting functions and helpers, most obviously `make_causal_plot()`, but also e.g. `causal_colors_general()`. For examples of their use, see the [descriptive](causal_descriptive_plots.qmd) and [outcome](/comparer/causal_plots.qmd) pages.

@@ -31,7 +31,7 @@ This is not to say that setting up an aggregation sequence does not require thou
 
 Users need to be able to conduct summaries in a number of ways, and so the aggregation functions allow a wide range of summary functions to provide this needed flexibility. Within the aggregators, particularly `multi_aggregate` and `read_and_agg`, these aggregations are done consistently and produce standard outputs with standard formats. Intermediate data manipulations are handled internally, and so the user can feed raw module output data and an aggregation sequence and receive clean output data, without having to manage many intermediate data groupings and summaries that are liable to introduce errors and differences between runs. By enforcing a consistent format for specifying the aggregations, it is easier to see what is being *aggregated*, rather than what is being *grouped* which greatly reduces the complexity of calls and and makes forgetting grouping levels much more difficult.
 
-While HydroBOT provides useful connections to modules, spatial data and causal networks, as well as aggregation fucntions, it also has the flexibility for uers to provide their own [causal networks](user_causal.qmd), [spatial information](user_spatial.qmd), and [aggregation functions](user_functions.qmd). Moreover, aggregation can happen on [arbitrary input data, possibly from unincorporated modules](user_module.qmd). See those pages for more detail using `read_and_agg()`, along with doing the same in [multi_aggregate()](using_multi_aggregate.qmd).
+While HydroBOT provides useful connections to modules, spatial data and causal networks, as well as aggregation functions, it also has the flexibility for users to provide their own [causal networks](user_causal.qmd), [spatial information](user_spatial.qmd), and [aggregation functions](user_functions.qmd). Moreover, aggregation can happen on [arbitrary input data, possibly from unincorporated modules](user_module.qmd). See those pages for more detail using `read_and_agg()`, along with doing the same in [multi_aggregate()](using_multi_aggregate.qmd).
 
 ## Dimensional safety
 
@@ -67,7 +67,7 @@ The user potentially has control over a number of decisions for the aggregation:
 
 -   Aggregation function(s) to apply at each step
 
--   Data to aggregate (one or more columns)
+-   Data to aggregate (one *or more* columns)
 
 -   Any desired groupings to retain
 

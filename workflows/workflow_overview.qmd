@@ -23,3 +23,6 @@ In practice, with large jobs, the typical approach is often to run the response 
 If you want to supply your own spatial data, causal networks, or aggregation functions, see examples in the [aggregator section](/aggregator/using_multi_aggregate.qmd) for detail, and they would typically be done through [read_and_agg](/aggregator/read_and_agg.qmd) in the full workflow.
 :::
 
+::: callout-tip
+For an example workflow to assess ratios of EWR achievement across scenarios (the 'frequency ratio' but also a ratio of achievement based on frequency *and* interevents), see [here](/workflows/ewr_ratios.qmd).
+:::

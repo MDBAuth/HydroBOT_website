@@ -29,7 +29,7 @@ library(ggplot2)
 
 We have [theme aggregation](theme_agg.qmd), [temporal_aggregation](temporal_agg.qmd), and [spatial aggregation](spatial_agg.qmd) shown separately for in-depth looks at their meaning and capability. Here, we focus on the typical use-case of interleaved aggregation along multiple dimensions. We do not get into all the different options and [syntax](aggregation_syntax.qmd) as they are covered in those other documents. In use, `multi_aggregate()` is typically not called directly, instead, \[read_and_agg\](read_and_agg.qmd) while providing data read-in to allow just passing paths, allows for parallelisation, and maintains data provenance and metadata. Because `multi_aggregate()` provides the core aggregation functionality, we discuss it here.
 
-All multi-step aggregation in [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) operates on the same core function and use similar principles- take a list of aggregation sequences, and aggregate each step according to a list of aggregation functions. Here, we show how `multi_aggregate` allows us to interleave the dimensions along which we aggregate, including auto-detecting which dimension we're operating on.
+All multi-step aggregation in [{HydroBOT}](https://github.com/galenholt/HydroBOT) operates on the same core function and use similar principles- take a list of aggregation sequences, and aggregate each step according to a list of aggregation functions. Here, we show how `multi_aggregate` allows us to interleave the dimensions along which we aggregate, including auto-detecting which dimension we're operating on.
 
 Fundamentally, `multi_aggregate` wraps `theme_aggregate()`, `temporal_aggregate()`, and `spatial_aggregate()` with data organisation and tracking of what the previous level of aggregation was to maintain proper grouping as they alternate. This provides critical functionality to prevent accidental collapse along multiple dimensions simultaneously, and also allows grouping through part of the aggregation sequence (see [here](pseudo_spatial_group_until.qmd)). These internal functions wrap `general_aggregate` with some data arrangement specific to the dimension they aggregate along, such as stripping and re-adding geometry.
 
@@ -41,7 +41,7 @@ Any step in the aggregation sequence can have multiple aggregations (e.g. calcul
 
 ## Demonstration setup
 
-First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](/controller/controller_overview.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/MDBAuth/HydroBOT) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
+First, we need to provide a set of paths to point to the input data, in this case the outputs from the EWR tool for the small demonstration, created by [a controller notebook](/controller/controller_overview.qmd). Spatial units could be any arbitrary polygons, but we use those provided by [{HydroBOT}](https://github.com/galenholt/HydroBOT) for consistency, which also provides the spatial locations of the gauges in `bom_basin_gauges`.
 
 ```{r}
 project_dir <- "hydrobot_scenarios"
@@ -54,7 +54,7 @@ ewr_results <- file.path(project_dir, "module_output", "EWR")
 This will be attached to metadata, typically. For this demonstration, we just use it for plot clarity and the data is simple.
 
 ```{r}
-multipliers <- c(1.1, 1.5, 2, 3, 4)
+multipliers <- c(4)
 
 scenemults <- c(1 / rev(multipliers), 1, multipliers)
 
@@ -145,6 +145,10 @@ By default the data column has a very long name, which provides a record of its 
 
 The default option is to return only the final outcome, which is far cheaper for memory, but doesn't say how we got that answer.
 
+::: callout-tip
+HydroBOT can aggregate more than one column at a time if they use the same aggregation sequence. We demonstrate that here, with `aggCols = c("frequency_achieved", "ewr_achieved")` . We could also include any other outcome column if desired.
+:::
+
 ```{r}
 #| message: false
 #| warning: false
@@ -152,7 +156,7 @@ tsagg <- multi_aggregate(
   dat = ewrdata,
   causal_edges = causal_ewr,
   groupers = "scenario",
-  aggCols = "ewr_achieved",
+  aggCols = c("ewr_achieved", "frequency_achieved"),
   aggsequence = aggseq,
   funsequence = funseq,
   auto_ewr_PU = TRUE,
@@ -528,7 +532,7 @@ Tracking history in column names is unweildy, but describes exactly what the num
 names(multi_functions)[ncol(multi_functions)-1]
 ```
 
-This says the values in this column are the `5-year targets`, calculated as the arithmetic mean of `Objectives`, which were the arithmetic mean of `Specific goals`, which were calculated from `env_obj` as limiting factors, which were obtained from the `ewr_code` as limiting factors, with those were calculated from the `ewr_code_timing` as compensating factors, which were calculated from the time-average of the original data.
+This says the values in this column are the `5-year targets`, calculated as the arithmetic mean of `Objectives`, which were the arithmetic mean of `Specific goal`, which were calculated from `env_obj` as limiting factors, which were obtained from the `ewr_code` as limiting factors, with those were calculated from the `ewr_code_timing` as compensating factors, which were calculated from the time-average of the original data.
 
 It may be easier to think about the meaning of the names from the other direction- `ewr_achieved` were aggregated from the yearly to the full timeseries as an average, and then `ewr_code_timing` into `ewr_code` as Compensating Factors, then into `env_obj` as limiting factors- for the `env_obj` to pass, all `ewr_code`s contributing to it must pass. Then the `env_obj`s were aggregated into `Specific_goal`, again as limiting factors, so to meet a goal, all contributing `env_obj` must pass. Those `Specific_goal`s were then aggregated into `Objectives` with the arithmetic mean, so the value for an `Objective` is then the average of the contributing `Specific_goal`s. Similarly, the 5-year targets were obtained by averaging the `Objective`s contributing to them.
 

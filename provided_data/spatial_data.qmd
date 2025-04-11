@@ -15,7 +15,7 @@ library(ggplot2)
 
 ## Visualizing spatial data from HydroBOT
 
-The [{HydroBOT}](https://github.com/MDBAuth/HydroBOT){style="font-size: 11pt;"} package provides a standard set of spatial data commonly needed for analyses in the Murray-Darling Basin. Here, we provide visualisation of these datasets.
+The [{HydroBOT}](https://github.com/galenholt/HydroBOT){style="font-size: 11pt;"} package provides a standard set of spatial data commonly needed for analyses in the Murray-Darling Basin. Here, we provide visualisation of these datasets.
 
 The datasets are `bom_basin_gauges` (points), and `basin` (the MDB as a single polygon), `sdl_units`, `resource_plan_areas`, `cewo_valleys`, `planning_units`, and `basin_rivers`.
 

@@ -67,7 +67,7 @@ It takes -forever- to do a type translation on the `DATETIME` column in the gaug
 
 ## Spatial datasets
 
-We use spatial datasets provided by [{HydroBOT}](https://github.com/MDBAuth/HydroBOT), which creates a standard set in `data_creation/spatial_data_creation.qmd`. These are visualised in [a separate notebook](../provided_data/spatial_data.qmd). Relevant to this scenario creation, we are interested in the gauges, (`HydroBOT::bom_basin_gauges`) since this is what were contained in the EWR tool. We use the `sdl_units` dataset to obtain a subset of gauges for these simple scenarios. Relevant to the case study- the original polygon used was the Macquarie-Castlereagh in the resource_plan_areas, though we seem to use sdl units elsewhere, so I'll use them here.
+We use spatial datasets provided by [{HydroBOT}](https://github.com/galenholt/HydroBOT), which creates a standard set in `data_creation/spatial_data_creation.qmd`. These are visualised in [a separate notebook](../provided_data/spatial_data.qmd). Relevant to this scenario creation, we are interested in the gauges, (`HydroBOT::bom_basin_gauges`) since this is what were contained in the EWR tool. We use the `sdl_units` dataset to obtain a subset of gauges for these simple scenarios. Relevant to the case study- the original polygon used was the Macquarie-Castlereagh in the resource_plan_areas, though we seem to use sdl units elsewhere, so I'll use them here.
 
 # Subset the gauges
 
@@ -331,4 +331,3 @@ jsonlite::write_json(scenario_meta,
   path = file.path(hydro_dir, "scenario_metadata.json")
 )
 ```
-

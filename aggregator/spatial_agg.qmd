@@ -93,7 +93,7 @@ This provides a spatially-referenced (to gauge) theme-aggregated tibble to use t
 
 ## Spatial inputs (polygons)
 
-Spatial aggregation requires polygons to aggregate into, and we want the capability to do that several times. The user can read in any desired polygons with `sf::read_sf(path/to/polygon.shp)`, but here we use those provided in the standard set with {HydroBOT}. We'll use SDL units, catchments (from CEWO), and the basin to show how the aggregation can have multiple steps with polygons that may not be nested (though care should be taken when that is the case).
+Spatial aggregation requires polygons to aggregate into, and we want the capability to do that several times. The user can read in any desired polygons with `sf::read_sf(path/to/polygon.shp)`, but here we use those provided in the standard set with {HydroBOT}. We'll use SDL units, catchments, and the basin to show how the aggregation can have multiple steps with polygons that may not be nested (though care should be taken when that is the case).
 
 # Examples
 
@@ -272,7 +272,11 @@ simplepolypoly |>
 
 ### Non-nested
 
-Aggregating from SDL units to CEWO valleys requires addressing issues of overlaps among the various polygons. As such, it makes a good test case that catches issues with the intersection of polygons that might not happen with a simpler set of polygons @fig-cewo-sdl .
+Aggregating from SDL units to catchments (`cewo_valleys`) requires addressing issues of overlaps among the various polygons. As such, it makes a good test case that catches issues with the intersection of polygons that might not happen with a simpler set of polygons @fig-cewo-sdl .
+
+::: callout-note
+The name `cewo_valleys` reflects this dataset's original name and provenance from the Commonwealth Environmental Water Office.
+:::
 
 ::: callout-caution
 The aggregation process for multiple spatial levels works the same whether or not the smaller levels nest into the larger, but more care should be taken (and more explanation is needed) in the nonnested case.
@@ -280,7 +284,7 @@ The aggregation process for multiple spatial levels works the same whether or no
 
 ```{r}
 #| label: fig-cewo-sdl
-#| fig-cap: CEWO valleys (coloured lines) and SDL units (coloured fills) alone (a & b) and overlain (c), showing these are not nested, but instead are intersecting polygons.
+#| fig-cap: Catchments (coloured lines; `cewo_valleys`) and SDL units (coloured fills) alone (a & b) and overlain (c), showing these are not nested, but instead are intersecting polygons.
 #| 
 overlay_cewo_sdl <- ggplot() +
   geom_sf(data = sdl_units, aes(fill = SWSDLName), color = NA, alpha = 0.5) +
@@ -291,7 +295,7 @@ overlay_cewo_sdl <- ggplot() +
 valleys <- ggplot() +
   geom_sf(data = cewo_valleys, aes(color = ValleyName), fill = "white") +
   theme(legend.position = "none") +
-  ggtitle('cewo_valleys')
+  ggtitle('catchments')
 
 sdls <- ggplot() +
   geom_sf(data = sdl_units, aes(fill = SWSDLName), alpha = 0.5) +
@@ -316,7 +320,7 @@ To better see the many-to-many chopping we get with this particular pair of inte
 
 ```{r}
 #| label: fig-sdl-valley-intersect
-#| fig-cap: SDL units intersected with CEWO valleys and split to allow aggregation
+#| fig-cap: SDL units intersected with catchment (`cewo_valleys`) and split to allow aggregation
 nvorig <- ggplot() +
   geom_sf(data = dplyr::filter(sdl_units, SWSDLName == "Victorian Murray"))
 
@@ -362,10 +366,10 @@ nestedpolypoly <- spatial_aggregate(
 nestedpolypoly
 ```
 
-Those are now in the CEWO valleys, with values from the intersecting parts of the sdl_units.
+Those are now in the catchments (`cewo_valleys`), with values from the intersecting parts of the `sdl_units`.
 
 ::: callout-warning
-Even valleys with only a small part of an sdl_unit have values here, illustrating one of the dangers of such non-nested aggregations.
+Even catchments with only a small part of an sdl_unit have values here, illustrating one of the dangers of such non-nested aggregations.
 :::
 
 ```{r}

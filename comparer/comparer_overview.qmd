@@ -12,7 +12,7 @@ There is quite a lot of flexibility built into all of the comparer, because diff
 
 While this is called the 'Comparer' and most plots use the function `plot_outcomes()`, it also contains other functionality related to analysis generally, and can produce plots that do not include comparisons or outcomes, e.g. [hydrographs](hydrographs.qmd) to simply illustrate historical flows.
 
-Nearly all plots of outcomes are made with `plot_outcomes`, including [bars](bar_plots.qmd), [lines](line_plots.qmd), [heatmaps](heatmap.qmd), and [maps](maps.qmd). This is because at their foundation, they area all plotting a quantitative outcome with grouping of some sort. The data preparation is the same across all of them, as well as many of the arguments to `ggplot()`.
+Nearly all plots of outcomes are made with `plot_outcomes`, including [bars](bar_plots.qmd), [lines](line_plots.qmd) (including [timeseries](timeseries.qmd)), [heatmaps](heatmap.qmd), and [maps](maps.qmd). This is because at their foundation, they area all plotting a quantitative outcome with grouping of some sort. The data preparation is the same across all of them, as well as many of the arguments to `ggplot()`.
 
 Nearly all plots (with the current exception of the causal networks) are made internally with `ggplot2` and return `ggplot2` objects, which can easily be further modified. The plot functions here wrap the ggplot2 to standardise appearance and data preparation and ensure dimensions are handled appropriately. Though it can be annoying to not use `ggplot()` directly to make the plots, one **MAJOR** advantage of the plotting function here is that any data changes that clean it for a given plot aren't preserved, and so it's far easier to keep the data clean, know what the data is, and avoid accidental overwriting or mislabeling of data. Further, the internal data manipulation remains the same whether the outcome is plotted as a y-axis, color, etc or the plot type changes.
 
@@ -26,20 +26,20 @@ Unlike calls to bare ggplot, *data-variable* names in arguments should generally
 
 # Comparisons
 
-Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes, as well as aggregation sequences. It can do these comparisons visually (e.g. plotting raw values next to each other), but also calculate comparison values and plot these. There are a few primary sorts of plots,
+Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes, as well as aggregation sequences. It can do these comparisons visually (e.g. plotting raw values next to each other), but also calculate comparison values and plot these. There are a few primary sorts of plots, all of which focus on plotting quantitative outcomes.
 
--   Quantitative outcome plots (values on y - 1d)
+-   Quantitative outcome values on y
 
     -   [Bar](bar_plots.qmd)
 
     -   [Line](line_plots.qmd)
 
-    -   Timeseries
+    -   [Timeseries](timeseries.qmd)
 
-        -   [hydrographs](hydrographs.qmd),
-        -   Write pages for other variables
+        -   [hydrographs](hydrographs.qmd)
+        -   [outcomes](timeseries.qmd)
 
--   Quantitative outcome plots (values in color - 2d)
+-   Quantitative outcome values as colour
 
     -   [Maps](maps.qmd)
 
@@ -87,7 +87,7 @@ scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |>
   tibble::as_tibble()
 ```
 
-To scale flow, we apply nine flow multipliers, ranging from 0.5 to 2.0, to the historical hydrographs (SI @tbl-scenarios). We refer to these as 'climate' scenarios, reflecting a common representation where entire hydrographs might shift to represent climate change. To achieve pulsed change for each of the 'climate' scenarios, four flow additions were applied including 1) no addition (baseline), 2) addition of 250 ML/d, 3) addition of 6500 ML/d, and 4) addition of 12000 ML/d (@tbl-scenarios). These additional flows were added throughout the period of September to December. We refer to these scenarios as 'climate adaptations' because management options are often available in the form of altering water availability for short time periods through mechanisms like water releases, though the options here do not represent proposed actions. These scenarios should not be interpreted as potential climate impacts or adaptations, but instead as different ways flows might change (multiplicative or additive) and different magnitudes of change.
+To scale flow, we apply nine flow multipliers, ranging from 0.5 to 2.0, to the historical hydrographs (@tbl-scenarios). We refer to these as 'climate' scenarios, reflecting a common representation where entire hydrographs might shift to represent climate change. To achieve pulsed change for each of the 'climate' scenarios, four flow additions were applied including 1) no addition (baseline), 2) addition of 250 ML/d, 3) addition of 6500 ML/d, and 4) addition of 12000 ML/d (@tbl-scenarios). These additional flows were added throughout the period of September to December. We refer to these scenarios as 'climate adaptations' because management options are often available in the form of altering water availability for short time periods through mechanisms like water releases, though the options here do not represent proposed actions. These scenarios should not be interpreted as potential climate impacts or adaptations, but instead as different ways flows might change (multiplicative or additive) and different magnitudes of change.
 
 ```{r}
 #| label: tbl-scenarios

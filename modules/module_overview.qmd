@@ -1,0 +1,11 @@
+---
+title: "Module overview"
+---
+
+'Modules' or 'response models' capture the response of various outcomes to hydrology (and in future, other drivers). They are expected to be written by subject-matter experts, and are likely to target a range of outcomes across themes. They will typically target granular outputs, e.g. the hydrologic indicators at gauges in the [Environmental Water Requirements (EWR) tool](https://pypi.org/project/py-ewr/). Moreover, they are likely to be written in different languages and for different purposes. A key goal of HydroBOT is to unify these approaches into a common framework, and allow processing and integration for management decision making. As such, HydroBOT maintains a flexible general structure able to accept a range of datasets given a small set of requirements. It also provides functionality to handle idiosyncracies in that data (e.g. [pseudo-spatial aggregation](/aggregator/pseudo_spatial_group_until.qmd)) and, for integrated modules, can automate detection and handling of those idiosyncracies.
+
+-   Modules might be fully-integrated (as is only the case for the EWR tool currently); see [additional information about the EWR module](ewr_overview.qmd).
+
+-   The toolkit can also proceed from the outputs of unintegrated modules if necessary, as demonstrated [here](/aggregator/user_module.qmd).
+
+-   Integrating new modules will depend on their structure and particular needs, but simple pseudocode describing the necessary functions is provided [here](integrating_new.qmd).

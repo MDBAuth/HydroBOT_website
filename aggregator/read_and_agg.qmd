@@ -63,7 +63,7 @@ list.files(ewr_results, recursive = TRUE)
 This will be attached to metadata, typically. For this demonstration, we just use it for plot clarity and the data is simple.
 
 ```{r}
-multipliers <- c(1.1, 1.5, 2, 3, 4)
+multipliers <- c(4)
 
 scenemults <- c(1 / rev(multipliers), 1, multipliers)
 
@@ -112,6 +112,10 @@ funseq <- list(
 
 Now, we use `read_and_agg()` to read the data in, aggregate it, and save it out. We also return it here for making some simple example plots. Rather than using `auto_ewr_PU = TRUE`, we use `group_until` and `pseudo_spatial` as defined in more detail [elsewhere](pseudo_spatial_group_until.qmd).
 
+::: callout-tip
+HydroBOT can aggregate more than one column at a time if they use the same aggregation sequence. We demonstrate that here, with `aggCols = c("frequency_achieved", "ewr_achieved")` . We could also include any other outcome column if desired.
+:::
+
 ```{r}
 agged_dat <- read_and_agg(
   datpath = ewr_results,
@@ -119,7 +123,7 @@ agged_dat <- read_and_agg(
   geopath = bom_basin_gauges,
   causalpath = causal_ewr,
   groupers = "scenario",
-  aggCols = "ewr_achieved",
+  aggCols = c("ewr_achieved", "frequency_achieved"),
   group_until = list(
     SWSDLName = is_notpoint,
     planning_unit_name = is_notpoint,

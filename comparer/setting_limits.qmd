@@ -47,7 +47,7 @@ To make visualization easier, the SDL units data is given a grouping column that
 
 If we had used multiple aggregation functions at any step, we should filter down to the one we want here, but we only used one for this example.
 
-For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2). 
+For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2).
 
 ```{r}
 scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
@@ -128,7 +128,7 @@ plot_outcomes(
   ggtitle("Default fish limits")
 
 orig_bar_bird <- basin_to_plot |> 
-  filter(Target == 'Waterbird') |> 
+  filter(Target == 'Waterbirds') |> 
 plot_outcomes(
   outcome_col = "ewr_achieved",
   x_col = 'climate_code',
@@ -151,7 +151,7 @@ limit_bar_fish <- basin_to_plot |>
   ggtitle("Adjusted fish limits")
 
 limit_bar_bird <- basin_to_plot |> 
-  filter(Target == 'Waterbird') |> 
+  filter(Target == 'Waterbirds') |> 
   plot_outcomes(
   outcome_col = "ewr_achieved",
   x_col = 'climate_code',
@@ -174,7 +174,7 @@ We can do similar things for color values on a continuous scale, here demonstrat
 
 ```{r}
 orig_basin <- basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
@@ -188,7 +188,7 @@ orig_basin <- basin_to_plot |>
   ggtitle("Default limits")
 
 limit_basin <- basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
@@ -215,7 +215,7 @@ When setting midpoints, HydroBOT alerts to situations where the top and bottom a
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
@@ -229,11 +229,11 @@ basin_to_plot |>
     )
 ```
 
-We can set the midpoints and the limits with three values, here using somethign other than 0.5 so it's obvious we've changed something). Note that to get the midpoint to work, the scale needs to extend, but it will do this consistently to have the same spacing up and down.
+We can set the midpoints and the limits with three values, here using something other than 0.5 so it's obvious we've changed something). Note that to get the midpoint to work, the scale needs to extend, but it will do this consistently to have the same spacing up and down.
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
@@ -253,7 +253,7 @@ For the auto with difference, we use a diverging palette and get
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     plot_type = "map",
@@ -274,7 +274,7 @@ And for relative
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     plot_type = "map",
@@ -302,7 +302,7 @@ diff2 <- function(x,y) {
 }
 
 new_diff_default <- basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     plot_type = "map",
@@ -319,7 +319,7 @@ new_diff_default <- basin_to_plot |>
   ) + ggtitle('Default limits')
 
 new_diff_adj <- basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     plot_type = "map",
@@ -344,7 +344,7 @@ Even if the limits would generally be auto-set (e.g. with `difference`), perhaps
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbird')) |> # reduce the number of levels for clarity
+  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
   plot_outcomes(
     outcome_col =  "ewr_achieved",
     plot_type = "map",

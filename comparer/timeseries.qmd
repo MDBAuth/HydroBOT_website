@@ -1,0 +1,192 @@
+---
+title: "Timeseries"
+---
+
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+make_ewr_output()
+```
+
+```{r}
+#| message: false
+library(HydroBOT)
+library(dplyr)
+library(ggplot2)
+```
+
+```{r}
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, 'hydrographs')
+ewr_results <- file.path(project_dir, "module_output", "EWR")
+```
+
+The output data is often temporal, hence the use of [temporal aggregation](/aggregator/temporal_aggregation.qmd). However, visualising change through time can be incredibly powerful, and so leaving that temporal aggregation off (or aggregating to coarser timesteps, e.g. from years to decades or days to years) allows these sorts of analyses. Here, we demonstrate aggregating along the theme and spatial dimensions while retaining years to yield timeseries of various 'theme' levels at various spatial scales. The examples here are only a small number of the potential ways of plotting timeseries available from `plot_outcomes()`, but illustrate the key feature of using `date` as either a facet or x-axis.
+
+### Scenario information
+
+We use the scenarios provided by HydroBOT:
+
+```{r}
+multipliers <- c(4)
+
+scenemults <- c(1 / rev(multipliers), 1, multipliers)
+
+scenenames <- c(
+  paste0("down", as.character(rev(multipliers))),
+  "base",
+  paste0("up", as.character(multipliers))
+) |>
+  stringr::str_replace("\\.", "_")
+
+
+scenarios <- tibble::tibble(scenario = scenenames, delta = scenemults)
+
+scene_pal <- make_pal(unique(scenarios$scenario), palette = "ggsci::nrc_npg", refvals = "base", refcols = "black")
+```
+
+### Aggregation sequences
+
+Here, we use a similar aggregation sequence as for [other](/aggregator/using_multi_aggregate.qmd) [examples](/aggregator/read_and_agg.qmd), but without the first step of temporal aggregation over years. Instead, we keep years in the data (though we could also aggregate to other timesteps, see [here](/aggregator/temporal_agg.qmd)).
+
+```{r}
+aggseq <- list(
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Target = c("env_obj", "Target"),
+  basin = basin
+)
+
+funseq <- list(
+  ewr_code = "CompensatingFactor",
+  env_obj = "ArithmeticMean",
+  sdl_units = "ArithmeticMean",
+  Target = "ArithmeticMean",
+  basin = 'SpatialWeightedMean'
+  )
+```
+
+### Do the aggregation
+
+Now, we use `read_and_agg()` to read the data in, aggregate it, and just return it here for making the plots. Rather than using `auto_ewr_PU = TRUE`, we use `group_until` and `pseudo_spatial` as defined in more detail [elsewhere](/aggregator/pseudo_spatial_group_until.qmd).
+
+```{r}
+agged_dat <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  group_until = list(
+    SWSDLName = is_notpoint,
+    planning_unit_name = is_notpoint,
+    gauge = is_notpoint
+  ),
+  pseudo_spatial = "sdl_units",
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE
+)
+```
+
+Now, we have temporal data, and we can visualise that in different ways. There are, as usual, many ways we might present this data, depending on the goal. Two obvious options are timeseries lines and maps.
+
+## Spatial changes through time (maps)
+
+Maps can show visually how outcomes change across both space and time, but have limited ability to compare scenarios, multiple outcomes, and multiple times due to excessive dimensionality.
+
+For a single small-scale objective (otherwise there are too many dimensions):
+
+```{r}
+#| message: false
+agged_dat$sdl_units |>
+  dplyr::filter(env_obj %in% c("EF1")) |>
+  dplyr::left_join(scenarios) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::lapaz"),
+    pal_direction = -1,
+    facet_col = "date",
+    facet_row = "scenario",
+    sceneorder = c("down4", "base", "up4"),
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "grey90"
+    )
+  )
+```
+
+Target groups through time, but only in the historical scenario.
+
+```{r}
+#| message: false
+agged_dat$Target |>
+  dplyr::filter(scenario == 'base') |>
+  dplyr::left_join(scenarios) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorgroups = NULL,
+    colorset = "ewr_achieved",
+    pal_list = list("scico::lapaz"),
+    pal_direction = -1,
+    facet_col = "date",
+    facet_row = "Target",
+    underlay_list = list(
+      underlay = sdl_units,
+      underlay_pal = "grey90"
+    )
+  )
+```
+
+### Timeseries
+
+As one of many possible examples, we might plot the information above as a timeseries, which allows us to include the scenarios as well.
+
+```{r}
+#| message: false
+#| warning: false
+agged_dat$Target |>
+  dplyr::left_join(scenarios) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    x_col = 'date',
+    colorset = "scenario",
+    pal_list = scene_pal,
+    facet_col = "Target",
+    facet_row = "SWSDLName"
+  )
+```
+
+And similarly, we can swap axes around (and look at a different spatial scale) for a different view of the data.
+
+```{r}
+#| message: false
+#| warning: false
+agged_dat$basin |>
+  dplyr::left_join(scenarios) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    x_col = 'date',
+    colorset = "Target",
+    facet_row = 'scenario',
+    pal_list = list("calecopal::superbloom1")
+  )
+
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```

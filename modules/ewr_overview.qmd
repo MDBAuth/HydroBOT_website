@@ -1,0 +1,147 @@
+---
+title: "EWR tool overview"
+bibliography: references.bib
+---
+
+```{r}
+library(HydroBOT)
+library(dplyr)
+library(ggplot2)
+library(patchwork)
+```
+
+The only module currently integrated into HydroBOT is the [Environmental Water Requirements (EWR) tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool is written in Python, and takes hydrographs from `r nrow(HydroBOT::get_ewr_gauges())` gauges in the Murray-Darling Basin as inputs. The EWR tool then assesses whether a suite of environmental water requirements defined by the Basin states in Long Term Watering Plans (LTWPs) are met.
+
+## EWR definitions
+
+The EWRs are defined by discharge, duration, timing, and the requirements also include frequency requirements (how many years out of 10), and inter-event durations (how long is acceptable between events). These EWRs define ecologically-relevant parts of the flow regime, and so differ between gauges due to local differences in hydrologic conditions and topography. At any given gauge or planning unit, there are typically many different EWRs. These account not only for the different flow regime components shown in @fig-flow-regime, but also several different EWRs within individual parts of the flow regime, reflecting the different ecological requirements for e.g. small freshes by different groups of organisms or life stages. There are `r nrow(HydroBOT::get_ewr_table())` requirements defined across the basin, each of which is defined in the Long-Term Watering Plans (LTWPs) produced by Basin states, [e.g. @nswdepartmentofplanningindustryandenvironment2020; @dew2020].
+
+![EWRs capture a range of flow categories with different hypothesised relationships to environmental outcomes. Figure from NSW Department of Planning and Environment, NSW Long Term Water Plans: Background Information A description of the development of the 9 LTWPs in NSW [Part C: Environmental water requirements](https://www.environment.nsw.gov.au/sites/default/files/long-term-water-plans-background-information-part-c-230052.pdf).](/images/NSW_flow_cats.png){#fig-flow-regime}
+
+## Ecological relationships
+
+Although the EWRs define hydrologic thresholds, and the EWR tool assesses only those hydrologic thresholds, they were developed based on hypothesized relationships to ecological objectives and management targets, with those links established in the LTWPs. The causal networks provided by HydroBOT for the EWR tool (`causal_ewr`) have extracted these links from the LTWPs, allowing HydroBOT to connect the outcomes of the EWR module to larger 'theme' scale outcomes.
+
+Briefly, the 'theme' scales provided in the causal networks begin with `ewr_code_timing` and `ewr_code` , which are the hydrologic thresholds themselves returned by the EWR tool. The `ewr_code_timing` are the raw outputs, but represent different 'versions' of a single EWR, and so can sometimes be collapsed to `ewr_code`. This practice is done in the examples here but is dubious. In some cases, the `_timing` versions are simply different levels of leniency, but in others they seem to represent fundamentally different checks for different anticipated outcomes.
+
+Onward, larger, theme scales include:
+
+-   `env_obj`, which are proximate environmental objectives, e.g. NF1: No loss of native fish species. The full set of code meanings are in the LTWPs.
+
+-   `Target` The large ecological groupings (Native Fish, Waterbirds, Ecosystem Function, and Native Vegetation).
+
+-   `Specific_goal` often certain species or particular ecosystem functions. Care should be taken; these are highly location-specific, but that is not well QCed.
+
+-   `Objective` typically objectives around maintaining or increasing populations or habitat
+
+-   `target_5_year_2024`, `target_10_year_2029`, `target_20_year_2039`; similar to `Objective`, but future-looking
+
+These levels are not strictly nested, and are not 1:1 relationships. It is common for several 'ewr_code's to link to each 'env_obj', and each 'ewr_code' usually links to more than one 'env_obj'. Thus, while we refer to 'aggregation', it is possible for the number of units to grow as we move up the causal network. An example for a single gauge is shown here, from `ewr_code` to `env_obj` to `Specific_goal` to `Target` , as well as from `env_obj` to `target_5_year_2024`. In practice, the set of levels and their order should be determined by the question being asked. For more details about causal networks and illustrations with the EWR network, see [here](/provided_data/causal_overview.qmd).
+
+```{r}
+#| message: false
+edges <- make_edges(
+  dflist = causal_ewr,
+  fromtos = list(
+    c("ewr_code", "env_obj"),
+    c("env_obj", "Specific_goal"),
+    c("Specific_goal", "Target"),
+    c("env_obj", "target_5_year_2024")
+  ),
+  gaugefilter = "409025"
+)
+nodes <- make_nodes(edges)
+default_network <- make_causal_plot(nodes, edges, render = FALSE)
+DiagrammeR::render_graph(default_network)
+```
+
+## Spatial context
+
+Some gauges provide information about conditions in multiple *planning units* (fine-scaled spatially-defined water plannning areas, predominantly in New South Wales) and *sustainable diversion limit (sdl) units*, which are approximately subcatchments within the Basin and define a larger planning area. This information sharing from gauges to other units was the driving force to provide [non-spatial joins of spatial data](/aggregator/pseudo_spatial_group_until.qmd) in HydroBOT.
+
+```{r}
+#| label: fig-gauge-sdl-pu
+#| fig-cap: Gauges in the EWR tool (points) superimposed on SDL units (a) and planning units (b). Points are colored by the number of larger units they are associated with; typically one but sometimes up to 2 sdl units or 10 planning units.  
+
+
+eg <- get_ewr_gauges()
+
+etp <- eg |> 
+    sf::st_drop_geometry() |> 
+  select(gauge, planning_unit_name) |> 
+  distinct() |> 
+  summarise(n_planning = n(), .by = gauge)
+
+ets <- eg |> 
+  sf::st_drop_geometry() |> 
+  select(gauge, SWSDLName) |> 
+    distinct() |> 
+  summarise(n_sdl = n(), .by = gauge)
+
+eg <- eg |> 
+  left_join(ets, by = 'gauge') |> 
+  left_join(etp, by = 'gauge')
+
+cpal <- make_pal(as.factor(1:10), palette = 'grDevices::Viridis')
+
+sdlmap <- ggplot() +
+  geom_sf(data = sdl_units, fill = 'azure') +
+  geom_sf(data = eg, mapping = aes(color = as.factor(n_sdl))) +
+  scale_color_manual(values = cpal) +
+  theme_hydrobot() +
+  labs(color = 'Number sdl units')
+
+pumap <- ggplot() +
+  geom_sf(data = planning_units, fill = 'azure') +
+  geom_sf(data = eg, mapping = aes(color = as.factor(n_planning))) +
+  scale_color_manual(values = cpal) +
+  theme_hydrobot() + 
+  labs(color = 'Number planning units')
+
+sdlmap / pumap +
+  plot_annotation(tag_levels = 'a')
+```
+
+## EWR tool and HydroBOT
+
+HydroBOT analyses proceed by feeding the EWR tool a set of hydrographs, which then get run through the EWR tool. The outputs are then processed by the Aggregator and Comparer. These approaches form the core of the demonstrations on this website, as most examples are easiest with the real examples we can run through the included EWR tool module.
+
+While the EWR tool can pull hydrographs on the fly, it uses a different set of functions to do so than those it uses to process scenarios and modeled data. Thus, HydroBOT tends to run saved hydrographs representing scenarios. If purely historical data will be run, it is easiest to pre-download it with e.g. [hydrogauge](https://github.com/galenholt/hydrogauge) (R) or the [mdba gauge-getter](https://pypi.org/project/mdba-gauge-getter/) (Python).
+
+::: callout-tip
+For an example workflow to assess ratios of EWR achievement across scenarios (the 'frequency ratio' but also a ratio of achievement based on frequency *and* interevents), see [here](/workflows/ewr_ratios.qmd).
+:::
+
+### EWR helpers in HydroBOT
+
+HydroBOT provides some useful functions to access information about the EWR tool and clean it up:
+
+-   `get_ewr_version()` obtains the currently installed version of py-ewr
+
+-   `get_causal_ewr()` obtains the causal network from py-ewr
+
+    -   Also see the HydroBOT data `causal_ewr`
+
+-   `get_ewr_gauges()` obtains the gauges used by py-ewr
+
+-   `get_ewr_table()` obtains the 'parameter sheet' in py-ewr
+
+-   `assess_ewr_achievement()` assesses the yearly 'events' returned by py-ewr according to frequency and interevent requirements, allowing analysis of the raw events as well as those additional requirements
+
+-   `cleanewrs()` a simple text cleaner of the EWR outputs
+
+    -   There are a number of more specific cleaners not discussed here, see the [function reference](https://galenholt.github.io/HydroBOT/reference/#module-helpers).
+
+### EWR assessment
+
+The EWR tool py-ewr has potentially several output files. The standard one to use with HydroBOT is the `yearly` output, which returns one row per year per EWR. The key outcome column is `event_years`, which indicates whether the discharge, timing, and duration of flows met that EWR in that year. HydroBOT then can perform some further assessment, checking whether those yearly achievements met frequency and interevent requirements. This assessment (done by `assess_ewr_achievement()`, which gets called when the `type = 'achievement'` argument is used in `read_and_agg()` or other EWR-read-in functions (e.g. `prep_ewr_output()`), returns three new 'achievement' columns in addition to the `event_years` column which is also passed through:
+
+-   `frequency_achieved`- did the `event_years` meet target frequencies?
+
+-   `interevent_achieved`- was the interevent period below or equal to the maximum interevent period?
+
+-   `ewr_achieved`- were both the frequency and interevent conditions met?
+
+HydroBOT checks the frequency conditions with a 10-year lookback window for each year, and so if, for example, an EWR must have a frequency of 0.8, it asks whether it has been met in 8 of the most recent 10 years, rather than 80% of the entire timeseries. Thus, we can obtain an 'achievement' value for each year and avoid potentially major issues caused by patterns within the timeseries that would otherwise be masked. This reflects the reality of the system as well- whether the frequency of an event has been sufficient is a property of the years up to each year, not the whole series. I.e. these are not *aggregations*, but *assessments of condition*.
+
+If temporal aggregtion is desired over the timeseries, these yearly assessments should then be aggregated with the [aggregator](/aggregator/aggregation_overview.qmd). This aggregation can proceed with the user's choice of outcome columns; `event_years`, `frequency_achieved`, `interevent_achieved`, or `ewr_achieved`.

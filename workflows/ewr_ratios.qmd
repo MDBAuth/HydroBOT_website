@@ -1,0 +1,580 @@
+---
+title: "EWR ratios"
+---
+
+```{r}
+#| include: false
+source("R/helpers.R")
+make_hydro_csv()
+```
+
+```{r}
+#| message: false
+library(HydroBOT)
+library(dplyr)
+```
+
+This document is an example script that produces first the 'Frequency Ratio', i.e. the ratio of passing in a given scenario compared to a baseline. It *also* (@sec-full-ewr) does the same thing (ratio to the baseline) with the full EWR achievement dependent on frequency and interevent conditions.
+
+## Approach
+
+The key here is that we identify the type of outcome we want to model (EWR achievement), aggregate it along the various dimensions, as seen in all [aggregation demonstrations](/aggregator/aggregation_overview.qmd), and then compare it with `baseline_compare()` (inside `plot_outcomes()`). This models the achievement at any level of space, time, and theme, and then for that level, compares its achievement as a ratio with the baseline. E.g. we get fish achievement in each sdl unit in each scenario, and then ask about the ratio of that achievement between scenarios.
+
+## Outcomes
+
+The output of EWR runs contains the information we need to compare several different kinds of outcomes- it has yearly event occurrence, as well as frequency conditions. When we read it in using the argument `type = 'achievement'`, `prep_ewr_output()` (inside `read_and_agg()`) will calculate whether the frequency of events within the last 10 years is above the required frequency (yielding a `frequency_achieved` column), as well as an `interevent_achieved` column.
+
+This yields four output columns capturing different EWR conditions and achievements.
+
+The ultimate `ewr_achieved` column is 1 for a year when
+
+1.  An event occurred in that year (`event_years`) *and*
+
+2.  The frequency of events in the preceding 10 years is \>= the target frequency (`frequency_achieved`) *and*
+
+3.  The interevent period is \<= the maximum interevent period (`interevent_achieved`).
+
+## General setup
+
+### Directories and EWR runs
+
+Here, we will use the example hydrographs that come with HydroBOT.
+
+```{r}
+#| message: false
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, 'hydrographs')
+ewr_results <- file.path(project_dir, "module_output", "EWR")
+agg_results <- file.path(project_dir, "aggregator_output")
+```
+
+Define their scenarios
+
+```{r}
+multipliers <- c(4)
+
+scenemults <- c(1 / rev(multipliers), 1, multipliers)
+
+scenenames <- c(
+  paste0("down", as.character(rev(multipliers))),
+  "base",
+  paste0("up", as.character(multipliers))
+) |>
+  stringr::str_replace("\\.", "_")
+
+
+scenarios <- tibble::tibble(scenario = scenenames, delta = scenemults)
+
+scene_pal <- make_pal(unique(scenarios$scenario), palette = "ggsci::nrc_npg", refvals = "base", refcols = "black")
+```
+
+Run the EWR tool
+
+```{r}
+#| message: false
+#| label: run-ewr
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  outputType = list("yearly"),
+  returnType = list("yearly")
+)
+```
+
+### Aggregation
+
+We can aggregate in whatever sequence we want. This will push the achievements through the temporal, spatial, and causal network aggregations, yielding outcomes at each of those scales as we have done in all other [demonstrations](/aggregator/aggregation_overview.qmd).
+
+::: callout-tip
+HydroBOT can aggregate more than one column at a time if they use the same aggregation sequence. We take advantage of that here, with `aggCols = c("frequency_achieved", "ewr_achieved")` to let us look at the ratios between scenarios for the frequency achievement and achievement considering both frequency and interevent conditions. We could also include `event_years` and `interevent_achievement` (or any other outcome column) if desired.
+:::
+
+```{r}
+#| label: aggseqs
+aggseq <- list(
+  all_time = "all_time",
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Target = c("env_obj", "Target"),
+  mdb = basin,
+  target_5_year_2024 = c("Target", "target_5_year_2024")
+)
+
+funseq <- list(
+  all_time = "ArithmeticMean",
+  ewr_code = "CompensatingFactor",
+  env_obj = "ArithmeticMean",
+  sdl_units = "ArithmeticMean",
+  Target = "ArithmeticMean",
+  mdb = "SpatialWeightedMean",
+  target_5_year_2024 = "ArithmeticMean"
+)
+```
+
+```{r}
+#| label: run-agg
+aggout <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = c("frequency_achieved", "ewr_achieved"),
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE,
+  savepath = agg_results
+)
+```
+
+## Frequency ratio
+
+First, we calculate a frequency ratio. Typically, we would do this inside `plot_outcomes()`, but here we show what `baseline_compare()` is doing (and this allows producing the ratio datasets directly if needed).
+
+For any level in the aggregation, we use `comp_fun = 'relative'` (we use `add_eps = 'auto'` to avoid divide-by-zero, though that decision should be interrogated- what does it mean to have infinitely better achievement?) as the function to baseline with and `base_lev = 'base'` to relativise to the scenario named 'base'. For the 'frequency ratio', we use `values_col = 'frequency_achieved'`. We need to retain relevant groupings so each env_obj is compared to itself in the different scenarios and locations, and so use `group_cols = c('env_obj', 'SWSDLName')`.
+
+```{r}
+sdl_ratio <- aggout$sdl_units |> 
+  baseline_compare(compare_col = 'scenario', 
+                   base_lev = 'base',
+                   values_col = 'frequency_achieved',
+                   group_cols = c('env_obj', 'SWSDLName'),
+                   comp_fun = 'relative',
+                   add_eps = 'auto')
+```
+
+That yields new columns `ref_frequency_achieved`, i.e. the reference value in the baseline scenario, and `relative_frequency_achieved`, i.e. the 'frequency ratio' for each EWR in each sdl unit for that scenario/baseline scenario.
+
+```{r}
+sdl_ratio
+```
+
+We can then do whatever calculations we want with that dataframe. We can also do all of this internally to `plot_outcomes()` by providing a `base_list` argument, which is often cleaner and yields fewer errors. As an example with Targets at the SDL scale, we can make:
+
+### Maps
+
+```{r}
+#| label: fig-map-relative
+#| fig-cap: Achievement ratio (judged by frequency requirements) for Target groups in sdl units. White is no change, orange are declines, and blues are increases.
+aggout$Target |>
+  plot_outcomes(
+    outcome_col =  "frequency_achieved",
+    plot_type = "map",
+    colorset = "frequency_achieved",
+    pal_list = list("ggthemes::Orange-Blue-White Diverging"),
+    facet_col = "Target",
+    facet_row = "scenario",
+    sceneorder = c('down4', 'base', 'up4'),
+    base_list = list(base_lev = "base",
+                     comp_fun = "relative",
+                     group_cols = c("Target", "polyID"),
+                     add_eps = 'auto'),
+    zero_adjust = "auto",
+    transoutcome = "log10",
+    underlay_list = list(underlay = basin, underlay_pal = "azure")
+  )
+```
+
+### Lines
+
+Or we can make lines for the env_objs or any other [plot type](/comparer/comparer_overview.qmd) we want at whatever theme scale we want. Here, we log both axes to look at multiplicative changes in water vs multiplicative changes in env_obj frequency achievement.
+
+```{r}
+#| message: false
+aggout$sdl_units |>
+  left_join(scenarios) |> 
+  plot_outcomes(
+    outcome_col =  "frequency_achieved",
+    x_col = 'delta',
+    colorset = "env_obj",
+    pal_list = list("scico::berlin"),
+    facet_col = "SWSDLName",
+    base_list = list(base_lev = "base",
+                     comp_fun = "relative",
+                     group_cols = c("env_obj", "polyID"),
+                     add_eps = 'auto'),
+    zero_adjust = "auto",
+    transoutcome = "log10",
+    transx = 'log10'
+  )
+```
+
+We can plot the outcomes for a single gauge (otherwise it gets huge) on a causal network. We start with the values for each scenario, and then follow with the ratios between them at each node.
+
+```{r}
+example_gauge <- "421001"
+
+edges <- make_edges(causal_ewr,
+  fromtos = aggseq[c('ewr_code', 'env_obj', 'Target')],
+  gaugefilter = example_gauge
+)
+
+nodes <- make_nodes(edges)
+
+# Get the values for each node
+aggvals <- extract_vals_causal(aggout,
+                               whichaggs = funseq, # Since only one agg function at each step
+                               valcol = 'frequency_achieved',
+                               targetlevels = c('ewr_code', 'env_obj', 'Target')) # Only the theme levels
+
+
+# filter to a single gauge. Multiple gauges should have separate networks or otherwise split the gauge-specific nodes. And include the larger scales pertaining to that gauge.
+
+# if we stay within the gauge, and just do value, this works
+aggvals <- aggvals |> 
+  filter(gauge == example_gauge | is.na(gauge)) |> 
+  st_drop_geometry()
+
+# join to the nodes
+nodes_with_vals <- dplyr::left_join(nodes, aggvals)
+```
+
+```{r}
+#| label: fig-network-base
+#| fig-cap: Frequency achievement in 'base' scenario
+aggNetwork_base <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "base"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "frequency_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_base)
+```
+
+```{r}
+#| label: fig-network-down
+#| fig-cap: Frequency achievement in 'down4' scenario
+aggNetwork_down <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "down4"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "frequency_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_down)
+```
+
+```{r}
+#| label: fig-network-up
+#| fig-cap: Frequency achievement in 'up4' scenario
+aggNetwork_up <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "up4"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "frequency_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_up)
+```
+
+Now we can plot the ratio of achievement for each of those nodes by calculating it with `baseline_compare()` .
+
+::: callout-tip
+We log the outcomes since it's a multiplicative change, and so 0.25x is an equivalent change to 4x on that scale.
+:::
+
+```{r}
+# This isn't strictly necessary, but it simplifies things to pre-calculate until networks are integrated into `plot_outcomes`
+basenodes <- nodes_with_vals |>
+  filter(!is.na(scenario)) |> 
+  baseline_compare(compare_col = 'scenario', 
+                   base_lev = 'base',
+                   values_col = 'frequency_achieved',
+                   group_cols = c('Name', 'NodeType', 'nodeorder'),
+                   comp_fun = 'relative',
+                   add_eps = 'auto') |>
+  mutate(logrel_frequency_achieved = log10(relative_frequency_achieved))
+```
+
+Now we have the change ratio for each node for reduced (\@fig-down-rel-network) and up (\@fig-up-rel-network)
+
+```{r}
+#| label: fig-down-rel-network
+#| fig-cap: Ratio of achievement of each node in the causal network in the 'down4' scenario compared to the 'base' scenario. Color ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases. 
+aggNetwork_down_rel <- make_causal_plot(
+  nodes = basenodes |> filter(scenario == 'down4'),
+  edges = edges,
+  setLimits = c(min(basenodes$logrel_frequency_achieved, na.rm = TRUE),
+                               0,
+                               max(basenodes$logrel_frequency_achieved, na.rm = TRUE)),
+  edge_pal = "black",
+  node_pal = list(value = "ggthemes::Orange-Blue-White Diverging"),
+  node_colorset = "logrel_frequency_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_down_rel)
+```
+
+```{r}
+#| label: fig-up-rel-network
+#| fig-cap: Ratio of achievement of each node in the causal network in the 'up4' scenario compared to the 'base' scenario. Color ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases.
+#| 
+aggNetwork_up_rel <- make_causal_plot(
+  nodes = basenodes |> filter(scenario == 'up4'),
+  edges = edges,
+  setLimits = c(min(basenodes$logrel_frequency_achieved, na.rm = TRUE),
+                               0,
+                               max(basenodes$logrel_frequency_achieved, na.rm = TRUE)),
+  edge_pal = "black",
+  node_pal = list(value = "ggthemes::Orange-Blue-White Diverging"),
+  node_colorset = "logrel_frequency_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_up_rel)
+```
+
+## Achievement ratio {#sec-full-ewr}
+
+We can do the exact same thing with overall ewr achievement that meets both frequency and interevent conditions (or any other outcome of interest).
+
+Exactly following the above, all we do is swap 'ewr_achieved' for 'frequency_achieved' to get the ratio of achievement of any outcome between scenarios.
+
+```{r}
+sdl_ratio_ewr <- aggout$sdl_units |> 
+  baseline_compare(compare_col = 'scenario', 
+                   base_lev = 'base',
+                   values_col = 'ewr_achieved',
+                   group_cols = c('env_obj', 'SWSDLName'),
+                   comp_fun = 'relative',
+                   add_eps = 'auto')
+```
+
+That yields new columns `ref_ewr_achieved`, i.e. the reference value in the baseline scenario, and `relative_ewr_achieved`, i.e. the 'achievement ratio' for each EWR in each sdl unit for that scenario/baseline scenario.
+
+```{r}
+sdl_ratio_ewr
+```
+
+We can then do whatever calculations we want with that dataframe. We can also do all of this internally to `plot_outcomes()` by providing a `base_list` argument, which is often cleaner and yields fewer errors. As an example with Targets at the SDL scale, we can make:
+
+### Maps
+
+```{r}
+#| label: fig-map-relative-ewr
+#| fig-cap: Achievement ratio (judged by frequency and interevent requirements) for Target groups in sdl units. White is no change, orange are declines, and blues are increases.
+aggout$Target |>
+  plot_outcomes(
+    outcome_col =  "ewr_achieved",
+    plot_type = "map",
+    colorset = "ewr_achieved",
+    pal_list = list("ggthemes::Orange-Blue-White Diverging"),
+    facet_col = "Target",
+    facet_row = "scenario",
+    sceneorder = c('down4', 'base', 'up4'),
+    base_list = list(base_lev = "base",
+                     comp_fun = "relative",
+                     group_cols = c("Target", "polyID"),
+                     add_eps = 'auto'),
+    zero_adjust = "auto",
+    transoutcome = "log10",
+    underlay_list = list(underlay = basin, underlay_pal = "azure")
+  )
+```
+
+### Lines
+
+Or we can make lines for the env_objs or any other [plot type](/comparer/comparer_overview.qmd) we want at whatever theme scale we want. Here, we log both axes to look at multiplicative changes in water vs multiplicative changes in env_obj EWR achievement.
+
+```{r}
+#| message: false
+aggout$sdl_units |>
+  left_join(scenarios) |> 
+  plot_outcomes(
+    outcome_col =  "ewr_achieved",
+    x_col = 'delta',
+    colorset = "env_obj",
+    pal_list = list("scico::berlin"),
+    facet_col = "SWSDLName",
+    base_list = list(base_lev = "base",
+                     comp_fun = "relative",
+                     group_cols = c("env_obj", "polyID"),
+                     add_eps = 'auto'),
+    zero_adjust = "auto",
+    transoutcome = "log10",
+    transx = 'log10'
+  )
+```
+
+We can plot the outcomes for a single gauge (otherwise it gets huge) on a causal network. We start with the values for each scenario, and then follow with the ratios between them at each node.
+
+```{r}
+example_gauge <- "421001"
+
+edges <- make_edges(causal_ewr,
+  fromtos = aggseq[c('ewr_code', 'env_obj', 'Target')],
+  gaugefilter = example_gauge
+)
+
+nodes <- make_nodes(edges)
+
+# Get the values for each node
+aggvals <- extract_vals_causal(aggout,
+                               whichaggs = funseq, # Since only one agg function at each step
+                               valcol = 'ewr_achieved',
+                               targetlevels = c('ewr_code', 'env_obj', 'Target')) # Only the theme levels
+
+
+# filter to a single gauge. Multiple gauges should have separate networks or otherwise split the gauge-specific nodes. And include the larger scales pertaining to that gauge.
+
+# if we stay within the gauge, and just do value, this works
+aggvals <- aggvals |> 
+  filter(gauge == example_gauge | is.na(gauge)) |> 
+  st_drop_geometry()
+
+# join to the nodes
+nodes_with_vals <- dplyr::left_join(nodes, aggvals)
+```
+
+```{r}
+#| label: fig-network-base-ewr
+#| fig-cap: Achievement in 'base' scenario
+aggNetwork_base <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "base"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "ewr_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_base)
+```
+
+```{r}
+#| label: fig-network-down-ewr
+#| fig-cap: Achievement in 'down4' scenario
+aggNetwork_down <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "down4"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "ewr_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_down)
+```
+
+```{r}
+#| label: fig-network-up-ewr
+#| fig-cap: Achievement in 'up4' scenario
+aggNetwork_up <- make_causal_plot(
+  nodes = dplyr::filter(
+    nodes_with_vals,
+    scenario == "up4"
+  ),
+  edges = edges,
+                 setLimits = c(0, 1),
+  edge_pal = "black",
+  node_pal = list(value = "scico::lapaz"),
+  node_pal_direction = -1,
+  node_colorset = "ewr_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_up)
+```
+
+Now we can plot the ratio of achievement for each of those nodes by calculating it with `baseline_compare()`.
+
+::: callout-tip
+We log the outcomes since it's a multiplicative change, and so 0.25x is an equivalent change to 4x on that scale.
+:::
+
+```{r}
+# This isn't strictly necessary, but it simplifies things to pre-calculate until networks are integrated into `plot_outcomes`
+basenodes <- nodes_with_vals |>
+  filter(!is.na(scenario)) |> 
+  baseline_compare(compare_col = 'scenario', 
+                   base_lev = 'base',
+                   values_col = 'ewr_achieved',
+                   group_cols = c('Name', 'NodeType', 'nodeorder'),
+                   comp_fun = 'relative',
+                   add_eps = 'auto') |>
+  mutate(logrel_ewr_achieved = log10(relative_ewr_achieved))
+```
+
+Now we have the change ratio for each node for reduced (@fig-down-rel-network) and up (@fig-up-rel-network)
+
+```{r}
+#| label: fig-down-rel-network-ewr
+#| fig-cap: Ratio of achievement of each node in the causal network in the 'down4' scenario compared to the 'base' scenario. Color ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases. 
+aggNetwork_down_rel <- make_causal_plot(
+  nodes = basenodes |> filter(scenario == 'down4'),
+  edges = edges,
+  setLimits = c(min(basenodes$logrel_ewr_achieved, na.rm = TRUE),
+                               0,
+                               max(basenodes$logrel_ewr_achieved, na.rm = TRUE)),
+  edge_pal = "black",
+  node_pal = list(value = "ggthemes::Orange-Blue-White Diverging"),
+  node_colorset = "logrel_ewr_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_down_rel)
+```
+
+```{r}
+#| label: fig-up-rel-network-ewr
+#| fig-cap: Ratio of achievement of each node in the causal network in the 'up4' scenario compared to the 'base' scenario. Color ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases.
+#| 
+aggNetwork_up_rel <- make_causal_plot(
+  nodes = basenodes |> filter(scenario == 'up4'),
+  edges = edges,
+  setLimits = c(min(basenodes$logrel_ewr_achieved, na.rm = TRUE),
+                               0,
+                               max(basenodes$logrel_ewr_achieved, na.rm = TRUE)),
+  edge_pal = "black",
+  node_pal = list(value = "ggthemes::Orange-Blue-White Diverging"),
+  node_colorset = "logrel_ewr_achieved",
+  render = FALSE
+)
+
+DiagrammeR::render_graph(aggNetwork_up_rel)
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```

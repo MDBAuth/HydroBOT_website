@@ -79,9 +79,9 @@ We can now create a minimal plot before digging back in to demo some options und
 
 # Plotting networks
 
-Plotting takes these dataframes, adds some attributes, and generates the plots. We use `make_causal_plot()` for this, which is mostly a wrapper and cleanup around functions to do final filtering of the data (`find_related_nodes()`), attach attributes/aesthetics (`node_plot_atts``()` and `causal_colors_general``()`), and construct the plot itself using {DiagrammeR}. There are also some switches around saving and printing.
+Plotting takes these dataframes, adds some attributes, and generates the plots. We use `make_causal_plot()` for this, which is mostly a wrapper and cleanup around functions to do final filtering of the data (`find_related_nodes()`), attach attributes/aesthetics (``` node_plot_atts``() ``` and ``` causal_colors_general``() ```), and construct the plot itself using {DiagrammeR}. There are also some switches around saving and printing.
 
-We will look under the hood at those later ([More options])- there's quite a bit of functionality there to do things like isolate relevant parts of the network, colour within node groups or by the [outcomes of HydroBOT](/comparer/causal_plots.qmd) zs(e.g. change in relationships between scenarios or native fish populations).
+We will look under the hood at those later ([More options])- there's quite a bit of functionality there to do things like isolate relevant parts of the network, colour within node groups or by the [outcomes of HydroBOT](/comparer/causal_plots.qmd) (e.g. change in relationships between scenarios or native fish populations).
 
 First, let's just make a simple plot of the network. By default it saves the network to an object so we can modify/use it later. We can turn that off (`returnnetwork = FALSE`), along with switches for whether to render in place and/or save as png and pdf (`save = TRUE`). If `render = TRUE`, it renders in place just fine when using as a notebook, but doesn't get picked up when the quarto renders to html (and pdf etc). So for these demonstrations, we'll use a two-step process of returning the network and then rendering it.
 

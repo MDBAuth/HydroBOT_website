@@ -51,17 +51,27 @@ file.copy(file.path(demo_webdir, "images", "architecture.eps"),
 # This is a placeholder to move conceptual figs, since it HATES spaces in names of the raw {fig} divs
 ```
 
-This website and [associated github repository](https://github.com/MDBAuth/HydroBOT) provides examples of using HydroBOT in various ways, as well as its capabilities and pitfalls. To install and use, see [get started](getting_started.qmd).
+This website and [associated github repository](https://github.com/galenholt/HydroBOT) provides examples of using HydroBOT in various ways, as well as its capabilities and pitfalls. To install and use, see [get started](getting_started.qmd).
 
 HydroBOT has several goals, and provides workflow and analysis capabilities to achieve them. It treats scenario comparison as a first-class objective, and so is structured to automate over many scenarios, performing the same processing to each, followed by comparison across scenarios (though it can run single scenarios if desired). It produces metadata files to document settings at each step, which double as runnable parameter files for reproducibility.
 
-HydroBOT is built to provide general capacity for synthesis, to then be tailored for specific analysis: what questions are being asked of the scenarios, what synthesis do they need, and how should they be compared. It is designed to be modular, incorporating many different response models, though at this point it contains only the EWR tool. It provides important guardrails for both idiosyncrasies of the EWR outputs and multidimensional scaling.
+HydroBOT is built to provide general capacity for synthesis, to then be tailored for specific analysis: what questions are being asked of the scenarios, what synthesis do they need, and how should they be compared. It is designed to be modular, incorporating many different response models, though at this point it contains only one module. It provides important guardrails for both module idiosyncrasies and multidimensional scaling.
 
 Users should consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters relevant to the particular analysis.
 
+::: callout-note
+## Website examples
+
+The majority of the examples on this website are developed with a simple set of hydrological scenarios and model ecological responses to them with the [Environmental Water Requirements (EWR) Tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool models hydrological indicators, which are then translated through causal networks to assess their impact on varying levels of ecological outcomes and management targets. Please see additional detail about the [scenarios](demo_scenarios.qmd) and the [EWR tool and associated outcome levels](/modules/ewr_overview.qmd).
+:::
+
 ## Workflow
 
-The basic workflow of HydroBOT involves identifying and selecting data inputs representing scenarios, running response models, aggregation, scaling, and onward modelling of those outputs, and finally synthesis and production of output figures, tables, and other products. In concept, the HydroBOT workflow is split into three components: the [*controller*](controller/controller_overview.qmd) which points to data and runs response models, the [*aggregator*](aggregator/aggregation_overview.qmd) which scales the outputs of those models in space, time, and along causal networks, and the [*comparer*](comparer/comparer_overview.qmd) which synthesizes and produces interpretable outputs. There are many ways to structure this workflow in practice, with examples [here](workflows/workflow_overview.qmd).
+The basic workflow of HydroBOT involves identifying and selecting data inputs representing scenarios, running response models, aggregation, scaling, and onward modelling of those outputs, and finally synthesis and production of output figures, tables, and other products. In concept, the HydroBOT workflow is split into three components: the [*controller*](controller/controller_overview.qmd) which points to data and runs response models, the [*aggregator*](aggregator/aggregation_overview.qmd) which scales the outputs of those models in space, time, and along causal networks, and the [*comparer*](comparer/comparer_overview.qmd) which synthesizes and produces interpretable outputs.
+
+::: callout-tip
+There are many ways to structure this workflow in practice, with examples of full workflows at [getting started](/getting_started.qmd) and [here](workflows/workflow_overview.qmd).
+:::
 
 ![Conceptualisation of HydroBOT architecture (blue arrows) and links to management decision making (yellow arrows). Scenarios, represented by hydrographs, reflect observed flows or modeled scenarios (produced via hydrological modelling outside HydroBOT). These hydrographs are fed in a consistent way to various response models via the HydroBOT Controller. These response models could assess response of any values of interest, here illustrated as a range of value types across environmental and human dimensions. Additional inputs of spatial data and causal networks provide grouping information for scaling via the HydroBOT Aggregator. The HydroBOT Comparer synthesizes the results into management-relevant outputs that aid decision making. This decision-making process is also supported by feedback from stakeholders, other expert advice and the social and political landscape. Water planning and policy decisions can then guide the development of scenarios to assess potential management options, which in turn can be assessed with HydroBOT.](images/Figure_1.png){#fig-tktomgmt}
 
@@ -71,40 +81,34 @@ Each of the components are discussed in more detail, with this detail used to mo
 
 -   [Controller](controller/controller_overview.qmd)
 
-    -   [in detail](controller/controller_ewr_stepthrough.qmd)
-
-    -   [simplified](controller/controller_ewr_wrapped.qmd)
-
-    -   Python notebooks exist, but are not maintained. Contact authors if needed.
-
 -   [Aggregator](aggregator/aggregation_overview.qmd)
-
-    -   [Theme and Space](aggregator/using_multi_aggregate.qmd)
-
-    -   [Theme alone with more options and plot examples](aggregator/theme_agg.qmd)
-
-    -   [Space alone with more options](aggregator/spatial_agg.qmd)- includes multilevel spatial agg into different polygons and complex aggregation functions
 
 -   [Comparer](comparer/comparer_overview.qmd)
 
-    -   [hydrographs](comparer/hydrographs.qmd)
-
-    -   [bar](comparer/bar_plots.qmd), [line](comparer/line_plots.qmd), [maps](comparer/maps.qmd), and [causal networks](comparer/causal_plots.qmd) all provide plotting of outcomes from HydroBOT
-
 ### Dependencies
 
-HydroBOT relies on external information in three main ways. First, it uses externally-defined response models, currently the [MDBA EWR tool](https://github.com/MDBAuth/EWR_tool). It also requires causal networks to link those outputs to larger-scale values. Finally, it requires the input scenarios, without which it would have nothing to model from.
+HydroBOT relies on external information in three main ways. First, it uses externally-defined response models. It also benefits from causal networks to link those outputs to larger-scale values. Finally, it requires the input scenarios, without which it would have nothing to model from.
 
--   [Causal networks](provided_data/causal_descriptive_plots.qmd)
+-   [Response models](modules/module_overview.qmd)
 
-    -   Causal networks are needed for aggregation and comparison, but are not part of the flow *per se*.
+    -   Response models estimate responses to hydrological drivers, and are typically developed outside HydroBOT by subject matter experts.
+
+-   [Causal networks](provided_data/causal_overview.qmd)
+
+    -   Causal networks are used for aggregation and comparison, but are not part of the flow *per se*.
 
 -   [Scenario creation](provided_data/scenario_creation.qmd)
 
     -   Scenario creation is not part of HydroBOT, but scenarios are needed to run HydroBOT
 
-**In use, HydroBOT expects that scenario hydrographs are available and the causal networks are defined.**
+::: callout-important
+In use, HydroBOT expects that scenario hydrographs are available and the causal networks are defined.
+:::
 
 ## Development
 
-See the [repo readme](https://github.com/MDBAuth/HydroBOT_website) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/MDBAuth/HydroBOT) repo for development of the package itself.
+See the [repo readme](https://github.com/MDBAuth/HydroBOT) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/galenholt/HydroBOT) repo for development of the package itself.
+
+## Acknowledgements
+
+HydroBOT was developed in the [climate adaptation theme](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation) of the [Murray–Darling Water and Environment Research Program](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program), a program of the [Murray-Darling Basin Authority](https://www.mdba.gov.au/). Collaboration with colleagues from Deakin University, CSIRO, and the MDBA were essential to its development and success.

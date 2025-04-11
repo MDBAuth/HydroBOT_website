@@ -14,7 +14,7 @@ make_hydro_csv()
 
 This document provides a template for running through HydroBOT in a single document, retaining everything in-memory (no intermediate saving). In general, given the time the EWR tool (and sometimes aggregation) take to run, this approach would only be taken with small sets of input data.
 
-Intermediate saving is a very simple flip of a switch, demoed in [its own doc](workflow_save_steps.qmd).
+Intermediate saving is a very simple flip of a switch, demoed in [its own doc](workflow_save_steps.qmd), which parallels this one nearly exactly with the exception of specifying an `outputType` in `prep_run_save_ewrs()` and a `savepath` in `read_and_agg()`. Saving is generally how workflows are run for large projects, and so that example is also used for the [getting started demonstration](/getting_started.qmd).
 
 Load the package
 

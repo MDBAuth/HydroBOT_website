@@ -24,7 +24,7 @@ library(dplyr)
 
 -   Many options we could set
 
--   See options at [github pages site](https://special-disco-eyonrvy.pages.github.io/){target="_blank"} for [HydroBOT_website](https://github.com/MDBAuth/HydroBOT_website){target="_blank"}
+-   See options at [HydroBOT_website](https://mdbauth.github.io/HydroBOT_website/){target="_blank"}
 
 -   Can run with minimal arguments
 

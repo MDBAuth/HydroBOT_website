@@ -12,15 +12,11 @@ website:
     - title: "Background"
       contents:
         - index.qmd
-
-        - section: "Provided spatial data"
-          contents:
-            - href: provided_data/spatial_data.qmd
-              text: "Spatial data"
+        - demo_scenarios.qmd
 
     - title: "Reference"
       contents:
-        - href: https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html
+        - href: https://galenholt.github.io/HydroBOT/reference/index.html
 
     - title: "Workflows"
       contents:
@@ -38,6 +34,8 @@ website:
 
         - section: "Examples"
           contents:
+            - href: workflows/ewr_ratios.qmd
+              text: "EWR frequency ratio"
             - href: presentation/walkthrough_presentation.qmd
               text: "Walkthrough presentation"
             - href: workflows/run_hydrobot_website.qmd
@@ -69,8 +67,6 @@ website:
               text: "Aggregation syntax"
             - href: aggregator/pseudo_spatial_group_until.qmd
               text: "Unusual grouping requirements"
-            - href: aggregator/using_multi_aggregate.qmd
-              text: "Multi-axis interleaved aggregation"
             - href: aggregator/user_causal.qmd
               text: "User-supplied causal networks"
             - href: aggregator/user_functions.qmd
@@ -104,6 +100,8 @@ website:
               text: "Line plots (quant x)"
             - href: comparer/maps.qmd
               text: "Maps"
+            - href: comparer/timeseries.qmd
+              text: "Timeseries"
             - href: comparer/causal_plots.qmd
               text: "Outcomes on causal networks"
             - href: comparer/heatmap.qmd
@@ -135,5 +133,22 @@ website:
               text: "Spatial data"
         - section: "Example scenarios"
           contents:
+            - href: demo_scenarios.qmd
+              text: "Scenarios used for demonstrations"
             - href: provided_data/scenario_creation.qmd
               text: "Example scenario information and creation"
+
+    - title: "Modules"
+      contents:
+        - modules/module_overview.qmd
+
+        - section: "Individual modules"
+          contents:
+            - href: modules/ewr_overview.qmd
+              text: "EWR module"
+            - href: workflows/ewr_ratios.qmd
+              text: "EWR frequency ratio"
+            - href: modules/integrating_new.qmd
+              text: "Integrating a new model"
+            - href: aggregator/user_module.qmd
+              text: "Using outputs of unincorporated modules"

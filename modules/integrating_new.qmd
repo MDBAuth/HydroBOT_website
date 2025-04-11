@@ -1,0 +1,97 @@
+---
+title: "Integrating new modules"
+---
+
+Integrating a new module will depend in large part on the structure and language of that module, and so specific advice is difficult to provide. However, there are some general features and requirements that should be followed.
+
+## Guidelines
+
+First, any new module must be scriptable. If it requires e.g. a GUI to operate, it cannot be called within HydroBOT and so users should proceed with the Aggregator step using the outputs of that module, as described [here](/aggregator/user_module.qmd). Scriptable but proprietary modules should be possible, but would only be usable by those with the proper licenses.
+
+Beyond being scriptable, the other key requirements and guidelines are:
+
+-   The module should take paths, not data, as an argument.
+
+    -   This isn't a dealbreaker, but passing data rather than paths is expensive, especially if the module is in a different language.
+
+    -   It may be possible to write a wrapper in the native language to provide this functionality, see `controller_functions.py` in HydroBOT.
+
+-   The module should be able to operate on a [directory structure representing scenarios](/workflows/scenarios_and_directories.qmd) and save to a similar structure.
+
+    -   Not only does this simplify the structure, it allows parallelisation.
+
+-   The calling function should accept relevant arguments controlling the module.
+
+    -   It can (and should) do some limited parsing and cleanup of these arguments.
+
+-   The outputs should be tabular, with a column indicating 'scenario', one or more columns of output values, and columns indicating the spatial and temporal unit (e.g 'gauge' and 'year').
+
+    -   If these columns exist, `read_and_agg()` should work, see the [user provided module example](/aggregator/user_module.qmd).
+
+## Pseudocode
+
+A good template to follow is `prep_run_save_ewrs()` in HydroBOT, along with the python functions in `python/controller_functions.py` that do minimal data cleaning in python to avoid passing data between languages.
+
+We provide some brief pseudocode here, along with notes about relevant helper functions. It is likely that `prep_run_save_ewrs()` will be made more generic into `prep_run_save_module()` as development progresses, further minimising the work needed to add modules. At present though, it works as follows (complexity such as `file_search`, `fill_missing`, and `rparallel` is not included here but could be easily adapted).
+
+``` r
+prep_run_save_newmod <- function(hydrograph_directory,
+                                 outer_output_directory,
+                                 output_subdirectory,
+                                 module_name,
+                                 module_arg1,
+                                 module_arg2,
+                                 module_outputs) {
+  # clean up module arguments (at top because they often relate to paths)
+  module_arg1 <- clean_arg1(module_arg1)
+  
+  # Get the paths to all the input hydrographs
+  # This might e.g. look for csvs or other requirements defined in module_arg1
+  needed_file_info <- parse_path_info(module_arg1, hydrograph_directory)
+  
+  # The find_scenario_paths() function can be helpful here, e.g.
+  hydro_paths <- find_scenario_paths(hydrograph_directory, type = filetype,
+                                       scenarios_from = 'directory',
+                                       file_search = file_search)
+  
+  # potentially, filter those according to something like `file_search` (not shown)
+  
+  # set up outputs (do it here so the directories exist for saving, and to enable checking missing runs). There might be different types of outputs, set by e.g. `outtypes`, 
+      output_path <- make_output_dir(outer_output_directory,
+      scenarios = names(hydro_paths),
+      module_name = module_name,
+      subdir = output_subdirectory,
+      outtypes = module_outputs
+      )
+      
+  # potentially, check and fill missing runs (e.g. if a huge parallel group failed partway through). Not shown
+      
+      # Create metadata file
+      
+      # loop over the list of hydro_paths (possibly in parallel) to call the module with its arguments
+      # `safe_imap` is a version of purrr::imap and furrr::imap that continues past errors so big runs don't fail. It reports and locates those errors as well.
+      mod_out <- safe_imap(hydro_paths, module_fun(module_arg1, module_arg2))
+      
+      # do any necessary cleanup (ideally, this would happen in `module_fun`)
+      
+      # save metadata file
+      
+      yaml::write_yaml(metadata_information_list)
+      
+      # possibly return the mod_out if desired
+      
+      # possibly save the mod_out if desired (though this is better in module_fun in general)
+}
+```
+
+The part that bears a bit more scrutiny there is `module_fun()`, which is the function that runs the module itself for a single hydrograph. If the module is itself an R function, this might just be that function. Where it is not, it might be an interface to a different language (e.g. Python) that also provides some simple saving functionality and smooths the transfer of output data back to R if necessary.
+
+E.g. if there is a module that take three arguments, `hydro_path`, `arg1`, and `arg2`, that function might do the following
+
+```         
+parse the args into relevant language (e.g. clean up any paths or lists to dicts)
+run the module function with those args
+clean the outputs into a dataframe or other tabular format with transferrable column types
+save the outputs (to avoid unnecessary passing)
+pass outputs back to `prep_run_save_newmod` if the user has asked for it
+```

@@ -37,6 +37,48 @@ ewr_out <- prep_run_save_ewrs(
 sumdat <- prep_ewr_output(ewr_out$yearly, type = 'achievement')
 ```
 
+# Multiple aggregation columns
+
+HydroBOT can aggregate more than one column at a time if they use the same aggregation sequence. Here, we use `aggCols = c("frequency_achieved", "ewr_achieved")` to perform the same aggregation steps on frequency achievement and achievement considering both frequency and interevent conditions.
+
+```{r}
+aggseq_1 <- list(
+  all_time = 'all_time',
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  sdl_units = sdl_units,
+  Target = c("env_obj", "Target")
+  )
+
+
+funseq_1 <- list(
+  all_time = 'ArithmeticMean',
+  ewr_code = 'ArithmeticMean',
+  env_obj = 'ArithmeticMean',
+  sdl_units = 'ArithmeticMean',
+  Target = 'ArithmeticMean'
+)
+```
+
+And we see that the output has an `ewr_achieved` and a `frequency_achieved` column that have both carried through the sequence.
+
+```{r}
+#| message: false
+#| warning: false
+agged_multi <- multi_aggregate(
+  dat = sumdat,
+  causal_edges = causal_ewr,
+  groupers = c("scenario"),
+  aggCols = c("ewr_achieved", 'frequency_achieved'),
+  aggsequence = aggseq_1,
+  funsequence = funseq_1,
+  namehistory = FALSE
+)
+
+agged_multi |> dplyr::filter(scenario != 'MAX')
+```
+
+
 # User-set functions
 
 We have established a simple set of default aggregation functions (`ArithmeticMean()`, `GeometricMean()`, `LimitingFactor()`, `CompensatingFactor()`, and `SpatialWeightedMean()`), available in `default_agg_functions.R`. It is also possible to supply user-defined functions to include in `funsequence`. We can do this by specifying a new function and including it in the list given to `funsequence`. Some different syntax is provided below in @sec-funsyntax, but the best way is shown here, involving defining a function or functions and using it just as we would built-ins.

@@ -12,9 +12,9 @@ format:
 
 website:
   title: "HydroBOT"
-  repo-url: https://github.com/MDBAuth/HydroBOT_website
+  repo-url: https://github.com/MDBAuth/HydroBOT
   page-footer:
-    left: "Website, documentation, and HydroBOT work in development. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its [github issues](https://github.com/MDBAuth/HydroBOT/issues)"
+    left: "HydroBOT was developed in the [climate adaptation theme](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation) of the [Murray–Darling Water and Environment Research Program](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program), a program of the [Murray-Darling Basin Authority](https://www.mdba.gov.au/).\nWebsite, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its [github issues](https://github.com/galenholt/HydroBOT/issues)"
     center:
       - text: "License"
         href: LICENSE.md
@@ -25,7 +25,7 @@ website:
     left:
       - href: getting_started.qmd
         text: Get started
-      - href: https://laughing-adventure-8jypg4z.pages.github.io/reference/index.html
+      - href: https://galenholt.github.io/HydroBOT/reference/index.html
         text: Reference
       - href: workflows/workflow_overview.qmd
         text: Workflows
@@ -37,9 +37,11 @@ website:
         text: Comparer
       - href: provided_data/data_overview.qmd
         text: Provided data and Causal networks
+      - href: modules/module_overview.qmd
+        text: Modules
     right:
       - icon: github
-        href: https://github.com/MDBAuth/HydroBOT_website
+        href: https://github.com/MDBAuth/HydroBOT
         aria-label: GitHub
 
 theme:
