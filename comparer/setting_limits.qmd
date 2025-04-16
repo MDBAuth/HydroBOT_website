@@ -15,7 +15,7 @@ library(patchwork)
 
 We often want to ensure that plots have comparable limits. If they are created internally (e.g with facetting), this is often handled automatically. However, if plots are made separately, we might want to ensure their limits are the same. Perhaps most importantly, we might want to make the limits reflect the *possible* limits. If a value (ewr_achieved, for example) can only be on 0-1, we might want to set the limits to 0-1 even if the realised values are all from 0.2 to 0.6.
 
-Limits are also critically important for colors, and especially diverging colors. This is done automatically by {HydroBOT} in `plot_outcomes()` when baselining with `relative` or `difference` is used, but can also be done manually.
+Limits are also critically important for colours, and especially diverging colours. This is done automatically by {HydroBOT} in `plot_outcomes()` when baselining with `relative` or `difference` is used, but can also be done manually.
 
 Here, we show some demonstrations for various plot types.
 
@@ -168,9 +168,9 @@ limit_bar_bird <- basin_to_plot |>
 
 ```
 
-# Color limits
+# Colour limits
 
-We can do similar things for color values on a continuous scale, here demonstrated for some simple basin-scale plots.
+We can do similar things for colour values on a continuous scale, here demonstrated for some simple basin-scale plots.
 
 ```{r}
 orig_basin <- basin_to_plot |>
@@ -205,7 +205,7 @@ limit_basin <- basin_to_plot |>
 orig_basin + limit_basin
 ```
 
-For colors, not only is it valuable to set limits for consistency across plots or for showing the full possible range of the data, it also can be critical for setting midpoints, whether to indicate e.g. 0.5 or to use diverging color palettes with baselining (and so for the examples below, we use a diverging palette).
+For colours, not only is it valuable to set limits for consistency across plots or for showing the full possible range of the data, it also can be critical for setting midpoints, whether to indicate e.g. 0.5 or to use diverging color palettes with baselining (and so for the examples below, we use a diverging palette).
 
 A single value to `setLimits` changes the midpoint while leaving the limits auto-adjusted. Here, we use this to set the midpoint of the raw (non-baselined data) to 0.5.
 

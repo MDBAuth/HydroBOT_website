@@ -133,7 +133,7 @@ funseq <- list(
 
 ## Aggregate
 
-Now we do the aggregation. Note that we have been very [aggressive in handling spatial processing](aggregation_overview.qmd) and so while spatial processing is slow, we minimize it as much as possible internally.
+Now we do the aggregation. Note that we have been very [aggressive in handling spatial processing](aggregation_overview.qmd) and so while spatial processing is slow, we minimise it as much as possible internally.
 
 Because we're aggregating EWR outputs, `multi_aggregate()` will catch some common pitfalls. The best solution is to use [pseudo_spatial and group_until](pseudo_spatial_group_until.qmd), but here for simplicity we use `auto_ewr_PU = TRUE` , which does that automatically.
 
@@ -222,7 +222,7 @@ allagg <- multi_aggregate(
 )
 ```
 
-Now, we'll inspect each step, both as dataframes and maps. There are many other ways of plotting the outcome data available in the [comparer](/comparer/comparer_overview.qmd). The goal here is simply to visualize what happens at each step along the way, so we make some quick maps.
+Now, we'll inspect each step, both as dataframes and maps. There are many other ways of plotting the outcome data available in the [comparer](/comparer/comparer_overview.qmd). The goal here is simply to visualise what happens at each step along the way, so we make some quick maps.
 
 #### Sheet 1- raw data from ewr
 
@@ -410,7 +410,7 @@ allagg$Objective |>
 
 #### Sheet 8- Basin
 
-This step is a spatial aggregation to the basin scale, with theme remaining at the Objective level. The scaling to the basin is area-weighted, so larger catchments count more toward the basin-scale outcome. Recognize that for this situation with data in only a subset of the basin, aggregation to the whole basin is fraught and is likely biased by missing data.
+This step is a spatial aggregation to the basin scale, with theme remaining at the Objective level. The scaling to the basin is area-weighted, so larger catchments count more toward the basin-scale outcome. Recognise that for this situation with data in only a subset of the basin, aggregation to the whole basin is fraught and is likely biased by missing data.
 
 ```{r}
 allagg$basin

@@ -13,7 +13,7 @@ library(sf)
 
 # Overview
 
-This notebook provides examples of creating bar plots, e.g. plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, the scenarios. We also demonstrate here the ability to use color and different color palettes to include additional information, including spatial unit or type of response.
+This notebook provides examples of creating bar plots, e.g. plots with one quantitative y-axis for outcome, and a qualitative x-axis. The x-axis is often, but not always, the scenarios. We also demonstrate here the ability to use colour and different colour palettes to include additional information, including spatial unit or type of response.
 
 For a quantitative x-axis, we would typically use [line plots](../comparer/line_plots.qmd).
 
@@ -63,9 +63,9 @@ obj_sdl_to_plot <- agged_data$sdl_units |>
 
 # Standard scenario appearance
 
-We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
+We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colours. Such standard colours are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
 
-Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
+Here, we use the special arguments `refvals` and `refcols` to make a colour palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
 
 There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the `sceneorder` argument here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
@@ -89,7 +89,7 @@ scene_pal
 
 We can make plots looking at how scenarios differ for each of the outcome categories for a simple case of only one outcome. This uses `facet_wrapper` to just wrap the single facet axis.
 
-The `colorset` argument is the column that determines color, while the `pal_list` defines those colors, here as a named `colors` object, but as we see below it can also be palette names.
+The `colorset` argument is the column that determines colour, while the `pal_list` defines those colours, here as a named `colors` object, but as we see below it can also be palette names.
 
 ```{r}
 #| message: false
@@ -120,7 +120,7 @@ plot_outcomes(basin_to_plot,
   labs(x = 'Scenario')
 ```
 
-Another approach is to put other groupings on the x-axis, and color by scenario.
+Another approach is to put other groupings on the x-axis, and colour by scenario.
 
 ```{r}
 #| message: false
@@ -151,7 +151,7 @@ plot_outcomes(basin_to_plot,
 
 We can use the aggregation step of `env_obj` and SDL units to demonstrate plotting that not only addresses the outcomes for scenarios, but how they differ across space.
 
-First, we look at how the different scenarios perform for the Ecosystem Function objectives in each SDL unit. We also use the `ggplot2` functionality to remove the x-axis label, since it is redundant with the color.
+First, we look at how the different scenarios perform for the Ecosystem Function objectives in each SDL unit. We also use the `ggplot2` functionality to remove the x-axis label, since it is redundant with the colour.
 
 ::: callout-tip
 Often when we have multiple dimensions, we'll want to do a simple filter to relevant subsets of the data for readability. When this filtering occurs, it is almost always a good idea to do it on the fly (as here), to avoid errors associated with losing track of data manipulations and instead start each figure with the full dataset.
@@ -172,7 +172,7 @@ obj_sdl_to_plot |>
   theme(axis.text.x = element_blank(), axis.title.x = element_blank())
 ```
 
-We address a few ways to handle groups of outcome variables, one of the simplest is to simply facet these plots by those groups, with all the outcomes in the group getting their own bars. This puts the theme levels on x and colors by scenario, with the groups accentuated by facets. These can be stacked (`position = 'stack'`- the default) or dodged (demonstrated here).
+We address a few ways to handle groups of outcome variables, one of the simplest is to simply facet these plots by those groups, with all the outcomes in the group getting their own bars. This puts the theme levels on x and colours by scenario, with the groups accentuated by facets. These can be stacked (`position = 'stack'`- the default) or dodged (demonstrated here).
 
 ```{r}
 dodgefacet <- obj_sdl_to_plot |>
@@ -192,11 +192,11 @@ dodgefacet + theme(legend.position = "bottom") +
   labs(x = "Environmental Objective")
 ```
 
-# Colors from outcomes
+# colours from outcomes
 
-Rather than facetting, we can stack each of the outcome categories (here, Target groups). To do this, we simply change the `colorset` to "Target" instead of 'scenario' (the default `x_col` is scenario, so it remains on x, but it is generally better to specify it explicitly. This is especially true here, where the 'climate_code' column is a better description). We also change the `pal_list` to a {paletteer} name, providing the palette from which to choose colors for each Target. If we wanted to retain these colours across the project, we would define a palette for the Targets as we did above for scenarios.
+Rather than facetting, we can stack each of the outcome categories (here, Target groups). To do this, we simply change the `colorset` to "Target" instead of 'scenario' (the default `x_col` is scenario, so it remains on x, but it is generally better to specify it explicitly. This is especially true here, where the 'climate_code' column is a better description). We also change the `pal_list` to a {paletteer} name, providing the palette from which to choose colours for each Target. If we wanted to retain these colours across the project, we would define a palette for the Targets as we did above for scenarios.
 
-This yields a more compact plot (@fig-color-target) that shows overall outcomes without as much duplication. The stacking here of the `env_obj` outcomes in each group while coloring them all the same is itself a sort of simple aggregation. The approach next with `position = "dodge"` is generally better (@fig-sdl-dodge).
+This yields a more compact plot (@fig-color-target) that shows overall outcomes without as much duplication. The stacking here of the `env_obj` outcomes in each group while colouring them all the same is itself a sort of simple aggregation. The approach next with `position = "dodge"` is generally better (@fig-sdl-dodge).
 
 ```{r}
 #| message: false
@@ -211,7 +211,7 @@ plot_outcomes(basin_to_plot,
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
-In another example of colors from other information in the data, when we have multiple spatial units we might color by them instead of coloring by outcome category. Here, we show how to color by SDL unit (SWSDLName) instead of `env_obj`. We also explicitly use `x_col` to use climate code and not the full names.
+In another example of colours from other information in the data, when we have multiple spatial units we might colour by them instead of colouring by outcome category. Here, we show how to colour by SDL unit (SWSDLName) instead of `env_obj`. We also explicitly use `x_col` to use climate code and not the full names.
 
 ```{r}
 #| message: false
@@ -227,7 +227,7 @@ plot_outcomes(obj_sdl_to_plot,
 
 That shows that while all SDL units are affected by the changes in the flow, the Lachlan is less sensitive.
 
-We can also use `position = 'dodge'` to have side-by-side bars instead of stacked (@fig-summed). Note that in this case, where we're coloring by SDL unit but there are many `env_obj` values, those `env_obj` no longer stack, and so we have to manually stack them by calculating their sum. This would not be the case if we were coloring by individual rows (`env_obj`)- see examples of that below.
+We can also use `position = 'dodge'` to have side-by-side bars instead of stacked (@fig-summed). Note that in this case, where we're colouring by SDL unit but there are many `env_obj` values, those `env_obj` no longer stack, and so we have to manually stack them by calculating their sum. This would not be the case if we were colouring by individual rows (`env_obj`)- see examples of that below.
 
 ```{r}
 #| message: false
@@ -245,7 +245,7 @@ obj_sdl_to_plot |>
   )
 ```
 
-If we have multiple levels of groupings, we can color by the groups directly if we don't care what the individual `env_obj`s are doing between them. This is very similar to the plots coloring by SDL unit above.
+If we have multiple levels of groupings, we can colour by the groups directly if we don't care what the individual `env_obj`s are doing between them. This is very similar to the plots colouring by SDL unit above.
 
 ```{r}
 plot_outcomes(obj_sdl_to_plot,
@@ -259,11 +259,11 @@ plot_outcomes(obj_sdl_to_plot,
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
-## Grouped colors
+## Grouped colours
 
-HydroBOT can assign different color palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](/provided_data/causal_descriptive_plots.qmd). For example, we might categorize the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colors chosen from different palettes.
+HydroBOT can assign different colour palettes to different sets of outcomes, yielding what is essentially another axis on which we can plot information. We use this same ability across a number of plot types, particularly [causal networks](/provided_data/causal_descriptive_plots.qmd). For example, we might categorise the `env_obj` outcomes into the larger scale groups (e.g. 'NF', 'EF', etc). We can then assign each of these a separate palette, and so the individual `env_obj`s get different colours chosen from different palettes.
 
-Achieving this requires specifying two columns- the `colorset`, as above, is the column that determines color. The `colorgroups` column specifies the groupings of those `colorset` values, and so what palette to use. Thus, the `pal_list` needs to be either length 1 (everything gets the same palette) or `length(unique(data$colorgroups))`. Note also that the `colorset` values must be unique to `colorgroups`- this cannot be a one-to-many mapping because each `colorset` value must get a color from a single palette defined by the `colorgroup` it is in.
+Achieving this requires specifying two columns- the `colorset`, as above, is the column that determines colour. The `colorgroups` column specifies the groupings of those `colorset` values, and so what palette to use. Thus, the `pal_list` needs to be either length 1 (everything gets the same palette) or `length(unique(data$colorgroups))`. Note also that the `colorset` values must be unique to `colorgroups`- this cannot be a one-to-many mapping because each `colorset` value must get a colour from a single palette defined by the `colorgroup` it is in.
 
 We demonstrate with `env_obj` variables mapped to larger environmental groups, making it easier to see at a glance the sorts of environmental objectives that are more or less affected, while also allowing views of the individual environmental objectives. Here we use `facet_col` and `facet_row` to ensure the SDL units don't wrap around. We made the `env_groups` column when we chose the data initially.
 
@@ -330,7 +330,7 @@ obj_sdl_to_plot |>
   theme(legend.key.size = unit(0.5, 'cm'))
 ```
 
-Another approach to groups of outcomes without the colors explicitly grouped is to not use `colorgroup`, but instead just facet by the group and give every `colorset` value a color from the same palette. Depending on the palette chosen and the breaks, this can be quicker, but will not accentuate groups as well.
+Another approach to groups of outcomes without the colours explicitly grouped is to not use `colorgroup`, but instead just facet by the group and give every `colorset` value a colour from the same palette. Depending on the palette chosen and the breaks, this can be quicker, but will not accentuate groups as well.
 
 ```{r}
 #| message: false
@@ -347,11 +347,11 @@ obj_sdl_to_plot |>
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
-These plots are interesting, but in typical use, the plots above using facets for the groups or coloring by the groups themselves are likely to be easier to read, unless we really are interested in this level of granularity. Whatever approach we choose for a given plot, accentuating the differences between outcome groups can be a powerful interpretation tool.
+These plots are interesting, but in typical use, the plots above using facets for the groups or colouring by the groups themselves are likely to be easier to read, unless we really are interested in this level of granularity. Whatever approach we choose for a given plot, accentuating the differences between outcome groups can be a powerful interpretation tool.
 
-## Manual color definition
+## Manual colour definition
 
-Though the above examples using {paletteer} palettes are the easiest way to specify coloring, we don't have to let the palettes auto-choose colors, and can instead pass `colors` objects, just as we do for scenarios. This can be particularly useful with small numbers of groups (defining too many colors is cumbersome- that's what palettes are for) when we want to control which is which. Just as with scenarios, we use `make_pal()`. Here, we will use `'scico::berlin'` as the base, but define several 'reference' values manually. This demonstration uses `includeRef = TRUE` so we *replace* the palette values with the refs, rather than choose them from the set of values with refs removed. This tends to yield better spread of colors (and lets us sometimes ref colors and sometimes not if we also used `returnUnref`). For example, maybe we want to sometimes really accentuate ecosystem function and native vegetation, but not in all plots.
+Though the above examples using {paletteer} palettes are the easiest way to specify colouring, we don't have to let the palettes auto-choose colours, and can instead pass `colors` objects, just as we do for scenarios. This can be particularly useful with small numbers of groups (defining too many colours is cumbersome- that's what palettes are for) when we want to control which is which. Just as with scenarios, we use `make_pal()`. Here, we will use `'scico::berlin'` as the base, but define several 'reference' values manually. This demonstration uses `includeRef = TRUE` so we *replace* the palette values with the refs, rather than choose them from the set of values with refs removed. This tends to yield better spread of colours (and lets us sometimes ref colours and sometimes not if we also used `returnUnref`). For example, maybe we want to sometimes really accentuate ecosystem function and native vegetation, but not in all plots.
 
 First, we create the palettes with and without the (garish) ref values.
 
@@ -379,7 +379,7 @@ plot_outcomes(obj_sdl_to_plot,
   theme(axis.text.x = element_text(angle = 45, vjust = 0.5))
 ```
 
-But for other plots maybe we don't want that accentuation and we can use the `unrefcols` to retain the standard coloring- note that 'NF', 'OS', and 'WB' colors are unchanged.
+But for other plots maybe we don't want that accentuation and we can use the `unrefcols` to retain the standard colouring- note that 'NF', 'OS', and 'WB' colours are unchanged.
 
 ```{r}
 #| message: false

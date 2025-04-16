@@ -17,7 +17,7 @@ library(sf)
 
 # Overview
 
-This notebook provides examples of creating heatmaps and other color surfaces to plot outcomes as colors with two driver axes (e.g. temperature and rainfall changes).
+This notebook provides examples of creating heatmaps and other colour surfaces to plot outcomes as colours with two driver axes (e.g. temperature and rainfall changes).
 
 # Demonstration setup
 
@@ -56,7 +56,7 @@ agged_data <- agged_data |>
 
 # Make surface plots
 
-The main thing to remember when making heatmaps is to use `plot_type = 'heatmap'`, and include `x_col`, `y_col` and `outcome_col` (the outcome plotted as color) arguments.
+The main thing to remember when making heatmaps is to use `plot_type = 'heatmap'`, and include `x_col`, `y_col` and `outcome_col` (the outcome plotted as colour) arguments.
 
 ## Qualitative axes
 

@@ -46,9 +46,9 @@ scenarios <- scenarios |>
 
 # Standard scenario appearance
 
-We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
+We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colours. Such standard colours are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
 
-Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
+Here, we use the special arguments `refvals` and `refcols` to make a colour palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
 
 There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the `sceneorder` argument here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
@@ -66,7 +66,7 @@ scene_pal <- make_pal(unique(scenarios$climate_code),
 scene_pal
 ```
 
-We will also make a standard set of gauge colors
+We will also make a standard set of gauge colours
 
 ```{r}
 gauge_pal <- make_pal(unique(gauges_to_plot),
@@ -93,7 +93,7 @@ scenehydros <- scenehydros |>
   left_join(scenarios)
 ```
 
-Now, we can make a simple plot using the standard format and colors
+Now, we can make a simple plot using the standard format and colours
 
 ```{r}
 plot_outcomes(scenehydros,

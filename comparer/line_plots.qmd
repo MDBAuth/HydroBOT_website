@@ -15,7 +15,7 @@ library(sf)
 
 This notebook provides examples of creating line plots, e.g. plots with one quantitative y-axis for outcome, and a quantitative x-axis. The x-axis is typically a quantitative representation of the scenario, e.g. a temperature increase, or for the demonstration here, the flow multiplier. This can be a very powerful analysis, as we can actually investigate numerical changes between scenarios, identifying potential nonlinearities, predictions, and interpolation.
 
-These plots also have the ability to use color and different color palettes to include additional information, including spatial unit and type of response. These settings are dealt with more completely in the [bar_plots](bar_plots.qmd), with much of the mechanics the same for lines, e.g. the use of `colorgroups` and a list for `pal_list`.
+These plots also have the ability to use colour and different colour palettes to include additional information, including spatial unit and type of response. These settings are dealt with more completely in the [bar_plots](bar_plots.qmd), with much of the mechanics the same for lines, e.g. the use of `colorgroups` and a list for `pal_list`.
 
 For a qualitative x, we would typically use [bar plots](bar_plots.qmd).
 
@@ -65,9 +65,9 @@ obj_sdl_to_plot <- agged_data$sdl_units |>
 
 # Standard scenario appearance
 
-We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
+We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colours. Such standard colours are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
 
-Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
+Here, we use the special arguments `refvals` and `refcols` to make a colour palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the codes (see [scenario definitions](comparer_overview.qmd)) rather than the names to make plots readable.
 
 There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the  `sceneorder` argument here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
@@ -89,7 +89,7 @@ We make two sorts of line plots- either straight lines through all the data poin
 
 ## Lines through all data
 
-A simple plot would be to look at all the outcomes, separated by color (though we ignore the added water scenarios). Even this simple plot is quite informative- we can see that the `env_obj` outcomes are differently sensitive to both decreases and increases in flow, and that this differs across space.
+A simple plot would be to look at all the outcomes, separated by colour (though we ignore the added water scenarios). Even this simple plot is quite informative- we can see that the `env_obj` outcomes are differently sensitive to both decreases and increases in flow, and that this differs across space.
 
 ```{r}
 sdl_line <- obj_sdl_to_plot |>
@@ -108,7 +108,7 @@ sdl_line
 
 ### Separate values within groups
 
-We might not care so much about individual outcomes, but about their groupings, and we can plot those in color for each env_obj, according to the larger grouping it is part of by changing `colorset = 'env_group'`. We need to use `point_group` here to separate out the points for each `env_obj`, since several will belong to each `env_group`.
+We might not care so much about individual outcomes, but about their groupings, and we can plot those in colour for each env_obj, according to the larger grouping it is part of by changing `colorset = 'env_group'`. We need to use `point_group` here to separate out the points for each `env_obj`, since several will belong to each `env_group`.
 
 This plot also demonstrates the use of some additional arguments. We're also using `transx` to log the x-axis, which is particularly appropriate for the multiplicative flow scaling in this demonstration. We also log the y-axis with `transoutcome` since we're using a `base_list` to baseline (with `comp_fun = relative` to look at the multiplicative shift in each env_obj to baseline). We're using various `*_lab` arguments to adjust the labelling.
 
@@ -148,11 +148,11 @@ sdl_line_options <- obj_sdl_to_plot |>
 sdl_line_options
 ```
 
-We can also give the groups different palettes, as demonstrated more completely in the [bar plots](bar_plots.qmd) and [causal networks](/provided_data/causal_descriptive_plots.qmd). Now, we don't need `point_group` anymore, since the colors are assigned to the unique `env_obj`s.
+We can also give the groups different palettes, as demonstrated more completely in the [bar plots](bar_plots.qmd) and [causal networks](/provided_data/causal_descriptive_plots.qmd). Now, we don't need `point_group` anymore, since the colours are assigned to the unique `env_obj`s.
 
 ```{r}
 #| label: fig-env-grouped
-#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Groups of environmental objectives plotted from different color palettes.
+#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Groups of environmental objectives plotted from different colour palettes.
 #| warning: false
 
 # Create a palette list
@@ -191,7 +191,7 @@ That's fairly complex, so we can facet it, as we did with the [bars](bar_plots.q
 
 ```{r}
 #| label: fig-env-group-facet
-#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Groups of environmental objectives plotted from different color palettes and facetted for easier visualisation.
+#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Groups of environmental objectives plotted from different colour palettes and facetted for easier visualisation.
 #| warning: false
 sdl_line_groups_facet <- obj_sdl_to_plot |>
   plot_outcomes(
@@ -224,11 +224,11 @@ The above is typically how we would go about this facetting, but it is worth rei
 sdl_line_groups + facet_grid(SWSDLName ~ env_group)
 ```
 
-As with the [bar plots](bar_plots.qmd), we can color by any column we want, and the spatial units is a logical choice. We again use `point_group`, since multiple `env_obj` rows are mapped to each color (spatial unit). The overplotting gets unreadable here and so I've retained some facetting, but the best combination of colors, row facets, and column facets will be project dependent and also depend on the number of values being plotted. Another solution is to summarise the data with a smoother- see @sec-smoothers.
+As with the [bar plots](bar_plots.qmd), we can colour by any column we want, and the spatial units is a logical choice. We again use `point_group`, since multiple `env_obj` rows are mapped to each colour (spatial unit). The overplotting gets unreadable here and so I've retained some facetting, but the best combination of colours, row facets, and column facets will be project dependent and also depend on the number of values being plotted. Another solution is to summarise the data with a smoother- see @sec-smoothers.
 
 ```{r}
-#| label: fig-sdl-colors
-#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Colors indicate SDL unit, each line is an `env_obj`.
+#| label: fig-sdl-colours
+#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. colours indicate SDL unit, each line is an `env_obj`.
 #| warning: false
 sdl_line_sdl <- obj_sdl_to_plot |>
   # filter(env_group == "EF") |>
@@ -256,7 +256,7 @@ sdl_line_sdl
 
 ## Smoothing (fit lines) {#sec-smoothers}
 
-We can use smoothing to fit lines through multiple points, e.g. if we want to group data in some way- maybe use it to put a line through the color groups and ignore individual levels. We demonstrate here using them to illustrate unique outcomes, as well as more typical uses as lines of best fit that aggregate over a number of outcomes.
+We can use smoothing to fit lines through multiple points, e.g. if we want to group data in some way- maybe use it to put a line through the colour groups and ignore individual levels. We demonstrate here using them to illustrate unique outcomes, as well as more typical uses as lines of best fit that aggregate over a number of outcomes.
 
 To get smoothed lines, we use `smooth_arglist = list()`. By default, (just an empty `list()`), that produces a loess fit (as with `ggplot2::geom_smooth`, but we can also pass arguments to `geom_smooth()` in `smooth_arglist`, and so allow things like `lm` and `glm` fits.
 
@@ -264,7 +264,7 @@ To get smoothed lines, we use `smooth_arglist = list()`. By default, (just an em
 
 Fitting lines through unique points at each scenario level is a bit contrived *vs.* just plotting lines as above, but it can be useful if we want to accentuate nonlinear relationships. Linear fits are possible too, though these are typically less useful.
 
-With unique points, this just fits a single curved line through each `env_obj`. Recapitulating the above, we color here from SDL unit.
+With unique points, this just fits a single curved line through each `env_obj`. Recapitulating the above, we colour here from SDL unit.
 
 ```{r}
 #| warning: false
@@ -358,13 +358,13 @@ Fitting lines is most often associated with things like regression and loess smo
 `group_cols` in `base_list` should still include unique values, because `group_cols` determines the baselining (e.g. what gets compared), not the plot groupings.
 :::
 
-One example would be to perform the same analysis as in @fig-sdl-colors, but instead of plotting each point, fit a line to show the mean change within each SDL unit. We've pulled `env_obj` out of `point_group`, but left it in `group_cols`, because we still want each `env_obj` baselined with itself, not to the mean of `env_group`. Now, we can look at all the `env_groups`, because there are far fewer lines and so the overplotting isn't an issue.
+One example would be to perform the same analysis as in @fig-sdl-colours, but instead of plotting each point, fit a line to show the mean change within each SDL unit. We've pulled `env_obj` out of `point_group`, but left it in `group_cols`, because we still want each `env_obj` baselined with itself, not to the mean of `env_group`. Now, we can look at all the `env_groups`, because there are far fewer lines and so the overplotting isn't an issue.
 
 We use a small `add_eps` to avoid zeros and allow all data to be relativised and plotted.
 
 ```{r}
-#| label: fig-sdl-colors-fit
-#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Fits are loess smoothers. Colors indicate SDL unit, which have single lines. Each point is an `env_obj`.
+#| label: fig-sdl-colours-fit
+#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Fits are loess smoothers. colours indicate SDL unit, which have single lines. Each point is an `env_obj`.
 #| warning: false
 #| message: false
 sdl_fit_sdl <- obj_sdl_to_plot |>
@@ -395,7 +395,7 @@ We can make a very similar plot, looking at the environmental groups, a smooth f
 
 ```{r}
 #| label: fig-env-grouped-fit
-#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Fits are loess smoothers. Colors indicate Environmental groups, which have single lines. Each point is an `env_obj`.
+#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Fits are loess smoothers. colours indicate Environmental groups, which have single lines. Each point is an `env_obj`.
 #| warning: false
 #| message: false
 sdl_fit_groups <- obj_sdl_to_plot |>
@@ -426,11 +426,11 @@ sdl_fit_groups
 
 As we saw above, we can use `method = 'lm'` to plot a regression, though in general we do not expect these relationships to be linear, and mathematically characterising them will be a complex task that is not the purview of plotting.
 
-A linear fit of the SDL units ( @fig-sdl-colors-lm ) is one example of how this might work. It is useful to know here that deviations from a 1:1 line on logged axes as here means that the outcomes are responding disproportionately more (steeper) or less (shallower) than the underlying changes to flow.
+A linear fit of the SDL units ( @fig-sdl-colours-lm ) is one example of how this might work. It is useful to know here that deviations from a 1:1 line on logged axes as here means that the outcomes are responding disproportionately more (steeper) or less (shallower) than the underlying changes to flow.
 
 ```{r}
-#| label: fig-sdl-colors-lm
-#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Fits are linear regressions. Colors indicate SDL unit, which have single lines. Each point is an `env_obj`.
+#| label: fig-sdl-colours-lm
+#| fig-cap: Change in proportion of environmental objectives met in each scenario, relative to the historical baseline, dependent on the shift in flow. Fits are linear regressions. colours indicate SDL unit, which have single lines. Each point is an `env_obj`.
 #| warning: false
 #| message: false
 sdl_lm_sdl <- obj_sdl_to_plot |>

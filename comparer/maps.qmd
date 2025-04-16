@@ -15,7 +15,7 @@ library(sf)
 
 This notebook provides examples of creating maps to display HydroBOT data and especially aggregated outcomes. Typically, these have quantitative fill that is spatially-relevant, whether that is a point (gauge) or polygon (SDL unit, basin, etc). The numerical values can be more difficult to ascertain precisely from maps, but they are often the clearest way to present spatial data, especially when the message is one of spatial variation. Because maps lose two dimensions for data (i.e x and y become position), we often have to reduce the number of categories we look at and rely heavily on facetting and subsetting.
 
-As with all plots in {HydroBOT}, maps have the ability to use color and different color palettes to include additional information, including type of response. These settings are dealt with more completely in the [bar_plots](bar_plots.qmd), with much of the mechanics the same for maps and [lines](line_plots.qmd) e.g. the use of `colorgroups` and a list for `pal_list`.
+As with all plots in {HydroBOT}, maps have the ability to use colour and different colour palettes to include additional information, including type of response. These settings are dealt with more completely in the [bar_plots](bar_plots.qmd), with much of the mechanics the same for maps and [lines](line_plots.qmd) e.g. the use of `colorgroups` and a list for `pal_list`.
 
 With maps, we can also plot multiple layers in the foreground `overlay` and background `underlay`, though these have fewer options than the 'primary' layer (e.g. we cannot plot data as fill in multiple polygon layers).
 
@@ -65,9 +65,9 @@ obj_sdl_to_plot <- agged_data$sdl_units |>
 
 # Standard scenario appearance
 
-We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colors. Such standard colors are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
+We will typically have a consistent look for the scenarios across the project, with a logical ordering and standard colours. Such standard colours are not included in the {HydroBOT} package because they are project/analysis- specific, but they could be set at project-level, e.g. in the `.Rprofile`, if desired.
 
-Here, we use the special arguments `refvals` and `refcols` to make a color palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the [codes defining the scenarios](comparer_overview.qmd) rather than the names to make plots readable.
+Here, we use the special arguments `refvals` and `refcols` to make a colour palette from a standard {paletter} option ("ggsci::nrc_npg") while setting a specific level to a specified value. We will use the [codes defining the scenarios](comparer_overview.qmd) rather than the names to make plots readable.
 
 There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the  `sceneorder` argument here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
@@ -218,7 +218,7 @@ In their most simple sense, underlays and overlays can be used to simply add spa
 
 While we can't have informative fill in multiple layers ({ggplot2} won't allow multiple fills), we *can* have informative fill in polygons underlying point (gauge) data, because the points use `color`, not `fill`.
 
-First, we include a fill in the underlay for SDL unit name (e.g. not a data fill, but still informative) by simply replacing the single color in `underlay_pal` with a {paletteer} palette. It is hard to find palettes for the full set of catchments. We use a qualitative palette here. Using a continuous palette (e.g. `grDevices::Purple-Yellow`) works OK as well, but the colors aren't very well spatially-separated.
+First, we include a fill in the underlay for SDL unit name (e.g. not a data fill, but still informative) by simply replacing the single colour in `underlay_pal` with a {paletteer} palette. It is hard to find palettes for the full set of catchments. We use a qualitative palette here. Using a continuous palette (e.g. `grDevices::Purple-Yellow`) works OK as well, but the colours aren't very well spatially-separated.
 
 ```{r}
 env_obj_to_plot |> 
@@ -241,7 +241,7 @@ env_obj_to_plot |>
   ggplot2::theme(legend.position = "bottom")
 ```
 
-We can use a continuous variable on the underlay fill, but have to be careful to choose palettes that don't mask each other. It is very tempting to put e.g. gauges under sdl units and color by the same palette to show the effect of the aggregation, but that is often confusing given the similarity in color (and noting that because here we have to eliminate some planning units to plot the gauges, the full set of aggregated gauge values is not shown).
+We can use a continuous variable on the underlay fill, but have to be careful to choose palettes that don't mask each other. It is very tempting to put e.g. gauges under sdl units and colour by the same palette to show the effect of the aggregation, but that is often confusing given the similarity in colour (and noting that because here we have to eliminate some planning units to plot the gauges, the full set of aggregated gauge values is not shown).
 
 ```{r}
 env_obj_to_plot |> 
@@ -315,7 +315,7 @@ env_obj_to_plot |>
 
 Above, we used the gauge layer as 'primary', and included the sdl units or basin as underlays. We can also overlay, here with the sdl layer as 'primary'.
 
-We start with a single color overlay to show where gauges are. This is the *full set of BOM gauges*, not just those that went into the aggregation (i.e. are in the EWR tool), which are the ones shown above (@fig-underover).
+We start with a single colour overlay to show where gauges are. This is the *full set of BOM gauges*, not just those that went into the aggregation (i.e. are in the EWR tool), which are the ones shown above (@fig-underover).
 
 ::: callout-tip
 We also show here the use of `clip`, which auto-clips the under or overlay data to the primary layer, and the use of just an {sf} object name for `underlay_list = "basin"` as shorthand when we don't want to specify any visual properties.
@@ -343,7 +343,7 @@ obj_sdl_to_plot |>
   ggplot2::theme(legend.position = "bottom")
 ```
 
-We can give the overlay informative colors- this outcome is similar to what we've done above, but the amount of control we have over scaling etc differs depending on whether a layer is 'primary'. We also use `map_outlinecolor` to adjust the color of the primary layer outlines.
+We can give the overlay informative colours- this outcome is similar to what we've done above, but the amount of control we have over scaling etc differs depending on whether a layer is 'primary'. We also use `map_outlinecolor` to adjust the colour of the primary layer outlines.
 
 ```{r}
 obj_sdl_to_plot |>

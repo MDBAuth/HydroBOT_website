@@ -20,7 +20,7 @@ The EWRs are defined by discharge, duration, timing, and the requirements also i
 
 ## Ecological relationships
 
-Although the EWRs define hydrologic thresholds, and the EWR tool assesses only those hydrologic thresholds, they were developed based on hypothesized relationships to ecological objectives and management targets, with those links established in the LTWPs. The causal networks provided by HydroBOT for the EWR tool (`causal_ewr`) have extracted these links from the LTWPs, allowing HydroBOT to connect the outcomes of the EWR module to larger 'theme' scale outcomes.
+Although the EWRs define hydrologic thresholds, and the EWR tool assesses only those hydrologic thresholds, they were developed based on hypothesised relationships to ecological objectives and management targets, with those links established in the LTWPs. The causal networks provided by HydroBOT for the EWR tool (`causal_ewr`) have extracted these links from the LTWPs, allowing HydroBOT to connect the outcomes of the EWR module to larger 'theme' scale outcomes.
 
 Briefly, the 'theme' scales provided in the causal networks begin with `ewr_code_timing` and `ewr_code` , which are the hydrologic thresholds themselves returned by the EWR tool. The `ewr_code_timing` are the raw outputs, but represent different 'versions' of a single EWR, and so can sometimes be collapsed to `ewr_code`. This practice is done in the examples here but is dubious. In some cases, the `_timing` versions are simply different levels of leniency, but in others they seem to represent fundamentally different checks for different anticipated outcomes.
 

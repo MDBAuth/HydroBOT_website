@@ -318,7 +318,7 @@ Now we have the change ratio for each node for reduced (\@fig-down-rel-network) 
 
 ```{r}
 #| label: fig-down-rel-network
-#| fig-cap: Ratio of achievement of each node in the causal network in the 'down4' scenario compared to the 'base' scenario. Color ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases. 
+#| fig-cap: Ratio of achievement of each node in the causal network in the 'down4' scenario compared to the 'base' scenario. Colour ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases. 
 aggNetwork_down_rel <- make_causal_plot(
   nodes = basenodes |> filter(scenario == 'down4'),
   edges = edges,
@@ -336,7 +336,7 @@ DiagrammeR::render_graph(aggNetwork_down_rel)
 
 ```{r}
 #| label: fig-up-rel-network
-#| fig-cap: Ratio of achievement of each node in the causal network in the 'up4' scenario compared to the 'base' scenario. Color ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases.
+#| fig-cap: Ratio of achievement of each node in the causal network in the 'up4' scenario compared to the 'base' scenario. Colour ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases.
 #| 
 aggNetwork_up_rel <- make_causal_plot(
   nodes = basenodes |> filter(scenario == 'up4'),
@@ -538,7 +538,7 @@ Now we have the change ratio for each node for reduced (@fig-down-rel-network) a
 
 ```{r}
 #| label: fig-down-rel-network-ewr
-#| fig-cap: Ratio of achievement of each node in the causal network in the 'down4' scenario compared to the 'base' scenario. Color ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases. 
+#| fig-cap: Ratio of achievement of each node in the causal network in the 'down4' scenario compared to the 'base' scenario. Colour ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases. 
 aggNetwork_down_rel <- make_causal_plot(
   nodes = basenodes |> filter(scenario == 'down4'),
   edges = edges,
@@ -556,7 +556,7 @@ DiagrammeR::render_graph(aggNetwork_down_rel)
 
 ```{r}
 #| label: fig-up-rel-network-ewr
-#| fig-cap: Ratio of achievement of each node in the causal network in the 'up4' scenario compared to the 'base' scenario. Color ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases.
+#| fig-cap: Ratio of achievement of each node in the causal network in the 'up4' scenario compared to the 'base' scenario. Colour ramp as in map plot @fig-map-relative. White is no change, orange are declines, and blues are increases.
 #| 
 aggNetwork_up_rel <- make_causal_plot(
   nodes = basenodes |> filter(scenario == 'up4'),

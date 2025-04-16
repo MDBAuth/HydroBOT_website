@@ -17,3 +17,5 @@ AutoAppendNewline: Yes
 StripTrailingWhitespace: Yes
 
 UseNativePipeOperator: Yes
+
+SpellingDictionary: en_AU

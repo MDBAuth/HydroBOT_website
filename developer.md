@@ -35,7 +35,7 @@ If you would like to set up your own development environment for python, there i
 
 Use `pyenv` [to manage python versions](https://github.com/pyenv/pyenv). Follow instructions there. On Windows, that means using [pyenv-win](https://github.com/pyenv-win/pyenv-win) and following instructions there. On Linux, install with `curl https://pyenv.run | bash`. That tells you to add something to `.bashrc`, do that.
 
-Then close and restart bash, and run `pyenv install 3.11.0` or whatever version we're using. I needed to `sudo apt-get install libffi-dev` to get it to compile some C bits on Azure. Poetry doesn't actually recognize the defaults, but this still works to install versions. We just end up needing to use `poetry env use VERSION`- see below.
+Then close and restart bash, and run `pyenv install 3.11.0` or whatever version we're using. I needed to `sudo apt-get install libffi-dev` to get it to compile some C bits on Azure. Poetry doesn't actually recognise the defaults, but this still works to install versions. We just end up needing to use `poetry env use VERSION`- see below.
 
 At present, we do most of the work in R, but {HydroBOT} wraps some python, and we also use some (predominantly from [py-ewr](https://pypi.org/project/py-ewr/) and [mdba gauge-getter](https://pypi.org/project/mdba-gauge-getter/)). To manage this, we need to create a python environment. I have already run `poetry new HydroBOT_website` to create the project.
 

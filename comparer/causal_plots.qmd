@@ -20,7 +20,7 @@ library(dplyr)
 
 # Overview
 
-As in the [theme aggregation example](../aggregator/theme_agg.qmd), we can color the nodes in a causal network by outcome values.
+As in the [theme aggregation example](../aggregator/theme_agg.qmd), we can colour the nodes in a causal network by outcome values.
 
 Here, we show those outcomes on the causal network, though there are [many other causal network plots](../provided_data/causal_descriptive_plots.qmd) we can make to describe the network itself.
 
@@ -68,7 +68,7 @@ agged_theme <- read_and_agg(datpath = ewr_results,
 
 ## Causal plot
 
-By returning values at each stage, we can map those to colour in a causal network. Here, we map the values of the aggregation to node color. To do this, we follow the `make_causal_plot()` approach of making edges and nodes, and then use a join to attach the value to each node.
+By returning values at each stage, we can map those to colour in a causal network. Here, we map the values of the aggregation to node colour. To do this, we follow the `make_causal_plot()` approach of making edges and nodes, and then use a join to attach the value to each node.
 
 To keep this demonstration from becoming too unwieldy, we limit the edge creation to a single gauge, and so filter the theme aggregations accordingly (or just rely on the join to drop).
 
