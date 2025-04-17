@@ -765,7 +765,7 @@ Typically we could use `namehistory = FALSE` to avoid the horrible long name wit
 
 ## Value to aggregate
 
-We have demonstrated everything here by aggregating EWR data with the `ewr_achieved` column. However, any numeric column can be aggregated, as we show in @sec-dummy-module for made up module outputs. Here, we also show aggregation on a different EWR metric, the achivement of interevent requirements:
+We have demonstrated everything here by aggregating EWR data with the `ewr_achieved` column. However, any numeric column can be aggregated, as we show in @sec-dummy-module for made up module outputs. Here, we also show aggregation on a different EWR metric, the achievement of interevent requirements:
 
 ```{r}
 #| message: false

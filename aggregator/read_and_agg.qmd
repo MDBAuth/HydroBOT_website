@@ -279,9 +279,9 @@ agged_dat_new <- read_and_agg(
 )
 ```
 
-## Value to aggregate
+## Quantity to aggregate
 
-We have demonstrated everything here by aggregating EWR data with the `ewr_achieved` column. However, any numeric column can be aggregated, as we [show for made up module outputs](user_module.qmd). Here, we also show aggregation on a different EWR metric, the achivement of interevent requirements:
+We have demonstrated everything here by aggregating EWR data with the `ewr_achieved` column. However, any numeric column can be aggregated, as we [show for made up module outputs](user_module.qmd). Here, we also show aggregation on a different EWR metric, the achievement of interevent requirements:
 
 ```{r}
 agged_interevent <- read_and_agg(

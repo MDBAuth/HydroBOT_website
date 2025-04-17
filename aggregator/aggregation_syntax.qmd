@@ -153,7 +153,7 @@ agged_custom_funs |>
 
 The aggregation functions have flexible syntax in some of their arguments, particularly for selecting grouping columns, the column(s) of values to aggregate, specification of aggregation functions, and the specification of spatial and temporal aggregation units. In general, these apply across the functions, though `multi_aggregate` has a bit less flexibility than the internal `spatial_aggregate`, `theme_aggregate`, `temporal_aggregate`, and `general_aggregate`, largely as a consequence of passing through the call stack. Here, we use primarily the example of `spatial_aggregate` to illustrate the different arguments, their syntax, and why we might use the different options.
 
-First, create test data as in the [spatial notebook](spatial_agg.qmd). This does some simple pre-aggregation in time and value dimensions to yield something easier to visualise.
+First, create test data as in the [spatial notebook](spatial_agg.qmd). This does some simple pre-aggregation in time and theme dimensions to yield something easier to visualise.
 
 ```{r}
 #| warning: false
@@ -193,13 +193,13 @@ Both `aggCols` and `groupers` can be character vectors, bare data-variable names
 Here, we use a combination of tidyselect and bare column names for `groupers`, a character for the aggCols, and bare function name for the function to apply.
 
 ::: callout-tip
-`multi_aggregate` takes advantage of this tidyselect ability under the hood to deal with the ever-lengthening column names (and sometimes expanding number of value columns if we have multiple aggregation functions at a step). This means, though, that using `tidyselect` to specify `aggCols` in `multi_aggregate` or `read_and_agg` is fragile. We try to handle it by changing to character, but it can collide with the internal `tidyselect`, and so characters are a safer option in those outer functions.
+`multi_aggregate()` takes advantage of this tidyselect ability under the hood to deal with the ever-lengthening column names (and sometimes expanding number of value columns if we have multiple aggregation functions at a step). This means, though, that using `{tidyselect}` to specify `aggCols` in `multi_aggregate()` or `read_and_agg()` is fragile. We try to handle it by changing to character, but it can collide with the internal `{tidyselect}`, and so characters are a safer option in those outer functions.
 
-Similarly, `multi_aggregate` and `read_and_agg` have to attempt to extract the character name from bare functions. If this extraction fails, they get lost for the purposes of naming the history by the time they get used in the call stack. So again, characters are safer.
+Similarly, `multi_aggregate()` and `read_and_agg()` have to attempt to extract the character name from bare functions. If this extraction fails, they get lost for the purposes of naming the history by the time they get used in the call stack. So again, characters are safer.
 :::
 
 ::: callout-note
-We need to specify `env_obj` as a grouper here because we are using `spatial_aggregate()` directly; in normal use with `multi_aggregate()` or `read_and_agg()` the dimensional safety will enforce that grouping in the value dimension while doing spatial aggregation.
+We need to specify `env_obj` as a grouper here because we are using `spatial_aggregate()` directly; in normal use with `multi_aggregate()` or `read_and_agg()` the dimensional safety will enforce that grouping in the theme dimension while doing spatial aggregation.
 :::
 
 This throws warnings about its meaning for the EWRs; since the point here is to demonstrate functionality, we will not print them.

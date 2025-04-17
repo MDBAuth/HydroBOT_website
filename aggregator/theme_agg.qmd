@@ -26,7 +26,7 @@ library(dplyr)
 
 Aggregating outcomes along the theme dimension is a key requirement of HydroBOT. For example, we might want to combine EWR pass/fails into the proportion of EWRs contributing to a proximate objective ('environmental objective' `env_obj`) that passed, and then translate that into outcomes for 5-year targets or Waterbirds, etc.
 
-The input data is thus the data coming out of the response modules (e.g. EWR tool), which is then aggregated. This data can be the immediate product of the response models or any subsequent aggregations (e.g. following spatial or temporal aggregations), provided it includes a column defining the theme levels and values each row applies to. The demonstrations here are all about the EWR outputs, but the aggregator is agnostic to the input data, provided we have the causal relationships to define the aggregation groupings- we specify the columns to aggregate and any additional grouping variables, which can be anything.
+The input data is thus the data coming out of the response modules (e.g. EWR tool), which is then aggregated. This data can be the immediate product of the response models or any subsequent aggregations (e.g. following spatial or temporal aggregations), provided it includes a column defining the theme levels each row applies to. The demonstrations here are all about the EWR outputs, but the aggregator is agnostic to the input data, provided we have the causal relationships to define the aggregation groupings- we specify the columns to aggregate and any additional grouping variables, which can be anything.
 
 ::: callout-important
 *The relationships that define the aggregations are the same as those defining the causal networks- these map finer-scale groups to coarser*. Thus, we need to access those relationships (and the `make_edges` function that builds the links).
@@ -42,7 +42,7 @@ In practice, we expect to interleave spatial, temporal, and thematic aggregation
 
 # Demonstration
 
-The theme relationships in the causal network `causal_ewr` provide the links and structure of the theme scaling, while the values to be scaled come out of the modules. For this demonstration, we provide a set of paths to point to the input data, in this case the outputs from the EWR tool, created by [a controller notebook](/controller/controller_overview.qmd).
+The theme relationships in the causal network `causal_ewr` provide the links and structure of the theme scaling, while the quantities to be scaled come out of the modules. For this demonstration, we provide a set of paths to point to the input data, in this case the outputs from the EWR tool, created by [a controller notebook](/controller/controller_overview.qmd).
 
 ```{r}
 project_dir <- "hydrobot_scenarios"
@@ -119,7 +119,7 @@ The `funlist` argument here specifies the function(s) to use *at a single step*.
 :::
 
 ::: callout-note
-The `aggCols` argument is `ends_with(original_name)` to reference the *original* name of the column of values- it may have a [long name tracking its aggregation history](aggregation_overview.qmd), so we give it the `tidyselect::ends_with` to find the column. More generally, both `aggCols` and `groupers` can take any tidyselect syntax or bare names or characters, see [here](aggregation_syntax.qmd).
+The `aggCols` argument is `tidyselect::ends_with(original_name)` to reference the *original* name of the column of values- it may have a [long name tracking its aggregation history](aggregation_overview.qmd), so we give it the `tidyselect::ends_with()` to find the column. More generally, both `aggCols` and `groupers` can take any tidyselect syntax or bare names or characters, see [here](aggregation_syntax.qmd).
 :::
 
 We demonstrate here by aggregating from the output of the EWR tool (at the 'ewr_code_timing' level) to the 'env_obj' level, which defines parts of lifecycles or components of larger Targets.

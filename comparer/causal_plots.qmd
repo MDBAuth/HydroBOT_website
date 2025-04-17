@@ -183,7 +183,7 @@ DiagrammeR::render_graph(aggNetwork_4)
 We can also baseline the data and then plot those changes on the network.
 
 ::: callout-caution
-The causal network defines how *values* at one level are linked to *values* at others. It is these values that propagate through the network. Comparisons do *not* propagate through the network. Thus, plotting them on the network shows only how each node is compared across scenarios, not how those comparisons propagate through the network (they don't, and because they are often nonlinear, the outcome would be highly misleading if they did). The links in this case show the existence of relationships, but are not appropriate to interpret as causal models as they are for the values themselves.
+The causal network defines how *values* at one theme level are linked to *values* at others. It is these values that propagate through the network, e.g. waterbird breeding and fledging contributing to overall waterbird population condition. Comparisons do *not* propagate through the network. Thus, plotting relative values between scenarios on the network shows only how each node is compared across scenarios, not how those comparisons propagate through the network (they don't, and because they are often nonlinear, the outcome would be highly misleading if they did). The links in this case show the existence of relationships, but are not appropriate to interpret as causal models as they are for the values themselves.
 :::
 
 ```{r}

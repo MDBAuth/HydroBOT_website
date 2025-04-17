@@ -102,7 +102,7 @@ Now, we have temporal data, and we can visualise that in different ways. There a
 
 Maps can show visually how outcomes change across both space and time, but have limited ability to compare scenarios, multiple outcomes, and multiple times due to excessive dimensionality.
 
-For a single small-scale objective (otherwise there are too many dimensions):
+For a single small-scale environmental objective (otherwise there are too many dimensions):
 
 ```{r}
 #| message: false

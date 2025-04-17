@@ -26,7 +26,7 @@ Unlike calls to bare ggplot, *data-variable* names in arguments should generally
 
 # Comparisons
 
-Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes, as well as aggregation sequences. It can do these comparisons visually (e.g. plotting raw values next to each other), but also calculate comparison values and plot these. There are a few primary sorts of plots, all of which focus on plotting quantitative outcomes.
+Nearly all analyses will be comparisons of some kind, and so the Comparer provides the capacity to produce plots comparing scenarios, time, space, and themes, ass well as aggregation sequences. It can do these comparisons visually (e.g. plotting raw values next to each other), but also calculate comparison values and plot these. There are a few primary sorts of plots, all of which focus on plotting quantitative outcomes.
 
 -   Quantitative outcome values on y
 

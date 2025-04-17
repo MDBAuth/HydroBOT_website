@@ -39,7 +39,7 @@ As with all of the internal HydroBOT aggregations, the `spatial_aggregate()` fun
 `spatial_aggregate` accept inputs at arbitrary aggregation levels (theme, spatial, or temporal), provided that data is spatial. In other words, the spatial aggregation should aggregate any input spatial data into any set of spatial units, whatever that input data represents. Though we demonstrate here with the polygons provided by {HydroBOT}, the user can supply any arbitrary spatial units in `sf` format.
 
 ::: {#spatial-themes style="border: 2px solid gray; color: gray"}
-EWR-specific note: in some cases, the definitions for outcomes along the value axis are defined spatially; for example, the definition of `Specific_objectives` might vary between planning units. However, these are the scale at which *definitions* of outcomes change, not the scale at which those outcomes must be assessed. For example, just because `Specific_objectives` are differently defined between planning units, we can still scale them up in space from gauge to basin, with no reference to planning unit.
+EWR-specific note: in some cases, the definitions for outcomes along the theme axis are defined spatially; for example, the definition of `Specific_objectives` might vary between planning units. However, these are the scale at which *definitions* of outcomes change, not the scale at which those outcomes must be assessed. For example, just because `Specific_objectives` are differently defined between planning units, we can still scale them up in space from gauge to basin, with no reference to planning unit.
 :::
 
 ## Demonstration setup
@@ -108,7 +108,7 @@ The `funlist` argument here specifies the function(s) to use *at a single step*.
 :::
 
 ::: callout-note
-The `aggCols` argument is `ends_with(original_name)` to reference the *original* name of the column of values- it may have a [long name tracking its aggregation history](aggregation_overview.qmd), so we give it the `tidyselect::ends_with` to find the column. More generally, both `aggCols` and `groupers` can take any tidyselect syntax or bare names or characters, see [here](aggregation_syntax.qmd).
+The `aggCols` argument is `ends_with(original_name)` to reference the *original* name of the column of values- it may have a [long name tracking its aggregation history](aggregation_overview.qmd), so we give it the `tidyselect::ends_with()` to find the column. More generally, both `aggCols` and `groupers` can take any tidyselect syntax or bare names or characters, see [here](aggregation_syntax.qmd).
 :::
 
 ```{r}

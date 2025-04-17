@@ -3,7 +3,7 @@ title: "Data"
 format: html
 ---
 
-Some spatial units and networks are needed for spatial and value-dimension aggregation. Users can supply their own, but HydroBOT includes a set of [spatial data](spatial_data.qmd) and [causal networks](causal_overview.qmd) relevant to the Murray-Darling Basin and EWRs.
+Some spatial units and networks are needed for spatial and theme-dimension aggregation. Users can supply their own, but HydroBOT includes a set of [spatial data](spatial_data.qmd) and [causal networks](causal_overview.qmd) relevant to the Murray-Darling Basin and EWRs.
 
 HydroBOT also includes example hydrographs suitable for example analyses in both csv and netcdf formats in `extdata`. To access, use
 

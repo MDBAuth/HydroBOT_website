@@ -52,7 +52,7 @@ ewr_out <- prep_run_save_ewrs(
 
 ## Aggregation
 
-We need to define an aggregation sequence, which specifies the steps along space, time, and value dimensions, as well as a matching sequence of aggregation functions at each step. The example here is a reasonable default for many situations, but should be considered carefully. Please see the [aggregator section](../aggregator/aggregation_overview.qmd) for a detailed treatment of the syntax and capabilities of these sequences.
+We need to define an aggregation sequence, which specifies the steps along space, time, and theme dimensions, as well as a matching sequence of aggregation functions at each step. The example here is a reasonable default for many situations, but should be considered carefully. Please see the [aggregator section](../aggregator/aggregation_overview.qmd) for a detailed treatment of the syntax and capabilities of these sequences.
 
 For this example, if any of the 'versions' of an EWR pass, say it passes in step 2. If we think the 'versions' are actually separate EWRs for different purposes, we might use 'ArithmeticMean' in step 2 intead.
 

@@ -73,7 +73,11 @@ The basic workflow of HydroBOT involves identifying and selecting data inputs re
 There are many ways to structure this workflow in practice, with examples of full workflows at [getting started](/getting_started.qmd) and [here](workflows/workflow_overview.qmd).
 :::
 
-![Conceptualisation of HydroBOT architecture (blue arrows) and links to management decision making (yellow arrows). Scenarios, represented by hydrographs, reflect observed flows or modeled scenarios (produced via hydrological modelling outside HydroBOT). These hydrographs are fed in a consistent way to various response models via the HydroBOT Controller. These response models could assess response of any values of interest, here illustrated as a range of value types across environmental and human dimensions. Additional inputs of spatial data and causal networks provide grouping information for scaling via the HydroBOT Aggregator. The HydroBOT Comparer synthesises the results into management-relevant outputs that aid decision making. This decision-making process is also supported by feedback from stakeholders, other expert advice and the social and political landscape. Water planning and policy decisions can then guide the development of scenarios to assess potential management options, which in turn can be assessed with HydroBOT.](images/Figure_1.png){#fig-tktomgmt}
+![Conceptualisation of HydroBOT architecture (blue arrows) and links to management decision making (yellow arrows). Scenarios, represented by hydrographs, reflect observed flows or modeled scenarios (produced via hydrological modelling outside HydroBOT). These hydrographs are fed in a consistent way to various response models via the HydroBOT Controller. These response models could assess response of any values of interest, here illustrated as a range of types across environmental and human dimensions ('themes' characterising the type of value). Additional inputs of spatial data and causal networks provide grouping information for scaling via the HydroBOT Aggregator. The HydroBOT Comparer synthesises the results into management-relevant outputs that aid decision making. This decision-making process is also supported by feedback from stakeholders, other expert advice and the social and political landscape. Water planning and policy decisions can then guide the development of scenarios to assess potential management options, which in turn can be assessed with HydroBOT.](images/Figure_1.png){#fig-tktomgmt}
+
+::: callout-tip
+In HydroBOT (and hence, this website), we use the word 'theme' to refer to the dimension from proximate, granular outcomes (e.g. fish spawning) to larger-scale outcomes such as species, groups of species, or decadal management targets. In the paper describing HydroBOT, this dimension is referred to as 'value', representing the use of 'value' defined in the sense of an 'ecological value', i.e. any social, economic, environmental or cultural asset or function of significance, importance, worth, or use. While that use of 'value' is closest to the meaning of this dimension, we do not use it in HydroBOT or here because in describing the functioning of HydroBOT, the word 'value' is too easily confused with its meaning as 'a number' or even more generally a state, such as the 'value' of a function argument. See also the [causal network](/provided_data/causal_overview.qmd).
+:::
 
 ## Components
 
@@ -87,7 +91,7 @@ Each of the components are discussed in more detail, with this detail used to mo
 
 ### Dependencies
 
-HydroBOT relies on external information in three main ways. First, it uses externally-defined response models. It also benefits from causal networks to link those outputs to larger-scale values. Finally, it requires the input scenarios, without which it would have nothing to model from.
+HydroBOT relies on external information in three main ways. First, it uses externally-defined response models. It also benefits from causal networks to link those outputs to larger-scale values along the 'theme' dimension. Finally, it requires the input scenarios, without which it would have nothing to model from.
 
 -   [Response models](modules/module_overview.qmd)
 
