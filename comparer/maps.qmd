@@ -46,21 +46,21 @@ If we had used multiple aggregation functions at any step, we should filter down
 For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2). Thus, we make two small dataframes for our primary examples here.
 
 ```{r}
-scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
+scenarios_to_plot <- c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0")
 
-scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
+scenarios <- yaml::read_yaml(file.path(hydro_dir, "scenario_metadata.yml")) |>
   tibble::as_tibble()
 
-basin_to_plot <- agged_data$mdb |> 
-  dplyr::filter(scenario %in% scenarios_to_plot) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+basin_to_plot <- agged_data$mdb |>
+  dplyr::filter(scenario %in% scenarios_to_plot) |>
+  dplyr::left_join(scenarios, by = "scenario")
 
 # Create a grouping variable
 obj_sdl_to_plot <- agged_data$sdl_units |>
-    dplyr::filter(scenario %in% scenarios_to_plot) |> 
+  dplyr::filter(scenario %in% scenarios_to_plot) |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
-  dplyr::arrange(env_group, env_obj) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+  dplyr::arrange(env_group, env_obj) |>
+  dplyr::left_join(scenarios, by = "scenario")
 ```
 
 # Standard scenario appearance
@@ -72,8 +72,10 @@ Here, we use the special arguments `refvals` and `refcols` to make a colour pale
 There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the  `sceneorder` argument here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
 ```{r}
-sceneorder <- forcats::fct_reorder(basin_to_plot$scenario,
-                                   basin_to_plot$flow_multiplier)
+sceneorder <- forcats::fct_reorder(
+  basin_to_plot$scenario,
+  basin_to_plot$flow_multiplier
+)
 
 scene_pal <- make_pal(unique(basin_to_plot$climate_code),
   palette = "ggsci::nrc_npg",
@@ -91,7 +93,7 @@ We start with a simple map of polygon aggregations. Because maps lose two dimens
 obj_sdl_to_plot |>
   dplyr::filter(env_group == "WB") |> # Need to reduce dimensionality
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
     plot_type = "map",
     colorset = "ewr_achieved",
@@ -99,7 +101,7 @@ obj_sdl_to_plot |>
     pal_direction = -1,
     facet_col = "env_obj",
     facet_row = "climate_code"
-    )
+  )
 ```
 
 ## Simple background and foreground
@@ -109,15 +111,15 @@ We can add a polygon with no mapped aesthetics to the background and foreground 
 ```{r}
 #| label: fig-underover
 # this can take a while so use a small sheet and pre-filter to make smaller
-relevant_gauges <- agged_data$ewr_code |> 
-  filter(scenario == 'climatebaseadapt0') |> 
- select(gauge, geometry) |> 
- distinct()
+relevant_gauges <- agged_data$ewr_code |>
+  filter(scenario == "climatebaseadapt0") |>
+  select(gauge, geometry) |>
+  distinct()
 
 obj_sdl_to_plot |>
   dplyr::filter(env_group == "WB") |> # Need to reduce dimensionality
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
     plot_type = "map",
     colorset = "ewr_achieved",
@@ -129,8 +131,10 @@ obj_sdl_to_plot |>
       underlay = basin,
       underlay_pal = "azure"
     ),
-    overlay_list = list(overlay = relevant_gauges, 
-                        overlay_pal = 'firebrick')
+    overlay_list = list(
+      overlay = relevant_gauges,
+      overlay_pal = "firebrick"
+    )
   )
 ```
 
@@ -145,10 +149,10 @@ If we attempt to run this as-is, it shows the value of `plot_outcomes()` for cat
 ```{r}
 #| error: true
 agged_data$env_obj |> # for readability
-  dplyr::filter(env_obj == "NF1" & 
-                  scenario %in% scenarios_to_plot) |> # Need to reduce dimensionality
+  dplyr::filter(env_obj == "NF1" &
+    scenario %in% scenarios_to_plot) |> # Need to reduce dimensionality
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
     plot_type = "map",
     colorset = "ewr_achieved",
@@ -168,17 +172,17 @@ The 'real' fix of that issue would be to filter to a particular planning unit we
 
 ```{r}
 env_obj_to_plot <- agged_data$env_obj |> # for readability
-  dplyr::filter(env_obj == "NF1" & 
-                  scenario %in% scenarios_to_plot) |> # Need to reduce dimensionality
-  group_by(scenario, env_obj) |> 
-  filter(!duplicated(gauge)) |> 
+  dplyr::filter(env_obj == "NF1" &
+    scenario %in% scenarios_to_plot) |> # Need to reduce dimensionality
+  group_by(scenario, env_obj) |>
+  filter(!duplicated(gauge)) |>
   ungroup()
 ```
 
 ```{r}
-env_obj_to_plot |> 
+env_obj_to_plot |>
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
     plot_type = "map",
     colorset = "ewr_achieved",
@@ -199,7 +203,7 @@ We can also plot the basin-scale outcomes (rather than just the shape as above).
 ```{r}
 basin_to_plot |>
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
     plot_type = "map",
     colorset = "ewr_achieved",
@@ -207,7 +211,7 @@ basin_to_plot |>
     pal_direction = -1,
     facet_col = "Target",
     facet_row = "climate_code"
-    )
+  )
 ```
 
 ## Multiple *informative* layers
@@ -221,7 +225,7 @@ While we can't have informative fill in multiple layers ({ggplot2} won't allow m
 First, we include a fill in the underlay for SDL unit name (e.g. not a data fill, but still informative) by simply replacing the single colour in `underlay_pal` with a {paletteer} palette. It is hard to find palettes for the full set of catchments. We use a qualitative palette here. Using a continuous palette (e.g. `grDevices::Purple-Yellow`) works OK as well, but the colours aren't very well spatially-separated.
 
 ```{r}
-env_obj_to_plot |> 
+env_obj_to_plot |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "All arithmetic mean",
@@ -231,7 +235,7 @@ env_obj_to_plot |>
     pal_direction = 1,
     facet_col = "scenario",
     facet_row = "env_obj",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     underlay_list = list(
       underlay = sdl_units,
       underlay_ycol = "SWSDLName",
@@ -244,42 +248,42 @@ env_obj_to_plot |>
 We can use a continuous variable on the underlay fill, but have to be careful to choose palettes that don't mask each other. It is very tempting to put e.g. gauges under sdl units and colour by the same palette to show the effect of the aggregation, but that is often confusing given the similarity in colour (and noting that because here we have to eliminate some planning units to plot the gauges, the full set of aggregated gauge values is not shown).
 
 ```{r}
-env_obj_to_plot |> 
+env_obj_to_plot |>
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("scico::oslo"),
     facet_col = "scenario",
     facet_row = "env_obj",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     underlay_list = list(
-        underlay = dplyr::filter(obj_sdl_to_plot, env_obj == "NF1"),
-        underlay_ycol = "ewr_achieved",
-        underlay_pal = "scico::oslo"
-      )
-    ) +
+      underlay = dplyr::filter(obj_sdl_to_plot, env_obj == "NF1"),
+      underlay_ycol = "ewr_achieved",
+      underlay_pal = "scico::oslo"
+    )
+  ) +
   ggplot2::theme(legend.position = "bottom")
 ```
 
 While the aggregation isn't as obvious here, it is easier to see the different levels:
 
 ```{r}
-env_obj_to_plot |> 
+env_obj_to_plot |>
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Gold"),
     facet_col = "scenario",
     facet_row = "env_obj",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     underlay_list = list(
-        underlay = dplyr::filter(obj_sdl_to_plot, env_obj == "NF1"),
-        underlay_ycol = "ewr_achieved",
-        underlay_pal = "scico::oslo"
-      )
-    ) +
+      underlay = dplyr::filter(obj_sdl_to_plot, env_obj == "NF1"),
+      underlay_ycol = "ewr_achieved",
+      underlay_pal = "scico::oslo"
+    )
+  ) +
   ggplot2::theme(legend.position = "bottom")
 ```
 
@@ -287,15 +291,15 @@ We can also have multiple levels of underlay polygons (e.g. if we want the basin
 
 ```{r}
 #| label: fig-multiunderlays
-env_obj_to_plot |> 
+env_obj_to_plot |>
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Gold"),
     facet_col = "scenario",
     facet_row = "env_obj",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     underlay_list = list(
       list(
         underlay = "basin",
@@ -325,7 +329,7 @@ We also show here the use of `clip`, which auto-clips the under or overlay data 
 obj_sdl_to_plot |>
   dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("scico::lapaz"),
@@ -333,7 +337,7 @@ obj_sdl_to_plot |>
     facet_col = "scenario",
     facet_row = "env_obj",
     underlay_list = "basin",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     overlay_list = list(
       overlay = "bom_basin_gauges",
       overlay_pal = "grey40",
@@ -349,7 +353,7 @@ We can give the overlay informative colours- this outcome is similar to what we'
 obj_sdl_to_plot |>
   dplyr::filter(env_obj == "NF1") |> # Need to reduce dimensionality
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("scico::lapaz"),
@@ -357,8 +361,8 @@ obj_sdl_to_plot |>
     facet_col = "scenario",
     facet_row = "env_obj",
     underlay_list = "basin",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
-    map_outlinecolor = 'forestgreen',
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
+    map_outlinecolor = "forestgreen",
     overlay_list = list(
       overlay = env_obj_to_plot,
       overlay_pal = "scico::oslo",
@@ -377,13 +381,13 @@ Here, we demonstrate a primary layer at the basin scale, overlay the sdl units w
 #| label: fig-multioverlays
 basin_to_plot |> # Need to reduce dimensionality
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("scico::oslo"),
     facet_col = "Target",
     facet_row = "scenario",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     overlay_list = list(
       list(overlay = "sdl_units"),
       list(
@@ -404,17 +408,17 @@ As with the other plotting functions, we can compare to baseline using arbitrary
 obj_sdl_to_plot |>
   dplyr::filter(env_group == "WB") |> # Need to reduce dimensionality
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Blue-White Diverging"),
     facet_col = "env_obj",
     facet_row = "scenario",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     base_list = list(
-    base_lev = "climatebaseadapt0",
-    comp_fun = "difference",
-    group_cols = c("env_obj", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "difference",
+      group_cols = c("env_obj", "polyID")
     ),
     underlay_list = list(underlay = basin, underlay_pal = "azure")
   )
@@ -426,18 +430,20 @@ And the `relative` change is likely to be the most informative and appropriate i
 obj_sdl_to_plot |>
   dplyr::filter(env_group == "WB") |> # Need to reduce dimensionality
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorgroups = NULL,
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Blue-White Diverging"),
     facet_col = "env_obj",
     facet_row = "scenario",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
-    base_list = list(base_lev = "climatebaseadapt0",
-    comp_fun = "relative",
-    group_cols = c("env_obj", "polyID"),
-    add_eps = 'auto'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
+    base_list = list(
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("env_obj", "polyID"),
+      add_eps = "auto"
+    ),
     zero_adjust = "auto",
     transoutcome = "log10",
     underlay_list = list(underlay = basin, underlay_pal = "azure")

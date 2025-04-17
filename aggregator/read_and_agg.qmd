@@ -47,7 +47,7 @@ Note that we specify a path here for the aggregator results.
 
 ```{r}
 project_dir <- "hydrobot_scenarios"
-hydro_dir <- file.path(project_dir, 'hydrographs')
+hydro_dir <- file.path(project_dir, "hydrographs")
 ewr_results <- file.path(project_dir, "module_output", "EWR")
 agg_results <- file.path(project_dir, "aggregator_output", "demo")
 ```
@@ -86,7 +86,7 @@ We use the same examples as in [multi_aggregate](using_multi_aggregate.qmd). The
 
 ```{r}
 aggseq <- list(
-  all_time = 'all_time',
+  all_time = "all_time",
   ewr_code = c("ewr_code_timing", "ewr_code"),
   env_obj = c("ewr_code", "env_obj"),
   sdl_units = sdl_units,
@@ -97,15 +97,15 @@ aggseq <- list(
 )
 
 funseq <- list(
-  all_time = 'ArithmeticMean',
+  all_time = "ArithmeticMean",
   ewr_code = "CompensatingFactor",
   env_obj = "ArithmeticMean",
   sdl_units = "ArithmeticMean",
   Specific_goal = "ArithmeticMean",
   Objective = "ArithmeticMean",
-  basin = 'SpatialWeightedMean',
+  basin = "SpatialWeightedMean",
   target_5_year_2024 = "ArithmeticMean"
-  )
+)
 ```
 
 ### Do the aggregation
@@ -230,7 +230,7 @@ For example, if we wanted to aggregate to Targets (Native fish, Waterbirds, etc)
 
 ```{r}
 aggseq_new <- list(
-  all_time = 'all_time',
+  all_time = "all_time",
   ewr_code = c("ewr_code_timing", "ewr_code"),
   env_obj = c("ewr_code", "env_obj"),
   sdl_units = "sdl_units",
@@ -243,13 +243,13 @@ Median <- function(x) {
 }
 
 funseq_new <- list(
-  all_time = 'ArithmeticMean',
+  all_time = "ArithmeticMean",
   ewr_code = "LimitingFactor",
   env_obj = "Median",
   sdl_units = "Max",
   Target = "Min",
-  basin = 'SpatialWeightedMean'
-  )
+  basin = "SpatialWeightedMean"
+)
 ```
 
 Then, to avoid overwriting the earlier version, since in this example we would want to look at both sets of aggregations, we change the `savepath` argument (along with `aggsequence` and `funsequence`:
@@ -274,7 +274,7 @@ agged_dat_new <- read_and_agg(
   namehistory = FALSE,
   keepAllPolys = FALSE,
   returnList = TRUE,
-  savepath = file.path(project_dir, 'aggregator_output', 'second'),
+  savepath = file.path(project_dir, "aggregator_output", "second"),
   add_max = FALSE
 )
 ```
@@ -346,7 +346,7 @@ We usually want to apply analyses to the full set of scenarios or gauges. Howeve
 #| message: false
 
 smallreadagg <- read_and_agg(
-  datpath = ewr_results, 
+  datpath = ewr_results,
   type = "achievement",
   geopath = bom_basin_gauges,
   causalpath = causal_ewr,
@@ -355,7 +355,7 @@ smallreadagg <- read_and_agg(
   aggsequence = aggseq,
   funsequence = funseq,
   auto_ewr_PU = TRUE,
-    add_max = FALSE,
+  add_max = FALSE,
   namehistory = FALSE,
   gaugefilter = NULL,
   scenariofilter = "base"

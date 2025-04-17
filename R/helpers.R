@@ -37,8 +37,8 @@ make_ewr_output <- function() {
   ewr_out <- HydroBOT::prep_run_save_ewrs(
     hydro_dir = hydro_dir,
     output_parent_dir = project_dir,
-    outputType = list('yearly'),
-    returnType = list('none')
+    outputType = list("yearly"),
+    returnType = list("none")
   )
   # This destroys it once used
   withr::defer_parent(unlink("hydrobot_scenarios", recursive = TRUE))
@@ -67,20 +67,19 @@ make_simpleyml <- function(renderfile = "auto") {
 }
 
 find_missing_pages <- function(files = NULL, pattern = "_quarto.*.yml") {
-
   if (is.null(files)) {
     files <- list.files(pattern = pattern)
   }
 
   qmd_in_proj <- list.files(pattern = "*.qmd", recursive = TRUE)
 
-  qmd_in_yml <- vector(mode = 'character')
+  qmd_in_yml <- vector(mode = "character")
   for (f in files) {
     qmd_in_file <- readLines(f) |>
       purrr::keep(\(x) grepl(".qmd", x)) |>
-      gsub('\\s', '', x = _) |>
-      gsub('-', '', x = _) |>
-      gsub('href:', '', x = _)
+      gsub("\\s", "", x = _) |>
+      gsub("-", "", x = _) |>
+      gsub("href:", "", x = _)
 
     qmd_in_yml <- c(qmd_in_yml, qmd_in_file)
   }

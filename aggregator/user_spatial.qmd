@@ -22,7 +22,7 @@ As always, we need to point to the data.
 
 ```{r}
 project_dir <- "hydrobot_scenarios"
-hydro_dir <- file.path(project_dir, 'hydrographs')
+hydro_dir <- file.path(project_dir, "hydrographs")
 ewr_results <- file.path(project_dir, "module_output", "EWR")
 agg_results <- file.path(project_dir, "aggregator_output", "demo")
 ```
@@ -30,7 +30,7 @@ agg_results <- file.path(project_dir, "aggregator_output", "demo")
 ## New spatial units
 
 ```{r}
-austates <- rnaturalearth::ne_states(country = 'australia') |> 
+austates <- rnaturalearth::ne_states(country = "australia") |>
   dplyr::select(state = name, geometry)
 ```
 
@@ -38,17 +38,17 @@ We'll set `keepAllPolys = TRUE` since the data is all in NSW and we want to show
 
 ```{r}
 aggseq_states <- list(
-  all_time = 'all_time',
+  all_time = "all_time",
   env_obj = c("ewr_code_timing", "env_obj"),
-  Target = c("env_obj", 'Target'),
+  Target = c("env_obj", "Target"),
   state = austates
 )
 
 funseq_states <- list(
-  all_time = 'ArithmeticMean',
-  env_obj = 'ArithmeticMean',
-  Target = 'ArithmeticMean',
-  state = 'ArithmeticMean'
+  all_time = "ArithmeticMean",
+  env_obj = "ArithmeticMean",
+  Target = "ArithmeticMean",
+  state = "ArithmeticMean"
 )
 
 state_agg <- read_and_agg(
@@ -78,7 +78,7 @@ state_agg
 And a quick plot of that to see the different spatial units (though this example is all in New South Wales so other states have no data).
 
 ```{r}
-state_agg$state |> 
+state_agg$state |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     plot_type = "map",

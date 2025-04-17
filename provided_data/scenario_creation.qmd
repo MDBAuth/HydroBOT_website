@@ -148,14 +148,13 @@ Since some of those are flow and some are level, let's do two calls and bind. We
 ```{r}
 if (params$REBUILD_DATA) {
   demo_levs <- hydrogauge::get_ts_traces(
-  portal = "NSW",
-  site_list = gauges_to_pull,
-  var_list = 141, # This is flow
-  start_time = starttime,
-  end_time = endtime
-)
+    portal = "NSW",
+    site_list = gauges_to_pull,
+    var_list = 141, # This is flow
+    start_time = starttime,
+    end_time = endtime
+  )
 }
-
 ```
 
 The azure boxes have old GDAL, which can't read WKT2. Need to fix, but in the meantime, [force with the crs number](https://github.com/r-spatial/sf/issues/1419).
@@ -196,16 +195,16 @@ Set up the data structure
 
 ```{r}
 if (params$REBUILD_DATA) {
-demo_flow <- demo_levs |>
-  dplyr::mutate(Date = lubridate::date(time)) |>
-  # append the gauge type
-  dplyr::mutate(site = paste0(site, "_flow")) |>
-  dplyr::select(Date, value, site) |>
-  tidyr::pivot_wider(
-    id_cols = Date,
-    names_from = site,
-    values_from = value
-  )
+  demo_flow <- demo_levs |>
+    dplyr::mutate(Date = lubridate::date(time)) |>
+    # append the gauge type
+    dplyr::mutate(site = paste0(site, "_flow")) |>
+    dplyr::select(Date, value, site) |>
+    tidyr::pivot_wider(
+      id_cols = Date,
+      names_from = site,
+      values_from = value
+    )
 }
 ```
 
@@ -259,9 +258,9 @@ scenenames <- c(scenenames, "MAX")
 scenemults <- c(scenemults, 0)
 sceneadds <- c(sceneadds, 500000)
 sceneadapttimes <- c(sceneadapttimes, 0)
-climate_code <- c(climate_code, 'MAX')
+climate_code <- c(climate_code, "MAX")
 adapt_code <- c(adapt_code, Inf)
-scenario_code <- c(scenario_code, 'MAX')
+scenario_code <- c(scenario_code, "MAX")
 
 check <- data.frame(scenenames = scenenames)
 check$scenemults <- scenemults

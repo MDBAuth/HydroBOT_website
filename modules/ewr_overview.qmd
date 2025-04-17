@@ -61,45 +61,45 @@ Some gauges provide information about conditions in multiple *planning units* (f
 
 ```{r}
 #| label: fig-gauge-sdl-pu
-#| fig-cap: Gauges in the EWR tool (points) superimposed on SDL units (a) and planning units (b). Points are colored by the number of larger units they are associated with; typically one but sometimes up to 2 sdl units or 10 planning units.  
+#| fig-cap: Gauges in the EWR tool (points) superimposed on SDL units (a) and planning units (b). Points are colored by the number of larger units they are associated with; typically one but sometimes up to 2 sdl units or 10 planning units.
 
 
 eg <- get_ewr_gauges()
 
-etp <- eg |> 
-    sf::st_drop_geometry() |> 
-  select(gauge, planning_unit_name) |> 
-  distinct() |> 
+etp <- eg |>
+  sf::st_drop_geometry() |>
+  select(gauge, planning_unit_name) |>
+  distinct() |>
   summarise(n_planning = n(), .by = gauge)
 
-ets <- eg |> 
-  sf::st_drop_geometry() |> 
-  select(gauge, SWSDLName) |> 
-    distinct() |> 
+ets <- eg |>
+  sf::st_drop_geometry() |>
+  select(gauge, SWSDLName) |>
+  distinct() |>
   summarise(n_sdl = n(), .by = gauge)
 
-eg <- eg |> 
-  left_join(ets, by = 'gauge') |> 
-  left_join(etp, by = 'gauge')
+eg <- eg |>
+  left_join(ets, by = "gauge") |>
+  left_join(etp, by = "gauge")
 
-cpal <- make_pal(as.factor(1:10), palette = 'grDevices::Viridis')
+cpal <- make_pal(as.factor(1:10), palette = "grDevices::Viridis")
 
 sdlmap <- ggplot() +
-  geom_sf(data = sdl_units, fill = 'azure') +
+  geom_sf(data = sdl_units, fill = "azure") +
   geom_sf(data = eg, mapping = aes(color = as.factor(n_sdl))) +
   scale_color_manual(values = cpal) +
   theme_hydrobot() +
-  labs(color = 'Number sdl units')
+  labs(color = "Number sdl units")
 
 pumap <- ggplot() +
-  geom_sf(data = planning_units, fill = 'azure') +
+  geom_sf(data = planning_units, fill = "azure") +
   geom_sf(data = eg, mapping = aes(color = as.factor(n_planning))) +
   scale_color_manual(values = cpal) +
-  theme_hydrobot() + 
-  labs(color = 'Number planning units')
+  theme_hydrobot() +
+  labs(color = "Number planning units")
 
 sdlmap / pumap +
-  plot_annotation(tag_levels = 'a')
+  plot_annotation(tag_levels = "a")
 ```
 
 ## EWR tool and HydroBOT

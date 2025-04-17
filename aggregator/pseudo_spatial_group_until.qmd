@@ -59,9 +59,8 @@ funseq <- list(
 Grouping by SWSDLName, gauge, and planning_unit name columns is retained until the sdl_unit aggregation, specified in three different ways. Likewise, the aggregation into SDL units is done non-spatially.
 
 ```{r}
-
 aggout <- read_and_agg(
-  datpath = 'hydrobot_scenarios/module_output/EWR',
+  datpath = "hydrobot_scenarios/module_output/EWR",
   type = "achievement",
   geopath = bom_basin_gauges,
   causalpath = causal_ewr,
@@ -69,7 +68,7 @@ aggout <- read_and_agg(
   aggCols = "ewr_achieved",
   group_until = list(
     SWSDLName = 3,
-    planning_unit_name = 'sdl_units',
+    planning_unit_name = "sdl_units",
     gauge = is_notpoint
   ),
   pseudo_spatial = "sdl_units",
@@ -81,7 +80,6 @@ aggout <- read_and_agg(
   returnList = TRUE,
   add_max = FALSE
 )
-
 ```
 
 ## `auto_ewr_PU`
@@ -101,7 +99,7 @@ Using `auto_ewr_PU` to achieve the same results as above is done with this call,
 
 ```{r}
 aggout_auto <- read_and_agg(
-  datpath = 'hydrobot_scenarios/module_output/EWR',
+  datpath = "hydrobot_scenarios/module_output/EWR",
   type = "achievement",
   geopath = bom_basin_gauges,
   causalpath = causal_ewr,

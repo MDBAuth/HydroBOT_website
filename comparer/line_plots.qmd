@@ -46,21 +46,21 @@ If we had used multiple aggregation functions at any step, we should filter down
 For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2). Thus, we make two small dataframes for our primary examples here.
 
 ```{r}
-scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
+scenarios_to_plot <- c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0")
 
-scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
+scenarios <- yaml::read_yaml(file.path(hydro_dir, "scenario_metadata.yml")) |>
   tibble::as_tibble()
 
-basin_to_plot <- agged_data$mdb |> 
-  dplyr::filter(scenario %in% scenarios_to_plot) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+basin_to_plot <- agged_data$mdb |>
+  dplyr::filter(scenario %in% scenarios_to_plot) |>
+  dplyr::left_join(scenarios, by = "scenario")
 
 # Create a grouping variable
 obj_sdl_to_plot <- agged_data$sdl_units |>
-    dplyr::filter(scenario %in% scenarios_to_plot) |> 
+  dplyr::filter(scenario %in% scenarios_to_plot) |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
-  dplyr::arrange(env_group, env_obj) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+  dplyr::arrange(env_group, env_obj) |>
+  dplyr::left_join(scenarios, by = "scenario")
 ```
 
 # Standard scenario appearance
@@ -72,8 +72,10 @@ Here, we use the special arguments `refvals` and `refcols` to make a colour pale
 There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the  `sceneorder` argument here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
 ```{r}
-sceneorder <- forcats::fct_reorder(scenarios$scenario,
-                                   scenarios$flow_multiplier)
+sceneorder <- forcats::fct_reorder(
+  scenarios$scenario,
+  scenarios$flow_multiplier
+)
 
 scene_pal <- make_pal(unique(scenarios$climate_code),
   palette = "ggsci::nrc_npg",
@@ -93,7 +95,7 @@ A simple plot would be to look at all the outcomes, separated by colour (though 
 
 ```{r}
 sdl_line <- obj_sdl_to_plot |>
-  filter(adapt_code == 1) |> 
+  filter(adapt_code == 1) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     x_col = "flow_multiplier",
@@ -139,9 +141,9 @@ sdl_line_options <- obj_sdl_to_plot |>
     facet_row = "SWSDLName",
     sceneorder = sceneorder,
     base_list = list(
-          base_lev = "climatebaseadapt0",
-    comp_fun = "relative",
-    group_cols = c("env_obj", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("env_obj", "polyID")
     )
   )
 
@@ -178,9 +180,9 @@ sdl_line_groups <- obj_sdl_to_plot |>
     pal_list = grouplist,
     facet_row = "SWSDLName",
     base_list = list(
-          base_lev = "climatebaseadapt0",
-    comp_fun = "relative",
-    group_cols = c("env_obj", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("env_obj", "polyID")
     )
   )
 
@@ -208,9 +210,9 @@ sdl_line_groups_facet <- obj_sdl_to_plot |>
     facet_row = "SWSDLName",
     facet_col = "env_group",
     base_list = list(
-          base_lev = "climatebaseadapt0",
-    comp_fun = "relative",
-    group_cols = c("env_obj", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("env_obj", "polyID")
     )
   )
 
@@ -245,9 +247,9 @@ sdl_line_sdl <- obj_sdl_to_plot |>
     point_group = "env_obj",
     facet_col = "env_group",
     base_list = list(
-          base_lev = "climatebaseadapt0",
-    comp_fun = "relative",
-    group_cols = c("env_obj", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("env_obj", "polyID")
     )
   )
 
@@ -283,9 +285,9 @@ sdl_smooth_sdl <- obj_sdl_to_plot |>
     pal_list = list("ggsci::default_jama"),
     facet_row = "env_group",
     base_list = list(
-          base_lev = "climatebaseadapt0",
-    comp_fun = "relative",
-    group_cols = c("env_obj", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("env_obj", "polyID")
     ),
     smooth_arglist = list()
   )
@@ -304,7 +306,7 @@ sdl_smooth_groups <- obj_sdl_to_plot |>
     y_lab = "Proportion met",
     x_lab = "Change in flow",
     transx = "log10",
-    transoutcome = 'log10',
+    transoutcome = "log10",
     color_lab = "Environmental grouping",
     colorgroups = NULL,
     colorset = "env_group",
@@ -313,12 +315,12 @@ sdl_smooth_groups <- obj_sdl_to_plot |>
     facet_row = "env_group",
     facet_col = "SWSDLName",
     base_list = list(
-          base_lev = "climatebaseadapt0",
-    comp_fun = "relative",
-    group_cols = c("env_obj", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("env_obj", "polyID")
     ),
     smooth_arglist = list(),
-    zero_adjust = 'auto'
+    zero_adjust = "auto"
   )
 sdl_smooth_groups
 ```
@@ -329,25 +331,25 @@ Using `method = 'lm'` in `smooth_arglist` yields a linear fit (and any other `me
 #| message: false
 #| warning: false
 obj_sdl_to_plot |>
-    plot_outcomes(
-        outcome_col = "ewr_achieved",
-        x_col = "flow_multiplier",
-        y_lab = "Proportion met",
-        x_lab = "Change in flow",
-        transx = "log10",
-        color_lab = "Environmental grouping",
-        colorset = "env_group",
-        point_group = "env_obj",
-        pal_list = list("scico::berlin"),
-        facet_row = "env_group",
-        facet_col = "SWSDLName",
-        base_list = list(
-            base_lev = "climatebaseadapt0",
-            comp_fun = "relative",
-            group_cols = c("env_obj", "polyID")
-        ),
-        smooth_arglist = list(method = 'lm', se = FALSE)
-    )
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    x_col = "flow_multiplier",
+    y_lab = "Proportion met",
+    x_lab = "Change in flow",
+    transx = "log10",
+    color_lab = "Environmental grouping",
+    colorset = "env_group",
+    point_group = "env_obj",
+    pal_list = list("scico::berlin"),
+    facet_row = "env_group",
+    facet_col = "SWSDLName",
+    base_list = list(
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("env_obj", "polyID")
+    ),
+    smooth_arglist = list(method = "lm", se = FALSE)
+  )
 ```
 
 ### Fit multiple points {#sec-smooth-multiple}
@@ -379,13 +381,13 @@ sdl_fit_sdl <- obj_sdl_to_plot |>
     colorset = "SWSDLName",
     pal_list = list("ggsci::default_jama"),
     facet_wrapper = "env_group",
-        base_list = list(
-            base_lev = "climatebaseadapt0",
-            comp_fun = "relative",
-            add_eps = 'auto',
-            group_cols = c("env_obj", "polyID")
-        ),
-        smooth_arglist = list()
+    base_list = list(
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      add_eps = "auto",
+      group_cols = c("env_obj", "polyID")
+    ),
+    smooth_arglist = list()
   )
 
 sdl_fit_sdl
@@ -411,13 +413,13 @@ sdl_fit_groups <- obj_sdl_to_plot |>
     pal_list = list("scico::berlin"),
     facet_row = "SWSDLName",
     facet_col = ".",
-        base_list = list(
-            base_lev = "climatebaseadapt0",
-            comp_fun = "relative",
-            add_eps = 'auto',
-            group_cols = c("env_obj", "polyID")
-        ),
-        smooth_arglist = list(),
+    base_list = list(
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      add_eps = "auto",
+      group_cols = c("env_obj", "polyID")
+    ),
+    smooth_arglist = list(),
     position = position_jitter(width = 0.01, height = 0)
   )
 
@@ -445,13 +447,13 @@ sdl_lm_sdl <- obj_sdl_to_plot |>
     colorset = "SWSDLName",
     pal_list = list("ggsci::default_jama"),
     facet_wrapper = "env_group",
-        base_list = list(
-            base_lev = "climatebaseadapt0",
-            comp_fun = "relative",
-            add_eps = 'auto',
-            group_cols = c("env_obj", "polyID")
-        ),
-        smooth_arglist = list(method = 'lm')
+    base_list = list(
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      add_eps = "auto",
+      group_cols = c("env_obj", "polyID")
+    ),
+    smooth_arglist = list(method = "lm")
   )
 
 sdl_lm_sdl

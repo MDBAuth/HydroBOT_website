@@ -236,7 +236,7 @@ lagplot + labs(y = "Lag 1 flow difference")
 Briefly, the `read_hydro()` function can also read `.nc` files, but is a bit more constrained as to their format. As a quick demonstration with the data provided with HydroBOT, we can read them in and plot.
 
 ```{r}
-nchydros <- read_hydro(system.file('extdata/ncdfexample/nchydros', package = 'HydroBOT'),
+nchydros <- read_hydro(system.file("extdata/ncdfexample/nchydros", package = "HydroBOT"),
   long = TRUE, format = "nc"
 )
 ```

@@ -46,7 +46,7 @@ The theme relationships in the causal network `causal_ewr` provide the links and
 
 ```{r}
 project_dir <- "hydrobot_scenarios"
-hydro_dir <- file.path(project_dir, 'hydrographs')
+hydro_dir <- file.path(project_dir, "hydrographs")
 ewr_results <- file.path(project_dir, "module_output", "EWR")
 ```
 
@@ -62,21 +62,21 @@ The data comes in as a timeseries, so we do one initial level of temporal aggreg
 ewr_out <- prep_run_save_ewrs(
   hydro_dir = hydro_dir,
   output_parent_dir = project_dir,
-  outputType = list('none'),
-  returnType = list('yearly')
+  outputType = list("none"),
+  returnType = list("yearly")
 )
 
 
 # This is just a simple prep step that is usually done internally to put the geographic coordinates on input data
-ewrdata <- prep_ewr_output(ewr_out$yearly, type = 'achievement', add_max = FALSE)
+ewrdata <- prep_ewr_output(ewr_out$yearly, type = "achievement", add_max = FALSE)
 
 # This gets us to env_obj at the gauge over all time
 preseq <- list(
   all_time = "all_time"
-  )
+)
 
 funseq <- list(
-  'ArithmeticMean'
+  "ArithmeticMean"
 )
 
 # Do the aggregation to get output at each gauge averaged over time
@@ -133,12 +133,12 @@ The `funlist` argument works as in the [spatial examples](spatial_agg.qmd), and 
 
 timing_obj <- theme_aggregate(
   dat = simpleAgg,
-  from_theme = 'ewr_code_timing',
-  to_theme = 'env_obj',
+  from_theme = "ewr_code_timing",
+  to_theme = "env_obj",
   # 'gauge' is not strictly necessary because this is an sf, but including it retains that column
-  groupers = c("scenario", 'gauge'),
+  groupers = c("scenario", "gauge"),
   aggCols = tidyselect::ends_with("ewr_achieved"),
-  funlist = 'ArithmeticMean',
+  funlist = "ArithmeticMean",
   causal_edges = causal_ewr
 )
 
@@ -156,10 +156,11 @@ names(timing_obj)
 We can clean those up into columns with `agg_names_to_cols()` (which happens internally in `multi_aggregate()` and `read_and_agg()` with `namehistory = FALSE`).
 
 ```{r}
-to_rename <- agg_names_to_cols(timing_obj, 
-                              aggsequence = c(names(preseq), 'env_obj'), 
-                              funsequence = c(funseq, 'ArithmeticMean'), 
-                              aggCols = 'ewr_achieved')
+to_rename <- agg_names_to_cols(timing_obj,
+  aggsequence = c(names(preseq), "env_obj"),
+  funsequence = c(funseq, "ArithmeticMean"),
+  aggCols = "ewr_achieved"
+)
 
 to_rename
 ```
@@ -167,23 +168,24 @@ to_rename
 A quick plot shows the outcome. For more plotting details, see the [plotting section](/comparer/comparer_overview.qmd). We'll simplify the names and choose a subset of the environmental objectives.
 
 ```{r}
-
-env_pals <- list(EB = 'grDevices::Grays',
-  EF = 'grDevices::Purp',
-                NF = 'grDevices::Mint',
-                NV = 'grDevices::Burg',
-                OS = 'grDevices::Blues 2',
-                WB = 'grDevices::Peach')
+env_pals <- list(
+  EB = "grDevices::Grays",
+  EF = "grDevices::Purp",
+  NF = "grDevices::Mint",
+  NV = "grDevices::Burg",
+  OS = "grDevices::Blues 2",
+  WB = "grDevices::Peach"
+)
 
 
 to_rename |>
-  dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-  dplyr::filter(env_group != 'EB') |> 
+  dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
+  dplyr::filter(env_group != "EB") |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
-    x_col = 'scenario',
+    x_col = "scenario",
     y_lab = "Arithmetic Mean",
-    colorgroups = 'env_group',
+    colorgroups = "env_group",
     colorset = "env_obj",
     pal_list = env_pals,
     # facet_col = "env_obj",
@@ -201,32 +203,35 @@ If we give `funlist` more than one aggregation function, it calculates both. Her
 
 timing_obj_2 <- theme_aggregate(
   dat = simpleAgg,
-  from_theme = 'ewr_code_timing',
-  to_theme = 'env_obj',
-  groupers = c("scenario", 'gauge'),
+  from_theme = "ewr_code_timing",
+  to_theme = "env_obj",
+  groupers = c("scenario", "gauge"),
   aggCols = tidyselect::ends_with("ewr_achieved"),
-  funlist = c('ArithmeticMean', 'Min'),
+  funlist = c("ArithmeticMean", "Min"),
   causal_edges = causal_ewr
 )
 
 timing_obj_2 <- agg_names_to_cols(timing_obj_2,
-                              aggsequence = c(names(preseq), 'env_obj'),
-                              funsequence = list(all_time = funseq,
-                                                 env_obj = list('ArithmeticMean', 'Min')),
-                              aggCols = 'ewr_achieved')
+  aggsequence = c(names(preseq), "env_obj"),
+  funsequence = list(
+    all_time = funseq,
+    env_obj = list("ArithmeticMean", "Min")
+  ),
+  aggCols = "ewr_achieved"
+)
 ```
 
 And now we can compare what we get out of the different functions
 
 ```{r}
 timing_obj_2 |>
-  dplyr::mutate(env_group = stringr::str_extract(env_obj, '^[A-Z]+')) |>
-  filter(polyID != "r1zp2f5py7d") |> 
+  dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
+  filter(polyID != "r1zp2f5py7d") |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
-    x_col = 'aggfun_2',
+    x_col = "aggfun_2",
     y_lab = "Arithmetic Mean",
-    colorgroups = 'env_group',
+    colorgroups = "env_group",
     colorset = "env_obj",
     pal_list = env_pals,
     facet_col = "scenario",
@@ -245,7 +250,7 @@ To create the aggregation, we provide the sequence lists created above, along wi
 #| message: false
 
 aggseq <- list(
-  all_time = 'all_time',
+  all_time = "all_time",
   ewr_code = c("ewr_code_timing", "ewr_code"),
   env_obj = c("ewr_code", "env_obj"),
   Specific_goal = c("env_obj", "Specific_goal"),
@@ -254,7 +259,7 @@ aggseq <- list(
 )
 
 funseq <- list(
-  all_time = 'ArithmeticMean',
+  all_time = "ArithmeticMean",
   ewr_code = c("CompensatingFactor"),
   env_obj = c("ArithmeticMean", "LimitingFactor"),
   Specific_goal = c("ArithmeticMean", "LimitingFactor"),
@@ -265,14 +270,14 @@ funseq <- list(
 theme_steps <- multi_aggregate(
   dat = ewrdata,
   causal_edges = causal_ewr,
-  groupers = c("scenario", 'gauge'),
+  groupers = c("scenario", "gauge"),
   aggCols = "ewr_achieved",
   aggsequence = aggseq,
   funsequence = funseq,
   namehistory = FALSE,
   saveintermediate = TRUE,
   auto_ewr_PU = TRUE # avoid warnings and errors
-) 
+)
 ```
 
 ### Causal plot
@@ -313,13 +318,14 @@ valcol <- "ewr_achieved"
 
 # Get the values for each node
 aggvals <- extract_vals_causal(theme_steps,
-                               whichaggs = whichaggs,
-                               valcol = 'ewr_achieved',
-                               targetlevels = names(aggseq)[2:6]) # don't use the first one, it's time at _timing 
+  whichaggs = whichaggs,
+  valcol = "ewr_achieved",
+  targetlevels = names(aggseq)[2:6]
+) # don't use the first one, it's time at _timing
 
-aggvals <- aggvals |> 
+aggvals <- aggvals |>
   # the NA gauges are for levels past gauge definitions
-  filter(gauge == example_gauge | is.na(gauge)) |> 
+  filter(gauge == example_gauge | is.na(gauge)) |>
   st_drop_geometry()
 
 # join to the nodes

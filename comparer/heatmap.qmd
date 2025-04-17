@@ -44,14 +44,12 @@ To make visualisation easier, the SDL units data is given a grouping column that
 If we had used multiple aggregation functions at any step, we should filter down to the one we want here, but we only used one for this example.
 
 ```{r}
-
-scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
+scenarios <- yaml::read_yaml(file.path(hydro_dir, "scenario_metadata.yml")) |>
   tibble::as_tibble()
 
 # join the scenario information to each of those sheets
 agged_data <- agged_data |>
-  purrr::map(\(x) left_join(x, scenarios, by = 'scenario'))
-
+  purrr::map(\(x) left_join(x, scenarios, by = "scenario"))
 ```
 
 # Make surface plots
@@ -64,24 +62,28 @@ If we have qualitative descriptions on x- and y-, the heatmap will have even ste
 
 ```{r}
 qual_heatmap <- agged_data$Target |>
-  dplyr::filter(adapt_code %in% c(1,2,3, 4)) |> 
-  dplyr::filter(!is.na(Target)) |> 
+  dplyr::filter(adapt_code %in% c(1, 2, 3, 4)) |>
+  dplyr::filter(!is.na(Target)) |>
   # clean names
-  mutate(SWSDLName = stringr::str_replace(SWSDLName, '–', '-\n'),
-         Target = stringr::str_replace(Target, 'Priority e', 'E'),
-         Target = stringr::str_wrap(Target, width = 12),
-         adapt_code = as.character(adapt_code)) |>
-  plot_outcomes(outcome_col = 'ewr_achieved',
-                outcome_lab = 'Condition',
-                y_col = 'adapt_code', 
-                y_lab = 'Adaptation option',
-                x_col = 'climate_code', 
-                x_lab = 'Climate scenario',
-                plot_type = 'heatmap',
-                colorset = 'ewr_achieved',
-                pal_list = 'grDevices::Viridis',
-                facet_row = 'Target',
-                facet_col = 'SWSDLName')
+  mutate(
+    SWSDLName = stringr::str_replace(SWSDLName, "–", "-\n"),
+    Target = stringr::str_replace(Target, "Priority e", "E"),
+    Target = stringr::str_wrap(Target, width = 12),
+    adapt_code = as.character(adapt_code)
+  ) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    outcome_lab = "Condition",
+    y_col = "adapt_code",
+    y_lab = "Adaptation option",
+    x_col = "climate_code",
+    x_lab = "Climate scenario",
+    plot_type = "heatmap",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_row = "Target",
+    facet_col = "SWSDLName"
+  )
 
 qual_heatmap
 ```
@@ -93,25 +95,29 @@ Here, our scenarios are defined quantitatively, and so we can allow x and y to b
 ```{r}
 # Quantitative axes- it's more informative, but uglier
 quant_heatmap <- agged_data$Target |>
-  dplyr::filter(adapt_code %in% c(1,2,3)) |> 
+  dplyr::filter(adapt_code %in% c(1, 2, 3)) |>
   # clean names
-  mutate(SWSDLName = stringr::str_replace(SWSDLName, '–', '-\n'),
-         Target = stringr::str_replace(Target, 'Priority e', 'E'),
-         Target = stringr::str_wrap(Target, width = 12)) |>
-  mutate(flow_addition = flow_addition + 1) |> 
-  plot_outcomes(outcome_col = 'ewr_achieved',
-                outcome_lab = 'Condition',
-                y_col = 'flow_addition', 
-                y_lab = "Flow addition ('adaptation')",
-                x_col = 'flow_multiplier', 
-                x_lab = "Flow multiplier ('climate')",
-                plot_type = 'heatmap',
-                transy = 'log10',
-                transx = 'log10',
-                colorset = 'ewr_achieved',
-                pal_list = 'grDevices::Viridis',
-                facet_row = 'Target',
-                facet_col = 'SWSDLName')
+  mutate(
+    SWSDLName = stringr::str_replace(SWSDLName, "–", "-\n"),
+    Target = stringr::str_replace(Target, "Priority e", "E"),
+    Target = stringr::str_wrap(Target, width = 12)
+  ) |>
+  mutate(flow_addition = flow_addition + 1) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    outcome_lab = "Condition",
+    y_col = "flow_addition",
+    y_lab = "Flow addition ('adaptation')",
+    x_col = "flow_multiplier",
+    x_lab = "Flow multiplier ('climate')",
+    plot_type = "heatmap",
+    transy = "log10",
+    transx = "log10",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_row = "Target",
+    facet_col = "SWSDLName"
+  )
 
 quant_heatmap
 ```
@@ -122,26 +128,30 @@ We can try to fill in the missing locations by interpolating a raster using the 
 
 ```{r}
 quant_interp_heatmap <- agged_data$Target |>
-  dplyr::filter(adapt_code %in% c(1,2,3)) |>
+  dplyr::filter(adapt_code %in% c(1, 2, 3)) |>
   # clean names
-  mutate(SWSDLName = stringr::str_replace(SWSDLName, '–', '-\n'),
-         Target = stringr::str_replace(Target, 'Priority e', 'E'),
-         Target = stringr::str_wrap(Target, width = 12)) |>
-  mutate(flow_addition = flow_addition + 1) |> 
-  plot_outcomes(outcome_col = 'ewr_achieved',
-                outcome_lab = 'Condition',
-                y_col = 'flow_addition', 
-                y_lab = "Flow addition ('adaptation')",
-                x_col = 'flow_multiplier', 
-                x_lab = "Flow multiplier ('climate')",
-                plot_type = 'heatmap',
-                transy = 'log10',
-                transx = 'log10',
-                colorset = 'ewr_achieved',
-                pal_list = 'grDevices::Viridis',
-                facet_row = 'Target',
-                facet_col = 'SWSDLName',
-                contour_arglist = list(interpolate = TRUE))
+  mutate(
+    SWSDLName = stringr::str_replace(SWSDLName, "–", "-\n"),
+    Target = stringr::str_replace(Target, "Priority e", "E"),
+    Target = stringr::str_wrap(Target, width = 12)
+  ) |>
+  mutate(flow_addition = flow_addition + 1) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    outcome_lab = "Condition",
+    y_col = "flow_addition",
+    y_lab = "Flow addition ('adaptation')",
+    x_col = "flow_multiplier",
+    x_lab = "Flow multiplier ('climate')",
+    plot_type = "heatmap",
+    transy = "log10",
+    transx = "log10",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_row = "Target",
+    facet_col = "SWSDLName",
+    contour_arglist = list(interpolate = TRUE)
+  )
 
 quant_interp_heatmap
 ```
@@ -151,29 +161,32 @@ quant_interp_heatmap
 We can also just fit contour surfaces, done by passing a list of arguments to `contour_arglist`. If it is an empty list, as here, it simply triggers the contour. Again, these contours would be better if they were fit to tighter scenario spacing.
 
 ```{r}
-  contour_heatmap <- agged_data$Target |>
-  dplyr::filter(adapt_code %in% c(1,2,3)) |> 
+contour_heatmap <- agged_data$Target |>
+  dplyr::filter(adapt_code %in% c(1, 2, 3)) |>
   # clean names
-  mutate(scenario = paste0(climate_code, adapt_code), 
-         SWSDLName = stringr::str_replace(SWSDLName, '–', '-\n'),
-         Target = stringr::str_replace(Target, 'Priority e', 'E'),
-         Target = stringr::str_wrap(Target, width = 12),
-         adapt_code = as.character(adapt_code)) |>
-  mutate(flow_addition = flow_addition + 1) |> 
-  plot_outcomes(outcome_col = 'ewr_achieved',
-                outcome_lab = "Proportion\nEWR achieved",
-                y_col = 'flow_addition', 
-                y_lab = "Flow addition ('adaptation')",
-                x_col = 'flow_multiplier', 
-                x_lab = "Flow multiplier ('climate')",
-                plot_type = 'heatmap',
-                transy = 'log10',
-                transx = 'log10',
-                colorset = 'ewr_achieved',
-                pal_list = 'grDevices::Viridis',
-                facet_row = 'Target',
-                facet_col = 'SWSDLName',
-                contour_arglist = list()
+  mutate(
+    scenario = paste0(climate_code, adapt_code),
+    SWSDLName = stringr::str_replace(SWSDLName, "–", "-\n"),
+    Target = stringr::str_replace(Target, "Priority e", "E"),
+    Target = stringr::str_wrap(Target, width = 12),
+    adapt_code = as.character(adapt_code)
+  ) |>
+  mutate(flow_addition = flow_addition + 1) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    outcome_lab = "Proportion\nEWR achieved",
+    y_col = "flow_addition",
+    y_lab = "Flow addition ('adaptation')",
+    x_col = "flow_multiplier",
+    x_lab = "Flow multiplier ('climate')",
+    plot_type = "heatmap",
+    transy = "log10",
+    transx = "log10",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_row = "Target",
+    facet_col = "SWSDLName",
+    contour_arglist = list()
   )
 
 contour_heatmap
@@ -182,29 +195,32 @@ contour_heatmap
 We can use `contour_arglist` to pass arguments to `geom_contour`, e.g. changing the bins, binwidth, or breaks.
 
 ```{r}
-  contour_heatmap_adj <- agged_data$Target |>
-  dplyr::filter(adapt_code %in% c(1,2,3)) |> 
+contour_heatmap_adj <- agged_data$Target |>
+  dplyr::filter(adapt_code %in% c(1, 2, 3)) |>
   # clean names
-  mutate(scenario = paste0(climate_code, adapt_code), 
-         SWSDLName = stringr::str_replace(SWSDLName, '–', '-\n'),
-         Target = stringr::str_replace(Target, 'Priority e', 'E'),
-         Target = stringr::str_wrap(Target, width = 12),
-         adapt_code = as.character(adapt_code)) |>
-  mutate(flow_addition = flow_addition + 1) |> 
-  plot_outcomes(outcome_col = 'ewr_achieved',
-                outcome_lab = "Proportion\nEWR achieved",
-                y_col = 'flow_addition', 
-                y_lab = "Flow addition ('adaptation')",
-                x_col = 'flow_multiplier', 
-                x_lab = "Flow multiplier ('climate')",
-                plot_type = 'heatmap',
-                transy = 'log10',
-                transx = 'log10',
-                colorset = 'ewr_achieved',
-                pal_list = 'grDevices::Viridis',
-                facet_row = 'Target',
-                facet_col = 'SWSDLName',
-                contour_arglist = list(bins = 30)
+  mutate(
+    scenario = paste0(climate_code, adapt_code),
+    SWSDLName = stringr::str_replace(SWSDLName, "–", "-\n"),
+    Target = stringr::str_replace(Target, "Priority e", "E"),
+    Target = stringr::str_wrap(Target, width = 12),
+    adapt_code = as.character(adapt_code)
+  ) |>
+  mutate(flow_addition = flow_addition + 1) |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    outcome_lab = "Proportion\nEWR achieved",
+    y_col = "flow_addition",
+    y_lab = "Flow addition ('adaptation')",
+    x_col = "flow_multiplier",
+    x_lab = "Flow multiplier ('climate')",
+    plot_type = "heatmap",
+    transy = "log10",
+    transx = "log10",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_row = "Target",
+    facet_col = "SWSDLName",
+    contour_arglist = list(bins = 30)
   )
 
 contour_heatmap_adj
@@ -216,7 +232,9 @@ At present, we cannot plot points on top of the heatmap internally to `plot_outc
 
 ```{r}
 contour_heatmap +
-  geom_point(data = scenarios |> 
-               filter(adapt_code %in% c(1,2,3)),
-             color = 'black')
+  geom_point(
+    data = scenarios |>
+      filter(adapt_code %in% c(1, 2, 3)),
+    color = "black"
+  )
 ```

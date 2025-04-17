@@ -22,7 +22,7 @@ As always, we need to point to the data.
 
 ```{r}
 project_dir <- "hydrobot_scenarios"
-hydro_dir <- file.path(project_dir, 'hydrographs')
+hydro_dir <- file.path(project_dir, "hydrographs")
 ewr_results <- file.path(project_dir, "module_output", "EWR")
 agg_results <- file.path(project_dir, "aggregator_output", "demo")
 ```
@@ -45,20 +45,20 @@ Now we can put those in the `funsequence`:
 
 ```{r}
 aggseq_funs <- list(
-  all_time = 'all_time',
+  all_time = "all_time",
   ewr_code = c("ewr_code_timing", "ewr_code"),
   env_obj = c("ewr_code", "env_obj"),
   sdl_units = sdl_units,
   Target = c("env_obj", "Target")
-  )
+)
 
 
 funseq_funs <- list(
-  all_time = 'ArithmeticMean',
-  ewr_code = 'ArithmeticMean',
-  env_obj = 'mean_given_occurred',
-  sdl_units = 'medna',
-  Target = 'mean_given_occurred'
+  all_time = "ArithmeticMean",
+  ewr_code = "ArithmeticMean",
+  env_obj = "mean_given_occurred",
+  sdl_units = "medna",
+  Target = "mean_given_occurred"
 )
 ```
 
@@ -90,14 +90,13 @@ agged_custom_funs <- read_and_agg(
   savepath = agg_results,
   add_max = FALSE
 )
-
 ```
 
 We can plot them to double check it worked.
 
 ```{r}
-agged_custom_funs$Target |> 
-  dplyr::filter(scenario != 'MAX')  |>  
+agged_custom_funs$Target |>
+  dplyr::filter(scenario != "MAX") |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -109,7 +108,7 @@ agged_custom_funs$Target |>
     facet_col = "Target",
     facet_row = "scenario",
     sceneorder = c("down4", "base", "up4")
-)
+  )
 ```
 
 ```{r}

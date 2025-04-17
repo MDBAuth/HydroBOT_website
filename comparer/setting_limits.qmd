@@ -50,14 +50,16 @@ If we had used multiple aggregation functions at any step, we should filter down
 For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2).
 
 ```{r}
-scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
+scenarios_to_plot <- c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0")
 
-scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
-  tibble::as_tibble() |> 
+scenarios <- yaml::read_yaml(file.path(hydro_dir, "scenario_metadata.yml")) |>
+  tibble::as_tibble() |>
   dplyr::filter(scenario %in% scenarios_to_plot)
 
-sceneorder <- forcats::fct_reorder(scenarios$scenario,
-                                   scenarios$flow_multiplier)
+sceneorder <- forcats::fct_reorder(
+  scenarios$scenario,
+  scenarios$flow_multiplier
+)
 
 scene_pal <- make_pal(unique(scenarios$climate_code),
   palette = "ggsci::nrc_npg",
@@ -70,16 +72,16 @@ scene_pal
 We make two small dataframes for our primary examples here.
 
 ```{r}
-basin_to_plot <- agged_data$mdb |> 
-  dplyr::filter(scenario %in% scenarios_to_plot) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+basin_to_plot <- agged_data$mdb |>
+  dplyr::filter(scenario %in% scenarios_to_plot) |>
+  dplyr::left_join(scenarios, by = "scenario")
 
 # Create a grouping variable
 obj_sdl_to_plot <- agged_data$sdl_units |>
-    dplyr::filter(scenario %in% scenarios_to_plot) |> 
+  dplyr::filter(scenario %in% scenarios_to_plot) |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
-  dplyr::arrange(env_group, env_obj) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+  dplyr::arrange(env_group, env_obj) |>
+  dplyr::left_join(scenarios, by = "scenario")
 ```
 
 # Y-axis limits
@@ -89,83 +91,82 @@ Here, we show adjustments of the y-axis using a simple [bar plot](bar_plots.qmd)
 ```{r}
 #| message: false
 orig_bar <-
-plot_outcomes(basin_to_plot,
-  outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
-  facet_wrapper = "Target",
-  colorset = "climate_code",
-  pal_list = scene_pal
-) +
+  plot_outcomes(basin_to_plot,
+    outcome_col = "ewr_achieved",
+    x_col = "climate_code",
+    facet_wrapper = "Target",
+    colorset = "climate_code",
+    pal_list = scene_pal
+  ) +
   ggtitle("Default limits")
 
 limit_bar <- plot_outcomes(basin_to_plot,
   outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
+  x_col = "climate_code",
   facet_wrapper = "Target",
   colorset = "climate_code",
   pal_list = scene_pal,
-  setLimits = c(0,1)
+  setLimits = c(0, 1)
 ) +
   ggtitle("Limits at full range")
 
 
 orig_bar + limit_bar +
-  plot_layout(guides = 'collect') & theme(legend.position = 'bottom')
+  plot_layout(guides = "collect") & theme(legend.position = "bottom")
 ```
 
 We might also do that if we for some reason weren't using facetting, but making plots separately. Here, we just choose limits that encompass the range of both groups, but do not go all the way to 1.
 
 ```{r}
-orig_bar_fish <- basin_to_plot |> 
-  filter(Target == 'Native fish') |> 
-plot_outcomes(
-  outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
-  facet_wrapper = "Target",
-  colorset = "climate_code",
-  pal_list = scene_pal
-) +
+orig_bar_fish <- basin_to_plot |>
+  filter(Target == "Native fish") |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    x_col = "climate_code",
+    facet_wrapper = "Target",
+    colorset = "climate_code",
+    pal_list = scene_pal
+  ) +
   ggtitle("Default fish limits")
 
-orig_bar_bird <- basin_to_plot |> 
-  filter(Target == 'Waterbirds') |> 
-plot_outcomes(
-  outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
-  facet_wrapper = "Target",
-  colorset = "climate_code",
-  pal_list = scene_pal
-) +
+orig_bar_bird <- basin_to_plot |>
+  filter(Target == "Waterbirds") |>
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    x_col = "climate_code",
+    facet_wrapper = "Target",
+    colorset = "climate_code",
+    pal_list = scene_pal
+  ) +
   ggtitle("Default bird limits")
 
-limit_bar_fish <- basin_to_plot |> 
-  filter(Target == 'Native fish') |> 
+limit_bar_fish <- basin_to_plot |>
+  filter(Target == "Native fish") |>
   plot_outcomes(
-  outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
-  facet_wrapper = "Target",
-  colorset = "climate_code",
-  pal_list = scene_pal,
-  setLimits = c(0,0.6)
-) +
+    outcome_col = "ewr_achieved",
+    x_col = "climate_code",
+    facet_wrapper = "Target",
+    colorset = "climate_code",
+    pal_list = scene_pal,
+    setLimits = c(0, 0.6)
+  ) +
   ggtitle("Adjusted fish limits")
 
-limit_bar_bird <- basin_to_plot |> 
-  filter(Target == 'Waterbirds') |> 
+limit_bar_bird <- basin_to_plot |>
+  filter(Target == "Waterbirds") |>
   plot_outcomes(
-  outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
-  facet_wrapper = "Target",
-  colorset = "climate_code",
-  pal_list = scene_pal,
-  setLimits = c(0,0.6)
-) +
+    outcome_col = "ewr_achieved",
+    x_col = "climate_code",
+    facet_wrapper = "Target",
+    colorset = "climate_code",
+    pal_list = scene_pal,
+    setLimits = c(0, 0.6)
+  ) +
   ggtitle("Adjusted bird limits")
 
 
 (orig_bar_fish + orig_bar_bird) / (limit_bar_fish + limit_bar_bird) +
-  plot_layout(guides = 'collect')
-
+  plot_layout(guides = "collect")
 ```
 
 # Colour limits
@@ -174,9 +175,9 @@ We can do similar things for colour values on a continuous scale, here demonstra
 
 ```{r}
 orig_basin <- basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
     plot_type = "map",
     colorset = "ewr_achieved",
@@ -184,22 +185,22 @@ orig_basin <- basin_to_plot |>
     pal_direction = -1,
     facet_col = "Target",
     facet_row = "climate_code"
-    )+
+  ) +
   ggtitle("Default limits")
 
 limit_basin <- basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("scico::lapaz"),
     pal_direction = -1,
-    setLimits = c(0,1),
+    setLimits = c(0, 1),
     facet_col = "Target",
     facet_row = "climate_code"
-    )+
+  ) +
   ggtitle("Limits at full range")
 
 orig_basin + limit_basin
@@ -215,9 +216,9 @@ When setting midpoints, HydroBOT alerts to situations where the top and bottom a
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
     plot_type = "map",
     colorset = "ewr_achieved",
@@ -226,16 +227,16 @@ basin_to_plot |>
     setLimits = c(0.5),
     facet_col = "Target",
     facet_row = "climate_code"
-    )
+  )
 ```
 
 We can set the midpoints and the limits with three values, here using something other than 0.5 so it's obvious we've changed something). Note that to get the midpoint to work, the scale needs to extend, but it will do this consistently to have the same spacing up and down.
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     y_lab = "Proportion EWR\nachieved",
     plot_type = "map",
     colorset = "ewr_achieved",
@@ -244,7 +245,7 @@ basin_to_plot |>
     setLimits = c(0, 0.75, 1),
     facet_col = "Target",
     facet_row = "climate_code"
-    )
+  )
 ```
 
 HydroBOT auto-sets the midpoint to 0 if `difference` is used and 1 if `relative` and using `transoutcome = 'log10'` (as is typically appropriate for multiplicative changes). But the user can change these if they want a different midpoint, want to adjust the endpoints, or use a different function and so need to set it themselves.
@@ -253,19 +254,19 @@ For the auto with difference, we use a diverging palette and get
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Blue-White Diverging"),
     facet_col = "Target",
     facet_row = "scenario",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     base_list = list(
-    base_lev = "climatebaseadapt0",
-    comp_fun = "difference",
-    group_cols = c("Target", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "difference",
+      group_cols = c("Target", "polyID")
     )
   )
 ```
@@ -274,19 +275,19 @@ And for relative
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Blue-White Diverging"),
     facet_col = "Target",
     facet_row = "scenario",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     base_list = list(
-    base_lev = "climatebaseadapt0",
-    comp_fun = "relative",
-    group_cols = c("Target", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "relative",
+      group_cols = c("Target", "polyID")
     ),
     zero_adjust = "auto",
     transoutcome = "log10",
@@ -296,68 +297,66 @@ basin_to_plot |>
 We might need to do that manually if we don't use a built-in function, and we also might want to set the limits in addition to the midpoint. So, for example, we write a new difference function, which does not trip the flags to auto-set limits and centers. We can then adjust it using just the center and let it auto-calculate the top and bottom.
 
 ```{r}
-
-diff2 <- function(x,y) {
-  x-y
+diff2 <- function(x, y) {
+  x - y
 }
 
 new_diff_default <- basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Blue-White Diverging"),
     facet_col = "Target",
     facet_row = "scenario",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     base_list = list(
-    base_lev = "climatebaseadapt0",
-    comp_fun = "diff2",
-    group_cols = c("Target", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "diff2",
+      group_cols = c("Target", "polyID")
     )
-  ) + ggtitle('Default limits')
+  ) + ggtitle("Default limits")
 
 new_diff_adj <- basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Blue-White Diverging"),
     facet_col = "Target",
     facet_row = "scenario",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     base_list = list(
-    base_lev = "climatebaseadapt0",
-    comp_fun = "diff2",
-    group_cols = c("Target", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "diff2",
+      group_cols = c("Target", "polyID")
     ),
     setLimits = c(0),
-  ) + ggtitle('Default limits')
+  ) + ggtitle("Default limits")
 
 new_diff_default + new_diff_adj
-
 ```
 
 Even if the limits would generally be auto-set (e.g. with `difference`), perhaps we want to shift the divergence point down and stretch the range. If we do this symmetrically, we do not get the messages about non-symmetrical bounds around the midpoint.
 
 ```{r}
 basin_to_plot |>
-  filter(Target %in% c('Native fish', 'Waterbirds')) |> # reduce the number of levels for clarity
+  filter(Target %in% c("Native fish", "Waterbirds")) |> # reduce the number of levels for clarity
   plot_outcomes(
-    outcome_col =  "ewr_achieved",
+    outcome_col = "ewr_achieved",
     plot_type = "map",
     colorset = "ewr_achieved",
     pal_list = list("ggthemes::Orange-Blue-White Diverging"),
     facet_col = "Target",
     facet_row = "scenario",
-    sceneorder = c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0'),
+    sceneorder = c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0"),
     setLimits = c(-0.5, -0.1, 0.3),
     base_list = list(
-    base_lev = "climatebaseadapt0",
-    comp_fun = "difference",
-    group_cols = c("Target", "polyID")
+      base_lev = "climatebaseadapt0",
+      comp_fun = "difference",
+      group_cols = c("Target", "polyID")
     )
   )
 ```

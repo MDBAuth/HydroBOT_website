@@ -30,7 +30,7 @@ As always, we need the input data
 
 ```{r}
 project_dir <- "hydrobot_scenarios"
-hydro_dir <- file.path(project_dir, 'hydrographs')
+hydro_dir <- file.path(project_dir, "hydrographs")
 ewr_results <- file.path(project_dir, "module_output", "EWR")
 ```
 
@@ -39,31 +39,36 @@ For simplicity, we just do aggregations along the theme dimension, since otherwi
 ```{r}
 #| message: false
 #| warning: false
-aggseq <- list(all_time = 'all_time',
-               ewr_code = c('ewr_code_timing', 'ewr_code'),
-               env_obj =  c('ewr_code', "env_obj"),
-               Target = c('env_obj', 'Target'))
+aggseq <- list(
+  all_time = "all_time",
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  Target = c("env_obj", "Target")
+)
 
-funseq <- list('ArithmeticMean', 
-               'CompensatingFactor',
-               'ArithmeticMean',
-               'ArithmeticMean')
+funseq <- list(
+  "ArithmeticMean",
+  "CompensatingFactor",
+  "ArithmeticMean",
+  "ArithmeticMean"
+)
 
-agged_theme <- read_and_agg(datpath = ewr_results, 
-           type = 'achievement',
-           geopath = bom_basin_gauges,
-           causalpath = causal_ewr,
-           groupers = 'scenario',
-           aggCols = 'ewr_achieved',
-           auto_ewr_PU = TRUE,
-           aggsequence = aggseq,
-           funsequence = funseq,
-           saveintermediate = TRUE,
-           namehistory = FALSE,
-           keepAllPolys = FALSE,
-           returnList = TRUE,
-           add_max = FALSE)
-
+agged_theme <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE
+)
 ```
 
 ## Causal plot
@@ -79,7 +84,6 @@ example_gauge <- "421001"
 The first step is to generate the edges and nodes for the network we want to look at.
 
 ```{r}
-
 edges <- make_edges(causal_ewr,
   fromtos = aggseq[2:length(aggseq)],
   gaugefilter = example_gauge
@@ -96,16 +100,17 @@ Now, extract the values we want from the aggregation and join them to the nodes.
 
 # Get the values for each node
 aggvals <- extract_vals_causal(agged_theme,
-                               whichaggs = funseq, # Since only one agg function at each step
-                               valcol = 'ewr_achieved',
-                               targetlevels = names(aggseq)[2:length(aggseq)]) # don't use the first one, it's time at _timing 
+  whichaggs = funseq, # Since only one agg function at each step
+  valcol = "ewr_achieved",
+  targetlevels = names(aggseq)[2:length(aggseq)]
+) # don't use the first one, it's time at _timing
 
 
 # filter to a single gauge. Multiple gauges should have separate networks or otherwise split the gauge-specific nodes. And include the larger scales pertaining to that gauge.
 
 # if we stay within the gauge, and just do value, this works
-aggvals <- aggvals |> 
-  filter(gauge == example_gauge) |> 
+aggvals <- aggvals |>
+  filter(gauge == example_gauge) |>
   st_drop_geometry()
 
 # join to the nodes
@@ -127,7 +132,7 @@ aggNetwork_base <- make_causal_plot(
     scenario == "base"
   ),
   edges = edges,
-                 setLimits = c(0, 1),
+  setLimits = c(0, 1),
   edge_pal = "black",
   node_pal = list(value = "scico::lapaz"),
   node_pal_direction = -1,
@@ -147,7 +152,7 @@ aggNetwork_down <- make_causal_plot(
     scenario == "down4"
   ),
   edges = edges,
-                 setLimits = c(0, 1),
+  setLimits = c(0, 1),
   edge_pal = "black",
   node_pal = list(value = "scico::lapaz"),
   node_pal_direction = -1,
@@ -167,7 +172,7 @@ aggNetwork_4 <- make_causal_plot(
     scenario == "up4"
   ),
   edges = edges,
-                 setLimits = c(0, 1),
+  setLimits = c(0, 1),
   edge_pal = "black",
   node_pal = list(value = "scico::lapaz"),
   node_pal_direction = -1,
@@ -188,14 +193,16 @@ The causal network defines how *values* at one theme level are linked to *values
 
 ```{r}
 # pre-filter to make plotting simpler
-basenodes <- nodes_with_vals |> 
-  filter(gauge == example_gauge) |> 
-  baseline_compare(compare_col = 'scenario', 
-                   base_lev = 'base',
-                   values_col = 'ewr_achieved',
-                   group_cols = c('Name', 'NodeType', 'nodeorder'),
-                   comp_fun = 'relative',
-                   add_eps = 0.01) |>
+basenodes <- nodes_with_vals |>
+  filter(gauge == example_gauge) |>
+  baseline_compare(
+    compare_col = "scenario",
+    base_lev = "base",
+    values_col = "ewr_achieved",
+    group_cols = c("Name", "NodeType", "nodeorder"),
+    comp_fun = "relative",
+    add_eps = 0.01
+  ) |>
   mutate(logrel_ewr_achieved = log(relative_ewr_achieved))
 ```
 
@@ -208,20 +215,24 @@ Causal networks look good in html, but often do not export well. The trick is to
 ```{r}
 #| label: fig-causalrel-down4
 #| fig-cap: Relative change between the 0.25x scenario and baseline for each node in the causal network. Blue indicates increases, white is no change, and orange is decrease.
-#| 
+#|
 aggNetworkdown_rel <- basenodes |>
-  dplyr::filter(scenario == 'down4') |>
-  make_causal_plot(edges = edges,
-                 edge_pal = 'black',
-                 node_pal = list(value = 'ggthemes::Orange-Blue-White Diverging'),
-                 node_colorset = 'logrel_ewr_achieved',
-                 render = FALSE,
-                 setLimits = c(min(basenodes$logrel_ewr_achieved),
-                               0,
-                               max(basenodes$logrel_ewr_achieved)),
-                 save = TRUE,
-                 savedir = tempdir(),
-                 savename = 'aggNetworkdown_rel')
+  dplyr::filter(scenario == "down4") |>
+  make_causal_plot(
+    edges = edges,
+    edge_pal = "black",
+    node_pal = list(value = "ggthemes::Orange-Blue-White Diverging"),
+    node_colorset = "logrel_ewr_achieved",
+    render = FALSE,
+    setLimits = c(
+      min(basenodes$logrel_ewr_achieved),
+      0,
+      max(basenodes$logrel_ewr_achieved)
+    ),
+    save = TRUE,
+    savedir = tempdir(),
+    savename = "aggNetworkdown_rel"
+  )
 
 DiagrammeR::render_graph(aggNetworkdown_rel)
 ```
@@ -229,23 +240,26 @@ DiagrammeR::render_graph(aggNetworkdown_rel)
 ```{r}
 #| label: fig-causalrel-up4
 #| fig-cap: Relative change between the 4x scenario and baseline for each node in the causal network. Blue indicates increases, white is no change, and orange is decrease.
-#| 
+#|
 aggNetworkup_rel <- basenodes |>
-  dplyr::filter(scenario == 'up4') |>
-  make_causal_plot(edges = edges,
-                 edge_pal = 'black',
-                 node_pal = list(value = 'ggthemes::Orange-Blue-White Diverging'),
-                 node_colorset = 'logrel_ewr_achieved',
-                 render = FALSE,
-                 setLimits = c(min(basenodes$logrel_ewr_achieved),
-                               0,
-                               max(basenodes$logrel_ewr_achieved)),
-                 save = TRUE,
-                 savedir = tempdir(),
-                 savename = 'aggNetworkup_rel')
+  dplyr::filter(scenario == "up4") |>
+  make_causal_plot(
+    edges = edges,
+    edge_pal = "black",
+    node_pal = list(value = "ggthemes::Orange-Blue-White Diverging"),
+    node_colorset = "logrel_ewr_achieved",
+    render = FALSE,
+    setLimits = c(
+      min(basenodes$logrel_ewr_achieved),
+      0,
+      max(basenodes$logrel_ewr_achieved)
+    ),
+    save = TRUE,
+    savedir = tempdir(),
+    savename = "aggNetworkup_rel"
+  )
 
 DiagrammeR::render_graph(aggNetworkup_rel)
-
 ```
 
 ```{r}

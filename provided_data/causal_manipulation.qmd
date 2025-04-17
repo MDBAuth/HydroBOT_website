@@ -11,8 +11,10 @@ At their core, the causal networks need to be defined as a list of dataframe(s) 
 
 ```{r}
 #| echo: false
-tibble::tibble(small = c('a', 'a', 'b', 'b'),
-               big = c('A', 'C', 'B', 'C'))
+tibble::tibble(
+  small = c("a", "a", "b", "b"),
+  big = c("A", "C", "B", "C")
+)
 ```
 
 For examples of preexisting complex causal networks, see the `causal_ewr` provided data, which is a list of three dataframes to avoid excessive data duplication. For examples of creating and providing your own causal network, see the [examples of user-provided networks](/aggregator/user_causal.qmd).

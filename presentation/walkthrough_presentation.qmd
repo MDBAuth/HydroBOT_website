@@ -19,7 +19,6 @@ make_hydro_csv()
 library(HydroBOT)
 library(sf)
 library(dplyr)
-
 ```
 
 -   Many options we could set
@@ -61,7 +60,7 @@ agg_results <- file.path(project_dir, "aggregator_output")
 
 ```{r}
 outputType <- list("yearly")
-returnType <- list("none") 
+returnType <- list("none")
 ```
 
 ## Aggregation sequencing {.smaller}
@@ -72,7 +71,7 @@ returnType <- list("none")
 
 ```{r}
 aggseq <- list(
-  all_time = 'all_time',
+  all_time = "all_time",
   ewr_code = c("ewr_code_timing", "ewr_code"),
   env_obj = c("ewr_code", "env_obj"),
   sdl_units = sdl_units,
@@ -85,14 +84,14 @@ aggseq <- list(
 
 
 funseq <- list(
-  'ArithmeticMean',
+  "ArithmeticMean",
   c("CompensatingFactor"),
   c("ArithmeticMean"),
   c("ArithmeticMean"),
   c("ArithmeticMean"),
-  'SpatialWeightedMean',
+  "SpatialWeightedMean",
   c("ArithmeticMean"),
-  'SpatialWeightedMean',
+  "SpatialWeightedMean",
   c("ArithmeticMean")
 )
 ```
@@ -167,11 +166,13 @@ scenarios <- jsonlite::read_json(file.path(
   "scenario_metadata.json"
 )) |>
   tibble::as_tibble() |>
-  tidyr::unnest(cols = everything()) |> 
+  tidyr::unnest(cols = everything()) |>
   rename(scenario = scenario_name)
 
-sceneorder <- forcats::fct_reorder(scenarios$scenario, 
-                                   scenarios$flow_multiplier)
+sceneorder <- forcats::fct_reorder(
+  scenarios$scenario,
+  scenarios$flow_multiplier
+)
 
 scene_pal <- make_pal(unique(scenarios$scenario),
   palette = "ggsci::nrc_npg",
@@ -189,15 +190,15 @@ gauge_pal
 ```{r}
 #| echo: false
 # make the super long names shorter but less useful.
-basin_to_plot <- agged_data$mdb |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+basin_to_plot <- agged_data$mdb |>
+  dplyr::left_join(scenarios, by = "scenario")
 
 # Create a grouping variable
 obj_sdl_to_plot <- agged_data$sdl_units |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
-  dplyr::filter(env_group %in% c('EF', 'NF', 'NV', 'OS', 'WB')) |> 
-  dplyr::arrange(env_group, env_obj) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+  dplyr::filter(env_group %in% c("EF", "NF", "NV", "OS", "WB")) |>
+  dplyr::arrange(env_group, env_obj) |>
+  dplyr::left_join(scenarios, by = "scenario")
 ```
 
 ## Input hydrographs
@@ -205,10 +206,12 @@ obj_sdl_to_plot <- agged_data$sdl_units |>
 ```{r}
 #| echo: false
 #| message: false
-scenehydros <- read_hydro(hydro_dir, long = TRUE, 
-                          format = "csv")
+scenehydros <- read_hydro(hydro_dir,
+  long = TRUE,
+  format = "csv"
+)
 
-scenehydros <- scenehydros |> 
+scenehydros <- scenehydros |>
   # these have EWR-specific _flow after the gauge name
   mutate(gauge = stringr::str_remove_all(gauge, "_[a-z]*")) |>
   # because gauges are not their own files, we have to filter them on read-in
@@ -364,11 +367,12 @@ sdl_line_groups_facet <- obj_sdl_to_plot |>
     facet_row = "SWSDLName",
     facet_col = "env_group",
     sceneorder = sceneorder,
-    base_list = list(base_lev = "base",
-    comp_fun = "relative",
-    add_eps = 'auto',
-    group_cols = c("env_obj", "polyID"))
-    
+    base_list = list(
+      base_lev = "base",
+      comp_fun = "relative",
+      add_eps = "auto",
+      group_cols = c("env_obj", "polyID")
+    )
   )
 
 sdl_line_groups_facet + ggplot2::theme(legend.position = "none")
@@ -396,11 +400,13 @@ sdl_fit_sdl <- obj_sdl_to_plot |>
     pal_list = list("ggsci::default_jama"),
     facet_wrapper = "env_group",
     sceneorder = sceneorder,
-base_list = list(base_lev = "base",
-    comp_fun = "relative",
-    add_eps = 'auto',
-    group_cols = c("env_obj", "polyID")),
-smooth_arglist = list()
+    base_list = list(
+      base_lev = "base",
+      comp_fun = "relative",
+      add_eps = "auto",
+      group_cols = c("env_obj", "polyID")
+    ),
+    smooth_arglist = list()
   )
 
 suppressWarnings(print(sdl_fit_sdl))
@@ -412,30 +418,36 @@ suppressWarnings(print(sdl_fit_sdl))
 ```{r}
 #| echo: false
 # Which steps are theme? This glosses over potential changes with space
-aggseq <- list(all_time = 'all_time',
-               ewr_code = c('ewr_code_timing', 'ewr_code'),
-               env_obj =  c('ewr_code', "env_obj"),
-               Target = c('env_obj', 'Target'))
+aggseq <- list(
+  all_time = "all_time",
+  ewr_code = c("ewr_code_timing", "ewr_code"),
+  env_obj = c("ewr_code", "env_obj"),
+  Target = c("env_obj", "Target")
+)
 
-funseq <- list('ArithmeticMean', 
-               'CompensatingFactor',
-               'ArithmeticMean',
-               'ArithmeticMean')
+funseq <- list(
+  "ArithmeticMean",
+  "CompensatingFactor",
+  "ArithmeticMean",
+  "ArithmeticMean"
+)
 
-agged_theme <- read_and_agg(datpath = ewr_results, 
-           type = 'achievement',
-           geopath = bom_basin_gauges,
-           causalpath = causal_ewr,
-           groupers = 'scenario',
-           aggCols = 'ewr_achieved',
-           auto_ewr_PU = TRUE,
-           aggsequence = aggseq,
-           funsequence = funseq,
-           saveintermediate = TRUE,
-           namehistory = FALSE,
-           keepAllPolys = FALSE,
-           returnList = TRUE,
-           add_max = FALSE)
+agged_theme <- read_and_agg(
+  datpath = ewr_results,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = funseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE
+)
 
 example_gauge <- "421001"
 
@@ -454,16 +466,17 @@ nodes <- make_nodes(edges)
 
 # Get the values for each node
 aggvals <- extract_vals_causal(agged_theme,
-                               whichaggs = funseq, # Since only one agg function at each step
-                               valcol = 'ewr_achieved',
-                               targetlevels = names(aggseq)[2:length(aggseq)]) # don't use the first one, it's time at _timing 
+  whichaggs = funseq, # Since only one agg function at each step
+  valcol = "ewr_achieved",
+  targetlevels = names(aggseq)[2:length(aggseq)]
+) # don't use the first one, it's time at _timing
 
 
 # filter to a single gauge. Multiple gauges should have separate networks or otherwise split the gauge-specific nodes. And include the larger scales pertaining to that gauge.
 
 # if we stay within the gauge, and just do value, this works
-aggvals <- aggvals |> 
-  filter(gauge == example_gauge) |> 
+aggvals <- aggvals |>
+  filter(gauge == example_gauge) |>
   st_drop_geometry()
 
 # join to the nodes
@@ -480,7 +493,7 @@ aggNetwork_down <- make_causal_plot(
     scenario == "down4"
   ),
   edges = edges,
-                 setLimits = c(0, 1),
+  setLimits = c(0, 1),
   edge_pal = "black",
   node_pal = list(value = "scico::lapaz"),
   node_pal_direction = -1,
@@ -501,7 +514,7 @@ aggNetwork_base <- make_causal_plot(
     scenario == "base"
   ),
   edges = edges,
-                 setLimits = c(0, 1),
+  setLimits = c(0, 1),
   edge_pal = "black",
   node_pal = list(value = "scico::lapaz"),
   node_pal_direction = -1,
@@ -522,7 +535,7 @@ aggNetwork_4 <- make_causal_plot(
     scenario == "up4"
   ),
   edges = edges,
-                 setLimits = c(0, 1),
+  setLimits = c(0, 1),
   edge_pal = "black",
   node_pal = list(value = "scico::lapaz"),
   node_pal_direction = -1,

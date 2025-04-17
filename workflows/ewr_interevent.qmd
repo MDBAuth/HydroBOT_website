@@ -19,7 +19,6 @@ The MDBA has proposed a number of interevent statistics. Here, we quickly demons
 #| include: false
 #| label: cleanup
 withr::deferred_run()
-
 ```
 
 

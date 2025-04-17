@@ -48,30 +48,30 @@ For this demonstration, we start with gauge-referenced data at the `env_obj` the
 
 ```{r}
 #| warning: false
-project_dir <- 'hydrobot_scenarios'
-hydro_dir <- file.path(project_dir, 'hydrographs')
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, "hydrographs")
 ewr_results <- file.path(project_dir, "module_output", "EWR")
 
 ewr_out <- prep_run_save_ewrs(
   hydro_dir = hydro_dir,
   output_parent_dir = project_dir,
-  outputType = list('none'),
-  returnType = list('yearly')
+  outputType = list("none"),
+  returnType = list("yearly")
 )
 
 
 # This is just a simple prep step that is usually done internally to put the geographic coordinates on input data
-ewrdata <- prep_ewr_output(ewr_out$yearly, type = 'achievement')
+ewrdata <- prep_ewr_output(ewr_out$yearly, type = "achievement")
 
 # This gets us to env_obj at the gauge over all time
 preseq <- list(
   all_time = "all_time",
   ewr_code = c("ewr_code_timing", "ewr_code"),
   env_obj = c("ewr_code", "env_obj")
-  )
+)
 
 funseq <- list(
-  all_time = 'ArithmeticMean',
+  all_time = "ArithmeticMean",
   ewr_code = "CompensatingFactor",
   env_obj = "ArithmeticMean"
 )
@@ -137,7 +137,7 @@ obj2poly <- spatial_aggregate(
   groupers = c("scenario", "env_obj"),
   aggCols = ends_with("ewr_achieved"),
   funlist = ArithmeticMean,
-  prefix = 'sdl_units_'
+  prefix = "sdl_units_"
 )
 obj2poly
 ```
@@ -151,10 +151,11 @@ names(obj2poly)
 We can clean those up into columns with `agg_names_to_cols()` (which happens internally in `multi_aggregate()` and `read_and_agg()` with `namehistory = FALSE`).
 
 ```{r}
-obj2poly_rename <- agg_names_to_cols(obj2poly, 
-                              aggsequence = c(names(preseq), 'sdl_units'), 
-                              funsequence = c(funseq, 'ArithmeticMean'), 
-                              aggCols = 'ewr_achieved')
+obj2poly_rename <- agg_names_to_cols(obj2poly,
+  aggsequence = c(names(preseq), "sdl_units"),
+  funsequence = c(funseq, "ArithmeticMean"),
+  aggCols = "ewr_achieved"
+)
 obj2poly_rename
 ```
 
@@ -182,7 +183,6 @@ obj2poly_rename |>
 If we give `funlist` more than one aggregation function, it calculates both. Here, we use the mean and median.
 
 ```{r}
-
 medna <- function(x) {
   median(x, na.rm = TRUE)
 }
@@ -193,26 +193,26 @@ obj2poly_2 <- spatial_aggregate(
   to_geo = sdl_units,
   groupers = c("scenario", "env_obj"),
   aggCols = ends_with("ewr_achieved"),
-  funlist = c('ArithmeticMean', 'medna'),
-  prefix = 'sdl_units_'
+  funlist = c("ArithmeticMean", "medna"),
+  prefix = "sdl_units_"
 )
 
 # we need a full sequence
 funseq2 <- funseq
-funseq2$sdl_units = list('ArithmeticMean', 'medna')
+funseq2$sdl_units <- list("ArithmeticMean", "medna")
 
-obj2poly_2 <- agg_names_to_cols(obj2poly_2, 
-                              aggsequence = c(names(preseq), 'sdl_units'), 
-                              funsequence = funseq2, 
-                              aggCols = 'ewr_achieved')
-
+obj2poly_2 <- agg_names_to_cols(obj2poly_2,
+  aggsequence = c(names(preseq), "sdl_units"),
+  funsequence = funseq2,
+  aggCols = "ewr_achieved"
+)
 ```
 
 And now we can compare what we get out of the different functions (just for the baseline scenario or we run out of dimensions).
 
 ```{r}
 obj2poly_2 |>
-  filter(scenario == 'base') |> 
+  filter(scenario == "base") |>
   filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
@@ -247,14 +247,14 @@ simplepolypoly <- spatial_aggregate(
   funlist = rlang::quo(list(wmna = ~ weighted.mean(., .data$area, na.rm = TRUE))),
   na.rm = TRUE,
   failmissing = FALSE,
-  prefix = 'basin_'
+  prefix = "basin_"
 )
 simplepolypoly
 ```
 
 ```{r}
-simplepolypoly |> 
-  rename('ewr_achieved' = ends_with('ewr_achieved')) |>
+simplepolypoly |>
+  rename("ewr_achieved" = ends_with("ewr_achieved")) |>
   filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
@@ -285,22 +285,22 @@ The aggregation process for multiple spatial levels works the same whether or no
 ```{r}
 #| label: fig-cewo-sdl
 #| fig-cap: Catchments (coloured lines; `cewo_valleys`) and SDL units (coloured fills) alone (a & b) and overlain (c), showing these are not nested, but instead are intersecting polygons.
-#| 
+#|
 overlay_cewo_sdl <- ggplot() +
   geom_sf(data = sdl_units, aes(fill = SWSDLName), color = NA, alpha = 0.5) +
   geom_sf(data = cewo_valleys, aes(color = ValleyName), fill = NA) +
   theme(legend.position = "none") +
-  ggtitle('both')
+  ggtitle("both")
 
 valleys <- ggplot() +
   geom_sf(data = cewo_valleys, aes(color = ValleyName), fill = "white") +
   theme(legend.position = "none") +
-  ggtitle('catchments')
+  ggtitle("catchments")
 
 sdls <- ggplot() +
   geom_sf(data = sdl_units, aes(fill = SWSDLName), alpha = 0.5) +
   theme(legend.position = "none") +
-  ggtitle('sdl_units')
+  ggtitle("sdl_units")
 
 valleys + sdls + overlay_cewo_sdl
 ```
@@ -361,7 +361,7 @@ nestedpolypoly <- spatial_aggregate(
   funlist = "SpatialWeightedMean",
   na.rm = TRUE,
   failmissing = FALSE,
-  prefix = 'cewo_valleys_'
+  prefix = "cewo_valleys_"
 )
 nestedpolypoly
 ```
@@ -373,8 +373,8 @@ Even catchments with only a small part of an sdl_unit have values here, illustra
 :::
 
 ```{r}
-nestedpolypoly |> 
-  rename('ewr_achieved' = ends_with('ewr_achieved')) |>
+nestedpolypoly |>
+  rename("ewr_achieved" = ends_with("ewr_achieved")) |>
   filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
@@ -403,14 +403,14 @@ obj2poly_keep <- spatial_aggregate(
   groupers = c("scenario", "env_obj"),
   aggCols = ends_with("ewr_achieved"),
   funlist = ArithmeticMean,
-  prefix = 'sdl_units_'
+  prefix = "sdl_units_"
 )
 obj2poly_keep
 ```
 
 ```{r}
 obj2poly_rename |>
-  rename('ewr_achieved' = ends_with('ewr_achieved')) |>
+  rename("ewr_achieved" = ends_with("ewr_achieved")) |>
   filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
@@ -430,7 +430,7 @@ Now we have retained polygons without data. The default is `keepAllPolys = FALSE
 
 ```{r}
 obj2poly_rename |>
-  rename('ewr_achieved' = ends_with('ewr_achieved')) |>
+  rename("ewr_achieved" = ends_with("ewr_achieved")) |>
   filter(grepl("^EF[1-3]", env_obj)) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
@@ -440,7 +440,7 @@ obj2poly_rename |>
     colorset = "ewr_achieved",
     pal_list = list("scico::lapaz"),
     pal_direction = -1,
-    underlay_list = list(underlay = 'sdl_units', pal_list = 'azure'),
+    underlay_list = list(underlay = "sdl_units", pal_list = "azure"),
     facet_col = "env_obj",
     facet_row = "scenario",
     sceneorder = c("down4", "base", "up4")

@@ -63,14 +63,13 @@ Use a 'standard' aggregation sequence, as in [getting started](/getting_started.
 Some of the example gauges provide information into other sdl units, but since we do not have full gauge coverage in those units, we clip to only those that are relevant.
 
 ```{r}
-sdl_clip <- sdl_units |> 
+sdl_clip <- sdl_units |>
   filter(SWSDLName %in% c("Lachlan", "Namoi", "Macquarie-Castlereagh"))
 
 causal_clip <- causal_ewr
 
-causal_clip[1:2] <- causal_clip[1:2] |> 
+causal_clip[1:2] <- causal_clip[1:2] |>
   purrr::map(\(x) filter(x, SWSDLName %in% c("Lachlan", "Namoi", "Macquarie-Castlereagh")))
-  
 ```
 
 ```{r}

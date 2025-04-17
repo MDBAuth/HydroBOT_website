@@ -18,10 +18,10 @@ First, we create some dummy 'module' data, as in [the multi_aggregate example](u
 We need to know the spatial units to create the data:
 
 ```{r}
-austates <- rnaturalearth::ne_states(country = 'australia') |> 
+austates <- rnaturalearth::ne_states(country = "australia") |>
   dplyr::select(state = name, geometry)
 
-all_aus <- rnaturalearth::ne_countries(country = 'australia') |> 
+all_aus <- rnaturalearth::ne_countries(country = "australia") |>
   dplyr::select(geounit)
 ```
 
@@ -32,65 +32,84 @@ Then we create the data and save it out
 
 # This is all copied from multi_aggregate except the last saving line.
 
-  # add a date column
-  state_inputs <- austates |>
-    dplyr::mutate(date = lubridate::ymd('20000101'))
+# add a date column
+state_inputs <- austates |>
+  dplyr::mutate(date = lubridate::ymd("20000101"))
 
-  # add some values
-  withr::with_seed(17,
-                   state_inputs <- state_inputs |>
-                     dplyr::mutate(value = runif(nrow(state_inputs)))
-  )
+# add some values
+withr::with_seed(
+  17,
+  state_inputs <- state_inputs |>
+    dplyr::mutate(value = runif(nrow(state_inputs)))
+)
 
-  withr::with_seed(17,
-                   # add some more days, each with different values
-                   state_inputs <- purrr::map(0:10,
-                                              \(x) dplyr::mutate(state_inputs,
-                                                                 date = date + x,
-                                                                 value = value * rnorm(nrow(state_inputs),
-                                                                                       mean = x, sd = x/2))) |>
-                     dplyr::bind_rows()
-                   )
-  
-    # add a scenario column, each with different values
-  state_inputs <- purrr::imap(letters[1:4],
-                              \(x,y) dplyr::mutate(state_inputs,
-                                            scenario = x,
-                                            value = value + y)) |>
-    dplyr::bind_rows()
-
-    # add a theme-relevant column, each with different values
-  state_inputs <- purrr::imap(c("E", "F", "G", "H", "I", "J"),
-                              \(x,y) dplyr::mutate(state_inputs,
-                                            theme1 = x,
-                                            value = value + y)) |>
-    dplyr::bind_rows()
-
-
-  # This bit saves it out so we can use read_and_agg.
-  purrr::map(unique(state_inputs$scenario),
-             \(x) dir.create(file.path(tempdir(), 'module_output', 'fake_module', x), 
-                             recursive = TRUE))
-  
-  si <- state_inputs |> 
-    sf::st_drop_geometry() |> 
-    split(state_inputs$scenario) |> 
-    purrr::iwalk(
-      \(x,y) readr::write_csv(x, file.path(tempdir(), 'module_output', 'fake_module',
-                                       y, paste0("fakeout_", y, '.csv')))
+withr::with_seed(
+  17,
+  # add some more days, each with different values
+  state_inputs <- purrr::map(
+    0:10,
+    \(x) dplyr::mutate(state_inputs,
+      date = date + x,
+      value = value * rnorm(nrow(state_inputs),
+        mean = x, sd = x / 2
       )
-    
-  
+    )
+  ) |>
+    dplyr::bind_rows()
+)
+
+# add a scenario column, each with different values
+state_inputs <- purrr::imap(
+  letters[1:4],
+  \(x, y) dplyr::mutate(state_inputs,
+    scenario = x,
+    value = value + y
+  )
+) |>
+  dplyr::bind_rows()
+
+# add a theme-relevant column, each with different values
+state_inputs <- purrr::imap(
+  c("E", "F", "G", "H", "I", "J"),
+  \(x, y) dplyr::mutate(state_inputs,
+    theme1 = x,
+    value = value + y
+  )
+) |>
+  dplyr::bind_rows()
+
+
+# This bit saves it out so we can use read_and_agg.
+purrr::map(
+  unique(state_inputs$scenario),
+  \(x) dir.create(file.path(tempdir(), "module_output", "fake_module", x),
+    recursive = TRUE
+  )
+)
+
+si <- state_inputs |>
+  sf::st_drop_geometry() |>
+  split(state_inputs$scenario) |>
+  purrr::iwalk(
+    \(x, y) readr::write_csv(x, file.path(
+      tempdir(), "module_output", "fake_module",
+      y, paste0("fakeout_", y, ".csv")
+    ))
+  )
 ```
 
 And we need a simple causal network.
 
 ```{r}
 # make a simple 'causal' network
-  state_theme <- tibble::tibble(theme1 = c("E", "F", "G", "H", "I", "J"),
-                                theme2 = c("vowel", "consonant", "consonant",
-                                           "consonant", "vowel", "consonant")) |> 
-    list()
+state_theme <- tibble::tibble(
+  theme1 = c("E", "F", "G", "H", "I", "J"),
+  theme2 = c(
+    "vowel", "consonant", "consonant",
+    "consonant", "vowel", "consonant"
+  )
+) |>
+  list()
 ```
 
 ### Using the Aggregator
@@ -99,48 +118,48 @@ First, we set up some aggregation steps. Will just use means throughout.
 
 ```{r}
 # This will aggregate into weeks, then to type, and then to the country.
-  ausseq <- list(
-    week = 'week',
-    theme2 = c('theme1', 'theme2'),
-    all_aus = all_aus
-  )
+ausseq <- list(
+  week = "week",
+  theme2 = c("theme1", "theme2"),
+  all_aus = all_aus
+)
 
-  # just use mean, since there are no NA in the data.
-  ausfuns <- list(
-    week = 'mean',
-    type = 'mean',
-    all_aus = 'mean'
-  )
+# just use mean, since there are no NA in the data.
+ausfuns <- list(
+  week = "mean",
+  type = "mean",
+  all_aus = "mean"
+)
 ```
 
 Do the aggregation. Note that this warns about some built-in checks for the EWR module that are not relevant here.
 
 ```{r}
-  # Do the aggregation
-  ausagg <-  ausagg <- read_and_agg(
-  datpath = file.path(tempdir(), 'module_output', 'fake_module'),
+# Do the aggregation
+ausagg <- ausagg <- read_and_agg(
+  datpath = file.path(tempdir(), "module_output", "fake_module"),
   type = "everything",
   geopath = austates,
   causalpath = state_theme,
   groupers = "scenario",
   aggCols = "value",
-    aggsequence = ausseq,
+  aggsequence = ausseq,
   funsequence = ausfuns,
   saveintermediate = TRUE,
   namehistory = FALSE,
   keepAllPolys = FALSE,
   returnList = TRUE,
   add_max = FALSE,
-  savepath = file.path(tempdir(), 'aggregator_output', 'dummy')
+  savepath = file.path(tempdir(), "aggregator_output", "dummy")
 )
 ```
 
 Quick plots of a couple levels
 
 ```{r}
-ausagg$week |> 
-  filter(theme1 == 'E') |> 
-    plot_outcomes(
+ausagg$week |>
+  filter(theme1 == "E") |>
+  plot_outcomes(
     outcome_col = "value",
     plot_type = "map",
     colorgroups = NULL,
@@ -153,9 +172,9 @@ ausagg$week |>
 ```
 
 ```{r}
-ausagg$theme2 |> 
-  filter(date == lubridate::ymd("2000-01-03")) |> 
-    plot_outcomes(
+ausagg$theme2 |>
+  filter(date == lubridate::ymd("2000-01-03")) |>
+  plot_outcomes(
     outcome_col = "value",
     plot_type = "map",
     colorgroups = NULL,
@@ -168,9 +187,9 @@ ausagg$theme2 |>
 ```
 
 ```{r}
-ausagg$all_aus |> 
-  filter(date == lubridate::ymd("2000-01-03")) |> 
-    plot_outcomes(
+ausagg$all_aus |>
+  filter(date == lubridate::ymd("2000-01-03")) |>
+  plot_outcomes(
     outcome_col = "value",
     plot_type = "map",
     colorgroups = NULL,

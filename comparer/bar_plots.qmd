@@ -44,21 +44,21 @@ If we had used multiple aggregation functions at any step, we should filter down
 For simplicity here, we will only look at a small selection of the scenarios (multiplicative changes of 0.5,1, and 2). Thus, we make two small dataframes for our primary examples here.
 
 ```{r}
-scenarios_to_plot <- c('climatedown2adapt0', 'climatebaseadapt0', 'climateup2adapt0')
+scenarios_to_plot <- c("climatedown2adapt0", "climatebaseadapt0", "climateup2adapt0")
 
-scenarios <- yaml::read_yaml(file.path(hydro_dir, 'scenario_metadata.yml')) |> 
+scenarios <- yaml::read_yaml(file.path(hydro_dir, "scenario_metadata.yml")) |>
   tibble::as_tibble()
 
-basin_to_plot <- agged_data$mdb |> 
-  dplyr::filter(scenario %in% scenarios_to_plot) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+basin_to_plot <- agged_data$mdb |>
+  dplyr::filter(scenario %in% scenarios_to_plot) |>
+  dplyr::left_join(scenarios, by = "scenario")
 
 # Create a grouping variable
 obj_sdl_to_plot <- agged_data$sdl_units |>
-    dplyr::filter(scenario %in% scenarios_to_plot) |> 
+  dplyr::filter(scenario %in% scenarios_to_plot) |>
   dplyr::mutate(env_group = stringr::str_extract(env_obj, "^[A-Z]+")) |>
-  dplyr::arrange(env_group, env_obj) |> 
-  dplyr::left_join(scenarios, by = 'scenario')
+  dplyr::arrange(env_group, env_obj) |>
+  dplyr::left_join(scenarios, by = "scenario")
 ```
 
 # Standard scenario appearance
@@ -70,8 +70,10 @@ Here, we use the special arguments `refvals` and `refcols` to make a colour pale
 There is a `sceneorder` argument to `plot_outcomes()` that lets us explicitly set the order of the scenarios. However, it is typically easiest to simply make the scenarios a factor, though we use the `sceneorder` argument here. It operates *only* on a column named 'scenario', though, so if other columns need to be ordered they should be made factors before feeding to `plot_outcomes()`.
 
 ```{r}
-sceneorder <- forcats::fct_reorder(basin_to_plot$scenario,
-                                   basin_to_plot$flow_multiplier)
+sceneorder <- forcats::fct_reorder(
+  basin_to_plot$scenario,
+  basin_to_plot$flow_multiplier
+)
 
 scene_pal <- make_pal(unique(basin_to_plot$climate_code),
   palette = "ggsci::nrc_npg",
@@ -95,7 +97,7 @@ The `colorset` argument is the column that determines colour, while the `pal_lis
 #| message: false
 plot_outcomes(basin_to_plot,
   outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
+  x_col = "climate_code",
   facet_wrapper = "Target",
   colorset = "climate_code",
   pal_list = scene_pal,
@@ -110,14 +112,14 @@ HydroBOT retains the axis names as-is from the incoming dataframe, as they provi
 plot_outcomes(basin_to_plot,
   outcome_col = "ewr_achieved",
   y_lab = "Proportion Objectives\nAchieved",
-  x_col = 'climate_code',
+  x_col = "climate_code",
   color_lab = "Scenario",
   facet_wrapper = "Target",
   colorset = "climate_code",
   pal_list = scene_pal,
-  sceneorder = c('climateup2adapt0', 'climatebaseadapt0', 'climatedown2adapt0')
+  sceneorder = c("climateup2adapt0", "climatebaseadapt0", "climatedown2adapt0")
 ) +
-  labs(x = 'Scenario')
+  labs(x = "Scenario")
 ```
 
 Another approach is to put other groupings on the x-axis, and colour by scenario.
@@ -143,7 +145,7 @@ plot_outcomes(basin_to_plot,
   colorset = "climate_code",
   pal_list = scene_pal,
   sceneorder = sceneorder,
-  position = 'dodge'
+  position = "dodge"
 )
 ```
 
@@ -218,7 +220,7 @@ In another example of colours from other information in the data, when we have m
 #| label: fig-sdl-dodge
 plot_outcomes(obj_sdl_to_plot,
   outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
+  x_col = "climate_code",
   colorset = "SWSDLName",
   pal_list = list("ggsci::default_jama"),
   sceneorder = sceneorder
@@ -250,7 +252,7 @@ If we have multiple levels of groupings, we can colour by the groups directly if
 ```{r}
 plot_outcomes(obj_sdl_to_plot,
   outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
+  x_col = "climate_code",
   colorset = "env_group",
   pal_list = list("scico::berlin"),
   facet_col = "SWSDLName",
@@ -283,14 +285,14 @@ env_pals <- list(
 obj_sdl_to_plot |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
-    x_col = 'climate_code',
+    x_col = "climate_code",
     colorgroups = "env_group",
     colorset = "env_obj",
     pal_list = env_pals,
     facet_col = "SWSDLName",
     facet_row = "."
   ) +
-  theme(legend.key.size = unit(0.5, 'cm'))
+  theme(legend.key.size = unit(0.5, "cm"))
 ```
 
 Adding facetting by those groups can make that easier to read if the goal is to focus on changes within groups, but more plots.
@@ -301,14 +303,14 @@ Adding facetting by those groups can make that easier to read if the goal is to 
 obj_sdl_to_plot |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
-    x_col = 'climate_code',
+    x_col = "climate_code",
     colorgroups = "env_group",
     colorset = "env_obj",
     pal_list = env_pals,
     facet_col = "SWSDLName",
     facet_row = "env_group"
-  ) + 
-  theme(legend.key.size = unit(0.5, 'cm'))
+  ) +
+  theme(legend.key.size = unit(0.5, "cm"))
 ```
 
 We could also split those bars sideways instead of stack them, but that likely makes more sense if there are fewer categories than here. We again use `position = 'dodge'`, but now we don't need to sum because we're stacking each row already. I've flipped the facetting and taken advantage of the fact that these are just ggplot objects to remove the legend, making it very slightly easier to read (but harder to interpret). This gets very crowded with the full set of scenarios, so we can use the `scenariofilter` argument to cut it to just a few (here, base and multiply and divide by 1.5).
@@ -319,15 +321,15 @@ We could also split those bars sideways instead of stack them, but that likely m
 obj_sdl_to_plot |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
-    x_col = 'climate_code',
+    x_col = "climate_code",
     colorgroups = "env_group",
     colorset = "env_obj",
     pal_list = env_pals,
     facet_col = "SWSDLName",
     facet_row = "env_group",
-    position = 'dodge'
+    position = "dodge"
   ) +
-  theme(legend.key.size = unit(0.5, 'cm'))
+  theme(legend.key.size = unit(0.5, "cm"))
 ```
 
 Another approach to groups of outcomes without the colours explicitly grouped is to not use `colorgroup`, but instead just facet by the group and give every `colorset` value a colour from the same palette. Depending on the palette chosen and the breaks, this can be quicker, but will not accentuate groups as well.
@@ -369,7 +371,7 @@ Then we can create an accentuated plot sometimes, if, perhaps, we want to highli
 #| message: false
 plot_outcomes(obj_sdl_to_plot,
   outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
+  x_col = "climate_code",
   colorset = "env_group",
   pal_list = obj_pal$refcols,
   facet_col = "SWSDLName",
@@ -385,7 +387,7 @@ But for other plots maybe we don't want that accentuation and we can use the `un
 #| message: false
 plot_outcomes(obj_sdl_to_plot,
   outcome_col = "ewr_achieved",
-  x_col = 'climate_code',
+  x_col = "climate_code",
   colorset = "env_group",
   pal_list = obj_pal$unrefcols,
   facet_col = "SWSDLName",

@@ -30,7 +30,7 @@ For this demonstration, we provide a set of paths to point to the input data, in
 
 ```{r}
 project_dir <- "hydrobot_scenarios"
-hydro_dir <- file.path(project_dir, 'hydrographs')
+hydro_dir <- file.path(project_dir, "hydrographs")
 ewr_results <- file.path(project_dir, "module_output", "EWR")
 ```
 
@@ -46,26 +46,26 @@ The data comes in as a timeseries but at fine ecological detail and across sever
 ewr_out <- prep_run_save_ewrs(
   hydro_dir = hydro_dir,
   output_parent_dir = project_dir,
-  outputType = list('none'),
-  returnType = list('yearly')
+  outputType = list("none"),
+  returnType = list("yearly")
 )
 
 
 # This is just a simple prep step that is usually done internally to put the geographic coordinates on input data
-ewrdata <- prep_ewr_output(ewr_out$yearly, type = 'achievement', add_max = FALSE)
+ewrdata <- prep_ewr_output(ewr_out$yearly, type = "achievement", add_max = FALSE)
 
 # This gets us to Target at the SDL unit every year
 preseq <- list(
   env_obj = c("ewr_code_timing", "env_obj"),
   sdl_units = sdl_units,
   Target = c("env_obj", "Target")
-  )
+)
 
 
 funseq <- list(
-  all_time = 'ArithmeticMean',
-  ewr_code = 'ArithmeticMean',
-  env_obj = 'ArithmeticMean'
+  all_time = "ArithmeticMean",
+  ewr_code = "ArithmeticMean",
+  env_obj = "ArithmeticMean"
 )
 
 # Do the aggregation to get output at each gauge averaged over time
@@ -91,13 +91,13 @@ unique(simpleAgg$date)
 We can plot that data (for just one scenario) to better see what it looks like.
 
 ```{r}
-
-
-simpleAgg |> 
-  agg_names_to_cols(aggsequence = names(preseq),
-                    funsequence = funseq,
-                    aggCols = 'ewr_achieved') |> 
-  filter(scenario == 'base') |> 
+simpleAgg |>
+  agg_names_to_cols(
+    aggsequence = names(preseq),
+    funsequence = funseq,
+    aggCols = "ewr_achieved"
+  ) |>
+  filter(scenario == "base") |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -124,21 +124,24 @@ The `funlist` argument here specifies the function(s) to use *at a single step*.
 We often just want to simply get some summary over the full timeseries. It uses the special value `'all_time'` in `breaks` for simplicity, though specifying the start and end works as well. Think carefully though, it very well make more sense to weight this by recency or similar.
 
 ```{r}
-full_period <- temporal_aggregate(simpleAgg, 
-                                  breaks = 'all_time',
-                                  groupers = c('scenario', 'SWSDLName', 'Target'),
-                                  aggCols = 'ewr_achieved',
-                                  funlist = 'ArithmeticMean')
+full_period <- temporal_aggregate(simpleAgg,
+  breaks = "all_time",
+  groupers = c("scenario", "SWSDLName", "Target"),
+  aggCols = "ewr_achieved",
+  funlist = "ArithmeticMean"
+)
 ```
 
 Now we only have one value and have lost the date column
 
 ```{r}
-full_period |> 
-  agg_names_to_cols(aggsequence = c(names(preseq), 'all_time'),
-                    funsequence = c(funseq, list('ArithmeticMean')),
-                    aggCols = 'ewr_achieved') |> 
-  filter(scenario == 'base') |> 
+full_period |>
+  agg_names_to_cols(
+    aggsequence = c(names(preseq), "all_time"),
+    funsequence = c(funseq, list("ArithmeticMean")),
+    aggCols = "ewr_achieved"
+  ) |>
+  filter(scenario == "base") |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -156,24 +159,27 @@ full_period |>
 We may want to specify breaks, which we can do by feeding times at the breakpoints. Here, we demonstrate with two-year intervals since the period is short, but these might be e.g. decades (if long) or seasonal (if fine-scaled data).
 
 ```{r}
-time_breaks <- c('2014-01-01', '2016-01-01', '2018-01-01', '2020-01-01')
+time_breaks <- c("2014-01-01", "2016-01-01", "2018-01-01", "2020-01-01")
 tg <- lubridate::ymd(time_breaks)
 
-two_years <- temporal_aggregate(simpleAgg, 
-                                  breaks = tg,
-                                  groupers = c('scenario', 'SWSDLName', 'Target'),
-                                  aggCols = 'ewr_achieved',
-                                  funlist = 'ArithmeticMean')
+two_years <- temporal_aggregate(simpleAgg,
+  breaks = tg,
+  groupers = c("scenario", "SWSDLName", "Target"),
+  aggCols = "ewr_achieved",
+  funlist = "ArithmeticMean"
+)
 ```
 
 And the plot
 
 ```{r}
-two_years |> 
-  agg_names_to_cols(aggsequence = c(names(preseq), 'all_time'),
-                    funsequence = c(funseq, list('ArithmeticMean')),
-                    aggCols = 'ewr_achieved') |> 
-  filter(scenario == 'base') |> 
+two_years |>
+  agg_names_to_cols(
+    aggsequence = c(names(preseq), "all_time"),
+    funsequence = c(funseq, list("ArithmeticMean")),
+    aggCols = "ewr_achieved"
+  ) |>
+  filter(scenario == "base") |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -183,7 +189,7 @@ two_years |>
     pal_list = list("scico::lapaz"),
     pal_direction = -1,
     facet_col = "Target",
-    facet_row = 'date'
+    facet_row = "date"
   )
 ```
 
@@ -192,21 +198,24 @@ two_years |>
 The `temporal_aggregate()` function relies on `base::cut.POSIXt()` internally, and so can use the break specifications allowed there, where characters can be used to define lengths and units of the intervals. See `?base::cut.POSIXt` for more information. This can be very useful for sub-yearly aggregations (e.g. '2 months', 'quarter', etc), or with long timeseries allowing the use of things like '10 years'. Here we demonstrate with 3 years due to the short demonstration timeseries.
 
 ```{r}
-three_years_cut <- temporal_aggregate(simpleAgg, 
-                                  breaks = '3 years',
-                                  groupers = c('scenario', 'SWSDLName', 'Target'),
-                                  aggCols = 'ewr_achieved',
-                                  funlist = 'ArithmeticMean')
+three_years_cut <- temporal_aggregate(simpleAgg,
+  breaks = "3 years",
+  groupers = c("scenario", "SWSDLName", "Target"),
+  aggCols = "ewr_achieved",
+  funlist = "ArithmeticMean"
+)
 ```
 
 And the plot
 
 ```{r}
-three_years_cut |> 
-  agg_names_to_cols(aggsequence = c(names(preseq), 'all_time'),
-                    funsequence = c(funseq, list('ArithmeticMean')),
-                    aggCols = 'ewr_achieved') |> 
-  filter(scenario == 'base') |> 
+three_years_cut |>
+  agg_names_to_cols(
+    aggsequence = c(names(preseq), "all_time"),
+    funsequence = c(funseq, list("ArithmeticMean")),
+    aggCols = "ewr_achieved"
+  ) |>
+  filter(scenario == "base") |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
     y_lab = "Arithmetic Mean",
@@ -216,7 +225,7 @@ three_years_cut |>
     pal_list = list("scico::lapaz"),
     pal_direction = -1,
     facet_col = "Target",
-    facet_row = 'date'
+    facet_row = "date"
   )
 ```
 
