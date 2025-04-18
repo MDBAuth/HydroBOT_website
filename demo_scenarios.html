@@ -6163,6 +6163,12 @@ window.onload = function() {
  <span class="menu-text">Demonstration scenarios</span></a>
   </div>
 </li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./modules/ewr_overview.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">EWR tool overview</span></a>
+  </div>
+</li>
     </ul>
 </div>
 </nav><div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
@@ -6192,14 +6198,34 @@ window.onload = function() {
 
 
 </header><div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://galenholt.github.io/HydroBOT/">HydroBOT</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: sf</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Linking to GEOS 3.13.0, GDAL 3.10.1, PROJ 9.5.1; sf_use_s2() is TRUE</code></pre>
+</div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: &#39;dplyr&#39;</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <section id="simplest-scenarios" class="level2"><h2 class="anchored" data-anchor-id="simplest-scenarios">Simplest scenarios</h2>
 <p>For most of the examples in the <a href="./workflows/workflow_overview.html">workflow</a>, <a href="./controller/controller_overview.html">controller</a>, and <a href="./aggregator/aggregation_overview.html">aggregator</a> sections, we do not need much complexity to demonstrate use, and so we use a set of very simple scenarios provided as hydrographs with HydroBOT. These include a baseline scenario that is a 5-year historical hydrograph for 6 gauges in the Macquarie and Lachlan catchments in the Murray-Darling Basin, Australia <a href="#fig-simple-locs" class="quarto-xref">Figure 1</a>. They include two other scenarios that are simple 0.25x and 4x scaling of the historical hydrograph.</p>
 <div class="cell">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">scenehydros</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_hydro.html">read_hydro</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">&#39;extdata/testsmall/hydrographs&#39;</span>, package <span class="op">=</span> <span class="st">&#39;HydroBOT&#39;</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">scenehydros</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_hydro.html">read_hydro</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html">system.file</a></span><span class="op">(</span><span class="st">&quot;extdata/testsmall/hydrographs&quot;</span>, package <span class="op">=</span> <span class="st">&quot;HydroBOT&quot;</span><span class="op">)</span>,</span>
 <span>  long <span class="op">=</span> <span class="cn">TRUE</span>, format <span class="op">=</span> <span class="st">&quot;csv&quot;</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
@@ -6243,32 +6269,38 @@ Figure 3: Locations of 45 gauges (red) for factorial multiplicative and additiv
 </div>
 <p>To scale flow, we apply nine flow multipliers, ranging from 0.5 to 2.0, to the historical hydrographs (<a href="#tbl-scenarios" class="quarto-xref">Table 1</a>). We refer to these as ‘climate’ scenarios, reflecting a common representation where entire hydrographs might shift to represent climate change. To achieve pulsed change for each of the ‘climate’ scenarios, four flow additions were applied including 1) no addition (baseline), 2) addition of 250 ML/d, 3) addition of 6500 ML/d, and 4) addition of 12000 ML/d (<a href="#tbl-scenarios" class="quarto-xref">Table 1</a>). These additional flows were added throughout the period of September to December. We refer to these scenarios as ‘climate adaptations’ because management options are often available in the form of altering water availability for short time periods through mechanisms like water releases, though the options here do not represent proposed actions. These scenarios should not be interpreted as potential climate impacts or adaptations, but instead as different ways flows might change (multiplicative or additive) and different magnitudes of change.</p>
 <div class="cell" width="4">
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">adapt_scenes</span> <span class="op">&lt;-</span> <span class="va">scenarios</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">!=</span> <span class="st">&#39;MAX&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>flow_addition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">flow_addition</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>`Adaptation code` <span class="op">=</span> <span class="va">adapt_code</span>,</span>
-<span>         `Flow addition (ML/d)` <span class="op">=</span> <span class="va">flow_addition</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">adapt_scenes</span> <span class="op">&lt;-</span> <span class="va">scenarios</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">!=</span> <span class="st">&quot;MAX&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>flow_addition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html">as.integer</a></span><span class="op">(</span><span class="va">flow_addition</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span></span>
+<span>    `Adaptation code` <span class="op">=</span> <span class="va">adapt_code</span>,</span>
+<span>    `Flow addition (ML/d)` <span class="op">=</span> <span class="va">flow_addition</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html">distinct</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">climate_scenes</span> <span class="op">&lt;-</span> <span class="va">scenarios</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">!=</span> <span class="st">&#39;MAX&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>`Climate code` <span class="op">=</span> <span class="va">climate_code</span>,</span>
-<span>         `Flow multiplier` <span class="op">=</span> <span class="va">flow_multiplier</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="va">climate_scenes</span> <span class="op">&lt;-</span> <span class="va">scenarios</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">!=</span> <span class="st">&quot;MAX&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span></span>
+<span>    `Climate code` <span class="op">=</span> <span class="va">climate_code</span>,</span>
+<span>    `Flow multiplier` <span class="op">=</span> <span class="va">flow_multiplier</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/distinct.html">distinct</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">adapt_scenes</span> <span class="op">&lt;-</span> <span class="va">adapt_scenes</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>`Adaptation code` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">climate_scenes</span><span class="op">)</span> <span class="op">-</span> </span>
-<span>                                             <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">adapt_scenes</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>       `Flow addition (ML/d)` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">climate_scenes</span><span class="op">)</span> <span class="op">-</span> </span>
-<span>                                      <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">adapt_scenes</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">adapt_scenes</span> <span class="op">&lt;-</span> <span class="va">adapt_scenes</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>    `Adaptation code` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">climate_scenes</span><span class="op">)</span> <span class="op">-</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">adapt_scenes</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    `Flow addition (ML/d)` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">climate_scenes</span><span class="op">)</span> <span class="op">-</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">adapt_scenes</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">climate_scenes</span> <span class="op">|&gt;</span> </span>
-<span>               <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>`Flow multiplier` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">signif</a></span><span class="op">(</span><span class="va">`Flow multiplier`</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html">bind_cols</a></span><span class="op">(</span><span class="va">adapt_scenes</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html">flextable</a></span><span class="op">(</span><span class="op">)</span>  <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/font.html">font</a></span><span class="op">(</span>fontname <span class="op">=</span> <span class="st">&#39;Calibri&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/fontsize.html">fontsize</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span>, part <span class="op">=</span> <span class="st">&#39;all&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/set_table_properties.html">set_table_properties</a></span><span class="op">(</span>layout <span class="op">=</span> <span class="st">&quot;autofit&quot;</span>, width <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">climate_scenes</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>`Flow multiplier` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">signif</a></span><span class="op">(</span><span class="va">`Flow multiplier`</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_cols.html">bind_cols</a></span><span class="op">(</span><span class="va">adapt_scenes</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/flextable.html">flextable</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/font.html">font</a></span><span class="op">(</span>fontname <span class="op">=</span> <span class="st">&quot;Calibri&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/fontsize.html">fontsize</a></span><span class="op">(</span>size <span class="op">=</span> <span class="fl">10</span>, part <span class="op">=</span> <span class="st">&quot;all&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/set_table_properties.html">set_table_properties</a></span><span class="op">(</span>layout <span class="op">=</span> <span class="st">&quot;autofit&quot;</span>, width <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">flextable</span><span class="fu">::</span><span class="fu"><a href="https://davidgohel.github.io/flextable/reference/vline.html">vline</a></span><span class="op">(</span>j <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div id="tbl-scenarios" class="cell quarto-float quarto-figure quarto-figure-center anchored" width="4">
 <figure class="quarto-float quarto-float-tbl figure"><figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-scenarios-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -6276,68 +6308,68 @@ Table 1: Demonstration scenarios are a factorial combination of ‘climate’ (
 </figcaption><div aria-describedby="tbl-scenarios-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
 <div class="tabwid">
-<style>.cl-990ac0ac{table-layout:auto;width:100%;}.cl-99036780{font-family:'Arial';font-size:10pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-99036794{font-family:'Calibri';font-size:10pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-99069ae0{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-99069aea{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-9906c01a{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c02e{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 1pt solid rgba(102, 102, 102, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c02f{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 1pt solid rgba(102, 102, 102, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c038{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c039{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c03a{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 1pt solid rgba(102, 102, 102, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c042{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 1pt solid rgba(102, 102, 102, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c043{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c04c{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c04d{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 1pt solid rgba(102, 102, 102, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c04e{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 1pt solid rgba(102, 102, 102, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-9906c056{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
-<table data-quarto-disable-processing="true" class="cl-990ac0ac">
+<style>.cl-741df476{table-layout:auto;width:100%;}.cl-741666c0{font-family:'Arial';font-size:10pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-741666ca{font-family:'Calibri';font-size:10pt;font-weight:normal;font-style:normal;text-decoration:none;color:rgba(0, 0, 0, 1.00);background-color:transparent;}.cl-7419acc2{margin:0;text-align:left;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-7419accc{margin:0;text-align:right;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);padding-bottom:5pt;padding-top:5pt;padding-left:5pt;padding-right:5pt;line-height: 1;background-color:transparent;}.cl-7419c784{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c78e{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 1pt solid rgba(102, 102, 102, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c78f{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 1pt solid rgba(102, 102, 102, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c798{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 1.5pt solid rgba(102, 102, 102, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c799{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c79a{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 1pt solid rgba(102, 102, 102, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c7a2{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 1pt solid rgba(102, 102, 102, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c7a3{background-color:transparent;vertical-align: middle;border-bottom: 0 solid rgba(0, 0, 0, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c7a4{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c7a5{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 1pt solid rgba(102, 102, 102, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c7ac{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 1pt solid rgba(102, 102, 102, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}.cl-7419c7ad{background-color:transparent;vertical-align: middle;border-bottom: 1.5pt solid rgba(102, 102, 102, 1.00);border-top: 0 solid rgba(0, 0, 0, 1.00);border-left: 0 solid rgba(0, 0, 0, 1.00);border-right: 0 solid rgba(0, 0, 0, 1.00);margin-bottom:0;margin-top:0;margin-left:0;margin-right:0;}</style>
+<table data-quarto-disable-processing="true" class="cl-741df476">
 <thead><tr style="overflow-wrap:break-word;">
-<th class="cl-9906c01a"><p class="cl-99069ae0"><span class="cl-99036780">Climate code</span></p></th>
-<th class="cl-9906c02e"><p class="cl-99069aea"><span class="cl-99036780">Flow multiplier</span></p></th>
-<th class="cl-9906c02f"><p class="cl-99069aea"><span class="cl-99036780">Adaptation code</span></p></th>
-<th class="cl-9906c038"><p class="cl-99069aea"><span class="cl-99036780">Flow addition (ML/d)</span></p></th>
+<th class="cl-7419c784"><p class="cl-7419acc2"><span class="cl-741666c0">Climate code</span></p></th>
+<th class="cl-7419c78e"><p class="cl-7419accc"><span class="cl-741666c0">Flow multiplier</span></p></th>
+<th class="cl-7419c78f"><p class="cl-7419accc"><span class="cl-741666c0">Adaptation code</span></p></th>
+<th class="cl-7419c798"><p class="cl-7419accc"><span class="cl-741666c0">Flow addition (ML/d)</span></p></th>
 </tr></thead>
 <tbody>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c039"><p class="cl-99069ae0"><span class="cl-99036794">A</span></p></td>
-<td class="cl-9906c03a"><p class="cl-99069aea"><span class="cl-99036794">0.50</span></p></td>
-<td class="cl-9906c042"><p class="cl-99069aea"><span class="cl-99036794">1</span></p></td>
-<td class="cl-9906c043"><p class="cl-99069aea"><span class="cl-99036794">0</span></p></td>
+<td class="cl-7419c799"><p class="cl-7419acc2"><span class="cl-741666ca">A</span></p></td>
+<td class="cl-7419c79a"><p class="cl-7419accc"><span class="cl-741666ca">0.50</span></p></td>
+<td class="cl-7419c7a2"><p class="cl-7419accc"><span class="cl-741666ca">1</span></p></td>
+<td class="cl-7419c7a3"><p class="cl-7419accc"><span class="cl-741666ca">0</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c039"><p class="cl-99069ae0"><span class="cl-99036794">B</span></p></td>
-<td class="cl-9906c03a"><p class="cl-99069aea"><span class="cl-99036794">0.67</span></p></td>
-<td class="cl-9906c042"><p class="cl-99069aea"><span class="cl-99036794">2</span></p></td>
-<td class="cl-9906c043"><p class="cl-99069aea"><span class="cl-99036794">250</span></p></td>
+<td class="cl-7419c799"><p class="cl-7419acc2"><span class="cl-741666ca">B</span></p></td>
+<td class="cl-7419c79a"><p class="cl-7419accc"><span class="cl-741666ca">0.67</span></p></td>
+<td class="cl-7419c7a2"><p class="cl-7419accc"><span class="cl-741666ca">2</span></p></td>
+<td class="cl-7419c7a3"><p class="cl-7419accc"><span class="cl-741666ca">250</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c039"><p class="cl-99069ae0"><span class="cl-99036794">C</span></p></td>
-<td class="cl-9906c03a"><p class="cl-99069aea"><span class="cl-99036794">0.80</span></p></td>
-<td class="cl-9906c042"><p class="cl-99069aea"><span class="cl-99036794">3</span></p></td>
-<td class="cl-9906c043"><p class="cl-99069aea"><span class="cl-99036794">6,500</span></p></td>
+<td class="cl-7419c799"><p class="cl-7419acc2"><span class="cl-741666ca">C</span></p></td>
+<td class="cl-7419c79a"><p class="cl-7419accc"><span class="cl-741666ca">0.80</span></p></td>
+<td class="cl-7419c7a2"><p class="cl-7419accc"><span class="cl-741666ca">3</span></p></td>
+<td class="cl-7419c7a3"><p class="cl-7419accc"><span class="cl-741666ca">6,500</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c039"><p class="cl-99069ae0"><span class="cl-99036794">D</span></p></td>
-<td class="cl-9906c03a"><p class="cl-99069aea"><span class="cl-99036794">0.91</span></p></td>
-<td class="cl-9906c042"><p class="cl-99069aea"><span class="cl-99036794">4</span></p></td>
-<td class="cl-9906c043"><p class="cl-99069aea"><span class="cl-99036794">12,000</span></p></td>
+<td class="cl-7419c799"><p class="cl-7419acc2"><span class="cl-741666ca">D</span></p></td>
+<td class="cl-7419c79a"><p class="cl-7419accc"><span class="cl-741666ca">0.91</span></p></td>
+<td class="cl-7419c7a2"><p class="cl-7419accc"><span class="cl-741666ca">4</span></p></td>
+<td class="cl-7419c7a3"><p class="cl-7419accc"><span class="cl-741666ca">12,000</span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c039"><p class="cl-99069ae0"><span class="cl-99036794">E</span></p></td>
-<td class="cl-9906c03a"><p class="cl-99069aea"><span class="cl-99036794">1.00</span></p></td>
-<td class="cl-9906c042"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
-<td class="cl-9906c043"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
+<td class="cl-7419c799"><p class="cl-7419acc2"><span class="cl-741666ca">E</span></p></td>
+<td class="cl-7419c79a"><p class="cl-7419accc"><span class="cl-741666ca">1.00</span></p></td>
+<td class="cl-7419c7a2"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
+<td class="cl-7419c7a3"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c039"><p class="cl-99069ae0"><span class="cl-99036794">F</span></p></td>
-<td class="cl-9906c03a"><p class="cl-99069aea"><span class="cl-99036794">1.10</span></p></td>
-<td class="cl-9906c042"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
-<td class="cl-9906c043"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
+<td class="cl-7419c799"><p class="cl-7419acc2"><span class="cl-741666ca">F</span></p></td>
+<td class="cl-7419c79a"><p class="cl-7419accc"><span class="cl-741666ca">1.10</span></p></td>
+<td class="cl-7419c7a2"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
+<td class="cl-7419c7a3"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c039"><p class="cl-99069ae0"><span class="cl-99036794">G</span></p></td>
-<td class="cl-9906c03a"><p class="cl-99069aea"><span class="cl-99036794">1.20</span></p></td>
-<td class="cl-9906c042"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
-<td class="cl-9906c043"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
+<td class="cl-7419c799"><p class="cl-7419acc2"><span class="cl-741666ca">G</span></p></td>
+<td class="cl-7419c79a"><p class="cl-7419accc"><span class="cl-741666ca">1.20</span></p></td>
+<td class="cl-7419c7a2"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
+<td class="cl-7419c7a3"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c039"><p class="cl-99069ae0"><span class="cl-99036794">H</span></p></td>
-<td class="cl-9906c03a"><p class="cl-99069aea"><span class="cl-99036794">1.50</span></p></td>
-<td class="cl-9906c042"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
-<td class="cl-9906c043"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
+<td class="cl-7419c799"><p class="cl-7419acc2"><span class="cl-741666ca">H</span></p></td>
+<td class="cl-7419c79a"><p class="cl-7419accc"><span class="cl-741666ca">1.50</span></p></td>
+<td class="cl-7419c7a2"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
+<td class="cl-7419c7a3"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
 </tr>
 <tr style="overflow-wrap:break-word;">
-<td class="cl-9906c04c"><p class="cl-99069ae0"><span class="cl-99036794">I</span></p></td>
-<td class="cl-9906c04d"><p class="cl-99069aea"><span class="cl-99036794">2.00</span></p></td>
-<td class="cl-9906c04e"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
-<td class="cl-9906c056"><p class="cl-99069aea"><span class="cl-99036794"></span></p></td>
+<td class="cl-7419c7a4"><p class="cl-7419acc2"><span class="cl-741666ca">I</span></p></td>
+<td class="cl-7419c7a5"><p class="cl-7419accc"><span class="cl-741666ca">2.00</span></p></td>
+<td class="cl-7419c7ac"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
+<td class="cl-7419c7ad"><p class="cl-7419accc"><span class="cl-741666ca"></span></p></td>
 </tr>
 </tbody>
 </table>

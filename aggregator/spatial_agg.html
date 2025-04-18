@@ -6253,35 +6253,35 @@ window.onload = function() {
 <section id="inputs" class="level1"><h1>Inputs</h1>
 <p><code>spatial_aggregate</code> accept inputs at arbitrary aggregation levels (theme, spatial, or temporal), provided that data is spatial. In other words, the spatial aggregation should aggregate any input spatial data into any set of spatial units, whatever that input data represents. Though we demonstrate here with the polygons provided by {HydroBOT}, the user can supply any arbitrary spatial units in <code>sf</code> format.</p>
 <div id="spatial-themes" style="border: 2px solid gray; color: gray">
-<p>EWR-specific note: in some cases, the definitions for outcomes along the value axis are defined spatially; for example, the definition of <code>Specific_objectives</code> might vary between planning units. However, these are the scale at which <em>definitions</em> of outcomes change, not the scale at which those outcomes must be assessed. For example, just because <code>Specific_objectives</code> are differently defined between planning units, we can still scale them up in space from gauge to basin, with no reference to planning unit.</p>
+<p>EWR-specific note: in some cases, the definitions for outcomes along the theme axis are defined spatially; for example, the definition of <code>Specific_objectives</code> might vary between planning units. However, these are the scale at which <em>definitions</em> of outcomes change, not the scale at which those outcomes must be assessed. For example, just because <code>Specific_objectives</code> are differently defined between planning units, we can still scale them up in space from gauge to basin, with no reference to planning unit.</p>
 </div>
 <section id="demonstration-setup" class="level2"><h2 class="anchored" data-anchor-id="demonstration-setup">Demonstration setup</h2>
 <p>For this demonstration, we start with gauge-referenced data at the <code>env_obj</code> theme scale, and so do a bit of data pre-processing to get there.</p>
 <div class="cell">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">project_dir</span> <span class="op">&lt;-</span> <span class="st">&#39;hydrobot_scenarios&#39;</span></span>
-<span><span class="va">hydro_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="st">&#39;hydrographs&#39;</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">project_dir</span> <span class="op">&lt;-</span> <span class="st">&quot;hydrobot_scenarios&quot;</span></span>
+<span><span class="va">hydro_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="st">&quot;hydrographs&quot;</span><span class="op">)</span></span>
 <span><span class="va">ewr_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="st">&quot;module_output&quot;</span>, <span class="st">&quot;EWR&quot;</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="va">project_dir</span>,</span>
-<span>  outputType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&#39;none&#39;</span><span class="op">)</span>,</span>
-<span>  returnType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&#39;yearly&#39;</span><span class="op">)</span></span>
+<span>  outputType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&quot;none&quot;</span><span class="op">)</span>,</span>
+<span>  returnType <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&quot;yearly&quot;</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># This is just a simple prep step that is usually done internally to put the geographic coordinates on input data</span></span>
-<span><span class="va">ewrdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_ewr_output.html">prep_ewr_output</a></span><span class="op">(</span><span class="va">ewr_out</span><span class="op">$</span><span class="va">yearly</span>, type <span class="op">=</span> <span class="st">&#39;achievement&#39;</span><span class="op">)</span></span>
+<span><span class="va">ewrdata</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_ewr_output.html">prep_ewr_output</a></span><span class="op">(</span><span class="va">ewr_out</span><span class="op">$</span><span class="va">yearly</span>, type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># This gets us to env_obj at the gauge over all time</span></span>
 <span><span class="va">preseq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>  all_time <span class="op">=</span> <span class="st">&quot;all_time&quot;</span>,</span>
 <span>  ewr_code <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;ewr_code_timing&quot;</span>, <span class="st">&quot;ewr_code&quot;</span><span class="op">)</span>,</span>
 <span>  env_obj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;ewr_code&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">funseq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
-<span>  all_time <span class="op">=</span> <span class="st">&#39;ArithmeticMean&#39;</span>,</span>
+<span>  all_time <span class="op">=</span> <span class="st">&quot;ArithmeticMean&quot;</span>,</span>
 <span>  ewr_code <span class="op">=</span> <span class="st">&quot;CompensatingFactor&quot;</span>,</span>
 <span>  env_obj <span class="op">=</span> <span class="st">&quot;ArithmeticMean&quot;</span></span>
 <span><span class="op">)</span></span>
@@ -6335,7 +6335,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The <code>aggCols</code> argument is <code>ends_with(original_name)</code> to reference the <em>original</em> name of the column of values- it may have a <a href="../aggregator/aggregation_overview.html">long name tracking its aggregation history</a>, so we give it the <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html">tidyselect::ends_with</a></code> to find the column. More generally, both <code>aggCols</code> and <code>groupers</code> can take any tidyselect syntax or bare names or characters, see <a href="../aggregator/aggregation_syntax.html">here</a>.</p>
+<p>The <code>aggCols</code> argument is <code>ends_with(original_name)</code> to reference the <em>original</em> name of the column of values- it may have a <a href="../aggregator/aggregation_overview.html">long name tracking its aggregation history</a>, so we give it the <code><a href="https://tidyselect.r-lib.org/reference/starts_with.html">tidyselect::ends_with()</a></code> to find the column. More generally, both <code>aggCols</code> and <code>groupers</code> can take any tidyselect syntax or bare names or characters, see <a href="../aggregator/aggregation_syntax.html">here</a>.</p>
 </div>
 </div>
 <div class="cell">
@@ -6384,7 +6384,7 @@ Tip
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
 <span>  aggCols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span><span class="op">)</span>,</span>
 <span>  funlist <span class="op">=</span> <span class="va">ArithmeticMean</span>,</span>
-<span>  prefix <span class="op">=</span> <span class="st">&#39;sdl_units_&#39;</span></span>
+<span>  prefix <span class="op">=</span> <span class="st">&quot;sdl_units_&quot;</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: !
@@ -6419,10 +6419,11 @@ EWR gauge to sdl units or planning units detected without `pseudo_spatial`!
 </div>
 <p>We can clean those up into columns with <code><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols()</a></code> (which happens internally in <code><a href="https://galenholt.github.io/HydroBOT/reference/multi_aggregate.html">multi_aggregate()</a></code> and <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> with <code>namehistory = FALSE</code>).</p>
 <div class="cell">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2poly_rename</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span><span class="va">obj2poly</span>, </span>
-<span>                              aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&#39;sdl_units&#39;</span><span class="op">)</span>, </span>
-<span>                              funsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">funseq</span>, <span class="st">&#39;ArithmeticMean&#39;</span><span class="op">)</span>, </span>
-<span>                              aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2poly_rename</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span><span class="va">obj2poly</span>,</span>
+<span>  aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&quot;sdl_units&quot;</span><span class="op">)</span>,</span>
+<span>  funsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">funseq</span>, <span class="st">&quot;ArithmeticMean&quot;</span><span class="op">)</span>,</span>
+<span>  aggCols <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">obj2poly_rename</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div data-pagedtable="false">
@@ -6468,8 +6469,8 @@ EWR gauge to sdl units or planning units detected without `pseudo_spatial`!
 <span>  to_geo <span class="op">=</span> <span class="va">sdl_units</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
 <span>  aggCols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span><span class="op">)</span>,</span>
-<span>  funlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&#39;ArithmeticMean&#39;</span>, <span class="st">&#39;medna&#39;</span><span class="op">)</span>,</span>
-<span>  prefix <span class="op">=</span> <span class="st">&#39;sdl_units_&#39;</span></span>
+<span>  funlist <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;ArithmeticMean&quot;</span>, <span class="st">&quot;medna&quot;</span><span class="op">)</span>,</span>
+<span>  prefix <span class="op">=</span> <span class="st">&quot;sdl_units_&quot;</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: !
@@ -6481,12 +6482,13 @@ EWR gauge to sdl units or planning units detected without `pseudo_spatial`!
 </div>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># we need a full sequence</span></span>
 <span><span class="va">funseq2</span> <span class="op">&lt;-</span> <span class="va">funseq</span></span>
-<span><span class="va">funseq2</span><span class="op">$</span><span class="va">sdl_units</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&#39;ArithmeticMean&#39;</span>, <span class="st">&#39;medna&#39;</span><span class="op">)</span></span>
+<span><span class="va">funseq2</span><span class="op">$</span><span class="va">sdl_units</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&quot;ArithmeticMean&quot;</span>, <span class="st">&quot;medna&quot;</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">obj2poly_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span><span class="va">obj2poly_2</span>, </span>
-<span>                              aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&#39;sdl_units&#39;</span><span class="op">)</span>, </span>
-<span>                              funsequence <span class="op">=</span> <span class="va">funseq2</span>, </span>
-<span>                              aggCols <span class="op">=</span> <span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">obj2poly_2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/agg_names_to_cols.html">agg_names_to_cols</a></span><span class="op">(</span><span class="va">obj2poly_2</span>,</span>
+<span>  aggsequence <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">preseq</span><span class="op">)</span>, <span class="st">&quot;sdl_units&quot;</span><span class="op">)</span>,</span>
+<span>  funsequence <span class="op">=</span> <span class="va">funseq2</span>,</span>
+<span>  aggCols <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Attempting to deparse lambda function in funsequence. 
 ℹ It is better to use named functions than lambdas in the funsequence, because they are more clearly defined and can be more easily known later.</code></pre>
@@ -6499,7 +6501,7 @@ to replace is not a multiple of replacement length</code></pre>
 <p>And now we can compare what we get out of the different functions (just for the baseline scenario or we run out of dimensions).</p>
 <div class="cell">
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2poly_2</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">==</span> <span class="st">&#39;base&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">==</span> <span class="st">&quot;base&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">&quot;^EF[1-3]&quot;</span>, <span class="va">env_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6544,7 +6546,7 @@ Important
 <span>  funlist <span class="op">=</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/defusing-advanced.html">quo</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>wmna <span class="op">=</span> <span class="op">~</span> <span class="fu"><a href="https://rdrr.io/r/stats/weighted.mean.html">weighted.mean</a></span><span class="op">(</span><span class="va">.</span>, <span class="va">.data</span><span class="op">$</span><span class="va">area</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  failmissing <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  prefix <span class="op">=</span> <span class="st">&#39;basin_&#39;</span></span>
+<span>  prefix <span class="op">=</span> <span class="st">&quot;basin_&quot;</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">simplepolypoly</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -6556,8 +6558,8 @@ Important
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">simplepolypoly</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span><span class="st">&#39;ewr_achieved&#39;</span> <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">simplepolypoly</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span> <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">&quot;^EF[1-3]&quot;</span>, <span class="va">env_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6607,21 +6609,22 @@ Caution
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">overlay_cewo_sdl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">#|</span></span>
+<span><span class="va">overlay_cewo_sdl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">sdl_units</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">SWSDLName</span><span class="op">)</span>, color <span class="op">=</span> <span class="cn">NA</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cewo_valleys</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">ValleyName</span><span class="op">)</span>, fill <span class="op">=</span> <span class="cn">NA</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">&quot;none&quot;</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">&#39;both&#39;</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">&quot;both&quot;</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">valleys</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">cewo_valleys</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">ValleyName</span><span class="op">)</span>, fill <span class="op">=</span> <span class="st">&quot;white&quot;</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">&quot;none&quot;</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">&#39;catchments&#39;</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">&quot;catchments&quot;</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">sdls</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsf.html">geom_sf</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">sdl_units</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span>fill <span class="op">=</span> <span class="va">SWSDLName</span><span class="op">)</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">&quot;none&quot;</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">&#39;sdl_units&#39;</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html">ggtitle</a></span><span class="op">(</span><span class="st">&quot;sdl_units&quot;</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">valleys</span> <span class="op">+</span> <span class="va">sdls</span> <span class="op">+</span> <span class="va">overlay_cewo_sdl</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -6696,7 +6699,7 @@ Figure 2: SDL units intersected with catchment (<code>cewo_valleys</code>) and 
 <span>  funlist <span class="op">=</span> <span class="st">&quot;SpatialWeightedMean&quot;</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  failmissing <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  prefix <span class="op">=</span> <span class="st">&#39;cewo_valleys_&#39;</span></span>
+<span>  prefix <span class="op">=</span> <span class="st">&quot;cewo_valleys_&quot;</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">nestedpolypoly</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -6722,8 +6725,8 @@ Warning
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nestedpolypoly</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span><span class="st">&#39;ewr_achieved&#39;</span> <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">nestedpolypoly</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span> <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">&quot;^EF[1-3]&quot;</span>, <span class="va">env_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6754,7 +6757,7 @@ Warning
 <span>  groupers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;scenario&quot;</span>, <span class="st">&quot;env_obj&quot;</span><span class="op">)</span>,</span>
 <span>  aggCols <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span><span class="op">)</span>,</span>
 <span>  funlist <span class="op">=</span> <span class="va">ArithmeticMean</span>,</span>
-<span>  prefix <span class="op">=</span> <span class="st">&#39;sdl_units_&#39;</span></span>
+<span>  prefix <span class="op">=</span> <span class="st">&quot;sdl_units_&quot;</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">obj2poly_keep</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -6767,7 +6770,7 @@ Warning
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2poly_rename</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span><span class="st">&#39;ewr_achieved&#39;</span> <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span> <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">&quot;^EF[1-3]&quot;</span>, <span class="va">env_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6791,7 +6794,7 @@ Warning
 <p>Now we have retained polygons without data. The default is <code>keepAllPolys = FALSE</code>. Another option for plotting though would be to use <code>FALSE</code> as earlier, and include an underlay. For more detail, see the <a href="../comparer/comparer_overview.html">plotting</a>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">obj2poly_rename</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span><span class="st">&#39;ewr_achieved&#39;</span> <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&#39;ewr_achieved&#39;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span> <span class="op">=</span> <span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html">ends_with</a></span><span class="op">(</span><span class="st">&quot;ewr_achieved&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html">grepl</a></span><span class="op">(</span><span class="st">&quot;^EF[1-3]&quot;</span>, <span class="va">env_obj</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6801,7 +6804,7 @@ Warning
 <span>    colorset <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>    pal_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&quot;scico::lapaz&quot;</span><span class="op">)</span>,</span>
 <span>    pal_direction <span class="op">=</span> <span class="op">-</span><span class="fl">1</span>,</span>
-<span>    underlay_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>underlay <span class="op">=</span> <span class="st">&#39;sdl_units&#39;</span>, pal_list <span class="op">=</span> <span class="st">&#39;azure&#39;</span><span class="op">)</span>,</span>
+<span>    underlay_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>underlay <span class="op">=</span> <span class="st">&quot;sdl_units&quot;</span>, pal_list <span class="op">=</span> <span class="st">&quot;azure&quot;</span><span class="op">)</span>,</span>
 <span>    facet_col <span class="op">=</span> <span class="st">&quot;env_obj&quot;</span>,</span>
 <span>    facet_row <span class="op">=</span> <span class="st">&quot;scenario&quot;</span>,</span>
 <span>    sceneorder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;down4&quot;</span>, <span class="st">&quot;base&quot;</span>, <span class="st">&quot;up4&quot;</span><span class="op">)</span></span>

@@ -6221,55 +6221,70 @@ window.onload = function() {
 <p>First, we create some dummy ‘module’ data, as in <a href="../aggregator/using_multi_aggregate.html">the multi_aggregate example</a>, but here we save it out.</p>
 <p>We need to know the spatial units to create the data:</p>
 <div class="cell">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">austates</span> <span class="op">&lt;-</span> <span class="fu">rnaturalearth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_states.html">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">&#39;australia&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">austates</span> <span class="op">&lt;-</span> <span class="fu">rnaturalearth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_states.html">ne_states</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">&quot;australia&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>state <span class="op">=</span> <span class="va">name</span>, <span class="va">geometry</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">all_aus</span> <span class="op">&lt;-</span> <span class="fu">rnaturalearth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html">ne_countries</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">&#39;australia&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">all_aus</span> <span class="op">&lt;-</span> <span class="fu">rnaturalearth</span><span class="fu">::</span><span class="fu"><a href="https://docs.ropensci.org/rnaturalearth/reference/ne_countries.html">ne_countries</a></span><span class="op">(</span>country <span class="op">=</span> <span class="st">&quot;australia&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">geounit</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Then we create the data and save it out</p>
 <div class="cell">
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># This is all copied from multi_aggregate except the last saving line.</span></span>
 <span></span>
-<span>  <span class="co"># add a date column</span></span>
-<span>  <span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="va">austates</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>date <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html">ymd</a></span><span class="op">(</span><span class="st">&#39;20000101&#39;</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># add a date column</span></span>
+<span><span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="va">austates</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>date <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html">ymd</a></span><span class="op">(</span><span class="st">&quot;20000101&quot;</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># add some values</span></span>
-<span>  <span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_seed.html">with_seed</a></span><span class="op">(</span><span class="fl">17</span>,</span>
-<span>                   <span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="va">state_inputs</span> <span class="op">|&gt;</span></span>
-<span>                     <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">state_inputs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co"># add some values</span></span>
+<span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_seed.html">with_seed</a></span><span class="op">(</span></span>
+<span>  <span class="fl">17</span>,</span>
+<span>  <span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="va">state_inputs</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>value <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">state_inputs</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_seed.html">with_seed</a></span><span class="op">(</span></span>
+<span>  <span class="fl">17</span>,</span>
+<span>  <span class="co"># add some more days, each with different values</span></span>
+<span>  <span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span></span>
+<span>    <span class="fl">0</span><span class="op">:</span><span class="fl">10</span>,</span>
+<span>    \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">state_inputs</span>,</span>
+<span>      date <span class="op">=</span> <span class="va">date</span> <span class="op">+</span> <span class="va">x</span>,</span>
+<span>      value <span class="op">=</span> <span class="va">value</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">state_inputs</span><span class="op">)</span>,</span>
+<span>        mean <span class="op">=</span> <span class="va">x</span>, sd <span class="op">=</span> <span class="va">x</span> <span class="op">/</span> <span class="fl">2</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># add a scenario column, each with different values</span></span>
+<span><span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/imap.html">imap</a></span><span class="op">(</span></span>
+<span>  <span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>,</span>
+<span>  \<span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">state_inputs</span>,</span>
+<span>    scenario <span class="op">=</span> <span class="va">x</span>,</span>
+<span>    value <span class="op">=</span> <span class="va">value</span> <span class="op">+</span> <span class="va">y</span></span>
 <span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="fu">withr</span><span class="fu">::</span><span class="fu"><a href="https://withr.r-lib.org/reference/with_seed.html">with_seed</a></span><span class="op">(</span><span class="fl">17</span>,</span>
-<span>                   <span class="co"># add some more days, each with different values</span></span>
-<span>                   <span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">10</span>,</span>
-<span>                                              \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">state_inputs</span>,</span>
-<span>                                                                 date <span class="op">=</span> <span class="va">date</span> <span class="op">+</span> <span class="va">x</span>,</span>
-<span>                                                                 value <span class="op">=</span> <span class="va">value</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">state_inputs</span><span class="op">)</span>,</span>
-<span>                                                                                       mean <span class="op">=</span> <span class="va">x</span>, sd <span class="op">=</span> <span class="va">x</span><span class="op">/</span><span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>                     <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
-<span>                   <span class="op">)</span></span>
-<span>  </span>
-<span>    <span class="co"># add a scenario column, each with different values</span></span>
-<span>  <span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/imap.html">imap</a></span><span class="op">(</span><span class="va">letters</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>,</span>
-<span>                              \<span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">state_inputs</span>,</span>
-<span>                                            scenario <span class="op">=</span> <span class="va">x</span>,</span>
-<span>                                            value <span class="op">=</span> <span class="va">value</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span>    <span class="co"># add a theme-relevant column, each with different values</span></span>
-<span>  <span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/imap.html">imap</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;E&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;G&quot;</span>, <span class="st">&quot;H&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;J&quot;</span><span class="op">)</span>,</span>
-<span>                              \<span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">state_inputs</span>,</span>
-<span>                                            theme1 <span class="op">=</span> <span class="va">x</span>,</span>
-<span>                                            value <span class="op">=</span> <span class="va">value</span> <span class="op">+</span> <span class="va">y</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co"># add a theme-relevant column, each with different values</span></span>
+<span><span class="va">state_inputs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/imap.html">imap</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;E&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;G&quot;</span>, <span class="st">&quot;H&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;J&quot;</span><span class="op">)</span>,</span>
+<span>  \<span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span><span class="va">state_inputs</span>,</span>
+<span>    theme1 <span class="op">=</span> <span class="va">x</span>,</span>
+<span>    value <span class="op">=</span> <span class="va">value</span> <span class="op">+</span> <span class="va">y</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html">bind_rows</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span></span>
-<span>  <span class="co"># This bit saves it out so we can use read_and_agg.</span></span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">state_inputs</span><span class="op">$</span><span class="va">scenario</span><span class="op">)</span>,</span>
-<span>             \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">&#39;module_output&#39;</span>, <span class="st">&#39;fake_module&#39;</span>, <span class="va">x</span><span class="op">)</span>, </span>
-<span>                             recursive <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co"># This bit saves it out so we can use read_and_agg.</span></span>
+<span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">state_inputs</span><span class="op">$</span><span class="va">scenario</span><span class="op">)</span>,</span>
+<span>  \<span class="op">(</span><span class="va">x</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/base/files2.html">dir.create</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">&quot;module_output&quot;</span>, <span class="st">&quot;fake_module&quot;</span>, <span class="va">x</span><span class="op">)</span>,</span>
+<span>    recursive <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
 [1] TRUE
@@ -6283,57 +6298,63 @@ window.onload = function() {
 [[4]]
 [1] TRUE</code></pre>
 </div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span>  <span class="va">si</span> <span class="op">&lt;-</span> <span class="va">state_inputs</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/split.html">split</a></span><span class="op">(</span><span class="va">state_inputs</span><span class="op">$</span><span class="va">scenario</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/imap.html">iwalk</a></span><span class="op">(</span></span>
-<span>      \<span class="op">(</span><span class="va">x</span>,<span class="va">y</span><span class="op">)</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/write_delim.html">write_csv</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">&#39;module_output&#39;</span>, <span class="st">&#39;fake_module&#39;</span>,</span>
-<span>                                       <span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">&quot;fakeout_&quot;</span>, <span class="va">y</span>, <span class="st">&#39;.csv&#39;</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span>      <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">si</span> <span class="op">&lt;-</span> <span class="va">state_inputs</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html">st_drop_geometry</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/split.html">split</a></span><span class="op">(</span><span class="va">state_inputs</span><span class="op">$</span><span class="va">scenario</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/imap.html">iwalk</a></span><span class="op">(</span></span>
+<span>    \<span class="op">(</span><span class="va">x</span>, <span class="va">y</span><span class="op">)</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/write_delim.html">write_csv</a></span><span class="op">(</span><span class="va">x</span>, <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">&quot;module_output&quot;</span>, <span class="st">&quot;fake_module&quot;</span>,</span>
+<span>      <span class="va">y</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">&quot;fakeout_&quot;</span>, <span class="va">y</span>, <span class="st">&quot;.csv&quot;</span><span class="op">)</span></span>
+<span>    <span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>And we need a simple causal network.</p>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># make a simple &#39;causal&#39; network</span></span>
-<span>  <span class="va">state_theme</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>theme1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;E&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;G&quot;</span>, <span class="st">&quot;H&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;J&quot;</span><span class="op">)</span>,</span>
-<span>                                theme2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;vowel&quot;</span>, <span class="st">&quot;consonant&quot;</span>, <span class="st">&quot;consonant&quot;</span>,</span>
-<span>                                           <span class="st">&quot;consonant&quot;</span>, <span class="st">&quot;vowel&quot;</span>, <span class="st">&quot;consonant&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="va">state_theme</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
+<span>  theme1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;E&quot;</span>, <span class="st">&quot;F&quot;</span>, <span class="st">&quot;G&quot;</span>, <span class="st">&quot;H&quot;</span>, <span class="st">&quot;I&quot;</span>, <span class="st">&quot;J&quot;</span><span class="op">)</span>,</span>
+<span>  theme2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">&quot;vowel&quot;</span>, <span class="st">&quot;consonant&quot;</span>, <span class="st">&quot;consonant&quot;</span>,</span>
+<span>    <span class="st">&quot;consonant&quot;</span>, <span class="st">&quot;vowel&quot;</span>, <span class="st">&quot;consonant&quot;</span></span>
+<span>  <span class="op">)</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="using-the-aggregator" class="level3"><h3 class="anchored" data-anchor-id="using-the-aggregator">Using the Aggregator</h3>
 <p>First, we set up some aggregation steps. Will just use means throughout.</p>
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># This will aggregate into weeks, then to type, and then to the country.</span></span>
-<span>  <span class="va">ausseq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
-<span>    week <span class="op">=</span> <span class="st">&#39;week&#39;</span>,</span>
-<span>    theme2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&#39;theme1&#39;</span>, <span class="st">&#39;theme2&#39;</span><span class="op">)</span>,</span>
-<span>    all_aus <span class="op">=</span> <span class="va">all_aus</span></span>
-<span>  <span class="op">)</span></span>
+<span><span class="va">ausseq</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>  week <span class="op">=</span> <span class="st">&quot;week&quot;</span>,</span>
+<span>  theme2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;theme1&quot;</span>, <span class="st">&quot;theme2&quot;</span><span class="op">)</span>,</span>
+<span>  all_aus <span class="op">=</span> <span class="va">all_aus</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span>  <span class="co"># just use mean, since there are no NA in the data.</span></span>
-<span>  <span class="va">ausfuns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
-<span>    week <span class="op">=</span> <span class="st">&#39;mean&#39;</span>,</span>
-<span>    type <span class="op">=</span> <span class="st">&#39;mean&#39;</span>,</span>
-<span>    all_aus <span class="op">=</span> <span class="st">&#39;mean&#39;</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span><span class="co"># just use mean, since there are no NA in the data.</span></span>
+<span><span class="va">ausfuns</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>  week <span class="op">=</span> <span class="st">&quot;mean&quot;</span>,</span>
+<span>  type <span class="op">=</span> <span class="st">&quot;mean&quot;</span>,</span>
+<span>  all_aus <span class="op">=</span> <span class="st">&quot;mean&quot;</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Do the aggregation. Note that this warns about some built-in checks for the EWR module that are not relevant here.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span>  <span class="co"># Do the aggregation</span></span>
-<span>  <span class="va">ausagg</span> <span class="op">&lt;-</span>  <span class="va">ausagg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
-<span>  datpath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">&#39;module_output&#39;</span>, <span class="st">&#39;fake_module&#39;</span><span class="op">)</span>,</span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Do the aggregation</span></span>
+<span><span class="va">ausagg</span> <span class="op">&lt;-</span> <span class="va">ausagg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<span>  datpath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">&quot;module_output&quot;</span>, <span class="st">&quot;fake_module&quot;</span><span class="op">)</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;everything&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">austates</span>,</span>
 <span>  causalpath <span class="op">=</span> <span class="va">state_theme</span>,</span>
 <span>  groupers <span class="op">=</span> <span class="st">&quot;scenario&quot;</span>,</span>
 <span>  aggCols <span class="op">=</span> <span class="st">&quot;value&quot;</span>,</span>
-<span>    aggsequence <span class="op">=</span> <span class="va">ausseq</span>,</span>
+<span>  aggsequence <span class="op">=</span> <span class="va">ausseq</span>,</span>
 <span>  funsequence <span class="op">=</span> <span class="va">ausfuns</span>,</span>
 <span>  saveintermediate <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  namehistory <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  keepAllPolys <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  returnList <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  add_max <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  savepath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">&#39;aggregator_output&#39;</span>, <span class="st">&#39;dummy&#39;</span><span class="op">)</span></span>
+<span>  savepath <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html">tempdir</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">&quot;aggregator_output&quot;</span>, <span class="st">&quot;dummy&quot;</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in filtergroups(thisdf, fromcol = p[1], tocol = p[2], fromfilter =
@@ -6343,9 +6364,9 @@ user they work together</code></pre>
 </div>
 <p>Quick plots of a couple levels</p>
 <div class="cell">
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ausagg</span><span class="op">$</span><span class="va">week</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">theme1</span> <span class="op">==</span> <span class="st">&#39;E&#39;</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ausagg</span><span class="op">$</span><span class="va">week</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">theme1</span> <span class="op">==</span> <span class="st">&quot;E&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;value&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -6363,9 +6384,9 @@ user they work together</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ausagg</span><span class="op">$</span><span class="va">theme2</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">date</span> <span class="op">==</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html">ymd</a></span><span class="op">(</span><span class="st">&quot;2000-01-03&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ausagg</span><span class="op">$</span><span class="va">theme2</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">date</span> <span class="op">==</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html">ymd</a></span><span class="op">(</span><span class="st">&quot;2000-01-03&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;value&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -6383,9 +6404,9 @@ user they work together</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ausagg</span><span class="op">$</span><span class="va">all_aus</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">date</span> <span class="op">==</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html">ymd</a></span><span class="op">(</span><span class="st">&quot;2000-01-03&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ausagg</span><span class="op">$</span><span class="va">all_aus</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">date</span> <span class="op">==</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd.html">ymd</a></span><span class="op">(</span><span class="st">&quot;2000-01-03&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;value&quot;</span>,</span>
 <span>    plot_type <span class="op">=</span> <span class="st">&quot;map&quot;</span>,</span>
 <span>    colorgroups <span class="op">=</span> <span class="cn">NULL</span>,</span>

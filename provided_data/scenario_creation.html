@@ -6317,12 +6317,12 @@ all geometries</code></pre>
 <div class="cell">
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">REBUILD_DATA</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">demo_levs</span> <span class="op">&lt;-</span> <span class="fu">hydrogauge</span><span class="fu">::</span><span class="fu"><a href="https://galenholt.github.io/hydrogauge/reference/get_ts_traces.html">get_ts_traces</a></span><span class="op">(</span></span>
-<span>  portal <span class="op">=</span> <span class="st">&quot;NSW&quot;</span>,</span>
-<span>  site_list <span class="op">=</span> <span class="va">gauges_to_pull</span>,</span>
-<span>  var_list <span class="op">=</span> <span class="fl">141</span>, <span class="co"># This is flow</span></span>
-<span>  start_time <span class="op">=</span> <span class="va">starttime</span>,</span>
-<span>  end_time <span class="op">=</span> <span class="va">endtime</span></span>
-<span><span class="op">)</span></span>
+<span>    portal <span class="op">=</span> <span class="st">&quot;NSW&quot;</span>,</span>
+<span>    site_list <span class="op">=</span> <span class="va">gauges_to_pull</span>,</span>
+<span>    var_list <span class="op">=</span> <span class="fl">141</span>, <span class="co"># This is flow</span></span>
+<span>    start_time <span class="op">=</span> <span class="va">starttime</span>,</span>
+<span>    end_time <span class="op">=</span> <span class="va">endtime</span></span>
+<span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The azure boxes have old GDAL, which can’t read WKT2. Need to fix, but in the meantime, <a href="https://github.com/r-spatial/sf/issues/1419">force with the crs number</a>.</p>
@@ -6357,16 +6357,16 @@ all geometries</code></pre>
 <p>Set up the data structure</p>
 <div class="cell">
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="va">params</span><span class="op">$</span><span class="va">REBUILD_DATA</span><span class="op">)</span> <span class="op">{</span></span>
-<span><span class="va">demo_flow</span> <span class="op">&lt;-</span> <span class="va">demo_levs</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>Date <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/date.html">date</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="co"># append the gauge type</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>site <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">site</span>, <span class="st">&quot;_flow&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">value</span>, <span class="va">site</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html">pivot_wider</a></span><span class="op">(</span></span>
-<span>    id_cols <span class="op">=</span> <span class="va">Date</span>,</span>
-<span>    names_from <span class="op">=</span> <span class="va">site</span>,</span>
-<span>    values_from <span class="op">=</span> <span class="va">value</span></span>
-<span>  <span class="op">)</span></span>
+<span>  <span class="va">demo_flow</span> <span class="op">&lt;-</span> <span class="va">demo_levs</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>Date <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/date.html">date</a></span><span class="op">(</span><span class="va">time</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="co"># append the gauge type</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>site <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">site</span>, <span class="st">&quot;_flow&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">Date</span>, <span class="va">value</span>, <span class="va">site</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_wider.html">pivot_wider</a></span><span class="op">(</span></span>
+<span>      id_cols <span class="op">=</span> <span class="va">Date</span>,</span>
+<span>      names_from <span class="op">=</span> <span class="va">site</span>,</span>
+<span>      values_from <span class="op">=</span> <span class="va">value</span></span>
+<span>    <span class="op">)</span></span>
 <span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we want to set up the ‘scenarios’ as multiplications and additions, as well as the directory structure.</p>
@@ -6418,9 +6418,9 @@ all geometries</code></pre>
 <span><span class="va">scenemults</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">scenemults</span>, <span class="fl">0</span><span class="op">)</span></span>
 <span><span class="va">sceneadds</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">sceneadds</span>, <span class="fl">500000</span><span class="op">)</span></span>
 <span><span class="va">sceneadapttimes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">sceneadapttimes</span>, <span class="fl">0</span><span class="op">)</span></span>
-<span><span class="va">climate_code</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">climate_code</span>, <span class="st">&#39;MAX&#39;</span><span class="op">)</span></span>
+<span><span class="va">climate_code</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">climate_code</span>, <span class="st">&quot;MAX&quot;</span><span class="op">)</span></span>
 <span><span class="va">adapt_code</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">adapt_code</span>, <span class="cn">Inf</span><span class="op">)</span></span>
-<span><span class="va">scenario_code</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">scenario_code</span>, <span class="st">&#39;MAX&#39;</span><span class="op">)</span></span>
+<span><span class="va">scenario_code</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="va">scenario_code</span>, <span class="st">&quot;MAX&quot;</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">check</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>scenenames <span class="op">=</span> <span class="va">scenenames</span><span class="op">)</span></span>
 <span><span class="va">check</span><span class="op">$</span><span class="va">scenemults</span> <span class="op">&lt;-</span> <span class="va">scenemults</span></span>

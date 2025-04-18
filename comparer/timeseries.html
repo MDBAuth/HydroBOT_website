@@ -6202,7 +6202,7 @@ window.onload = function() {
 </div>
 <div class="cell">
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">project_dir</span> <span class="op">&lt;-</span> <span class="st">&quot;hydrobot_scenarios&quot;</span></span>
-<span><span class="va">hydro_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="st">&#39;hydrographs&#39;</span><span class="op">)</span></span>
+<span><span class="va">hydro_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="st">&quot;hydrographs&quot;</span><span class="op">)</span></span>
 <span><span class="va">ewr_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/file.path.html">file.path</a></span><span class="op">(</span><span class="va">project_dir</span>, <span class="st">&quot;module_output&quot;</span>, <span class="st">&quot;EWR&quot;</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The output data is often temporal, hence the use of <a href="..\aggregator/temporal_aggregation.qmd">temporal aggregation</a>. However, visualising change through time can be incredibly powerful, and so leaving that temporal aggregation off (or aggregating to coarser timesteps, e.g. from years to decades or days to years) allows these sorts of analyses. Here, we demonstrate aggregating along the theme and spatial dimensions while retaining years to yield timeseries of various ‘theme’ levels at various spatial scales. The examples here are only a small number of the potential ways of plotting timeseries available from <code><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes()</a></code>, but illustrate the key feature of using <code>date</code> as either a facet or x-axis.</p>
@@ -6241,8 +6241,8 @@ window.onload = function() {
 <span>  env_obj <span class="op">=</span> <span class="st">&quot;ArithmeticMean&quot;</span>,</span>
 <span>  sdl_units <span class="op">=</span> <span class="st">&quot;ArithmeticMean&quot;</span>,</span>
 <span>  Target <span class="op">=</span> <span class="st">&quot;ArithmeticMean&quot;</span>,</span>
-<span>  basin <span class="op">=</span> <span class="st">&#39;SpatialWeightedMean&#39;</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>  basin <span class="op">=</span> <span class="st">&quot;SpatialWeightedMean&quot;</span></span>
+<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="do-the-aggregation" class="level3"><h3 class="anchored" data-anchor-id="do-the-aggregation">Do the aggregation</h3>
 <p>Now, we use <code><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg()</a></code> to read the data in, aggregate it, and just return it here for making the plots. Rather than using <code>auto_ewr_PU = TRUE</code>, we use <code>group_until</code> and <code>pseudo_spatial</code> as defined in more detail <a href="../aggregator/pseudo_spatial_group_until.html">elsewhere</a>.</p>
@@ -6272,7 +6272,7 @@ window.onload = function() {
 <p>Now, we have temporal data, and we can visualise that in different ways. There are, as usual, many ways we might present this data, depending on the goal. Two obvious options are timeseries lines and maps.</p>
 </section><section id="spatial-changes-through-time-maps" class="level2"><h2 class="anchored" data-anchor-id="spatial-changes-through-time-maps">Spatial changes through time (maps)</h2>
 <p>Maps can show visually how outcomes change across both space and time, but have limited ability to compare scenarios, multiple outcomes, and multiple times due to excessive dimensionality.</p>
-<p>For a single small-scale objective (otherwise there are too many dimensions):</p>
+<p>For a single small-scale environmental objective (otherwise there are too many dimensions):</p>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_dat</span><span class="op">$</span><span class="va">sdl_units</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">env_obj</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">&quot;EF1&quot;</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -6302,7 +6302,7 @@ window.onload = function() {
 <p>Target groups through time, but only in the historical scenario.</p>
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">agged_dat</span><span class="op">$</span><span class="va">Target</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">==</span> <span class="st">&#39;base&#39;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">scenario</span> <span class="op">==</span> <span class="st">&quot;base&quot;</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
@@ -6332,7 +6332,7 @@ window.onload = function() {
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
-<span>    x_col <span class="op">=</span> <span class="st">&#39;date&#39;</span>,</span>
+<span>    x_col <span class="op">=</span> <span class="st">&quot;date&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;scenario&quot;</span>,</span>
 <span>    pal_list <span class="op">=</span> <span class="va">scene_pal</span>,</span>
 <span>    facet_col <span class="op">=</span> <span class="st">&quot;Target&quot;</span>,</span>
@@ -6351,9 +6351,9 @@ window.onload = function() {
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">left_join</a></span><span class="op">(</span><span class="va">scenarios</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/plot_outcomes.html">plot_outcomes</a></span><span class="op">(</span></span>
 <span>    outcome_col <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
-<span>    x_col <span class="op">=</span> <span class="st">&#39;date&#39;</span>,</span>
+<span>    x_col <span class="op">=</span> <span class="st">&quot;date&quot;</span>,</span>
 <span>    colorset <span class="op">=</span> <span class="st">&quot;Target&quot;</span>,</span>
-<span>    facet_row <span class="op">=</span> <span class="st">&#39;scenario&#39;</span>,</span>
+<span>    facet_row <span class="op">=</span> <span class="st">&quot;scenario&quot;</span>,</span>
 <span>    pal_list <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="st">&quot;calecopal::superbloom1&quot;</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">

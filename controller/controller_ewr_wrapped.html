@@ -6298,12 +6298,6 @@ Tip
 <span>  returnType <span class="op">=</span> <span class="va">returnType</span>,</span>
 <span>  rparallel <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The function prep_run_save_ewrs() has run, but the scenario(s) base_module_output_EWR_base have failed and have been bypassed after 2 retries.
-• The function prep_run_save_ewrs() has run, but the scenario(s) base_module_output_EWR_base have failed and have been bypassed after 2 retries.
-• The first error is:
-• &lt;pointer: 0x0&gt;</code></pre>
-</div>
 </div>
 <p>This yields:</p>
 <pre><code>project_dir/
@@ -6323,7 +6317,7 @@ Tip
 <p>In some cases, the scenario names or directory structures might be such that they cannot reasonably be inferred from the directories, or more granular control is needed over the subset of scenarios to run. In this case, the <code>scenarios</code> argument allows passing in a named list of paths, with the names being scenario names and the paths the paths to the files. This then bypasses all the path and scenario inference, giving the user direct control.</p>
 <p>For example, we can rename scenarios and only run a subset, as illustrated here to run the down4 and up4 scenarios and rename the scenarios to decrease and increase. We do still need a <code>hydro_dir</code> argument, as the paths in <code>scenarios</code> are assumed to be relative to that directory, and it’s where metadata gets saved. That said, using a high-level location for <code>hydro_dir</code> would allow the paths to be essentially anywhere.</p>
 <div class="cell">
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ewr_out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/prep_run_save_ewrs.html">prep_run_save_ewrs</a></span><span class="op">(</span></span>
 <span>  hydro_dir <span class="op">=</span> <span class="va">hydro_dir</span>,</span>
 <span>  output_parent_dir <span class="op">=</span> <span class="va">project_dir</span>,</span>
 <span>  scenarios <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>

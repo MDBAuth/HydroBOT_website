@@ -6256,7 +6256,7 @@ window.onload = function() {
 <p>Grouping by SWSDLName, gauge, and planning_unit name columns is retained until the sdl_unit aggregation, specified in three different ways. Likewise, the aggregation into SDL units is done non-spatially.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">aggout</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
-<span>  datpath <span class="op">=</span> <span class="st">&#39;hydrobot_scenarios/module_output/EWR&#39;</span>,</span>
+<span>  datpath <span class="op">=</span> <span class="st">&quot;hydrobot_scenarios/module_output/EWR&quot;</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
 <span>  causalpath <span class="op">=</span> <span class="va">causal_ewr</span>,</span>
@@ -6264,7 +6264,7 @@ window.onload = function() {
 <span>  aggCols <span class="op">=</span> <span class="st">&quot;ewr_achieved&quot;</span>,</span>
 <span>  group_until <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
 <span>    SWSDLName <span class="op">=</span> <span class="fl">3</span>,</span>
-<span>    planning_unit_name <span class="op">=</span> <span class="st">&#39;sdl_units&#39;</span>,</span>
+<span>    planning_unit_name <span class="op">=</span> <span class="st">&quot;sdl_units&quot;</span>,</span>
 <span>    gauge <span class="op">=</span> <span class="va">is_notpoint</span></span>
 <span>  <span class="op">)</span>,</span>
 <span>  pseudo_spatial <span class="op">=</span> <span class="st">&quot;sdl_units&quot;</span>,</span>
@@ -6276,22 +6276,18 @@ window.onload = function() {
 <span>  returnList <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  add_max <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>! Unmatched links in causal network
-• 29 from ewr_code_timing to ewr_code</code></pre>
-</div>
 </div>
 </section><section id="auto_ewr_pu" class="level2"><h2 class="anchored" data-anchor-id="auto_ewr_pu"><code>auto_ewr_PU</code></h2>
 <p>The <code>auto_ewr_PU = TRUE</code> argument in [read_and_agg()] and [multi_aggregate()] is a shortcut to do known best-practices for EWR outputs. It sets any aggregations to planning units or sdl units to pseudo-spatial, since gauges informing those units may not be geographically located within them. It also uses <code>group_until</code> to hold their groupings and not accidentially collapse over them in preceding aggregation steps.</p>
 <p>Best practice is to be explicit (as above), with the following arguments to [read_and_agg()] and [multi_aggregate()], but it is often faster to use <code>auto_ewr_PU = TRUE</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>group_until <span class="ot">=</span> <span class="fu">list</span>(<span class="at">SWSDLName =</span> is_notpoint, </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">planning_unit_name =</span> is_notpoint, </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">gauge =</span> is_notpoint),</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>pseudo_spatial <span class="ot">=</span> <span class="st">&#39;sdl_units&#39;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>group_until <span class="ot">=</span> <span class="fu">list</span>(<span class="at">SWSDLName =</span> is_notpoint, </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">planning_unit_name =</span> is_notpoint, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">gauge =</span> is_notpoint),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>pseudo_spatial <span class="ot">=</span> <span class="st">&#39;sdl_units&#39;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Using <code>auto_ewr_PU</code> to achieve the same results as above is done with this call, but note the messages about being explicit.</p>
 <div class="cell">
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">aggout_auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
-<span>  datpath <span class="op">=</span> <span class="st">&#39;hydrobot_scenarios/module_output/EWR&#39;</span>,</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">aggout_auto</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://galenholt.github.io/HydroBOT/reference/read_and_agg.html">read_and_agg</a></span><span class="op">(</span></span>
+<span>  datpath <span class="op">=</span> <span class="st">&quot;hydrobot_scenarios/module_output/EWR&quot;</span>,</span>
 <span>  type <span class="op">=</span> <span class="st">&quot;achievement&quot;</span>,</span>
 <span>  geopath <span class="op">=</span> <span class="va">bom_basin_gauges</span>,</span>
 <span>  causalpath <span class="op">=</span> <span class="va">causal_ewr</span>,</span>
@@ -6320,8 +6316,6 @@ window.onload = function() {
 • Rows will collapse otherwise, silently aggregating over the wrong dimension
 • Best to explicitly use `group_until` in `multi_aggregate()` or `read_and_agg()`
 .
-! Unmatched links in causal network
-• 29 from ewr_code_timing to ewr_code
 ℹ EWR gauges joined to larger units pseudo-spatially.
 • Done automatically because `auto_ewr_PU = TRUE`
 • Non-spatial join needed because gauges may inform areas they are not within
@@ -6330,7 +6324,7 @@ window.onload = function() {
 </div>
 <p>And we see that those are the same</p>
 <div class="cell">
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="va">aggout</span><span class="op">$</span><span class="va">sdl_units</span><span class="op">$</span><span class="va">ewr_achieved</span> <span class="op">==</span> <span class="va">aggout_auto</span><span class="op">$</span><span class="va">sdl_units</span><span class="op">$</span><span class="va">ewr_achieved</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/all.html">all</a></span><span class="op">(</span><span class="va">aggout</span><span class="op">$</span><span class="va">sdl_units</span><span class="op">$</span><span class="va">ewr_achieved</span> <span class="op">==</span> <span class="va">aggout_auto</span><span class="op">$</span><span class="va">sdl_units</span><span class="op">$</span><span class="va">ewr_achieved</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
