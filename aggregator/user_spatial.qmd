@@ -91,6 +91,7 @@ state_agg$state |>
     sceneorder = c("down4", "base", "up4")
   )
 ```
+
 ```{r}
 #| include: false
 #| label: cleanup

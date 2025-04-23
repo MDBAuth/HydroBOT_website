@@ -285,6 +285,10 @@ Again choosing three of the first codes, we see this is still gauged.
 #| message: false
 allagg$env_obj |>
   dplyr::filter(env_obj %in% c("EF1", "WB1", "NF1")) |>
+  # Some gauges have > 1 value because they inform multiple planning units. For this, just look at the first one
+  dplyr::group_by(scenario, polyID, gauge, SWSDLName, env_obj) |>
+  dplyr::summarise(ewr_achieved = first(ewr_achieved)) |> 
+  dplyr::ungroup() |> 
   dplyr::left_join(scenarios) |>
   plot_outcomes(
     outcome_col = "ewr_achieved",
