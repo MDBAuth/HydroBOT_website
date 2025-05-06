@@ -1,6 +1,6 @@
 ---
 title: "Aggregation overview"
-author: "Galen Holt"
+
 format: html
 editor: visual
 ---

@@ -12,7 +12,7 @@ format:
 
 website:
   title: "HydroBOT"
-  repo-url: https://github.com/MDBAuth/HydroBOT
+  repo-url: https://github.com/galenholt/HydroBOT
   page-footer:
     left: "HydroBOT was developed in the [climate adaptation theme](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation) of the [Murray–Darling Water and Environment Research Program](https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program), a program of the [Murray-Darling Basin Authority](https://www.mdba.gov.au/).\nWebsite, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its [github issues](https://github.com/galenholt/HydroBOT/issues)"
     center:
@@ -41,7 +41,7 @@ website:
         text: Modules
     right:
       - icon: github
-        href: https://github.com/MDBAuth/HydroBOT
+        href: https://github.com/galenholt/HydroBOT
         aria-label: GitHub
 
 theme:

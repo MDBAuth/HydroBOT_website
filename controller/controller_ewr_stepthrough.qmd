@@ -1,6 +1,6 @@
 ---
 title: "Scenario controller internals"
-author: "Galen Holt"
+
 format:
   html:
     df-print: paged

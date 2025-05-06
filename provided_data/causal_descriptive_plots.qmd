@@ -1,6 +1,6 @@
 ---
 title: "Causal Network Plotting"
-author: "Galen Holt"
+
 format:
   html:
     df-print: paged

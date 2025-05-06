@@ -1,6 +1,6 @@
 ---
 title: "Scenario controller"
-author: "Galen Holt"
+
 format:
   html:
     df-print: paged

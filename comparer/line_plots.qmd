@@ -1,6 +1,6 @@
 ---
 title: "Line plots (quantitative x)"
-author: "Galen Holt"
+
 ---
 
 ```{r}

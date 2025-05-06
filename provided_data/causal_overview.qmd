@@ -1,6 +1,6 @@
 ---
 title: "Causal networks"
-author: "Galen Holt"
+
 format: html
 editor: visual
 bibliography: references.bib

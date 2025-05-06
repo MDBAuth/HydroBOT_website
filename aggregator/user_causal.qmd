@@ -1,6 +1,6 @@
 ---
 title: "User-provided causal networks"
-author: "Galen Holt"
+
 ---
 
 ```{r}

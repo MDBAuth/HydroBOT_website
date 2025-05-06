@@ -1,6 +1,6 @@
 ---
 title: "Controller"
-author: "Galen Holt"
+
 format: 
   html:
     code-link: true

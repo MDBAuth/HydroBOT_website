@@ -93,7 +93,7 @@ In use, HydroBOT expects that scenario hydrographs are available and the causal 
 
 ## Development
 
-See the [repo readme](https://github.com/MDBAuth/HydroBOT) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/galenholt/HydroBOT) for development of the package itself.
+See the [repo readme](https://github.com/galenholt/HydroBOT) for additional dev info and more complex package installation issues. See the [{HydroBOT} repo](https://github.com/galenholt/HydroBOT) for development of the package itself.
 
 ## Acknowledgements
 

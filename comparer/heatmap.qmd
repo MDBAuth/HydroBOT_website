@@ -1,6 +1,6 @@
 ---
 title: "Heatmaps and other surfaces"
-author: "Galen Holt"
+
 format:
   html:
     df-print: paged

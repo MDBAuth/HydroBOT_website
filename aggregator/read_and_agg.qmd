@@ -1,6 +1,6 @@
 ---
 title: "Read_and_agg in detail"
-author: "Galen Holt"
+
 format:
   html:
     df-print: paged

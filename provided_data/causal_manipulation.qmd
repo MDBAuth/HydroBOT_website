@@ -1,6 +1,6 @@
 ---
 title: "Causal network functions"
-author: "Galen Holt"
+
 ---
 
 HydroBOT provides several helpers to build and manipulate causal networks. This page points to others where this is explored in more detail.

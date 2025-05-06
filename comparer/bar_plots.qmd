@@ -1,6 +1,6 @@
 ---
 title: "Bar plots"
-author: "Galen Holt"
+
 ---
 
 ```{r}

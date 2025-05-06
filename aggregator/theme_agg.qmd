@@ -1,6 +1,6 @@
 ---
 title: "Theme aggregation"
-author: "Galen Holt"
+
 format:
   html:
     df-print: paged

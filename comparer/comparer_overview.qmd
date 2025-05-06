@@ -1,6 +1,6 @@
 ---
 title: "Comparer overview"
-author: "Galen Holt"
+
 editor: visual
 ---
 

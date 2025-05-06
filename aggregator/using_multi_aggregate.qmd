@@ -1,6 +1,6 @@
 ---
 title: "Aggregating over multiple dimensions"
-author: "Galen Holt"
+
 format:
   html:
     df-print: paged

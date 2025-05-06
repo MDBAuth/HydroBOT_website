@@ -11,7 +11,7 @@ library(ggplot2)
 library(patchwork)
 ```
 
-The only module currently integrated into HydroBOT is the [Environmental Water Requirements (EWR) tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool is written in Python, and takes hydrographs from `r nrow(HydroBOT::get_ewr_gauges())` gauges in the Murray-Darling Basin as inputs (as of version `r get_ewr_version()` used to build this website). The EWR tool then assesses whether a suite of environmental water requirements defined by the Basin states in Long Term Watering Plans (LTWPs) are met.
+The only module currently integrated into HydroBOT is the [Environmental Water Requirements (EWR) tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool is written in Python, and takes hydrographs from `r nrow(HydroBOT::get_ewr_gauges())` gauges in the Murray-Darling Basin as inputs (as of version `r HydroBOT::get_ewr_version()` used to build this website). The EWR tool then assesses whether a suite of environmental water requirements defined by the Basin states in Long Term Watering Plans (LTWPs) are met.
 
 ## EWR definitions
 

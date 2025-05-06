@@ -1,6 +1,6 @@
 ---
 title: "Spatial data"
-author: "Galen Holt"
+
 format:
   html:
     df-print: paged

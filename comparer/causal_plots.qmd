@@ -1,6 +1,6 @@
 ---
 title: "Causal network plots"
-author: "Galen Holt"
+
 ---
 
 ```{r}
