@@ -47,6 +47,8 @@ Nearly all analyses will be comparisons of some kind, and so the Comparer provid
 
     -   [Heatmaps](heatmap.qmd)
 
+Finally, we provide an example using these approaches to [compare aggregation choices](comparing_aggregations.qmd).
+
 # Standardization
 
 The `plot_outcomes()` function allows the user to specify theming and colour controls to maintain a standard look and calculation structure. More generally, {HydroBOT} provides some of this theming functionality with `theme_hydrobot()` and the ability to generate and manipulate colour palettes. These are described below. It is perhaps most important to know that these functions are also exposed to the user, and so these themes and standard approaches to appearance and baselining can be used for one-off ad-hoc plots as well. In any particular project, a user should set up relevant, consistent, and standard colour palettes, which can be used throughout and passed to `plot_outcomes()`.

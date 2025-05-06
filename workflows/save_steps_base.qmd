@@ -13,6 +13,8 @@ A common way to run HydroBOT is to use a single document (i.e. not running the C
 
 Retaining everything in-memory is a very simple flip of a switch, demoed in [its own doc](/workflows/workflow_in_memory.qmd), which parallels this one nearly exactly with the exception of not specifying an `outputType` in `prep_run_save_ewrs()` or a `savepath` in `read_and_agg()`. Saving is generally how workflows are run for large projects, and so is the example used here for getting started.
 
+Load the package
+
 ```{r}
 library(HydroBOT)
 ```
@@ -38,6 +40,10 @@ agg_results <- file.path(project_dir, "aggregator_output")
 ```
 
 We need the 'yearly' EWR outputs for HydroBOT processing, though we can get the EWR to return any of its options.
+
+::: callout-note
+If this is your *first* time using HydroBOT, and you haven't set up a Python environment, this might take a while as {reticulate} does it for you. This is required because the EWR tool is in Python.
+:::
 
 ```{r}
 #| message: false

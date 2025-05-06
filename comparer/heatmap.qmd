@@ -238,3 +238,27 @@ contour_heatmap +
     color = "black"
   )
 ```
+
+# Heatmaps for EWRs
+
+Heatmaps can also be useful for examining the EWRs that come in as input. Since they are unique by gauge, planning-unit, and sdl unit, the names can get ugly, but it can give a good sense of how the EWRs themselves are performing. Here, we'll look over time, and only for one catchment. If the names were simpler, we could facet by catchment or adaptation option.
+
+```{r}
+agged_data$all_time |> 
+  dplyr::filter(adapt_code %in% c(1) & 
+                  climate_code %in% c('A', 'E', 'I') &
+                  SWSDLName == 'Namoi') |>
+  dplyr::mutate(unique_ewr = paste0(ewr_code_timing, gauge, planning_unit_name)) |> 
+  # clean names
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_col = "unique_ewr",
+    x_col = "climate_code",
+    x_lab = "Climate scenario",
+    plot_type = "heatmap",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_wrapper = "SWSDLName",
+    scales = 'free_y'
+  )
+```

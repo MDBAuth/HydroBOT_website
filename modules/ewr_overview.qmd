@@ -10,7 +10,7 @@ library(ggplot2)
 library(patchwork)
 ```
 
-The only module currently integrated into HydroBOT is the [Environmental Water Requirements (EWR) tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool is written in Python, and takes hydrographs from `r nrow(HydroBOT::get_ewr_gauges())` gauges in the Murray-Darling Basin as inputs. The EWR tool then assesses whether a suite of environmental water requirements defined by the Basin states in Long Term Watering Plans (LTWPs) are met.
+The only module currently integrated into HydroBOT is the [Environmental Water Requirements (EWR) tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool is written in Python, and takes hydrographs from `r nrow(HydroBOT::get_ewr_gauges())` gauges in the Murray-Darling Basin as inputs (as of version `r get_ewr_version()` used to build this website). The EWR tool then assesses whether a suite of environmental water requirements defined by the Basin states in Long Term Watering Plans (LTWPs) are met.
 
 ## EWR definitions
 
@@ -110,6 +110,8 @@ While the EWR tool can pull hydrographs on the fly, it uses a different set of f
 
 ::: callout-tip
 For an example workflow to assess ratios of EWR achievement across scenarios (the 'frequency ratio' but also a ratio of achievement based on frequency *and* interevents), see [here](/workflows/ewr_ratios.qmd).
+
+For a similar example looking at characteristics of the interevent periods, see [here](/workflows/ewr_interevent.qmd).
 :::
 
 ### EWR helpers in HydroBOT
@@ -136,12 +138,48 @@ HydroBOT provides some useful functions to access information about the EWR tool
 
 The EWR tool py-ewr has potentially several output files. The standard one to use with HydroBOT is the `yearly` output, which returns one row per year per EWR. The key outcome column is `event_years`, which indicates whether the discharge, timing, and duration of flows met that EWR in that year. HydroBOT then can perform some further assessment, checking whether those yearly achievements met frequency and interevent requirements. This assessment (done by `assess_ewr_achievement()`, which gets called when the `type = 'achievement'` argument is used in `read_and_agg()` or other EWR-read-in functions (e.g. `prep_ewr_output()`), returns three new 'achievement' columns in addition to the `event_years` column which is also passed through:
 
--   `frequency_achieved`- did the `event_years` meet target frequencies?
+1.  `frequency_achieved`- did the `event_years` meet target frequencies?
 
--   `interevent_achieved`- was the interevent period below or equal to the maximum interevent period?
+2.  `interevent_achieved`- was the interevent period below or equal to the maximum interevent period?
 
--   `ewr_achieved`- were both the frequency and interevent conditions met?
+3.  `ewr_achieved`- were both the frequency and interevent conditions met?
 
 HydroBOT checks the frequency conditions with a 10-year lookback window for each year, and so if, for example, an EWR must have a frequency of 0.8, it asks whether it has been met in 8 of the most recent 10 years, rather than 80% of the entire timeseries. Thus, we can obtain an 'achievement' value for each year and avoid potentially major issues caused by patterns within the timeseries that would otherwise be masked. This reflects the reality of the system as well- whether the frequency of an event has been sufficient is a property of the years up to each year, not the whole series. I.e. these are not *aggregations*, but *assessments of condition*.
 
 If temporal aggregtion is desired over the timeseries, these yearly assessments should then be aggregated with the [aggregator](/aggregator/aggregation_overview.qmd). This aggregation can proceed with the user's choice of outcome columns; `event_years`, `frequency_achieved`, `interevent_achieved`, or `ewr_achieved`.
+
+These assessments provide the bulk of examples on this website and most of the uses of HydroBOT.
+
+### Interevent assessment
+
+In some cases, we might want to [assess various characteristics of the interevent periods themselves](/workflows/ewr_interevent.qmd). In this case, we use the `all_successful_interEvents` dataset returned by the EWR tool.
+
+::: callout-note
+The `all_successful_interEvents` dataset returns the interevent period between successful 'events', (as opposed to the `all_interEvents`, which returns the interevent period between 'events' whether or not those are successful). Thus, it is not the interevents that are successful, but the events themselves.
+
+The logic below would work for `all_interEvents` as well, and would only require changing `type = 'all_interEvents'` and `paramargs = list(type = 'interevents')` in `read_and_agg()`. See the [interevent notebook](/workflows/ewr_interevent.qmd).
+:::
+
+Setting the `type` argument in `prep_ewr_output()` to 'interevents', (via the `type` of `read_and_agg()` or better yet as the `prepargs = list(type = 'interevents')` argument) calculates some necessary statistics comparing each interevent to the maximum allowable. This happens with `assess_ewr_interevent()`. In addition to the `inter_event_length` variable returned as output by the EWR tool, this function returns an additional seven data columns:
+
+1.  `max_interevent`- the maximum interevent limit defined in the LTWP
+
+2.  `exceedance_days`- the number of days in each interevent that exceed the maximum allowed
+
+    -   This is just length - max, and so may be less than 0 if the interevent was below the maximum.
+
+3.  `interevent_ratio`- the days in the interevent as a fraction of the maximum
+
+    -   length/max, and so will be \< 1 if the event is shorter and \> 1 if the event is longer than the max
+
+4.  `exceedance_ratio`- ratio of days in the event beyond the max to the max.
+
+    -   interevent_ratio -1, which is the same as (days above max)/max
+
+5.  `exceedance`- binary, whether the interevent was \>= the max
+
+6.  `exceedance_only`- the days in the interevent beyond the max, 0 otherwise
+
+7.  `days_in_exceeding`- the total number of days in interevent periods that were longer than the max
+
+HydroBOT calculates all of these values, which can then be used in the [aggregator](/aggregator/aggregation_overview.qmd), as shown specifically for [some MDBA metrics](/workflows/ewr_interevent.qmd).

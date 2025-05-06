@@ -78,7 +78,6 @@ agged_multi <- multi_aggregate(
 agged_multi |> dplyr::filter(scenario != "MAX")
 ```
 
-
 # User-set functions
 
 We have established a simple set of default aggregation functions (`ArithmeticMean()`, `GeometricMean()`, `LimitingFactor()`, `CompensatingFactor()`, and `SpatialWeightedMean()`), available in `default_agg_functions.R`. It is also possible to supply user-defined functions to include in `funsequence`. We can do this by specifying a new function and including it in the list given to `funsequence`. Some different syntax is provided below in @sec-funsyntax, but the best way is shown here, involving defining a function or functions and using it just as we would built-ins.

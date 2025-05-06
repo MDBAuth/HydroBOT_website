@@ -22,7 +22,7 @@ The key here is that we identify the type of outcome we want to model (EWR achie
 
 ## Outcomes
 
-The output of EWR runs contains the information we need to compare several different kinds of outcomes- it has yearly event occurrence, as well as frequency conditions. When we read it in using the argument `type = 'achievement'`, `prep_ewr_output()` (inside `read_and_agg()`) will calculate whether the frequency of events within the last 10 years is above the required frequency (yielding a `frequency_achieved` column), as well as an `interevent_achieved` column.
+The output of EWR runs contains the information we need to compare several different kinds of outcomes- it has yearly event occurrence, as well as frequency conditions. When we read it in using the argument `type = 'achievement'`, `prep_ewr_output()` (inside `read_and_agg()`) will calculate whether the frequency of events within the last 10 years is above the required frequency (yielding a `frequency_achieved` column), as well as an `interevent_achieved` column (also see [here](/modules/ewr_overview.qmd) and `assess_ewr_achievement()`).
 
 This yields four output columns capturing different EWR conditions and achievements.
 

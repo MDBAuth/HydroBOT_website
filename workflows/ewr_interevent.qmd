@@ -9,16 +9,376 @@ make_hydro_csv()
 ```
 
 ```{r}
+#| message: false
 library(HydroBOT)
 library(dplyr)
 ```
 
-The MDBA has proposed a number of interevent statistics. Here, we quickly demonstrate their calculations with HydroBOT, noting where there are small discrepancies that could easily be fixed up.
+The MDBA has proposed a number of interevent statistics. Here, we quickly demonstrate their calculations with HydroBOT.
+
+## Approach
+
+We first calculate some necessary synthetic variables on the interevent dataframes using built-in HydroBOT functions, just as we did with the [EWR achievement](ewr_ratios.qmd). Then, we carefully set up to assess the interevent metrics, which are defined for the EWRs over the timeseries. Finally, we develop mathematically sound ways to aggregate those through the causal network and space, allow us to summarise the impact of interevent conditions at larger spatial and thematic scales.
+
+## Outcomes
+
+The output of EWR runs in all_interEvents and all_successful_interEvents contains the information we need (see the [EWR overview](/modules/ewr_overview.qmd) for more details). When we read it in using the argument `type = 'interevents'`, `prep_ewr_output()` (inside `read_and_agg()`) will calculate [a set of new columns that relate the lengths of the interevents to the maximum interevent in various ways](/modules/ewr_overview.qmd); also see `assess_ewr_interevents()`.
+
+This yields six output columns capturing comparisons between interevent length and the maximum allowable for each interevent in the data, in addition to the raw `inter_event_length`.
+
+1.  `exceedance_days`- the number of days in each interevent that exceed the maximum allowed
+
+    -   This is just length - max, and so may be less than 0 if the interevent was below the maximum.
+
+2.  `interevent_ratio`- the days in the interevent as a fraction of the maximum
+
+    -   length/max, and so will be \< 1 if the event is shorter and \> 1 if the event is longer than the max
+
+3.  `exceedance_ratio`- ratio of days in the event beyond the max to the max.
+
+    -   interevent_ratio -1, which is the same as (days above max)/max
+
+4.  `exceedance`- binary, whether the interevent was \>= the max
+
+5.  `exceedance_only`- the days in the interevent beyond the max, 0 otherwise
+
+6.  `days_in_exceeding`- the total number of days in interevent periods that were longer than the max
+
+These are then aggregated in time to get the primary metrics for the EWRs, and then in space and theme to look at how interevent conditions contribute to those scales.
+
+## General setup
+
+### Directories and EWR runs
+
+Here, we will use the example hydrographs that come with HydroBOT.
+
+```{r}
+#| message: false
+project_dir <- "hydrobot_scenarios"
+hydro_dir <- file.path(project_dir, "hydrographs")
+ewr_results <- file.path(project_dir, "module_output", "EWR")
+agg_results <- file.path(project_dir, "aggregator_output")
+```
+
+Define their scenarios
+
+```{r}
+multipliers <- c(4)
+
+scenemults <- c(1 / rev(multipliers), 1, multipliers)
+
+scenenames <- c(
+  paste0("down", as.character(rev(multipliers))),
+  "base",
+  paste0("up", as.character(multipliers))
+) |>
+  stringr::str_replace("\\.", "_")
+
+
+scenarios <- tibble::tibble(scenario = scenenames, delta = scenemults)
+
+scene_pal <- make_pal(unique(scenarios$scenario), palette = "ggsci::nrc_npg", refvals = "base", refcols = "black")
+```
+
+Run the EWR tool. We need the interevent outputs.
+
+::: callout-note
+The `all_successful_interEvents` dataset returns the interevent period between successful 'events', (as opposed to the `all_interEvents`, which returns the interevent period between 'events' whether or not those are successful). Thus, it is not the interevents that are successful, but the events themselves. MDBA tends to use the all_successful, but we return both here.
+:::
+
+```{r}
+#| message: false
+#| label: run-ewr
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = hydro_dir,
+  output_parent_dir = project_dir,
+  outputType = list("yearly", "all_interEvents", "all_successful_interEvents"),
+  returnType = list("none")
+)
+```
+
+# Analysis
+
+HydroBOT has a built-in function `assess_ewr_interevents()` that creates [a set of necessary synthetic variables](/modules/ewr_overview.qmd) from the maximum interevent definitions in the EWR parameter sheet and the 'inter_event_length' column. This function gets applied by `prep_ewr_output()` when `type = 'interevents'`. We then use these to calculate metrics at the scale of the EWR themselves, as well as reasonable ways to aggregate those metrics in time, space, and theme dimensions.
+
+## Exceedance count
+
+Each interevent is marked by whether it exceeds the maximum or not, in column 'exceedance'. To aggregate this over the timeseries, we use a sum to get the number of times an interevent limit was exceeded for each EWR.
+
+Then, a reasonable aggregation function along theme and space is also the sum, as this captures the number of interevent exceedances contributing to a species group or that occur in an sdl unit.
+
+```{r}
+#| label: aggseqs
+  aggseq_mec <- list(
+    all_time = 'all_time',
+    sdl_units = sdl_units,
+    Target = c("ewr_code_timing", "Target")
+  )
+
+  funseq_mec <- list(
+    all_time = "Sum",
+    sdl_units = "Sum",
+    Target = "Sum"
+  )
+```
+
+We use `type = 'all_successful_interEvents'` to pull that output file, `prep_ewr_output` as the data prep function that creates the necessary columns when `prepargs = list(type = 'interevents')`. (`prep_ewr_output` with `type = 'achievement'` is used to calculate EWR achievement from the yearly data).
+
+```{r}
+  mec <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_successful_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "exceedance",
+    aggsequence = aggseq_mec,
+    funsequence = funseq_mec,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units',
+                       gauge = is_notpoint, 
+                       SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+```
+
+The EWRs themselves, over the time period: Clearly this is an ugly naming scheme, but it does let us see which EWRs are going over the max frequently.
+
+```{r}
+
+  ewr_exceed <- mec$all_time |>
+    dplyr::mutate(unique_ewr = paste0(ewr_code_timing,
+                                      planning_unit_name,
+                                      gauge)) |> 
+    plot_outcomes(outcome_col = 'exceedance',
+                y_col = 'unique_ewr',
+                x_col = 'scenario',
+                colorset = 'exceedance',
+                plot_type = 'heatmap',
+                pal_list = 'grDevices::Viridis')
+  ewr_exceed
+```
+
+And we'll plot the final level of that aggregation:
+
+```{r}
+plot_outcomes(mec$Target,
+                outcome_col = "exceedance",
+                plot_type = 'map',
+                colorset = "exceedance",
+                facet_row = 'scenario',
+                facet_col = 'Target')
+```
+
+## Exceedance proportion
+
+The proportion of interevent periods that are above the max is the 'MRIP exceedance count proportion', i.e. the number of intervents that exceed / total number of interevents.
+
+For just the EWRs themselves, we might specify a 'proportion' function and use that on the 'exceedance' column, which is just 1 or 0 depending on whether the maximum was exceeded, and which has length equal to the number of interevent periods.
+
+```{r}
+  proportion <- function(x) {
+    sum(x)/length(x)
+  }
+```
+
+```{r}
+aggprop1 <- list(all_time = 'all_time')
+  funprop1 <- list(all_time = 'proportion')
+```
+
+```{r}
+mec_prop <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_successful_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = c("scenario", 'ewr_code_timing',
+                 'planning_unit_name',
+                 'gauge', 'SWSDLName'),
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "exceedance",
+    aggsequence = aggprop1,
+    funsequence = funprop1,
+    keepAllPolys = FALSE,
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+```
+
+```{r}
+mec_prop$all_time |>
+    dplyr::mutate(unique_ewr = paste0(ewr_code_timing,
+                                      planning_unit_name,
+                                      gauge)) |>  
+  plot_outcomes(outcome_col = 'exceedance',
+                y_col = 'unique_ewr',
+                x_col = 'scenario',
+                colorset = 'exceedance',
+                plot_type = 'heatmap',
+                pal_list = 'grDevices::Viridis')
+```
+
+Proportions are inherently tricky to aggregate- we don't want to push the proportion through the network or space. Instead, we would want to get the sum of exceedences and total number contributing to each level, as well as the total number, and calculate the proportion at each step. This is particularly true because both the numerators and denominators being combined differ between inputs (different EWRs will have different numbers of interevents) and stages (so will SDL units).
+
+Perhaps the easiest solution is to get the sum of exceedances and the number of interevents at step one, and then add those up at each subsequent step. So, for example, the final step here has the number of exceedances for all EWRs contributing to each Target in each SDL unit, as well as the total number of interevent periods contributing to each Target in each SDL unit. We can then get the proportion with a simple mutate at the end.
+
+```{r}
+  aggprop2 <- list(
+    all_time = 'all_time',
+    sdl_units = sdl_units,
+    Target = c("ewr_code_timing", "Target")
+  )
+
+  funprop2 <- list(
+    all_time = c("Sum", 'NumberOfValues'),
+    sdl_units = "Sum",
+    Target = "Sum"
+  )
+```
+
+```{r}
+mec_prop2 <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_successful_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = c("scenario"),
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "exceedance",
+    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    aggsequence = aggprop2,
+    funsequence = funprop2,
+    keepAllPolys = FALSE,
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+```
+
+Plotting the final level gives
+
+```{r}
+exceed_prop_target <- mec_prop2$Target |>
+    tidyr::pivot_wider(names_from = aggfun_1,
+                       values_from = exceedance) |>
+    dplyr::mutate(proportion = Sum/NumberOfValues) |> 
+
+  plot_outcomes(outcome_col = "proportion",
+                               plot_type = 'map',
+                               colorset = "proportion",
+                               facet_row = 'scenario',
+                               facet_col = 'Target')
+  exceed_prop_target
+```
+
+## Proportions of the timeperiod
+
+These are the *Inclusive* and *Exclusive* MRIP ratios. In both cases, we divide a number of days by the length of the full timeseries. For the *inclusive*, that number of days is the total number of days in an interevent period that exceeds the maximum (i.e. days \< max count if the full period is \> max). For the *exclusive*, it is just the number of days over the max. Unfortunately, there is no information in the data itself about the timeseries duration, and so we just have to know that number (here, 5 years).
+
+These use the same aggregation sequence. Because the timeseries length is fixed, we *can* get the ratio at step 1 and then take the mean- the math works because the denominator is fixed. It would also be possible to get the sums of days and the number of contributing timeseries (using NumberOfValues *after step 1*), and then do a post-hoc divide by timeseries length. That is a bit more complicated, so I'll just do the first.
+
+First, the inclusive
+
+```{r}
+# define a year-proportion function to use at step one
+sumdiv <- function(x) {
+  Sum(x)/(365*5)
+}
+```
+
+Then we take the mean of that.
+
+```{r}
+  aggseq_s <- list(
+    all_time = 'all_time',
+    sdl_units = sdl_units,
+    Target = c("ewr_code_timing", "Target")
+  )
+
+  funseq_s <- list(
+    all_time = "sumdiv",
+    sdl_units = "ArithmeticMean",
+    Target = "ArithmeticMean"
+  )
+```
+
+Get *inclusive* using `days_in_exceeding` column.
+
+```{r}
+imr <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "days_in_exceeding",
+    aggsequence = aggseq_s,
+    funsequence = funseq_s,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units',
+                       gauge = is_notpoint,
+                       SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+```
+
+```{r}
+plot_outcomes(imr$Target,
+                               outcome_col = "days_in_exceeding",
+              outcome_lab = "Inclusive ratio",
+                               plot_type = 'map',
+                               colorset = "days_in_exceeding",
+                               facet_row = 'scenario',
+                               facet_col = 'Target')
+```
+
+And now the *exclusive* ratio, all we change is to use the `exceedance_only` column.
+
+```{r}
+emr <- read_and_agg(
+    datpath = ewr_results,
+    type = "all_interEvents",
+    geopath = bom_basin_gauges,
+    causalpath = causal_ewr,
+    groupers = "scenario",
+    prepfun = 'prep_ewr_output',
+    prepargs = list(type = 'interevents'),
+    aggCols = "exceedance_only",
+    aggsequence = aggseq_s,
+    funsequence = funseq_s,
+    keepAllPolys = FALSE,
+    group_until = list(planning_unit_name = 'sdl_units',
+                       gauge = is_notpoint,
+                       SWSDLName = 'sdl_units'),
+    pseudo_spatial = 'sdl_units',
+    saveintermediate = TRUE,
+    namehistory = FALSE
+  )
+```
+
+```{r}
+plot_outcomes(emr$Target,
+                               outcome_col = "exceedance_only",
+              outcome_lab = "Exclusive ratio",
+                               plot_type = 'map',
+                               colorset = "exceedance_only",
+                               facet_row = 'scenario',
+                               facet_col = 'Target')
+```
 
 ```{r}
 #| include: false
 #| label: cleanup
 withr::deferred_run()
 ```
-
-

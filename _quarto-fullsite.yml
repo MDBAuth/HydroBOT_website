@@ -41,6 +41,8 @@ website:
           contents:
             - href: workflows/ewr_ratios.qmd
               text: "EWR frequency ratio"
+            - href: workflows/ewr_interevent.qmd
+              text: "EWR interevent metrics"
             - href: presentation/walkthrough_presentation.qmd
               text: "Walkthrough presentation"
             - href: workflows/run_hydrobot_website.qmd
@@ -65,6 +67,8 @@ website:
           contents:
             - href: aggregator/read_and_agg.qmd
               text: "Using with read and agg (primary)"
+            - href: comparer/comparing_aggregations.qmd
+              text: "Choosing and comparing aggregations"
 
         - section: "Syntax and details"
           contents:
@@ -80,6 +84,8 @@ website:
               text: "User-supplied spatial data"
             - href: aggregator/user_module.qmd
               text: "User-supplied modules"
+            - href: aggregator/data_prep.qmd
+              text: "User-supplied data preparation"
 
         - section: "Dimensions"
           contents:
@@ -119,6 +125,8 @@ website:
               text: "Comparer syntax"
             - href: comparer/setting_limits.qmd
               text: "Setting limits"
+            - href: comparer/comparing_aggregations.qmd
+              text: "Choosing and comparing aggregations"
 
     - title: "Provided data and Causal networks"
       contents:

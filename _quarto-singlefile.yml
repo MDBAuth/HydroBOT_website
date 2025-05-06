@@ -1,3 +1,3 @@
 project:
   render:
-  - aggregator/using_multi_aggregate.qmd
+  - comparer/comparing_aggregations.qmd

@@ -27,12 +27,6 @@ pak::pkg_install("galenholt/HydroBOT")
 HydroBOT depends on the [py-ewr](https://github.com/MDBAuth/EWR_tool) python package. **In most cases, users do not need to do anything, and {reticulate} will install that package automatically on first use.** If more control over python environments is desired, users will need to set up an environment containing py-ewr. There is a `pyproject.toml` file in this repo and the HydroBOT repo that should allow you to build an environment with [poetry](https://python-poetry.org/docs/), for more detail see [developer notes](developer.md). The [template repository](https://github.com/MDBAuth/toolkit_use) provides installation templates that handle installing poetry, pyenv, py-ewr and HydroBOT itself on a range of systems.
 :::
 
-Load the package
-
-```{r}
-library(HydroBOT)
-```
-
 ## Example workflow
 
 The basic workflow is to point to the hydrographs and run the modules in the [controller](controller/controller_overview.qmd), then scale the outcomes in the [aggregator](aggregator/aggregation_overview.qmd), and synthesise outputs with the [comparer](comparer/comparer_overview.qmd). More details are available at those links, and several [different workflows are demonstrated](workflows/workflow_overview.qmd) as well; a simple example follows.

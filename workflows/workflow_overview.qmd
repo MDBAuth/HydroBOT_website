@@ -25,4 +25,6 @@ If you want to supply your own spatial data, causal networks, or aggregation fun
 
 ::: callout-tip
 For an example workflow to assess ratios of EWR achievement across scenarios (the 'frequency ratio' but also a ratio of achievement based on frequency *and* interevents), see [here](/workflows/ewr_ratios.qmd).
+
+For a similar example looking at characteristics of the interevent periods, see [here](/workflows/ewr_interevent.qmd).
 :::

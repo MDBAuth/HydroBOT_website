@@ -47,7 +47,7 @@ withr::with_seed(
   17,
   # add some more days, each with different values
   state_inputs <- purrr::map(
-    0:10,
+    0:31,
     \(x) dplyr::mutate(state_inputs,
       date = date + x,
       value = value * rnorm(nrow(state_inputs),
@@ -134,11 +134,16 @@ ausfuns <- list(
 
 Do the aggregation. Note that this warns about some built-in checks for the EWR module that are not relevant here.
 
+::: callout-tip
+We need to use `prepfun = 'identity'` here because the data does not require any modifications on read-in. See [data preparation functions](data_prep.qmd) for more detail.
+:::
+
 ```{r}
 # Do the aggregation
 ausagg <- ausagg <- read_and_agg(
   datpath = file.path(tempdir(), "module_output", "fake_module"),
   type = "everything",
+  prepfun = 'identity',
   geopath = austates,
   causalpath = state_theme,
   groupers = "scenario",
@@ -200,4 +205,3 @@ ausagg$all_aus |>
     facet_row = "theme2"
   )
 ```
-

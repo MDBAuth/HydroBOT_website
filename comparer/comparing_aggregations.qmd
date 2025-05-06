@@ -1,0 +1,314 @@
+---
+title: "Choosing and comparing aggregation sequences"
+---
+
+```{r}
+#| include: false
+
+source("R/helpers.R")
+make_hydro_csv()
+```
+
+```{r}
+#| message: false
+library(HydroBOT)
+library(dplyr)
+library(ggplot2)
+```
+
+The choices of aggregation sequences are extremely important, and have large bearing on the final outcomes. They should be chosen to reflect the underlying processes, address the questions of an analysis, and be mathematically defensible. This is not always easy, but at the very least, significant thought and justification should go into them.
+
+Briefly, we illustrate the outcome of some simple aggregation functions built into HydroBOT, accentuating their different mathematical properties, though in general they should be chosen based on how well those properties match the processes underlying the aggregation step (e.g. how to birds combine over space, or how do life stages combine into species performance).
+
+![Illustration of a small set of four values (top boxes). Each of the bottom boxes is the single aggregated value according to the function labeled below. We do not include zero in the set of top values, as a single zero forces the Geometric and Harmonic means to equal zero due to their multiplicative nature.](/images/aggregation_examples.png)
+
+## Comparing aggregation sequences
+
+Given the importance of aggregations, HydroBOT can be used to compare different aggregation sequences to better understand and visualise their implications for the outcomes. Here, we demonstrate a simple example of three potential aggregation pathways.
+
+### Setup
+
+We keep the full workflow [in-memory](/workflows/workflow_in_memory.qmd), since this is a small run.
+
+```{r}
+#| message: false
+ewr_out <- prep_run_save_ewrs(
+  hydro_dir = system.file("extdata/testsmall/hydrographs", package = "HydroBOT"),
+  output_parent_dir = 'test_dir',
+  outputType = list('none'),
+  returnType = list('yearly')
+)
+
+```
+
+We'll use a simplified set of aggregations, over time, into small-scale 'env_obj' theme scales, then sdl units, and to Target theme levels.
+
+```{r}
+aggseq <- list(
+  all_time = "all_time",
+  env_obj = c("ewr_code_timing", "env_obj"),
+  sdl_units = sdl_units,
+  Target = c("env_obj", "Target")
+)
+```
+
+We create a modified geometric mean because of all the zeros in the data.
+
+```{r}
+geomeanplus <- function(x) {
+  add_eps <- min(x[x > 0],
+                 na.rm = TRUE)/10
+  x[x == 0] <- add_eps
+  GeometricMean(x)
+}
+```
+
+If we only want to check the aggregations at a single level, we just set that level up with multiple aggregation values. Here, we'll look at different aggregations of env_obj into SDL units, using Arithmetic means for the other two steps. The other stages could be compared in just the same way.
+
+```{r}
+funseq_compare <- list(
+  "ArithmeticMean",
+  "ArithmeticMean",
+  c("ArithmeticMean", "Median", "geomeanplus"),
+  "ArithmeticMean"
+)
+```
+
+The warning here are because when a set of values are *all* NA, there's nothing the na.rm setting can do.
+
+```{r}
+#| message: false
+aggout_compare <- read_and_agg(
+  datpath = ewr_out,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = funseq_compare,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE,
+  savepath = NULL
+)
+```
+
+The three scenarios mean we have too much to plot, but since the goal is just to compare aggregations, we look at only the historical scenario here.
+
+```{r}
+#| fig-height: 9
+aggout_compare$Target |>
+  dplyr::filter(scenario == "base") |> # Just look at one scenario
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorset = "ewr_achieved",
+    pal_list = list("scico::lapaz"),
+    pal_direction = -1,
+    facet_col = "aggfun_3",
+    facet_row = "Target",
+    underlay_list = "basin"
+  ) +
+  ggplot2::theme(legend.position = "bottom")
+```
+
+We could extend the above approach to multiple steps, but it soon gets factorially complicated. If we want to compare different aggregation sequences, it is often easiest to specify them separately. Here, we compare the same three aggregation functions as above, but carried through each stage.
+
+```{r}
+meanseq <- list(
+  "ArithmeticMean",
+    "ArithmeticMean",
+  "ArithmeticMean",
+  "ArithmeticMean"
+)
+
+medseq <- list(
+  "Median",
+    "Median",
+  "Median",
+  "Median"
+)
+
+geoseq <- list(
+  "geomeanplus",
+  'geomeanplus', 
+  'geomeanplus', 
+  'geomeanplus'
+)
+```
+
+Run each of those separately through the aggregator
+
+```{r}
+#| message: false
+aggout_mean <- read_and_agg(
+  datpath = ewr_out,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = meanseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE,
+  savepath = NULL
+)
+
+aggout_med <- read_and_agg(
+  datpath = ewr_out,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = medseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE,
+  savepath = NULL
+)
+
+aggout_geo <- read_and_agg(
+  datpath = ewr_out,
+  type = "achievement",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  aggCols = "ewr_achieved",
+  auto_ewr_PU = TRUE,
+  aggsequence = aggseq,
+  funsequence = geoseq,
+  saveintermediate = TRUE,
+  namehistory = FALSE,
+  keepAllPolys = FALSE,
+  returnList = TRUE,
+  add_max = FALSE,
+  savepath = NULL
+)
+```
+
+We could `bind_rows` those together and make plots with one call or make separate plots and {patchwork} them together. I'll demonstrate both approaches.
+
+For the first step (over time), we'll bind and make one plot call.
+
+```{r}
+aggout_mean$all_time |> 
+  bind_rows(aggout_med$all_time) |> 
+  bind_rows(aggout_geo$all_time) |> 
+    dplyr::filter(scenario == "base" & SWSDLName == 'Lachlan') |> 
+  dplyr::mutate(unique_ewr = paste0(ewr_code_timing, gauge, planning_unit_name)) |> 
+  # clean names
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_col = "unique_ewr",
+    x_col = "aggfun_1",
+    plot_type = "heatmap",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_col = 'SWSDLName'
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+For the second step (env_obj)
+
+```{r}
+aggout_mean$env_obj |> 
+  bind_rows(aggout_med$env_obj) |> 
+  bind_rows(aggout_geo$env_obj) |> 
+    dplyr::filter(scenario == "base" & SWSDLName == 'Lachlan') |> 
+  dplyr::mutate(unique_obj = paste0(env_obj, gauge, planning_unit_name)) |>
+  # clean names
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_col = "unique_obj",
+    x_col = "aggfun_1",
+    plot_type = "heatmap",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_col = 'SWSDLName'
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+That is a bit weird, because what we really want to do is combine those env_objs across gauges. Which is exactly what step three does:
+
+For the third step (space)
+
+```{r}
+aggout_mean$sdl_units |> 
+  bind_rows(aggout_med$sdl_units) |> 
+  bind_rows(aggout_geo$sdl_units) |> 
+    dplyr::filter(scenario == "base") |> 
+  # clean names
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    y_col = "env_obj",
+    x_col = "aggfun_1",
+    plot_type = "heatmap",
+    colorset = "ewr_achieved",
+    pal_list = "grDevices::Viridis",
+    facet_col = 'SWSDLName'
+  )
+```
+
+For a bit different presentation, let's also plot that as
+
+```{r}
+aggout_mean$sdl_units |> 
+  bind_rows(aggout_med$sdl_units) |> 
+  bind_rows(aggout_geo$sdl_units) |> 
+    dplyr::filter(scenario == "base") |> 
+  # clean names
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+   x_col = "env_obj",
+    colorset = "aggfun_1",
+    pal_list = "ltc::trio2",
+    facet_row = 'SWSDLName',
+   position = 'dodge'
+  ) +
+  theme(legend.position = 'bottom')
+```
+
+For the third step (to Target theme level), we see the ultimate difference in each of those aggregation sequences.
+
+```{r}
+#| fig-height: 9
+aggout_mean$Target |>
+  bind_rows(aggout_med$Target) |> 
+  bind_rows(aggout_geo$Target) |> 
+  dplyr::filter(scenario == "base") |> # Just look at one scenario
+  plot_outcomes(
+    outcome_col = "ewr_achieved",
+    plot_type = "map",
+    colorset = "ewr_achieved",
+    pal_list = list("scico::lapaz"),
+    pal_direction = -1,
+    facet_col = "aggfun_3", 
+    facet_row = "Target",
+    underlay_list = "basin"
+  ) +
+  ggplot2::theme(legend.position = "bottom")
+
+
+```
+
+```{r}
+#| include: false
+#| label: cleanup
+withr::deferred_run()
+```
