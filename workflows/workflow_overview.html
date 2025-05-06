@@ -6,7 +6,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Galen Holt">
 
 <title>Workflow overview – HydroBOT</title>
 <style>
@@ -4018,7 +4017,7 @@ vertical-align: -.125em;
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item compact">
-    <a class="nav-link" href="https://github.com/MDBAuth/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
+    <a class="nav-link" href="https://github.com/galenholt/HydroBOT"> <i class="bi bi-github" role="img" aria-label="GitHub">
 </i> 
 <span class="menu-text"></span></a>
   </li>  
@@ -4143,12 +4142,6 @@ vertical-align: -.125em;
 
 <div class="quarto-title-meta">
 
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Galen Holt </p>
-          </div>
-  </div>
     
   
     
@@ -4160,7 +4153,7 @@ vertical-align: -.125em;
 
 
 <p>HydroBOT may be used stepwise, that is calling the Controller, Aggregator, and Comparer in separate scripts or notebooks. This may in fact be the best solution for large jobs, especially where Aggregator and Comparer steps might need to be re-run without re-running the response modules. It can also be called in one go, feeding all necessary parameters in at once. In this case, we can think of the Controller as simply having larger scope, passing arguments all the way through instead of just to the modules. This can be done <a href="../workflows/workflow_in_memory.html">in-memory</a>, or <a href="../workflows/workflow_save_steps.html">saving outputs at each step</a>. In either case, it can be controlled interactively in notebooks, or with <a href="../workflows/workflow_parameters.html">parameters</a> which might be passed from a <code>params.yml</code> file, parameters in a notebook, or arguments passed to <code>Rscript</code> at the command line.</p>
-<p>The workflows section here provides three examples. Similar but not identical examples are available in the <a href="https://github.com/MDBAuth/toolkit_use">template repository</a>, which contains helper scripts for setup on several systems as well as skeleton scripts for various workflows.</p>
+<p>The workflows section here provides three examples. Similar but not identical examples are available in the <a href="https://github.com/MDBAuth/toolkit_use">template repository</a>, which contains helper scripts for setup on several specific systems as well as skeleton scripts for various workflows. If needed (e.g. Azure at MDBA, HPC systems), contact authors.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
