@@ -16,7 +16,7 @@ library(dplyr)
 
 # Overview
 
-This notebook provides descriptive plots of the inputs to HydroBOT (hydrographs), as they are often necessary for understanding the outputs. It also shows how `plot_outcomes()` is not restricted only to module outcomes, but is instead flexible enough to use nearly any dataframe with quantitative values. Though we plot the hydrographs here, this is the same approach as any other [line plot](lines.qmd). Though these are plots of the inputs, they do still allow various sorts of comparisons, whether simple visual comparisons or calculated differences, relative flows, etc.
+This notebook provides descriptive plots of the inputs to HydroBOT (hydrographs), as they are often necessary for understanding the outputs. It also shows how `plot_outcomes()` is not restricted only to module outcomes, but is instead flexible enough to use nearly any dataframe with quantitative values. Though we plot the hydrographs here, this is the same approach as any other [line plot](line_plots.qmd). Though these are plots of the inputs, they do still allow various sorts of comparisons, whether simple visual comparisons or calculated differences, relative flows, etc.
 
 ## Demonstration setup
 

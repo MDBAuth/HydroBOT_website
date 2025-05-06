@@ -22,7 +22,7 @@ hydro_dir <- file.path(project_dir, "hydrographs")
 ewr_results <- file.path(project_dir, "module_output", "EWR")
 ```
 
-The output data is often temporal, hence the use of [temporal aggregation](/aggregator/temporal_aggregation.qmd). However, visualising change through time can be incredibly powerful, and so leaving that temporal aggregation off (or aggregating to coarser timesteps, e.g. from years to decades or days to years) allows these sorts of analyses. Here, we demonstrate aggregating along the theme and spatial dimensions while retaining years to yield timeseries of various 'theme' levels at various spatial scales. The examples here are only a small number of the potential ways of plotting timeseries available from `plot_outcomes()`, but illustrate the key feature of using `date` as either a facet or x-axis.
+The output data is often temporal, hence the use of [temporal aggregation](/aggregator/temporal_agg.qmd). However, visualising change through time can be incredibly powerful, and so leaving that temporal aggregation off (or aggregating to coarser timesteps, e.g. from years to decades or days to years) allows these sorts of analyses. Here, we demonstrate aggregating along the theme and spatial dimensions while retaining years to yield timeseries of various 'theme' levels at various spatial scales. The examples here are only a small number of the potential ways of plotting timeseries available from `plot_outcomes()`, but illustrate the key feature of using `date` as either a facet or x-axis.
 
 ### Scenario information
 

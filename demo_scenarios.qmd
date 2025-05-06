@@ -3,6 +3,7 @@ title: "Demonstration scenarios"
 ---
 
 ```{r}
+#| message: false
 library(HydroBOT)
 library(dplyr)
 library(ggplot2)

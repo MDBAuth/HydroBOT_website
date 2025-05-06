@@ -4,6 +4,7 @@ bibliography: references.bib
 ---
 
 ```{r}
+#| message: false
 library(HydroBOT)
 library(dplyr)
 library(ggplot2)
@@ -183,3 +184,11 @@ Setting the `type` argument in `prep_ewr_output()` to 'interevents', (via the `t
 7.  `days_in_exceeding`- the total number of days in interevent periods that were longer than the max
 
 HydroBOT calculates all of these values, which can then be used in the [aggregator](/aggregator/aggregation_overview.qmd), as shown specifically for [some MDBA metrics](/workflows/ewr_interevent.qmd).
+
+## Example analyses
+
+Nearly all examples and analyses on this website use the EWR achievement analysis (i.e. dependent on frequency and interevents). Two specific analyses using MDBA metrics are demonstrated as well:
+
+1.  [Frequency ratio](/workflows/ewr_ratios.qmd) (also covers issues of raw assessments and comparisons)
+
+2.  [Inter-event statistics](/workflows/ewr_interevent.qmd)

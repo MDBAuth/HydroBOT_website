@@ -1,5 +1,5 @@
 ---
-title: Creating simple scenarios
+title: Creating example scenarios
 author: Galen Holt
 cache: false
 format:
@@ -28,50 +28,35 @@ HydroBOT proper begins with hydrographs as inputs. The creation of those hydrogr
 For this website, we use two sets of scenarios
 
 1.  The small set that comes with hydrobot itself, useful for examples that run the modules and aggregation steps
-2.  A larger set with more interesting structure, used for demonstrating the comparer.
 
-This document generates that second set. We copy the HydroBOT set over for ease of calling using the setup script, since we actually want to do that cleanly on a per-notebook basis to avoid cross-notebook contamination due to example processing.
+2.  A larger set with more interesting structure, used for demonstrating the comparer. See [information about them](/demo_scenarios.qmd)
+
+This document generates that second set, which is mainly used to demonstrate the [Comparer](/comparer/comparer_overview.qmd). Most other demonstrations just use the smaller set that comes with HydroBOT itself.
 
 ## HydroBOT relevance
 
-The creation of flow scenarios is not part of HydroBOT proper. Instead, HydroBOT expects to ingest hydrographs and then handles the ongoing response models, aggregation, and analyses. Thus, hydrographs are an essential input to HydroBOT. The point of this code is to generate those hydrographs.
-
-This notebook generates 9 simple scenarios by multiplying and dividing hydrographs. This lets us look at a range of changes. The primary needs are multiple gauges in multiple catchments (or other spatial units), and scenarios defined by different hydrographs for the same gauge.
+The creation of flow scenarios is not part of HydroBOT proper. Instead, HydroBOT expects to ingest hydrographs and then handles the ongoing response models, aggregation, and analyses.
 
 ## Process
 
-We pull a limited set of gauges for a limited time period to keep this dataset small. Primarily, we identify a set of gauges in two catchments, pull them for a short time period, and adjust them to create two simple modified scenarios, with the original data serving as the baseline scenario. Along the way, we examine the data in various ways to visualise what we're doing and where.
-
-A larger and more complex set of scenarios is created in [the flow scaling demonstration](https://github.com/MDBAuth/toolkit-flow-scaling), without as much visualisation.
+We pull a limited set of gauges for a limited time period to keep this dataset small. Primarily, we identify a set of gauges in two catchments, pull them for a short time period, and adjust them multiplicatively and additively to create modified scenarios, with the original data serving as the baseline scenario. Along the way, we examine the data in various ways to visualise what we're doing and where.
 
 ## Paths and other data
 
-The shapefiles used to see what we're doing and do the selecting were produced with within the HydroBOT package to keep consistency. It's possible we'll add more shapefile creation and move all the canonical versions and their creation to their own data package or repo.
-
-Set the data directory to make that easy to change. These should usually point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained. The [flow-scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling) sends them externally, which would be more typical.
+Set the data directory. These should usually point to external shared directories. For this simple example though, we put the data inside the repo to make it self contained.
 
 ```{r}
 scenario_dir <- "more_scenarios"
 hydro_dir <- file.path(scenario_dir, "hydrographs")
 ```
 
-::: {#language style="color: gray"}
-## Language note
-
-This notebook was originally built using only python, and there is an unmaintained python-only version available by contacting the authors. I've moved the active version of this notebook to R, however, when HydroBOT became an R package and the [flow scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling) ended up using R gauge pullers. There is still some remaining python in here (pulling gauges and some minor EWR functions). This notebook provides an example of how to mix R and python code chunks, which we do fairly frequently.
-
-We can access python objects in R with `py$objectname`and access R objects in python with `r.objectname` .
-
-It takes -forever- to do a type translation on the `DATETIME` column in the gauge data. It's unclear why (can't replicate it with any other datetime py object). We work around that by changing it to something simple while still in python, and change it back to datetime in R.
-:::
-
 ## Spatial datasets
 
-We use spatial datasets provided by [{HydroBOT}](https://github.com/galenholt/HydroBOT), which creates a standard set in `data_creation/spatial_data_creation.qmd`. These are visualised in [a separate notebook](../provided_data/spatial_data.qmd). Relevant to this scenario creation, we are interested in the gauges, (`HydroBOT::bom_basin_gauges`) since this is what were contained in the EWR tool. We use the `sdl_units` dataset to obtain a subset of gauges for these simple scenarios. Relevant to the case study- the original polygon used was the Macquarie-Castlereagh in the resource_plan_areas, though we seem to use sdl units elsewhere, so I'll use them here.
+We use spatial datasets provided by [{HydroBOT}](https://github.com/galenholt/HydroBOT), which provides a standard set. These are visualised in [a separate notebook](/provided_data/spatial_data.qmd). Relevant to this scenario creation, we are interested in the gauges, (`HydroBOT::bom_basin_gauges`) since this is what were contained in the EWR tool. We use the `sdl_units` dataset to obtain a subset of gauges for these simple scenarios. 
 
 # Subset the gauges
 
-We need multiple catchments for demos, so let's use the Macquarie, Castlereagh, Namoi, Lachlan.
+We need multiple catchments for reasonable demonstration of spatial aggregation, so let's use the Macquarie-Castlereagh, Namoi, Lachlan.
 
 ```{r}
 catch_demo <- sdl_units |>
@@ -104,9 +89,7 @@ gaugenums <- demo_gauges$gauge
 
 ### Find those relevant to HydroBOT
 
-We have the list of gauges, but now we need to cut the list down to those in the EWR tool. There's not any point in pulling gauges that do not appear later in HydroBOT.
-
-Which gauges are actually in the EWR tool?
+We have the list of gauges, but now we need to cut the list down to those in the EWR tool. There's not any point in pulling gauges that do not appear in the response model (here, the EWR tool).
 
 ```{r}
 ewrs_in_pyewr <- get_ewr_table()
@@ -114,15 +97,13 @@ ewrs_in_pyewr <- get_ewr_table()
 
 What are those gauges, and which are in both the ewr and the desired catchments?
 
-The way that works everywhere but vscode- this seems universal though
-
 ```{r}
 ewrgauges <- ewrs_in_pyewr$Gauge |> unique()
 ewr_demo_gauges <- gaugenums[gaugenums %in% ewrgauges]
 length(ewr_demo_gauges)
 ```
 
-47 isn't too many.
+`r length(ewr_demo_gauges)` isn't too many.
 
 Need to categorise them so we know what to pull. Let's cut to just flow gauges for the demo for simplicity- scaling levels is less clear.
 
@@ -143,7 +124,7 @@ starttime <- lubridate::ymd(20000701)
 endtime <- lubridate::ymd(20210630)
 ```
 
-Since some of those are flow and some are level, let's do two calls and bind. We could pmap, but this will be fine. It's tempting to just use flow.
+Pull the data with [hydrogauge](https://galenholt.github.io/hydrogauge/)
 
 ```{r}
 if (params$REBUILD_DATA) {
@@ -157,7 +138,7 @@ if (params$REBUILD_DATA) {
 }
 ```
 
-The azure boxes have old GDAL, which can't read WKT2. Need to fix, but in the meantime, [force with the crs number](https://github.com/r-spatial/sf/issues/1419).
+This forcing should not be necessary, but some azure systems have old GDAL, which can't read WKT2. Need to fix, but in the meantime, [force with the crs number](https://github.com/r-spatial/sf/issues/1419).
 
 ```{r}
 if (grepl("npd-dat", Sys.info()["nodename"])) {
@@ -181,13 +162,13 @@ Looks reasonable. Probably overkill for testing, but can do a cut down version t
 
 # Make test scenarios
 
-To generate simple scenarios that cover a range of flow conditions, we multiply and divide the baseline data by scaling factors, yielding symmetric changes up and down in relative flow. This section could easily be modified for other simple scenarios. More complex scenarios are created in [the flow scaling analyses](https://github.com/MDBAuth/toolkit-flow-scaling).
+To generate simple scenarios that cover a range of flow conditions, we multiply and divide the baseline data by scaling factors, yielding symmetric changes up and down in relative flow. We also add 'adaptation' options as additions of flow during Sept-Dec.
 
 ### Make the data readable by EWR tool
 
 The EWR tool has the capacity to pull gauge data directly, but because we have modified these data, they need to enter the EWR tool through `scenario_handling`, and so need to have a format the EWR tool can parse as output from one of the scenario generating tools it uses (IQQM, Source, etc). The current approach is to use `Standard time-series` as the type, which means we have to give the data the proper structure for that format.
 
-This requries having a date column `Date` and other columns with gauge numbers for names, with '\_flow' or '\_level' after them. The EWR tool can have multiple gauges, with each having its own column. HydroBOT expects directories for each scenario, with any number of csvs of hydrographs inside, (e.g. it could be one csv with columns for each gauge, or each csv could have a single gauge), which is handled by `find_scenario_paths` internally to the "Scenario controller" part of HydroBOT. Here, we save a single csv with many gauges for each scenario. The [flow scaling example](https://github.com/MDBAuth/toolkit-flow-scaling) takes the opposite approach, with one gauge per csv due to different time periods.
+This requries having a date column `Date` and other columns with gauge numbers for names, with '\_flow' or '\_level' after them. The EWR tool can have multiple gauges, with each having its own column. HydroBOT expects directories for each scenario, with any number of csvs of hydrographs inside, (e.g. it could be one csv with columns for each gauge, or each csv could have a single gauge), which is handled by `find_scenario_paths` internally to the "Scenario controller" part of HydroBOT. Here, we save a single csv with many gauges for each scenario. 
 
 ### Build scenarios and data structure
 
@@ -276,9 +257,9 @@ for (x in scenenames) {
 }
 ```
 
-Create clean dataframes to save. Could be fancy with a function and a purr, but I'm just saving, so a simple loop should be fine. Though now that we have `check` there, a `purrr::pmap` would be the way to go.
+Create clean dataframes to save. Could be fancy with a function and a purr, but we're just saving, so a simple loop should be fine. 
 
-I'm not providing a HydroBOT function to *write* scenario metadata, since the scenarios will come from elsewhere. But we need it, so make some here (both inside and outside the directories, since we're not sure what the final form is yet).
+HydroBOT does not *write* scenario metadata, since the scenarios will come from elsewhere. Instead, in an ideal world, scenarios will come with metadata. Here, since we're creating the scenarios, make some metadata here.
 
 ```{r}
 if (params$REBUILD_DATA) {
@@ -308,7 +289,7 @@ if (params$REBUILD_DATA) {
 
 That set of hydrographs can now be used as starting data for a demonstration of HydroBOT proper.
 
-Make some metadata for all scenarios too (both yaml and json for now).
+Make some metadata for all scenarios too (both yaml and json).
 
 ```{r}
 scenario_meta <- list(

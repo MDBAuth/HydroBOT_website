@@ -16,6 +16,7 @@ Retaining everything in-memory is a very simple flip of a switch, demoed in [its
 Load the package
 
 ```{r}
+#| message: false
 library(HydroBOT)
 ```
 

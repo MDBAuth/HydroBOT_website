@@ -13,7 +13,6 @@ make_ewr_output()
 
 ```{r}
 #| message: false
-
 library(HydroBOT)
 library(dplyr)
 ```

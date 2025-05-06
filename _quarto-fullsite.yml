@@ -90,9 +90,9 @@ website:
         - section: "Dimensions"
           contents:
             - href: aggregator/spatial_agg.qmd
-              text: "Spatial aggregation capability"
+              text: "Spatial aggregation"
             - href: aggregator/theme_agg.qmd
-              text: "Theme aggregation capability"
+              text: "Theme aggregation"
             - href: aggregator/temporal_agg.qmd
               text: "Temporal aggregation"
             - href: aggregator/using_multi_aggregate.qmd
@@ -159,9 +159,14 @@ website:
           contents:
             - href: modules/ewr_overview.qmd
               text: "EWR module"
-            - href: workflows/ewr_ratios.qmd
-              text: "EWR frequency ratio"
             - href: modules/integrating_new.qmd
               text: "Integrating a new model"
             - href: aggregator/user_module.qmd
               text: "Using outputs of unincorporated modules"
+
+        - section: "EWR examples"
+          contents:
+            - href: workflows/ewr_ratios.qmd
+              text: "EWR frequency ratio"
+            - href: workflows/ewr_interevent.qmd
+              text: "EWR interevent statistics"
