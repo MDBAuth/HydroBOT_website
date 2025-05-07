@@ -44,27 +44,24 @@ agg_results <- file.path(project_dir, "aggregator_output", "demo")
 First, we define a new function that takes the read-in dataframe as the first argument. It can have other arguments as well, these can be passed to the `prepargs`. Here, we'll add a contrived version to either use the difference or ratio.
 
 ```{r}
-
-daydiff <- function(dat, dr = 'difference') {
-  
+daydiff <- function(dat, dr = "difference") {
   # This bit isn't necessary, it just keeps some processing similar with the built-in EWR prep functions.
   names(dat) <- HydroBOT:::nameclean(names(dat))
   dat <- HydroBOT::cleanewrs(dat)
-  dat$date <- as.Date(paste0(as.character(dat$year), '-07-01'))
-  
-  
-  if (dr == 'difference') {
-    dat <- dat |> 
+  dat$date <- as.Date(paste0(as.character(dat$year), "-07-01"))
+
+
+  if (dr == "difference") {
+    dat <- dat |>
       dplyr::mutate(synthvals = total_event_days - event_length)
-  } else if (dr == 'ratio') {
-    dat <- dat |> 
+  } else if (dr == "ratio") {
+    dat <- dat |>
       dplyr::mutate(synthvals = total_event_days / event_length)
   } else {
-    rlang::abort('Bad dr argument')
+    rlang::abort("Bad dr argument")
   }
-  
+
   return(dat)
-    
 }
 ```
 
@@ -73,52 +70,55 @@ daydiff <- function(dat, dr = 'difference') {
 Now specify aggregation functions for the difference. Differences often make sense as sums in aggregation, so here we'll use a simple set.
 
 ```{r}
-  aggseq_d <- list(
-    all_time = 'all_time',
-    sdl_units = sdl_units,
-    Target = c("ewr_code_timing", "Target")
-  )
+aggseq_d <- list(
+  all_time = "all_time",
+  sdl_units = sdl_units,
+  Target = c("ewr_code_timing", "Target")
+)
 
-  funseq_d <- list(
-    all_time = "Sum",
-    sdl_units = "Sum",
-    Target = "Sum"
-  )
+funseq_d <- list(
+  all_time = "Sum",
+  sdl_units = "Sum",
+  Target = "Sum"
+)
 ```
 
 We use `type = 'yearly'` to get the yearly output files, `prepfun = 'daydiff'` to specify our new one, `prepargs` is simply the default empty list here since we're using the function defaults.
 
 ```{r}
-  diffagg <- read_and_agg(
-    datpath = ewr_results,
-    type = "yearly",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    prepfun = 'daydiff',
-    prepargs = list(),
-    aggCols = "synthvals",
-    aggsequence = aggseq_d,
-    funsequence = funseq_d,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units',
-                       gauge = is_notpoint,
-                       SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units',
-    saveintermediate = TRUE,
-    namehistory = FALSE
-  )
+diffagg <- read_and_agg(
+  datpath = ewr_results,
+  type = "yearly",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  prepfun = "daydiff",
+  prepargs = list(),
+  aggCols = "synthvals",
+  aggsequence = aggseq_d,
+  funsequence = funseq_d,
+  keepAllPolys = FALSE,
+  group_until = list(
+    planning_unit_name = "sdl_units",
+    gauge = is_notpoint,
+    SWSDLName = "sdl_units"
+  ),
+  pseudo_spatial = "sdl_units",
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 We can then plot that, noting that these values are contrived.
 
 ```{r}
 plot_outcomes(diffagg$Target,
-                               outcome_col = "synthvals",
-                               plot_type = 'map',
-                               colorset = "synthvals",
-                               facet_row = 'scenario',
-                               facet_col = 'Target')
+  outcome_col = "synthvals",
+  plot_type = "map",
+  colorset = "synthvals",
+  facet_row = "scenario",
+  facet_col = "Target"
+)
 ```
 
 ### Aggregate (passing an argument)
@@ -128,52 +128,55 @@ Now, we can use the `prepargs` to use the arguments available in `daydiff()`.
 We'd likely specify a different set of aggregation functions, though ratios are inherently tricky to aggregate. Here, we just use means, though note something more meaningful should be chosen if the preparations are meaningful.
 
 ```{r}
-  aggseq_r <- list(
-    all_time = 'all_time',
-    sdl_units = sdl_units,
-    Target = c("ewr_code_timing", "Target")
-  )
+aggseq_r <- list(
+  all_time = "all_time",
+  sdl_units = sdl_units,
+  Target = c("ewr_code_timing", "Target")
+)
 
-  funseq_r <- list(
-    all_time = "ArithmeticMean",
-    sdl_units = "ArithmeticMean",
-    Target = "ArithmeticMean"
-  )
+funseq_r <- list(
+  all_time = "ArithmeticMean",
+  sdl_units = "ArithmeticMean",
+  Target = "ArithmeticMean"
+)
 ```
 
 Now, all we change is to use those aggregation and function sequences, and change `prepargs = list(dr = 'ratio')`.
 
 ```{r}
-  ratioagg <- read_and_agg(
-    datpath = ewr_results,
-    type = "yearly",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    prepfun = 'daydiff',
-    prepargs = list(dr = 'ratio'),
-    aggCols = "synthvals",
-    aggsequence = aggseq_r,
-    funsequence = funseq_r,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units',
-                       gauge = is_notpoint,
-                       SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units',
-    saveintermediate = TRUE,
-    namehistory = FALSE
-  )
+ratioagg <- read_and_agg(
+  datpath = ewr_results,
+  type = "yearly",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  prepfun = "daydiff",
+  prepargs = list(dr = "ratio"),
+  aggCols = "synthvals",
+  aggsequence = aggseq_r,
+  funsequence = funseq_r,
+  keepAllPolys = FALSE,
+  group_until = list(
+    planning_unit_name = "sdl_units",
+    gauge = is_notpoint,
+    SWSDLName = "sdl_units"
+  ),
+  pseudo_spatial = "sdl_units",
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 And plot again, noting these are just examples of functionality and not well-supported aggregations.
 
 ```{r}
 plot_outcomes(ratioagg$Target,
-                               outcome_col = "synthvals",
-                               plot_type = 'map',
-                               colorset = "synthvals",
-                               facet_row = 'scenario',
-                               facet_col = 'Target')
+  outcome_col = "synthvals",
+  plot_type = "map",
+  colorset = "synthvals",
+  facet_row = "scenario",
+  facet_col = "Target"
+)
 ```
 
 ```{r}

@@ -34,11 +34,10 @@ We keep the full workflow [in-memory](/workflows/workflow_in_memory.qmd), since 
 #| message: false
 ewr_out <- prep_run_save_ewrs(
   hydro_dir = system.file("extdata/testsmall/hydrographs", package = "HydroBOT"),
-  output_parent_dir = 'test_dir',
-  outputType = list('none'),
-  returnType = list('yearly')
+  output_parent_dir = "test_dir",
+  outputType = list("none"),
+  returnType = list("yearly")
 )
-
 ```
 
 We'll use a simplified set of aggregations, over time, into small-scale 'env_obj' theme scales, then sdl units, and to Target theme levels.
@@ -57,7 +56,8 @@ We create a modified geometric mean because of all the zeros in the data.
 ```{r}
 geomeanplus <- function(x) {
   add_eps <- min(x[x > 0],
-                 na.rm = TRUE)/10
+    na.rm = TRUE
+  ) / 10
   x[x == 0] <- add_eps
   GeometricMean(x)
 }
@@ -121,23 +121,23 @@ We could extend the above approach to multiple steps, but it soon gets factorial
 ```{r}
 meanseq <- list(
   "ArithmeticMean",
-    "ArithmeticMean",
+  "ArithmeticMean",
   "ArithmeticMean",
   "ArithmeticMean"
 )
 
 medseq <- list(
   "Median",
-    "Median",
+  "Median",
   "Median",
   "Median"
 )
 
 geoseq <- list(
   "geomeanplus",
-  'geomeanplus', 
-  'geomeanplus', 
-  'geomeanplus'
+  "geomeanplus",
+  "geomeanplus",
+  "geomeanplus"
 )
 ```
 
@@ -205,11 +205,11 @@ We could `bind_rows` those together and make plots with one call or make separat
 For the first step (over time), we'll bind and make one plot call.
 
 ```{r}
-aggout_mean$all_time |> 
-  bind_rows(aggout_med$all_time) |> 
-  bind_rows(aggout_geo$all_time) |> 
-    dplyr::filter(scenario == "base" & SWSDLName == 'Lachlan') |> 
-  dplyr::mutate(unique_ewr = paste0(ewr_code_timing, gauge, planning_unit_name)) |> 
+aggout_mean$all_time |>
+  bind_rows(aggout_med$all_time) |>
+  bind_rows(aggout_geo$all_time) |>
+  dplyr::filter(scenario == "base" & SWSDLName == "Lachlan") |>
+  dplyr::mutate(unique_ewr = paste0(ewr_code_timing, gauge, planning_unit_name)) |>
   # clean names
   plot_outcomes(
     outcome_col = "ewr_achieved",
@@ -218,7 +218,7 @@ aggout_mean$all_time |>
     plot_type = "heatmap",
     colorset = "ewr_achieved",
     pal_list = "grDevices::Viridis",
-    facet_col = 'SWSDLName'
+    facet_col = "SWSDLName"
   ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
@@ -226,10 +226,10 @@ aggout_mean$all_time |>
 For the second step (env_obj)
 
 ```{r}
-aggout_mean$env_obj |> 
-  bind_rows(aggout_med$env_obj) |> 
-  bind_rows(aggout_geo$env_obj) |> 
-    dplyr::filter(scenario == "base" & SWSDLName == 'Lachlan') |> 
+aggout_mean$env_obj |>
+  bind_rows(aggout_med$env_obj) |>
+  bind_rows(aggout_geo$env_obj) |>
+  dplyr::filter(scenario == "base" & SWSDLName == "Lachlan") |>
   dplyr::mutate(unique_obj = paste0(env_obj, gauge, planning_unit_name)) |>
   # clean names
   plot_outcomes(
@@ -239,7 +239,7 @@ aggout_mean$env_obj |>
     plot_type = "heatmap",
     colorset = "ewr_achieved",
     pal_list = "grDevices::Viridis",
-    facet_col = 'SWSDLName'
+    facet_col = "SWSDLName"
   ) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
@@ -249,10 +249,10 @@ That is a bit weird, because what we really want to do is combine those env_objs
 For the third step (space)
 
 ```{r}
-aggout_mean$sdl_units |> 
-  bind_rows(aggout_med$sdl_units) |> 
-  bind_rows(aggout_geo$sdl_units) |> 
-    dplyr::filter(scenario == "base") |> 
+aggout_mean$sdl_units |>
+  bind_rows(aggout_med$sdl_units) |>
+  bind_rows(aggout_geo$sdl_units) |>
+  dplyr::filter(scenario == "base") |>
   # clean names
   plot_outcomes(
     outcome_col = "ewr_achieved",
@@ -261,27 +261,27 @@ aggout_mean$sdl_units |>
     plot_type = "heatmap",
     colorset = "ewr_achieved",
     pal_list = "grDevices::Viridis",
-    facet_col = 'SWSDLName'
+    facet_col = "SWSDLName"
   )
 ```
 
 For a bit different presentation, let's also plot that as
 
 ```{r}
-aggout_mean$sdl_units |> 
-  bind_rows(aggout_med$sdl_units) |> 
-  bind_rows(aggout_geo$sdl_units) |> 
-    dplyr::filter(scenario == "base") |> 
+aggout_mean$sdl_units |>
+  bind_rows(aggout_med$sdl_units) |>
+  bind_rows(aggout_geo$sdl_units) |>
+  dplyr::filter(scenario == "base") |>
   # clean names
   plot_outcomes(
     outcome_col = "ewr_achieved",
-   x_col = "env_obj",
+    x_col = "env_obj",
     colorset = "aggfun_1",
     pal_list = "ltc::trio2",
-    facet_row = 'SWSDLName',
-   position = 'dodge'
+    facet_row = "SWSDLName",
+    position = "dodge"
   ) +
-  theme(legend.position = 'bottom')
+  theme(legend.position = "bottom")
 ```
 
 For the third step (to Target theme level), we see the ultimate difference in each of those aggregation sequences.
@@ -289,8 +289,8 @@ For the third step (to Target theme level), we see the ultimate difference in ea
 ```{r}
 #| fig-height: 9
 aggout_mean$Target |>
-  bind_rows(aggout_med$Target) |> 
-  bind_rows(aggout_geo$Target) |> 
+  bind_rows(aggout_med$Target) |>
+  bind_rows(aggout_geo$Target) |>
   dplyr::filter(scenario == "base") |> # Just look at one scenario
   plot_outcomes(
     outcome_col = "ewr_achieved",
@@ -298,13 +298,11 @@ aggout_mean$Target |>
     colorset = "ewr_achieved",
     pal_list = list("scico::lapaz"),
     pal_direction = -1,
-    facet_col = "aggfun_3", 
+    facet_col = "aggfun_3",
     facet_row = "Target",
     underlay_list = "basin"
   ) +
   ggplot2::theme(legend.position = "bottom")
-
-
 ```
 
 ```{r}

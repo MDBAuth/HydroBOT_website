@@ -24,9 +24,10 @@ file.copy(file.path(demo_webdir, "images", "architecture.png"),
   overwrite = TRUE
 )
 
-file.copy(file.path(demo_webdir, 'images', 'aggregation_examples.png'), 
-          file.path('images', 'aggregation_examples.png'),
-          overwrite = TRUE)
+file.copy(file.path(demo_webdir, "images", "aggregation_examples.png"),
+  file.path("images", "aggregation_examples.png"),
+  overwrite = TRUE
+)
 
 
 

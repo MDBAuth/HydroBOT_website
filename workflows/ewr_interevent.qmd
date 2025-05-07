@@ -109,69 +109,75 @@ Then, a reasonable aggregation function along theme and space is also the sum, a
 
 ```{r}
 #| label: aggseqs
-  aggseq_mec <- list(
-    all_time = 'all_time',
-    sdl_units = sdl_units,
-    Target = c("ewr_code_timing", "Target")
-  )
+aggseq_mec <- list(
+  all_time = "all_time",
+  sdl_units = sdl_units,
+  Target = c("ewr_code_timing", "Target")
+)
 
-  funseq_mec <- list(
-    all_time = "Sum",
-    sdl_units = "Sum",
-    Target = "Sum"
-  )
+funseq_mec <- list(
+  all_time = "Sum",
+  sdl_units = "Sum",
+  Target = "Sum"
+)
 ```
 
 We use `type = 'all_successful_interEvents'` to pull that output file, `prep_ewr_output` as the data prep function that creates the necessary columns when `prepargs = list(type = 'interevents')`. (`prep_ewr_output` with `type = 'achievement'` is used to calculate EWR achievement from the yearly data).
 
 ```{r}
-  mec <- read_and_agg(
-    datpath = ewr_results,
-    type = "all_successful_interEvents",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    prepfun = 'prep_ewr_output',
-    prepargs = list(type = 'interevents'),
-    aggCols = "exceedance",
-    aggsequence = aggseq_mec,
-    funsequence = funseq_mec,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units',
-                       gauge = is_notpoint, 
-                       SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units',
-    saveintermediate = TRUE,
-    namehistory = FALSE
-  )
+mec <- read_and_agg(
+  datpath = ewr_results,
+  type = "all_successful_interEvents",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  prepfun = "prep_ewr_output",
+  prepargs = list(type = "interevents"),
+  aggCols = "exceedance",
+  aggsequence = aggseq_mec,
+  funsequence = funseq_mec,
+  keepAllPolys = FALSE,
+  group_until = list(
+    planning_unit_name = "sdl_units",
+    gauge = is_notpoint,
+    SWSDLName = "sdl_units"
+  ),
+  pseudo_spatial = "sdl_units",
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 The EWRs themselves, over the time period: Clearly this is an ugly naming scheme, but it does let us see which EWRs are going over the max frequently.
 
 ```{r}
-
-  ewr_exceed <- mec$all_time |>
-    dplyr::mutate(unique_ewr = paste0(ewr_code_timing,
-                                      planning_unit_name,
-                                      gauge)) |> 
-    plot_outcomes(outcome_col = 'exceedance',
-                y_col = 'unique_ewr',
-                x_col = 'scenario',
-                colorset = 'exceedance',
-                plot_type = 'heatmap',
-                pal_list = 'grDevices::Viridis')
-  ewr_exceed
+ewr_exceed <- mec$all_time |>
+  dplyr::mutate(unique_ewr = paste0(
+    ewr_code_timing,
+    planning_unit_name,
+    gauge
+  )) |>
+  plot_outcomes(
+    outcome_col = "exceedance",
+    y_col = "unique_ewr",
+    x_col = "scenario",
+    colorset = "exceedance",
+    plot_type = "heatmap",
+    pal_list = "grDevices::Viridis"
+  )
+ewr_exceed
 ```
 
 And we'll plot the final level of that aggregation:
 
 ```{r}
 plot_outcomes(mec$Target,
-                outcome_col = "exceedance",
-                plot_type = 'map',
-                colorset = "exceedance",
-                facet_row = 'scenario',
-                facet_col = 'Target')
+  outcome_col = "exceedance",
+  plot_type = "map",
+  colorset = "exceedance",
+  facet_row = "scenario",
+  facet_col = "Target"
+)
 ```
 
 ## Exceedance proportion
@@ -181,47 +187,53 @@ The proportion of interevent periods that are above the max is the 'MRIP exceeda
 For just the EWRs themselves, we might specify a 'proportion' function and use that on the 'exceedance' column, which is just 1 or 0 depending on whether the maximum was exceeded, and which has length equal to the number of interevent periods.
 
 ```{r}
-  proportion <- function(x) {
-    sum(x)/length(x)
-  }
+proportion <- function(x) {
+  sum(x) / length(x)
+}
 ```
 
 ```{r}
-aggprop1 <- list(all_time = 'all_time')
-  funprop1 <- list(all_time = 'proportion')
+aggprop1 <- list(all_time = "all_time")
+funprop1 <- list(all_time = "proportion")
 ```
 
 ```{r}
 mec_prop <- read_and_agg(
-    datpath = ewr_results,
-    type = "all_successful_interEvents",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = c("scenario", 'ewr_code_timing',
-                 'planning_unit_name',
-                 'gauge', 'SWSDLName'),
-    prepfun = 'prep_ewr_output',
-    prepargs = list(type = 'interevents'),
-    aggCols = "exceedance",
-    aggsequence = aggprop1,
-    funsequence = funprop1,
-    keepAllPolys = FALSE,
-    saveintermediate = TRUE,
-    namehistory = FALSE
-  )
+  datpath = ewr_results,
+  type = "all_successful_interEvents",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = c(
+    "scenario", "ewr_code_timing",
+    "planning_unit_name",
+    "gauge", "SWSDLName"
+  ),
+  prepfun = "prep_ewr_output",
+  prepargs = list(type = "interevents"),
+  aggCols = "exceedance",
+  aggsequence = aggprop1,
+  funsequence = funprop1,
+  keepAllPolys = FALSE,
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 ```{r}
 mec_prop$all_time |>
-    dplyr::mutate(unique_ewr = paste0(ewr_code_timing,
-                                      planning_unit_name,
-                                      gauge)) |>  
-  plot_outcomes(outcome_col = 'exceedance',
-                y_col = 'unique_ewr',
-                x_col = 'scenario',
-                colorset = 'exceedance',
-                plot_type = 'heatmap',
-                pal_list = 'grDevices::Viridis')
+  dplyr::mutate(unique_ewr = paste0(
+    ewr_code_timing,
+    planning_unit_name,
+    gauge
+  )) |>
+  plot_outcomes(
+    outcome_col = "exceedance",
+    y_col = "unique_ewr",
+    x_col = "scenario",
+    colorset = "exceedance",
+    plot_type = "heatmap",
+    pal_list = "grDevices::Viridis"
+  )
 ```
 
 Proportions are inherently tricky to aggregate- we don't want to push the proportion through the network or space. Instead, we would want to get the sum of exceedences and total number contributing to each level, as well as the total number, and calculate the proportion at each step. This is particularly true because both the numerators and denominators being combined differ between inputs (different EWRs will have different numbers of interevents) and stages (so will SDL units).
@@ -229,53 +241,56 @@ Proportions are inherently tricky to aggregate- we don't want to push the propor
 Perhaps the easiest solution is to get the sum of exceedances and the number of interevents at step one, and then add those up at each subsequent step. So, for example, the final step here has the number of exceedances for all EWRs contributing to each Target in each SDL unit, as well as the total number of interevent periods contributing to each Target in each SDL unit. We can then get the proportion with a simple mutate at the end.
 
 ```{r}
-  aggprop2 <- list(
-    all_time = 'all_time',
-    sdl_units = sdl_units,
-    Target = c("ewr_code_timing", "Target")
-  )
+aggprop2 <- list(
+  all_time = "all_time",
+  sdl_units = sdl_units,
+  Target = c("ewr_code_timing", "Target")
+)
 
-  funprop2 <- list(
-    all_time = c("Sum", 'NumberOfValues'),
-    sdl_units = "Sum",
-    Target = "Sum"
-  )
+funprop2 <- list(
+  all_time = c("Sum", "NumberOfValues"),
+  sdl_units = "Sum",
+  Target = "Sum"
+)
 ```
 
 ```{r}
 mec_prop2 <- read_and_agg(
-    datpath = ewr_results,
-    type = "all_successful_interEvents",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = c("scenario"),
-    prepfun = 'prep_ewr_output',
-    prepargs = list(type = 'interevents'),
-    aggCols = "exceedance",
-    group_until = list(planning_unit_name = 'sdl_units', gauge = is_notpoint, SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units',
-    aggsequence = aggprop2,
-    funsequence = funprop2,
-    keepAllPolys = FALSE,
-    saveintermediate = TRUE,
-    namehistory = FALSE
-  )
+  datpath = ewr_results,
+  type = "all_successful_interEvents",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = c("scenario"),
+  prepfun = "prep_ewr_output",
+  prepargs = list(type = "interevents"),
+  aggCols = "exceedance",
+  group_until = list(planning_unit_name = "sdl_units", gauge = is_notpoint, SWSDLName = "sdl_units"),
+  pseudo_spatial = "sdl_units",
+  aggsequence = aggprop2,
+  funsequence = funprop2,
+  keepAllPolys = FALSE,
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 Plotting the final level gives
 
 ```{r}
 exceed_prop_target <- mec_prop2$Target |>
-    tidyr::pivot_wider(names_from = aggfun_1,
-                       values_from = exceedance) |>
-    dplyr::mutate(proportion = Sum/NumberOfValues) |> 
-
-  plot_outcomes(outcome_col = "proportion",
-                               plot_type = 'map',
-                               colorset = "proportion",
-                               facet_row = 'scenario',
-                               facet_col = 'Target')
-  exceed_prop_target
+  tidyr::pivot_wider(
+    names_from = aggfun_1,
+    values_from = exceedance
+  ) |>
+  dplyr::mutate(proportion = Sum / NumberOfValues) |>
+  plot_outcomes(
+    outcome_col = "proportion",
+    plot_type = "map",
+    colorset = "proportion",
+    facet_row = "scenario",
+    facet_col = "Target"
+  )
+exceed_prop_target
 ```
 
 ## Proportions of the timeperiod
@@ -289,92 +304,98 @@ First, the inclusive
 ```{r}
 # define a year-proportion function to use at step one
 sumdiv <- function(x) {
-  Sum(x)/(365*5)
+  Sum(x) / (365 * 5)
 }
 ```
 
 Then we take the mean of that.
 
 ```{r}
-  aggseq_s <- list(
-    all_time = 'all_time',
-    sdl_units = sdl_units,
-    Target = c("ewr_code_timing", "Target")
-  )
+aggseq_s <- list(
+  all_time = "all_time",
+  sdl_units = sdl_units,
+  Target = c("ewr_code_timing", "Target")
+)
 
-  funseq_s <- list(
-    all_time = "sumdiv",
-    sdl_units = "ArithmeticMean",
-    Target = "ArithmeticMean"
-  )
+funseq_s <- list(
+  all_time = "sumdiv",
+  sdl_units = "ArithmeticMean",
+  Target = "ArithmeticMean"
+)
 ```
 
 Get *inclusive* using `days_in_exceeding` column.
 
 ```{r}
 imr <- read_and_agg(
-    datpath = ewr_results,
-    type = "all_interEvents",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    prepfun = 'prep_ewr_output',
-    prepargs = list(type = 'interevents'),
-    aggCols = "days_in_exceeding",
-    aggsequence = aggseq_s,
-    funsequence = funseq_s,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units',
-                       gauge = is_notpoint,
-                       SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units',
-    saveintermediate = TRUE,
-    namehistory = FALSE
-  )
+  datpath = ewr_results,
+  type = "all_interEvents",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  prepfun = "prep_ewr_output",
+  prepargs = list(type = "interevents"),
+  aggCols = "days_in_exceeding",
+  aggsequence = aggseq_s,
+  funsequence = funseq_s,
+  keepAllPolys = FALSE,
+  group_until = list(
+    planning_unit_name = "sdl_units",
+    gauge = is_notpoint,
+    SWSDLName = "sdl_units"
+  ),
+  pseudo_spatial = "sdl_units",
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 ```{r}
 plot_outcomes(imr$Target,
-                               outcome_col = "days_in_exceeding",
-              outcome_lab = "Inclusive ratio",
-                               plot_type = 'map',
-                               colorset = "days_in_exceeding",
-                               facet_row = 'scenario',
-                               facet_col = 'Target')
+  outcome_col = "days_in_exceeding",
+  outcome_lab = "Inclusive ratio",
+  plot_type = "map",
+  colorset = "days_in_exceeding",
+  facet_row = "scenario",
+  facet_col = "Target"
+)
 ```
 
 And now the *exclusive* ratio, all we change is to use the `exceedance_only` column.
 
 ```{r}
 emr <- read_and_agg(
-    datpath = ewr_results,
-    type = "all_interEvents",
-    geopath = bom_basin_gauges,
-    causalpath = causal_ewr,
-    groupers = "scenario",
-    prepfun = 'prep_ewr_output',
-    prepargs = list(type = 'interevents'),
-    aggCols = "exceedance_only",
-    aggsequence = aggseq_s,
-    funsequence = funseq_s,
-    keepAllPolys = FALSE,
-    group_until = list(planning_unit_name = 'sdl_units',
-                       gauge = is_notpoint,
-                       SWSDLName = 'sdl_units'),
-    pseudo_spatial = 'sdl_units',
-    saveintermediate = TRUE,
-    namehistory = FALSE
-  )
+  datpath = ewr_results,
+  type = "all_interEvents",
+  geopath = bom_basin_gauges,
+  causalpath = causal_ewr,
+  groupers = "scenario",
+  prepfun = "prep_ewr_output",
+  prepargs = list(type = "interevents"),
+  aggCols = "exceedance_only",
+  aggsequence = aggseq_s,
+  funsequence = funseq_s,
+  keepAllPolys = FALSE,
+  group_until = list(
+    planning_unit_name = "sdl_units",
+    gauge = is_notpoint,
+    SWSDLName = "sdl_units"
+  ),
+  pseudo_spatial = "sdl_units",
+  saveintermediate = TRUE,
+  namehistory = FALSE
+)
 ```
 
 ```{r}
 plot_outcomes(emr$Target,
-                               outcome_col = "exceedance_only",
-              outcome_lab = "Exclusive ratio",
-                               plot_type = 'map',
-                               colorset = "exceedance_only",
-                               facet_row = 'scenario',
-                               facet_col = 'Target')
+  outcome_col = "exceedance_only",
+  outcome_lab = "Exclusive ratio",
+  plot_type = "map",
+  colorset = "exceedance_only",
+  facet_row = "scenario",
+  facet_col = "Target"
+)
 ```
 
 ```{r}
