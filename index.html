@@ -16,7 +16,27 @@ ul.task-list li input[type="checkbox"] {
 width: 0.8em;
 margin: 0 0.8em 0.2em -1em;  vertical-align: middle;
 }
-</style>
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}</style>
 
 <script>const headroomChanged = new CustomEvent("quarto-hrChanged", {
   detail: {},
@@ -5352,21 +5372,23 @@ window.onload = function() {
   
 
 
-</header><p>This website and <a href="https://github.com/galenholt/HydroBOT">associated github repository</a> provides examples of using HydroBOT in various ways, as well as its capabilities and pitfalls. To install and use, see <a href="./getting_started.html">get started</a>.</p>
+</header><p>This website, the <a href="https://github.com/galenholt/HydroBOT">associated github repository</a>, and <span class="citation" data-cites="holt2025">Holt et al. (<a href="#ref-holt2025" role="doc-biblioref">2025</a>)</span> provide examples of using HydroBOT in various ways, as well as its capabilities and pitfalls. To install and use, see <a href="./getting_started.html">get started</a>.</p>
 <p>HydroBOT has several goals, and provides workflow and analysis capabilities to achieve them. It treats scenario comparison as a first-class objective, and so is structured to automate over many scenarios, performing the same processing to each, followed by comparison across scenarios (though it can run single scenarios if desired). It produces metadata files to document settings at each step, which double as runnable parameter files for reproducibility.</p>
 <p>HydroBOT is built to provide general capacity for synthesis, to then be tailored for specific analysis: what questions are being asked of the scenarios, what synthesis do they need, and how should they be compared. It is designed to be modular, incorporating many different response models, though at this point it contains only one module. It provides important guardrails for both module idiosyncrasies and multidimensional scaling.</p>
 <p>Users should consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters relevant to the particular analysis.</p>
-<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Website examples
+This website is a demonstration
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>The majority of the examples on this website are developed with a simple set of hydrological scenarios and model ecological responses to them with the <a href="https://pypi.org/project/py-ewr/">Environmental Water Requirements (EWR) Tool</a> maintained by the Murray-Darling Basin Authority. This tool models hydrological indicators, which are then translated through causal networks to assess their impact on varying levels of ecological outcomes and management targets. Please see additional detail about the <a href="./demo_scenarios.html">scenarios</a> and the <a href="./modules/ewr_overview.html">EWR tool and associated outcome levels</a>, particularly for information about terminology and context of the examples presented here.</p>
+<p>This website is a demonstration of HydroBOT functionality. As such, it uses a set of <a href="./demo_scenarios.html">extremely simple demonstration scenarios</a>, and the majority of analyses model ecological responses to them with the <a href="https://pypi.org/project/py-ewr/">Environmental Water Requirements (EWR) Tool</a>, maintained by the Murray-Darling Basin Authority. <em><strong>HydroBOT is not limited to these particular scenarios or the EWR tool</strong>.</em></p>
+<p>HydroBOT can take any set of hydrographs representing any set of scenarios as input, provided they match gauges for which response models exist. Thus, HydroBOT can be used for analysis of a wide range of hydrologic scenarios across many different projects. Generation of hydrographs representing various scenarios is <em>not</em> part of HydroBOT, instead, HydroBOT <em>ingests</em> hydrologic scenarios and models response to them. In use, users would supply meaningful scenarios.</p>
+<p>Please see additional detail about the <a href="./demo_scenarios.html">demonstration scenarios</a> and <a href="./modules/ewr_overview.html">EWR tool and associated outcome levels</a>, particularly for information about terminology and context of the examples presented here.</p>
 </div>
 </div>
 <section id="workflow" class="level2"><h2 class="anchored" data-anchor-id="workflow">Workflow</h2>
@@ -5453,7 +5475,12 @@ Important
 <p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Collaboration with colleagues from Deakin University, CSIRO, and the MDBA were essential to its development and success.</p>
 
 
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+
+</section><div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-holt2025" class="csl-entry" role="listitem">
+Holt, Galen, Georgia Dwyer, David Robertson, Martin Job, and Rebecca E. Lester. 2025. <span>“HydroBOT: An Integrated Toolkit for Assessment of Hydrology-Dependent Outcomes.”</span> <em>Environmental Modelling &amp; Software</em>, June, 106579. <a href="https://doi.org/10.1016/j.envsoft.2025.106579">https://doi.org/10.1016/j.envsoft.2025.106579</a>.
+</div>
+</div></section></div></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right
     if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
@@ -5868,20 +5895,25 @@ Important
 </div> <!-- /content -->
 <footer class="footer"><div class="nav-footer">
     <div class="nav-footer-left">
-<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>. Website, documentation, and HydroBOT in beta. Please contact g.holt@deakin.edu.au with questions or issues. To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
+<p>HydroBOT was developed in the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program/climate-adaptation">climate adaptation theme</a> of the <a href="https://www.mdba.gov.au/climate-and-river-health/murray-darling-water-and-environment-research-program">Murray–Darling Water and Environment Research Program</a>, a program of the <a href="https://www.mdba.gov.au/">Murray-Darling Basin Authority</a>.</p>
+<p>Please contact g.holt@deakin.edu.au with questions or issues.</p>
+<p>To report bugs in HydroBOT, please use its <a href="https://github.com/galenholt/HydroBOT/issues">github issues</a></p>
 </div>   
     <div class="nav-footer-center">
       <ul class="footer-items list-unstyled">
 <li class="nav-item">
     <a class="nav-link" href="./LICENSE.md">
-<p>License</p>
+<p>License: MIT</p>
 </a>
   </li>  
 </ul>
 </div>
     <div class="nav-footer-right">
-       
-    </div>
+<div style="text-align: left;">
+<p>Citing HydroBOT:</p>
+<p>Holt, Galen, Georgia Dwyer, David Robertson, Martin Job, and Rebecca E. Lester. 2025. <em>HydroBOT: An Integrated Toolkit for Assessment of Hydrology-Dependent Outcomes.</em> Environmental Modelling &amp; Software, June, 106579. <a href="https://doi.org/10.1016/j.envsoft.2025.106579" class="uri">https://doi.org/10.1016/j.envsoft.2025.106579</a>.</p>
+</div>
+</div>
   </div>
 </footer>
 

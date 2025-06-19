@@ -6,7 +6,7 @@
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/workflows/workflow_overview.html</loc>
-    <lastmod>2025-05-06T11:14:38.585Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.471Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/workflows/scenarios_and_directories.html</loc>
@@ -14,23 +14,23 @@
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/workflows/run_hydrobot_website.html</loc>
-    <lastmod>2025-04-17T13:47:34.746Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.288Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/workflows/ewr_interevent.html</loc>
-    <lastmod>2025-05-06T23:18:41.171Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.267Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/provided_data/scenario_creation.html</loc>
-    <lastmod>2025-05-06T06:33:45.167Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.231Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/provided_data/causal_overview.html</loc>
-    <lastmod>2025-05-06T11:14:38.579Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.204Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/provided_data/causal_descriptive_plots.html</loc>
-    <lastmod>2025-05-06T11:14:38.568Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.186Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/modules/module_overview.html</loc>
@@ -38,127 +38,127 @@
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/modules/ewr_overview.html</loc>
-    <lastmod>2025-05-06T12:21:32.338Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.169Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/getting_started.html</loc>
-    <lastmod>2025-05-06T11:12:15.560Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.148Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/controller/controller_overview.html</loc>
-    <lastmod>2025-05-06T11:14:38.564Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.118Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/controller/controller_ewr_stepthrough.html</loc>
-    <lastmod>2025-05-06T11:14:38.555Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.092Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/setting_limits.html</loc>
-    <lastmod>2025-04-17T13:47:28.122Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.073Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/line_plots.html</loc>
-    <lastmod>2025-05-06T11:14:38.544Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.051Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/heatmap.html</loc>
-    <lastmod>2025-05-06T23:18:32.719Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.008Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/comparer_syntax.html</loc>
-    <lastmod>2025-04-16T22:11:29.438Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.975Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/causal_plots.html</loc>
-    <lastmod>2025-05-06T11:14:38.524Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.949Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/using_multi_aggregate.html</loc>
-    <lastmod>2025-05-06T23:18:30.099Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.927Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/user_module.html</loc>
-    <lastmod>2025-05-06T23:18:28.203Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.908Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/user_causal.html</loc>
-    <lastmod>2025-05-06T11:14:38.503Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.888Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/temporal_agg.html</loc>
-    <lastmod>2025-04-17T13:47:17.992Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.870Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/read_and_agg.html</loc>
-    <lastmod>2025-05-06T11:14:38.486Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.854Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/data_prep.html</loc>
-    <lastmod>2025-05-06T23:18:24.395Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.836Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/aggregation_overview.html</loc>
-    <lastmod>2025-05-06T11:14:38.476Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.819Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/aggregation_syntax.html</loc>
-    <lastmod>2025-05-06T11:14:38.482Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.828Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/pseudo_spatial_group_until.html</loc>
-    <lastmod>2025-05-06T05:58:10.220Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.844Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/spatial_agg.html</loc>
-    <lastmod>2025-05-06T11:14:38.492Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.862Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/theme_agg.html</loc>
-    <lastmod>2025-05-06T11:14:38.498Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.878Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/user_functions.html</loc>
-    <lastmod>2025-04-17T13:47:19.219Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.898Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/aggregator/user_spatial.html</loc>
-    <lastmod>2025-04-18T11:44:07.750Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.917Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/bar_plots.html</loc>
-    <lastmod>2025-05-06T11:14:38.519Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.938Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/comparer_overview.html</loc>
-    <lastmod>2025-05-06T11:14:38.529Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.961Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/comparing_aggregations.html</loc>
-    <lastmod>2025-05-06T23:18:32.026Z</lastmod>
+    <lastmod>2025-05-07T02:52:50.993Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/hydrographs.html</loc>
-    <lastmod>2025-05-06T11:14:38.538Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.024Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/maps.html</loc>
-    <lastmod>2025-05-06T11:14:38.551Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.062Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/comparer/timeseries.html</loc>
-    <lastmod>2025-05-06T05:51:42.882Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.081Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/controller/controller_ewr_wrapped.html</loc>
-    <lastmod>2025-05-06T11:14:38.559Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.102Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/demo_scenarios.html</loc>
-    <lastmod>2025-05-06T05:59:24.196Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.131Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/index.html</loc>
-    <lastmod>2025-05-06T23:18:22.969Z</lastmod>
+    <lastmod>2025-06-19T02:50:47.454Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/modules/integrating_new.html</loc>
@@ -166,27 +166,27 @@
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/presentation/walkthrough_presentation.html</loc>
-    <lastmod>2025-04-18T04:08:52.724Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.177Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/provided_data/causal_manipulation.html</loc>
-    <lastmod>2025-05-06T11:14:38.573Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.194Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/provided_data/data_overview.html</loc>
-    <lastmod>2025-04-17T13:40:22.962Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.214Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/provided_data/spatial_data.html</loc>
-    <lastmod>2025-05-06T11:14:38.582Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.241Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/workflows/ewr_ratios.html</loc>
-    <lastmod>2025-05-06T06:02:05.833Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.279Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/workflows/save_steps_base.html</loc>
-    <lastmod>2025-05-06T05:59:10.387Z</lastmod>
+    <lastmod>2025-05-07T02:52:51.297Z</lastmod>
   </url>
   <url>
     <loc>https://MDBAuth.github.io/HydroBOT_website/workflows/workflow_in_memory.html</loc>
