@@ -1,6 +1,7 @@
 ---
 title: "HydroBOT demonstration"
 editor: visual
+bibliography: references.bib
 ---
 
 ```{r}
@@ -34,7 +35,7 @@ file.copy(file.path(demo_webdir, "images", "aggregation_examples.png"),
 # This is a placeholder to move conceptual figs, since it HATES spaces in names of the raw {fig} divs
 ```
 
-This website and [associated github repository](https://github.com/galenholt/HydroBOT) provides examples of using HydroBOT in various ways, as well as its capabilities and pitfalls. To install and use, see [get started](getting_started.qmd).
+This website, the [associated github repository](https://github.com/galenholt/HydroBOT), and @holt2025 provide examples of using HydroBOT in various ways, as well as its capabilities and pitfalls. To install and use, see [get started](getting_started.qmd).
 
 HydroBOT has several goals, and provides workflow and analysis capabilities to achieve them. It treats scenario comparison as a first-class objective, and so is structured to automate over many scenarios, performing the same processing to each, followed by comparison across scenarios (though it can run single scenarios if desired). It produces metadata files to document settings at each step, which double as runnable parameter files for reproducibility.
 
@@ -42,10 +43,14 @@ HydroBOT is built to provide general capacity for synthesis, to then be tailored
 
 Users should consider the various capabilities demonstrated here, and then develop a streamlined flow with just those parameters relevant to the particular analysis.
 
-::: callout-note
-## Website examples
+::: callout-important
+## This website is a demonstration
 
-The majority of the examples on this website are developed with a simple set of hydrological scenarios and model ecological responses to them with the [Environmental Water Requirements (EWR) Tool](https://pypi.org/project/py-ewr/) maintained by the Murray-Darling Basin Authority. This tool models hydrological indicators, which are then translated through causal networks to assess their impact on varying levels of ecological outcomes and management targets. Please see additional detail about the [scenarios](demo_scenarios.qmd) and the [EWR tool and associated outcome levels](/modules/ewr_overview.qmd), particularly for information about terminology and context of the examples presented here.
+This website is a demonstration of HydroBOT functionality. As such, it uses a set of [extremely simple demonstration scenarios](demo_scenarios.qmd), and the majority of analyses model ecological responses to them with the [Environmental Water Requirements (EWR) Tool](https://pypi.org/project/py-ewr/), maintained by the Murray-Darling Basin Authority. ***HydroBOT is not limited to these particular scenarios or the EWR tool**.*
+
+HydroBOT can take any set of hydrographs representing any set of scenarios as input, provided they match gauges for which response models exist. Thus, HydroBOT can be used for analysis of a wide range of hydrologic scenarios across many different projects. Generation of hydrographs representing various scenarios is *not* part of HydroBOT, instead, HydroBOT *ingests* hydrologic scenarios and models response to them. In use, users would supply meaningful scenarios.
+
+Please see additional detail about the [demonstration scenarios](demo_scenarios.qmd) and [EWR tool and associated outcome levels](/modules/ewr_overview.qmd), particularly for information about terminology and context of the examples presented here.
 :::
 
 ## Workflow
